@@ -1,0 +1,23 @@
+name: CustomCooking
+version: '${project.version}'
+main: plugin.customcooking.CustomCooking
+author: [ SnowyOwl217 ]
+api-version: 1.18
+depend:
+  - ProtocolLib
+  - PlaceholderAPI
+softdepend:
+  - ItemsAdder
+
+commands:
+  cooking:
+    description: The main plugin command
+    permission: customcooking.admin
+
+permissions:
+  customcooking.*:
+    default: false
+  customcooking.admin:
+    default: op
+  customcooking.player:
+    default: true

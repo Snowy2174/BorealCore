@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CustomCooking:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/CustomCooking_jar</output-path>
+    <root id="archive" name="CustomCooking.jar">
+      <element id="module-output" name="CustomCooking" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/plugin.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/recipes.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/bars.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/config.yml" />
+    </root>
+  </artifact>
+</component>

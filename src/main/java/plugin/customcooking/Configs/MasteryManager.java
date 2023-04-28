@@ -1,0 +1,83 @@
+package plugin.customcooking.Configs;
+
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import plugin.customcooking.CustomCooking;
+import plugin.customcooking.Minigame.Function;
+import plugin.customcooking.Util.AdventureUtil;
+import plugin.customcooking.Util.ConfigUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+
+import static plugin.customcooking.Configs.RecipeManager.masteryreqs;
+
+public class MasteryManager extends Function {
+
+    @Override
+    public void load() {
+        AdventureUtil.consoleMessage("[CustomCooking] Loaded mastery values");
+    }
+
+    public static void handleMastery(Player player, String recipe) {
+
+        YamlConfiguration config = ConfigUtil.getConfig("playerdata.yml");
+        File file = new File(CustomCooking.plugin.getDataFolder(), "playerdata.yml");
+
+        // retrieve the player's name or unique identifier and the task identifier
+        String playerName = player.getName();
+        // if the player value doesn't exist, create it and set the count to 0
+        if (!config.contains("players." + playerName)) {
+            config.createSection("players." + playerName);
+        }
+        // if the task identifier value doesn't exist, create it and set the count to 0
+        if (!config.contains("players." + playerName + "." + recipe)) {
+            config.set("players." + playerName + "." + recipe, 0);
+        }
+        // increment the count and update the YAML file
+        int count = config.getInt("players." + playerName + "." + recipe, 0);
+        count++;
+        config.set("players." + playerName + "." + recipe, count);
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace(); // Print the error message to help debug the issue
+            return; // Exit the method early to prevent further errors
+        }
+
+        AdventureUtil.consoleMessage("[CustomCooking] Player " + playerName + "has achieved <green>" + count + "/" + masteryreqs.get(recipe) + "</green> for the dish <green>" + recipe);
+        AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have cooked this dish perfectly <gold>" + count + "/" + masteryreqs.get(recipe) + "<green> times to achieve mastery!");
+
+        if (count >= masteryreqs.get(recipe)) {
+            // give the player the permission
+            player.addAttachment(CustomCooking.plugin, "customcooking." + recipe + ".mastery", true);
+            AdventureUtil.consoleMessage("[CustomCooking] Player <green>" + playerName + "</green> has been given <green>" + "customcooking." + recipe + ".mastery");
+
+            // clear the task data in the config
+            config.set("players." + playerName + "." + recipe, null);
+            try {
+                config.save(file);
+            } catch (IOException e) {
+                e.printStackTrace(); // Print the error message to help debug the issue
+                return; // Exit the method early to prevent further errors
+            }
+        }
+    }
+
+    public static int getMasteryCount(Player player, String recipe) {
+        YamlConfiguration config = ConfigUtil.getConfig("playerdata.yml");
+        int count = config.getInt("players." + player.getName() + "." + recipe, 0);
+        return count;
+    }
+
+    public static int getRequiredMastery(String recipe) {
+        Integer mastery = masteryreqs.get(recipe);
+        if (mastery == null) {
+            // return a default value or throw an exception as needed
+            System.out.println("No Mastery Value found for " + recipe);
+            return 10;
+        }
+        return mastery.intValue();
+    }
+}

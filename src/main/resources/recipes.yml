@@ -1,0 +1,46 @@
+recipes:
+  steak:
+    name: "steak"
+    lore:
+      - "&7A juicy steak!"
+    material: COOKED_BEEF
+    ingredients:
+      - "BEEF:1"
+    perfectItems:
+      - "DIAMOND:1"
+    cookedItems:
+      - "COOKED_BEEF:1"
+    burnedItems:
+      - "COAL:1"
+
+  cake:
+    name: "cake"
+    lore:
+      - "&7The best ever cake!"
+    material: CAKE
+    ingredients:
+      - "EGG:1"
+      - "SUGAR:1"
+    perfectItems:
+      - "DIAMOND:1"
+    cookedItems:
+      - "CAKE:1"
+    burnedItems:
+      - "COAL:1"
+    permission: "customcooking.cake"
+
+  pie:
+    name: "pie"
+    lore:
+      - "&7The best ever pie!"
+    material: CAKE
+    ingredients:
+      - "EGG:1"
+      - "SUGAR:1"
+    perfectItems:
+      - "DIAMOND:1"
+    cookedItems:
+      - "CAKE:1"
+    burnedItems:
+      - "COAL:1"
+    permission: "customcooking.pie"

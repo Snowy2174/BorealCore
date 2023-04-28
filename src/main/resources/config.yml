@@ -1,0 +1,26 @@
+titles:
+  success:
+    title:
+      - '<green>Success!</green>'
+      - '<green>GG!</green>'
+      - '<green>Good Job!</green>'
+    subtitle:
+      - 'You have captured a {loot}'
+      - '{loot} Here we go!'
+    fade:
+      # ticks
+      in: 10
+      stay: 30
+      out: 10
+  failure:
+    title:
+      - '<red>Be concentrated!</red>'
+      - '<red>Failure!</red>'
+      - '<red>Try next time!</red>'
+    subtitle:
+      - 'The fish escaped'
+      - 'Pay more attention on it!'
+    fade:
+      in: 10
+      stay: 30
+      out: 10
