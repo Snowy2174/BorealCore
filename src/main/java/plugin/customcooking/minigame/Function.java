@@ -1,4 +1,4 @@
-package plugin.customcooking.Minigame;
+package plugin.customcooking.minigame;
 
 //import com.comphenix.protocol.events.PacketContainer;
 

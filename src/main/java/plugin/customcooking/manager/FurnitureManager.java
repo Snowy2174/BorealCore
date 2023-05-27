@@ -1,4 +1,4 @@
-package plugin.customcooking.Manager;
+package plugin.customcooking.manager;
 
 import dev.lone.itemsadder.api.CustomFurniture;
 import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
@@ -8,11 +8,10 @@ import org.bukkit.Rotation;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.scheduler.BukkitRunnable;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.Listener.FurnitureListener;
-import plugin.customcooking.Minigame.Function;
-import plugin.customcooking.Util.AdventureUtil;
+import plugin.customcooking.listener.FurnitureListener;
+import plugin.customcooking.minigame.Function;
+import plugin.customcooking.util.AdventureUtil;
 
 import java.util.HashMap;
 import java.util.Map;

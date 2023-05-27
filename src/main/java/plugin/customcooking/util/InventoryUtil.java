@@ -1,4 +1,4 @@
-package plugin.customcooking.Util;
+package plugin.customcooking.util;
 
 import dev.lone.itemsadder.api.CustomStack;
 import net.kyori.adventure.sound.Sound;
@@ -8,16 +8,16 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.customcooking.Configs.RecipeManager;
+import plugin.customcooking.configs.RecipeManager;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.Manager.CookingManager;
-import plugin.customcooking.Minigame.Product;
+import plugin.customcooking.manager.CookingManager;
+import plugin.customcooking.minigame.Product;
 
 import java.util.List;
 
 import static net.kyori.adventure.key.Key.key;
-import static plugin.customcooking.Configs.RecipeManager.successItems;
-import static plugin.customcooking.Util.AdventureUtil.playerSound;
+import static plugin.customcooking.configs.RecipeManager.successItems;
+import static plugin.customcooking.util.AdventureUtil.playerSound;
 
 public class InventoryUtil {
 

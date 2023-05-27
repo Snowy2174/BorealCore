@@ -1,9 +1,9 @@
-package plugin.customcooking.Util;
+package plugin.customcooking.util;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import plugin.customcooking.Configs.MasteryManager;
+import plugin.customcooking.configs.MasteryManager;
 import plugin.customcooking.CustomCooking;
 
 public class PlaceholderUtil extends PlaceholderExpansion {

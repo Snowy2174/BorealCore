@@ -1,9 +1,9 @@
-package plugin.customcooking.Listener;
+package plugin.customcooking.listener;
 
 import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import plugin.customcooking.Manager.FurnitureManager;
+import plugin.customcooking.manager.FurnitureManager;
 
 public class FurnitureListener implements Listener {
 

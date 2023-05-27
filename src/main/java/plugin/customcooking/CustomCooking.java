@@ -4,15 +4,15 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import plugin.customcooking.Commands.MainCommand;
-import plugin.customcooking.Configs.LayoutManager;
-import plugin.customcooking.Configs.MasteryManager;
-import plugin.customcooking.Configs.RecipeManager;
-import plugin.customcooking.Manager.CookingManager;
-import plugin.customcooking.Manager.FurnitureManager;
-import plugin.customcooking.Util.AdventureUtil;
-import plugin.customcooking.Util.ConfigUtil;
-import plugin.customcooking.Util.PlaceholderUtil;
+import plugin.customcooking.commands.MainCommand;
+import plugin.customcooking.configs.LayoutManager;
+import plugin.customcooking.configs.MasteryManager;
+import plugin.customcooking.configs.RecipeManager;
+import plugin.customcooking.manager.CookingManager;
+import plugin.customcooking.manager.FurnitureManager;
+import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.util.ConfigUtil;
+import plugin.customcooking.util.PlaceholderUtil;
 
 public class CustomCooking extends JavaPlugin {
 

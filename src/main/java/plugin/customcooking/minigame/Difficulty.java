@@ -1,4 +1,4 @@
-package plugin.customcooking.Minigame;
+package plugin.customcooking.minigame;
 
 public record Difficulty(int timer, int speed) {
     @Override

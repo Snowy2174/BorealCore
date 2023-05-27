@@ -1,9 +1,9 @@
-package plugin.customcooking.Minigame;
+package plugin.customcooking.minigame;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import plugin.customcooking.Manager.CookingManager;
-import plugin.customcooking.Util.AdventureUtil;
+import plugin.customcooking.manager.CookingManager;
+import plugin.customcooking.util.AdventureUtil;
 
 public class CookingPlayer extends BukkitRunnable {
 

@@ -1,28 +1,27 @@
-package plugin.customcooking.Configs;
+package plugin.customcooking.configs;
 
 import dev.lone.itemsadder.api.ItemsAdder;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.Minigame.*;
-import plugin.customcooking.Util.AdventureUtil;
+import plugin.customcooking.minigame.*;
+import plugin.customcooking.util.AdventureUtil;
 
 import java.io.File;
 import java.util.*;
 
 public class RecipeManager extends Function {
 
-    public static HashMap<String, Product> RECIPES;
+    public static Map<String, Product> RECIPES;
 
     public static final Map<String, List<String>> itemIngredients = new HashMap<>();
     public static final Map<String, String> perfectItems = new HashMap<>();
     public static final Map<String, String> successItems = new HashMap<>();
-    public static final Map<String, String> burnedItems = new HashMap<>();
-    public static final Map<String, Integer> masteryreqs = new HashMap<>();
+    protected static final Map<String, String> burnedItems = new HashMap<>();
+    protected static final Map<String, Integer> masteryreqs = new HashMap<>();
 
 
     @Override

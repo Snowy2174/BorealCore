@@ -1,7 +1,7 @@
-package plugin.customcooking.Util;
+package plugin.customcooking.util;
 
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.customcooking.Configs.ConfigManager;
+import plugin.customcooking.configs.ConfigManager;
 import plugin.customcooking.CustomCooking;
 
 import java.io.File;

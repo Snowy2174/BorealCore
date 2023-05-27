@@ -1,7 +1,7 @@
-package plugin.customcooking.Configs;
+package plugin.customcooking.configs;
 
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.customcooking.Util.ConfigUtil;
+import plugin.customcooking.util.ConfigUtil;
 
 public class ConfigManager {
     public static String lang;

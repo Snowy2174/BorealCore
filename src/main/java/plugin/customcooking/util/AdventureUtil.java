@@ -1,4 +1,4 @@
-package plugin.customcooking.Util;
+package plugin.customcooking.util;
 
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;

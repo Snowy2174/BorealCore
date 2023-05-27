@@ -1,10 +1,10 @@
-package plugin.customcooking.Configs;
+package plugin.customcooking.configs;
 
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.customcooking.Minigame.Function;
-import plugin.customcooking.Minigame.Layout;
-import plugin.customcooking.Util.AdventureUtil;
-import plugin.customcooking.Util.ConfigUtil;
+import plugin.customcooking.minigame.Function;
+import plugin.customcooking.minigame.Layout;
+import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.util.ConfigUtil;
 
 import java.util.HashMap;
 import java.util.Objects;

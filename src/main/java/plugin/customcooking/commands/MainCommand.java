@@ -1,20 +1,18 @@
-package plugin.customcooking.Commands;
+package plugin.customcooking.commands;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import plugin.customcooking.Manager.CookingManager;
-import plugin.customcooking.Util.AdventureUtil;
-import plugin.customcooking.Util.ConfigUtil;
-import plugin.customcooking.Util.InventoryUtil;
+import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.util.ConfigUtil;
+import plugin.customcooking.util.InventoryUtil;
 
 import java.util.Arrays;
 
 import static org.bukkit.Bukkit.getPlayer;
-import static plugin.customcooking.Configs.RecipeManager.addRecipe;
-import static plugin.customcooking.Configs.RecipeManager.checkAndAddRandomRecipe;
+import static plugin.customcooking.configs.RecipeManager.addRecipe;
+import static plugin.customcooking.configs.RecipeManager.checkAndAddRandomRecipe;
 
 public class MainCommand implements CommandExecutor {
 

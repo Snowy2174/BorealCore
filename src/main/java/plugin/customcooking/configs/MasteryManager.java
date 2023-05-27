@@ -1,19 +1,18 @@
-package plugin.customcooking.Configs;
+package plugin.customcooking.configs;
 
 import dev.lone.itemsadder.api.ItemsAdder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.Minigame.Function;
-import plugin.customcooking.Util.AdventureUtil;
-import plugin.customcooking.Util.ConfigUtil;
+import plugin.customcooking.minigame.Function;
+import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.util.ConfigUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
-import static plugin.customcooking.Configs.RecipeManager.masteryreqs;
+import static plugin.customcooking.configs.RecipeManager.masteryreqs;
 
 public class MasteryManager extends Function {
 

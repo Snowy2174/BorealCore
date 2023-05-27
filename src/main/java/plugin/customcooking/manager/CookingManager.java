@@ -1,33 +1,31 @@
-package plugin.customcooking.Manager;
+package plugin.customcooking.manager;
 
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.customcooking.Configs.ConfigManager;
-import plugin.customcooking.Configs.LayoutManager;
-import plugin.customcooking.Configs.MasteryManager;
+import plugin.customcooking.configs.ConfigManager;
+import plugin.customcooking.configs.LayoutManager;
+import plugin.customcooking.configs.MasteryManager;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.Listener.InteractListener;
-import plugin.customcooking.Minigame.*;
-import plugin.customcooking.Util.AdventureUtil;
+import plugin.customcooking.listener.InteractListener;
+import plugin.customcooking.minigame.*;
+import plugin.customcooking.util.AdventureUtil;
 
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.kyori.adventure.key.Key.key;
-import static plugin.customcooking.Configs.RecipeManager.perfectItems;
-import static plugin.customcooking.Configs.RecipeManager.successItems;
-import static plugin.customcooking.Util.AdventureUtil.playerSound;
-import static plugin.customcooking.Util.InventoryUtil.giveItem;
+import static plugin.customcooking.configs.RecipeManager.perfectItems;
+import static plugin.customcooking.configs.RecipeManager.successItems;
+import static plugin.customcooking.util.AdventureUtil.playerSound;
+import static plugin.customcooking.util.InventoryUtil.giveItem;
 
 public class CookingManager extends Function {
 
