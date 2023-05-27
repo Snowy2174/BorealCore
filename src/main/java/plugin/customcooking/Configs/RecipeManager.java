@@ -1,9 +1,12 @@
 package plugin.customcooking.Configs;
 
+import dev.lone.itemsadder.api.ItemsAdder;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.Minigame.*;
 import plugin.customcooking.Util.AdventureUtil;
@@ -111,4 +114,58 @@ public class RecipeManager extends Function {
             }
         }
     }
+
+    public static void addRecipe(Player player, String recipe) {
+        String permission = "customcooking.recipe." + recipe;
+        player.addAttachment(CustomCooking.plugin, permission, true);
+    }
+    public static void checkAndAddRandomRecipe(Player player) {
+        List<String> unlockedRecipes = getUnlockedRecipes(player);
+        List<String> lockedRecipes = getLockedRecipes(unlockedRecipes);
+
+        if (lockedRecipes.isEmpty()) {
+            // Player has unlocked all recipes
+            return;
+        }
+
+        // Add a random locked recipe to the player's permissions
+        String randomRecipe = getRandomRecipe(lockedRecipes);
+        ItemsAdder.playTotemAnimation(player, randomRecipe);
+        AdventureUtil.playerMessage(player,  "<gray>[<green>!<gray>]<green> You have unlocked the recipe " + randomRecipe);
+        String permission = "customcooking.recipe." + randomRecipe;
+        player.addAttachment(CustomCooking.plugin, permission, true);
+    }
+
+    private static List<String> getUnlockedRecipes(Player player) {
+        List<String> unlockedRecipes = new ArrayList<>();
+
+        for (PermissionAttachmentInfo permission : player.getEffectivePermissions()) {
+            String perm = permission.getPermission();
+            if (perm.startsWith("customcooking.recipe.")) {
+                String recipeName = perm.substring(21);
+                unlockedRecipes.add(recipeName);
+            }
+        }
+
+        return unlockedRecipes;
+    }
+
+    private static List<String> getLockedRecipes(List<String> unlockedRecipes) {
+        List<String> lockedRecipes = new ArrayList<>();
+
+        for (String recipe : RECIPES.keySet()) {
+            if (!unlockedRecipes.contains(recipe)) {
+                lockedRecipes.add(recipe);
+            }
+        }
+
+        return lockedRecipes;
+    }
+
+    private static String getRandomRecipe(List<String> recipes) {
+        Random random = new Random();
+        int index = random.nextInt(recipes.size());
+        return recipes.get(index);
+    }
+
 }

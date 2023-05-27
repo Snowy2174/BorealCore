@@ -20,4 +20,13 @@ permissions:
   customcooking.admin:
     default: op
   customcooking.player:
-    default: true
+    children:
+      - customcooking.recipe.custardpie
+      - customcooking.recipe.tomatosoup
+      - customcooking.recipe.carrotsoup
+      - customcooking.recipe.seedsoup
+      - customcooking.recipe.applepie
+      - customcooking.recipe.pumpkinsoup
+      - customcooking.recipe.cactussoup
+      - customcooking.recipe.potatosoup
+    default: false

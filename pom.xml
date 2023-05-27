@@ -8,7 +8,6 @@
     <artifactId>CustomCooking</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-
     <name>CustomCooking</name>
 
     <properties>

@@ -1,5 +1,7 @@
 package plugin.customcooking.Configs;
 
+import dev.lone.itemsadder.api.ItemsAdder;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
@@ -51,9 +53,13 @@ public class MasteryManager extends Function {
 
         if (count >= masteryreqs.get(recipe)) {
             // give the player the permission
-            player.addAttachment(CustomCooking.plugin, "customcooking." + recipe + ".mastery", true);
-            AdventureUtil.consoleMessage("[CustomCooking] Player <green>" + playerName + "</green> has been given <green>" + "customcooking." + recipe + ".mastery");
+            ItemsAdder.playTotemAnimation(player, recipe);
+            player.addAttachment(CustomCooking.plugin, "customcooking.mastery." + recipe, true);
+            AdventureUtil.consoleMessage("[CustomCooking] Player <green>" + playerName + "</green> has been given <green>" + "customcooking.mastery." + recipe + "");
+            AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have been given 5 ₪ for gaining " + recipe + " mastery");
 
+            String command = "av user " + playerName + " addpoints 5";
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
             // clear the task data in the config
             config.set("players." + playerName + "." + recipe, null);
             try {

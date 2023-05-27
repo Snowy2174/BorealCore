@@ -30,7 +30,7 @@ public class LayoutManager extends Function {
                     range,
                     successRate,
                     size,
-                    config.getString(key + ".subtitle.start", "<font:customfishing:default>"),
+                    config.getString(key + ".subtitle.start", "<font:customcooking:default>"),
                     config.getString(key + ".subtitle.bar", "뀃"),
                     config.getString(key + ".subtitle.pointer", "뀄"),
                     config.getString(key + ".subtitle.offset", "뀁"),
