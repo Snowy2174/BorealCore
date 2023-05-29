@@ -138,6 +138,7 @@ public class MainCommand implements CommandExecutor {
             MasteryManager.setMasteryCount(player, recipe, count);
         } else {
             AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking mastery <player> <recipe> <count>\"");
+            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking unlock <player> <recipe>");
         }
     }
 
