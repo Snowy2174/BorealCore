@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.customcooking.commands.MainCommand;
+import plugin.customcooking.commands.TabCompletion;
 import plugin.customcooking.configs.LayoutManager;
 import plugin.customcooking.configs.MasteryManager;
 import plugin.customcooking.configs.RecipeManager;
@@ -45,6 +46,7 @@ public class CustomCooking extends JavaPlugin {
             new PlaceholderUtil(this).register();
         }
         getCommand("cooking").setExecutor(new MainCommand());
+        getCommand("cooking").setTabCompleter(new TabCompletion());
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Enabled!");
     }

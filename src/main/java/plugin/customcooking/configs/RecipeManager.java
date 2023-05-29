@@ -15,7 +15,7 @@ import java.util.*;
 
 public class RecipeManager extends Function {
 
-    public static Map<String, Product> RECIPES;
+    public static HashMap<String, Product> RECIPES;
 
     public static final Map<String, List<String>> itemIngredients = new HashMap<>();
     public static final Map<String, String> perfectItems = new HashMap<>();
@@ -114,10 +114,6 @@ public class RecipeManager extends Function {
         }
     }
 
-    public static void addRecipe(Player player, String recipe) {
-        String permission = "customcooking.recipe." + recipe;
-        player.addAttachment(CustomCooking.plugin, permission, true);
-    }
     public static void checkAndAddRandomRecipe(Player player) {
         List<String> unlockedRecipes = getUnlockedRecipes(player);
         List<String> lockedRecipes = getLockedRecipes(unlockedRecipes);
@@ -129,10 +125,16 @@ public class RecipeManager extends Function {
 
         // Add a random locked recipe to the player's permissions
         String randomRecipe = getRandomRecipe(lockedRecipes);
-        ItemsAdder.playTotemAnimation(player, randomRecipe);
-        AdventureUtil.playerMessage(player,  "<gray>[<green>!<gray>]<green> You have unlocked the recipe " + randomRecipe);
-        String permission = "customcooking.recipe." + randomRecipe;
+        addRecipe(player, randomRecipe);
+    }
+
+    public static void addRecipe(Player player, String recipe) {
+        String permission = "customcooking.recipe." + recipe;
         player.addAttachment(CustomCooking.plugin, permission, true);
+
+        ItemsAdder.playTotemAnimation(player, recipe+"_particle");
+        AdventureUtil.playerTitle(player, "<green> You have unlocked" + recipe, " ", 20, 40, 20);
+        AdventureUtil.playerMessage(player,  "<gray>[<green>!<gray>]<green> You have unlocked the recipe " + recipe);
     }
 
     private static List<String> getUnlockedRecipes(Player player) {

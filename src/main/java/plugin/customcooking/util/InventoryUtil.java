@@ -151,7 +151,7 @@ public class InventoryUtil {
 
     public static void giveItem(Player player, String item) {
         ItemStack drop = build(item);
-        player.getInventory().addItem(drop);
+        player.getLocation().getWorld().dropItem(player.getLocation(), drop);
     }
 
     @Nullable
