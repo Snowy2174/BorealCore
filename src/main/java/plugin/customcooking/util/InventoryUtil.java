@@ -38,10 +38,10 @@ public class InventoryUtil {
             //checks if player has required ingredients
             if (playerHasIngredients(player.getInventory(), ingredients)) {
                 removeIngredients(player.getInventory(), ingredients);
-                playerSound(player, Sound.Source.AMBIENT, key("customfoods", "cooking.ingredient"), 1f, 1f);
+                playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.ingredient"), 1f, 1f);
                 if (auto) {
                     giveItem(player, String.valueOf(successItems.get(recipe)));
-                    playerSound(player, Sound.Source.AMBIENT, key("customfoods", "done"), 1f, 1f);
+                    playerSound(player, Sound.Source.AMBIENT, key("customcooking", "done"), 1f, 1f);
                     AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have auto-cooked one " + recipe);
                 } else {
                     cookingManager.onCookedItem(player, bar);
