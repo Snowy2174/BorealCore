@@ -70,6 +70,34 @@ public class MasteryManager extends Function {
         }
     }
 
+    public static void setMasteryCount(Player player, String recipe, int count) {
+        YamlConfiguration config = ConfigUtil.getConfig("playerdata.yml");
+        File file = new File(CustomCooking.plugin.getDataFolder(), "playerdata.yml");
+
+        String playerName = player.getName();
+        String playerRecipePath = "players." + playerName + "." + recipe;
+
+        if (config.contains(playerRecipePath)) {
+            config.set(playerRecipePath, count);
+            try {
+                config.save(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            int requiredMastery = getRequiredMastery(recipe);
+            if (count >= requiredMastery) {
+                ItemsAdder.playTotemAnimation(player, recipe);
+                player.addAttachment(CustomCooking.plugin, "customcooking.mastery." + recipe, true);
+                AdventureUtil.consoleMessage("[CustomCooking] Player <green>" + playerName + "</green> has been given <green>customcooking.mastery." + recipe + "");
+                AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have achieved mastery for the dish: " + recipe);
+            }
+        } else {
+            AdventureUtil.consoleMessage("[CustomCooking] Player " + playerName + " does not have a mastery count for recipe " + recipe);
+        }
+    }
+
+
     public static int getMasteryCount(Player player, String recipe) {
         YamlConfiguration config = ConfigUtil.getConfig("playerdata.yml");
         int count = config.getInt("players." + player.getName() + "." + recipe, 0);

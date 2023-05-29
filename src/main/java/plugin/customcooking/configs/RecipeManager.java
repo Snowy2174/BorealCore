@@ -130,12 +130,44 @@ public class RecipeManager extends Function {
 
     public static void addRecipe(Player player, String recipe) {
         String permission = "customcooking.recipe." + recipe;
+
+        if (hasPermission(player, permission)) {
+            // Player already has the permission, do not add it again
+            return;
+        }
+
         player.addAttachment(CustomCooking.plugin, permission, true);
 
-        ItemsAdder.playTotemAnimation(player, recipe+"_particle");
-        AdventureUtil.playerTitle(player, "<green> You have unlocked" + recipe, " ", 20, 40, 20);
-        AdventureUtil.playerMessage(player,  "<gray>[<green>!<gray>]<green> You have unlocked the recipe " + recipe);
+        ItemsAdder.playTotemAnimation(player, recipe + "_particle");
+        AdventureUtil.playerTitle(player, "<green> You have unlocked " + recipe, " ", 20, 40, 20);
+        AdventureUtil.playerMessage(player, "<gray>[<green>!<gray>]<green> You have unlocked the recipe " + recipe);
     }
+
+    public static void removeRecipe(Player player, String recipe) {
+        String permission = "customcooking.recipe." + recipe;
+
+        if (!hasPermission(player, permission)) {
+            // Player doesn't have the permission, no need to remove it
+            return;
+        }
+
+        player.removeAttachment(player.addAttachment(CustomCooking.plugin, permission, false));
+
+        ItemsAdder.playTotemAnimation(player, recipe + "_particle");
+        AdventureUtil.playerTitle(player, "<red> You have lost the recipe " + recipe, " ", 20, 40, 20);
+        AdventureUtil.playerMessage(player, "<gray>[<red>!<gray>]<red> You have lost the recipe " + recipe);
+    }
+
+
+    private static boolean hasPermission(Player player, String permission) {
+        for (PermissionAttachmentInfo attachment : player.getEffectivePermissions()) {
+            if (attachment.getPermission().equalsIgnoreCase(permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private static List<String> getUnlockedRecipes(Player player) {
         List<String> unlockedRecipes = new ArrayList<>();

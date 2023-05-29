@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import plugin.customcooking.configs.MasteryManager;
 import plugin.customcooking.configs.RecipeManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
@@ -40,6 +41,10 @@ public class MainCommand implements CommandExecutor {
             handleReloadCommand(sender);
         } else if (subcommand.equalsIgnoreCase("unlock")) {
             handleUnlockCommand(sender, subargs);
+        } else if (subcommand.equalsIgnoreCase("lock")) {
+            handleLockCommand(sender, subargs);
+        } else if (subcommand.equalsIgnoreCase("mastery")) {
+            handleMasteryCommand(sender, subargs);
         } else {
             // Unknown subcommand
             AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> Unknown subcommand: " + subcommand);
@@ -53,6 +58,7 @@ public class MainCommand implements CommandExecutor {
         AdventureUtil.sendMessage(sender, "<grey>Created by <gold>SnowyOwl217");
         AdventureUtil.sendMessage(sender, "<gold>/cook cook <recipe> <player> [auto]");
         AdventureUtil.sendMessage(sender, "<gold>/cook unlock <player> <recipe>");
+        AdventureUtil.sendMessage(sender, "<gold>/cook lock <player> <recipe>");
         AdventureUtil.sendMessage(sender, "<gold>/cook reload");
     }
 
@@ -92,7 +98,46 @@ public class MainCommand implements CommandExecutor {
             String recipe = args[1];
             RecipeManager.addRecipe(player, recipe);
         } else {
-            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red>/cooking cook <recipe> <player> <auto>");
+            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking unlock <player> <recipe>");
+        }
+    }
+
+    private void handleLockCommand(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking lock <player> <recipe>");
+            return;
+        }
+
+        if (args.length == 2) {
+            Player player = Bukkit.getPlayer(args[0]);
+            String recipe = args[1];
+            if (player == null) {
+                AdventureUtil.consoleMessage("<Red> [!] Player " + args[0] + " not found.");
+                return;
+            }
+            RecipeManager.removeRecipe(player, recipe);
+        } else {
+            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking lock <player> <recipe>");
+        }
+    }
+
+    private void handleMasteryCommand(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking mastery <player> <recipe> <count>");
+            return;
+        }
+
+        if (args.length == 3) {
+            Player player = Bukkit.getPlayer(args[0]);
+            String recipe = args[1];
+            Integer count = Integer.parseInt(args[2]);
+            if (player == null) {
+                AdventureUtil.consoleMessage("<Red> [!] Player " + args[0] + " not found.");
+                return;
+            }
+            MasteryManager.setMasteryCount(player, recipe, count);
+        } else {
+            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking mastery <player> <recipe> <count>\"");
         }
     }
 

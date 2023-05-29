@@ -84,7 +84,7 @@ public class CookingManager extends Function {
         stopSoundLoop();
         player.removePotionEffect(PotionEffectType.SLOW);
         if (!cookingPlayer.isSuccess()) {
-            playerSound(player, Sound.Source.AMBIENT, key("customfoods", "cooking.fail"), 1f, 1f);
+            playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.fail"), 1f, 1f);
             fail(player);
             return;
         }
@@ -92,15 +92,15 @@ public class CookingManager extends Function {
             return;
         }
         if (Math.random() < 0.5) {
-            if (player.hasPermission("customcooking." + droppedItem.getKey() + ".mastery")) {
+            if (!player.hasPermission("customcooking.mastery." + droppedItem.getKey())) {
                 MasteryManager.handleMastery(player, droppedItem.getKey());
             }
-            playerSound(player, Sound.Source.AMBIENT, key("customfoods", "cooking.done"), 1f, 1f);
+            playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.done"), 1f, 1f);
             String drop = perfectItems.get(droppedItem.getKey());
             giveItem(player, drop);
             sendSuccessTitle(player, ("Perfect " + droppedItem.getNick()));
         } else {
-            playerSound(player, Sound.Source.AMBIENT, key("customfoods", "cooking.done"), 1f, 1f);
+            playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.done"), 1f, 1f);
             String drop = successItems.get(droppedItem.getKey());
             giveItem(player, drop);
             sendSuccessTitle(player, droppedItem.getNick());
@@ -123,7 +123,7 @@ public class CookingManager extends Function {
     }
 
     private void fail(Player player) {
-        playerSound(player, Sound.Source.AMBIENT, key("customfoods", "fail"), 1f, 1f);
+        playerSound(player, Sound.Source.AMBIENT, key("customcooking", "fail"), 1f, 1f);
         AdventureUtil.playerTitle(
                 player,
                 ConfigManager.failureTitle[new Random().nextInt(ConfigManager.failureTitle.length)],
@@ -185,7 +185,7 @@ public class CookingManager extends Function {
         soundTask = new BukkitRunnable() {
             @Override
             public void run() {
-                playerSound(player, Sound.Source.AMBIENT, key("customfoods", "cooking"), 1f, 1f);
+                playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking"), 1f, 1f);
             }
         };
         soundTask.runTaskTimer(CustomCooking.plugin, 0L, 60L); // run every 20 ticks (1 second)
