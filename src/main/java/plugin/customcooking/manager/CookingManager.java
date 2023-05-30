@@ -91,7 +91,7 @@ public class CookingManager extends Function {
         if (!(loot instanceof DroppedItem droppedItem)) {
             return;
         }
-        if (Math.random() < 0.5) {
+        if (Math.random() < 0.3) {
             if (!player.hasPermission("customcooking.mastery." + droppedItem.getKey())) {
                 MasteryManager.handleMastery(player, droppedItem.getKey());
             }

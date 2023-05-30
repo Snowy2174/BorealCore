@@ -61,6 +61,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.LoneDev6:api-itemsadder:3.2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.comphenix.protocol:ProtocolLib:4.7.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.bytebuddy:byte-buddy:1.11.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.luckperms:api:5.4" level="project" />
     <orderEntry type="library" name="Maven: net.kyori:adventure-api:4.12.0" level="project" />
     <orderEntry type="library" name="Maven: net.kyori:adventure-key:4.12.0" level="project" />
     <orderEntry type="library" name="Maven: net.kyori:examination-api:1.3.0" level="project" />

@@ -1,6 +1,11 @@
 package plugin.customcooking.configs;
 
 import dev.lone.itemsadder.api.ItemsAdder;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.data.DataMutateResult;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -8,9 +13,11 @@ import plugin.customcooking.CustomCooking;
 import plugin.customcooking.minigame.Function;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
+import plugin.customcooking.util.PermUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import static plugin.customcooking.configs.RecipeManager.masteryreqs;
 
@@ -52,8 +59,8 @@ public class MasteryManager extends Function {
 
         if (count >= masteryreqs.get(recipe)) {
             // give the player the permission
-            ItemsAdder.playTotemAnimation(player, recipe);
-            player.addAttachment(CustomCooking.plugin, "customcooking.mastery." + recipe, true);
+            ItemsAdder.playTotemAnimation(player, recipe+"_particle");
+            PermUtil.addPermission(player.getUniqueId(), "customcooking.mastery." + recipe);
             AdventureUtil.consoleMessage("[CustomCooking] Player <green>" + playerName + "</green> has been given <green>" + "customcooking.mastery." + recipe + "");
             AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have been given 5 ₪ for gaining " + recipe + " mastery");
 
@@ -87,8 +94,9 @@ public class MasteryManager extends Function {
 
             int requiredMastery = getRequiredMastery(recipe);
             if (count >= requiredMastery) {
-                ItemsAdder.playTotemAnimation(player, recipe);
-                player.addAttachment(CustomCooking.plugin, "customcooking.mastery." + recipe, true);
+                PermUtil.addPermission(player.getUniqueId(), "customcooking.mastery." + recipe);
+
+                ItemsAdder.playTotemAnimation(player, recipe+"_particle");
                 AdventureUtil.consoleMessage("[CustomCooking] Player <green>" + playerName + "</green> has been given <green>customcooking.mastery." + recipe + "");
                 AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have achieved mastery for the dish: " + recipe);
             }
@@ -96,7 +104,6 @@ public class MasteryManager extends Function {
             AdventureUtil.consoleMessage("[CustomCooking] Player " + playerName + " does not have a mastery count for recipe " + recipe);
         }
     }
-
 
     public static int getMasteryCount(Player player, String recipe) {
         YamlConfiguration config = ConfigUtil.getConfig("playerdata.yml");

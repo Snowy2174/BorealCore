@@ -1,6 +1,7 @@
 package plugin.customcooking.configs;
 
 import dev.lone.itemsadder.api.ItemsAdder;
+import net.luckperms.api.model.user.User;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -9,6 +10,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.minigame.*;
 import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.util.PermUtil;
 
 import java.io.File;
 import java.util.*;
@@ -131,12 +133,11 @@ public class RecipeManager extends Function {
     public static void addRecipe(Player player, String recipe) {
         String permission = "customcooking.recipe." + recipe;
 
-        if (hasPermission(player, permission)) {
+        if (PermUtil.hasPermission(player, permission)) {
             // Player already has the permission, do not add it again
             return;
         }
-
-        player.addAttachment(CustomCooking.plugin, permission, true);
+        PermUtil.addPermission(player.getUniqueId(), permission);
 
         ItemsAdder.playTotemAnimation(player, recipe + "_particle");
         AdventureUtil.playerTitle(player, "<green> You have unlocked " + recipe, " ", 20, 40, 20);
@@ -146,12 +147,12 @@ public class RecipeManager extends Function {
     public static void removeRecipe(Player player, String recipe) {
         String permission = "customcooking.recipe." + recipe;
 
-        if (!hasPermission(player, permission)) {
+        if (!PermUtil.hasPermission(player, permission)) {
             // Player doesn't have the permission, no need to remove it
             return;
         }
 
-        player.removeAttachment(player.addAttachment(CustomCooking.plugin, permission, false));
+        PermUtil.removePermission(player.getUniqueId(), permission);
 
         ItemsAdder.playTotemAnimation(player, recipe + "_particle");
         AdventureUtil.playerTitle(player, "<red> You have lost the recipe " + recipe, " ", 20, 40, 20);
@@ -159,14 +160,7 @@ public class RecipeManager extends Function {
     }
 
 
-    private static boolean hasPermission(Player player, String permission) {
-        for (PermissionAttachmentInfo attachment : player.getEffectivePermissions()) {
-            if (attachment.getPermission().equalsIgnoreCase(permission)) {
-                return true;
-            }
-        }
-        return false;
-    }
+
 
 
     private static List<String> getUnlockedRecipes(Player player) {

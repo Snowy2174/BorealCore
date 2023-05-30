@@ -1,8 +1,10 @@
 package plugin.customcooking;
 
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.customcooking.commands.MainCommand;
 import plugin.customcooking.commands.TabCompletion;
@@ -24,7 +26,6 @@ public class CustomCooking extends JavaPlugin {
     private static LayoutManager layoutManager;
     private static FurnitureManager furnitureManager;
     private static MasteryManager masteryManager;
-
 
     @Override
     public void onLoad() {
@@ -84,5 +85,9 @@ public class CustomCooking extends JavaPlugin {
 
     public static RecipeManager getRecipeManager() {
         return recipeManager;
+    }
+
+    public static MasteryManager getMasteryManager() {
+        return masteryManager;
     }
 }
