@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import static plugin.customcooking.configs.RecipeManager.RECIPES;
 import static plugin.customcooking.configs.RecipeManager.masteryreqs;
 
 public class MasteryManager extends Function {
@@ -30,6 +31,7 @@ public class MasteryManager extends Function {
 
     public static void handleMastery(Player player, String recipe) {
 
+        String recipeFormatted = RECIPES.get(recipe).getNick();
         YamlConfiguration config = ConfigUtil.getConfig("playerdata.yml");
         File file = new File(CustomCooking.plugin.getDataFolder(), "playerdata.yml");
 
@@ -62,12 +64,10 @@ public class MasteryManager extends Function {
             ItemsAdder.playTotemAnimation(player, recipe+"_particle");
             PermUtil.addPermission(player.getUniqueId(), "customcooking.mastery." + recipe);
             AdventureUtil.consoleMessage("[CustomCooking] Player <green>" + playerName + "</green> has been given <green>" + "customcooking.mastery." + recipe + "");
-            AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have been given 5 ₪ for gaining " + recipe + " mastery");
+            AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have been given 5 ₪ for gaining " + recipeFormatted + " mastery");
 
             String command = "av user " + playerName + " addpoints 5";
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-            // clear the task data in the config
-            config.set("players." + playerName + "." + recipe, null);
             try {
                 config.save(file);
             } catch (IOException e) {
@@ -82,6 +82,7 @@ public class MasteryManager extends Function {
         File file = new File(CustomCooking.plugin.getDataFolder(), "playerdata.yml");
 
         String playerName = player.getName();
+        String recipeFormatted = RECIPES.get(recipe).getNick();
         String playerRecipePath = "players." + playerName + "." + recipe;
 
         if (config.contains(playerRecipePath)) {
@@ -98,7 +99,7 @@ public class MasteryManager extends Function {
 
                 ItemsAdder.playTotemAnimation(player, recipe+"_particle");
                 AdventureUtil.consoleMessage("[CustomCooking] Player <green>" + playerName + "</green> has been given <green>customcooking.mastery." + recipe + "");
-                AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have achieved mastery for the dish: " + recipe);
+                AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have achieved mastery for the dish: " + recipeFormatted);
             }
         } else {
             AdventureUtil.consoleMessage("[CustomCooking] Player " + playerName + " does not have a mastery count for recipe " + recipe);

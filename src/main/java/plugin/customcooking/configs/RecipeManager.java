@@ -14,6 +14,7 @@ import plugin.customcooking.util.PermUtil;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RecipeManager extends Function {
 
@@ -24,6 +25,7 @@ public class RecipeManager extends Function {
     public static final Map<String, String> successItems = new HashMap<>();
     protected static final Map<String, String> burnedItems = new HashMap<>();
     protected static final Map<String, Integer> masteryreqs = new HashMap<>();
+    private static final String PERMISSION_PREFIX = "customcooking.recipe.";
 
 
     @Override
@@ -125,68 +127,43 @@ public class RecipeManager extends Function {
             return;
         }
 
-        // Add a random locked recipe to the player's permissions
         String randomRecipe = getRandomRecipe(lockedRecipes);
         addRecipe(player, randomRecipe);
     }
 
     public static void addRecipe(Player player, String recipe) {
         String permission = "customcooking.recipe." + recipe;
+        String recipeFormatted = RECIPES.get(recipe).getNick();
 
-        if (PermUtil.hasPermission(player, permission)) {
-            // Player already has the permission, do not add it again
-            return;
-        }
         PermUtil.addPermission(player.getUniqueId(), permission);
 
         ItemsAdder.playTotemAnimation(player, recipe + "_particle");
-        AdventureUtil.playerTitle(player, "<green> You have unlocked " + recipe, " ", 20, 40, 20);
-        AdventureUtil.playerMessage(player, "<gray>[<green>!<gray>]<green> You have unlocked the recipe " + recipe);
+        AdventureUtil.playerMessage(player, "<gray>[<green>!<gray>]<green> You have unlocked the recipe " + recipeFormatted);
     }
 
     public static void removeRecipe(Player player, String recipe) {
         String permission = "customcooking.recipe." + recipe;
-
-        if (!PermUtil.hasPermission(player, permission)) {
-            // Player doesn't have the permission, no need to remove it
-            return;
-        }
+        String recipeFormatted = RECIPES.get(recipe).getNick();
 
         PermUtil.removePermission(player.getUniqueId(), permission);
 
         ItemsAdder.playTotemAnimation(player, recipe + "_particle");
         AdventureUtil.playerTitle(player, "<red> You have lost the recipe " + recipe, " ", 20, 40, 20);
-        AdventureUtil.playerMessage(player, "<gray>[<red>!<gray>]<red> You have lost the recipe " + recipe);
+        AdventureUtil.playerMessage(player, "<gray>[<red>!<gray>]<red> You have lost the recipe " + recipeFormatted);
     }
 
-
-
-
-
     private static List<String> getUnlockedRecipes(Player player) {
-        List<String> unlockedRecipes = new ArrayList<>();
-
-        for (PermissionAttachmentInfo permission : player.getEffectivePermissions()) {
-            String perm = permission.getPermission();
-            if (perm.startsWith("customcooking.recipe.")) {
-                String recipeName = perm.substring(21);
-                unlockedRecipes.add(recipeName);
-            }
-        }
-
-        return unlockedRecipes;
+        return player.getEffectivePermissions().stream()
+                .map(PermissionAttachmentInfo::getPermission)
+                .filter(perm -> perm.startsWith(PERMISSION_PREFIX))
+                .map(perm -> perm.substring(PERMISSION_PREFIX.length()))
+                .collect(Collectors.toList());
     }
 
     private static List<String> getLockedRecipes(List<String> unlockedRecipes) {
-        List<String> lockedRecipes = new ArrayList<>();
-
-        for (String recipe : RECIPES.keySet()) {
-            if (!unlockedRecipes.contains(recipe)) {
-                lockedRecipes.add(recipe);
-            }
-        }
-
-        return lockedRecipes;
+        return RECIPES.keySet().stream()
+                .filter(recipe -> !unlockedRecipes.contains(recipe))
+                .collect(Collectors.toList());
     }
 
     private static String getRandomRecipe(List<String> recipes) {
@@ -194,5 +171,6 @@ public class RecipeManager extends Function {
         int index = random.nextInt(recipes.size());
         return recipes.get(index);
     }
+
 
 }
