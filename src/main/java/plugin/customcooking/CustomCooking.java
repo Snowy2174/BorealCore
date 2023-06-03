@@ -1,7 +1,7 @@
 package plugin.customcooking;
 
+import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -26,6 +26,7 @@ public class CustomCooking extends JavaPlugin {
     private static LayoutManager layoutManager;
     private static FurnitureManager furnitureManager;
     private static MasteryManager masteryManager;
+    private static InventoryManager inventoryManager;
 
     @Override
     public void onLoad() {
@@ -41,6 +42,9 @@ public class CustomCooking extends JavaPlugin {
         furnitureManager = new FurnitureManager();
         masteryManager = new MasteryManager();
         recipeManager = new RecipeManager();
+        inventoryManager = new InventoryManager(this);
+
+        inventoryManager.init();
 
         reloadConfig();
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -89,5 +93,8 @@ public class CustomCooking extends JavaPlugin {
 
     public static MasteryManager getMasteryManager() {
         return masteryManager;
+    }
+    public static InventoryManager getInventoryManager() {
+        return inventoryManager;
     }
 }

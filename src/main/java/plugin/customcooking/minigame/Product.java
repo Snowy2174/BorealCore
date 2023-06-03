@@ -10,6 +10,7 @@ public class Product {
     protected Difficulty[] difficulty;
     protected Layout[] layout;
     protected int time;
+    protected int slot;
 
     public Product(String key, Difficulty[] difficulty, int time) {
         this.key = key;
@@ -25,6 +26,12 @@ public class Product {
         return nick;
     }
 
+    public int getSlot() {
+        return slot;
+    }
+    public void setSlot(int slot) {
+        this.slot = slot;
+    }
     public void setNick(String nick) {
         this.nick = nick;
     }
@@ -52,5 +59,4 @@ public class Product {
     public void setTime(int time) {
         this.time = time;
     }
-
 }

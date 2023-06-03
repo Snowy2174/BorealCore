@@ -21,35 +21,10 @@ import static plugin.customcooking.util.AdventureUtil.playerSound;
 
 public class InventoryUtil {
 
-    private final CookingManager cookingManager;
+    private static CookingManager cookingManager;
 
     public InventoryUtil() {
         this.cookingManager = CustomCooking.getCookingManager();
-    }
-
-    public void ingredientCheck(Player player, String recipe, Boolean auto) {
-        if (cookingManager.cookingPlayerCache.get(player) != null) {
-            AdventureUtil.playerMessage(player, "<grey>[<bold><red>!</bold><grey>] <red>You're already cooking something.");
-        } else {
-            // check if player has required ingredients
-            List<String> ingredients = RecipeManager.itemIngredients.get(recipe);
-            // get the bar config
-            Product bar = RecipeManager.RECIPES.get(recipe);
-            //checks if player has required ingredients
-            if (playerHasIngredients(player.getInventory(), ingredients)) {
-                removeIngredients(player.getInventory(), ingredients);
-                playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.ingredient"), 1f, 1f);
-                if (auto) {
-                    giveItem(player, String.valueOf(successItems.get(recipe)));
-                    playerSound(player, Sound.Source.AMBIENT, key("customcooking", "done"), 1f, 1f);
-                    AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have auto-cooked one " + recipe);
-                } else {
-                    cookingManager.onCookedItem(player, bar);
-                }
-            } else {
-                AdventureUtil.playerMessage(player, "<grey>[<bold><red>!</bold><grey>] <red>You do not have the required ingredients to cook this item.</red>");
-            }
-        }
     }
 
     public static boolean playerHasIngredients(Inventory playerInventory, List<String> ingredients) {
@@ -177,7 +152,12 @@ public class InventoryUtil {
                 return playerInventory.containsAtLeast(itemStack, 1);
             } else {
                 Material material = Material.getMaterial(ingredient);
-                return playerInventory.contains(material);
+                if (material != null) {
+                    return playerInventory.contains(material);
+                } else {
+                    System.out.println("Invalid ingredient: " + ingredient);
+                    return false;
+                }
             }
         }
     }

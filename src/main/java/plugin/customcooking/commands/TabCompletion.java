@@ -22,6 +22,7 @@ public class TabCompletion implements TabCompleter {
             completions.add("unlock");
             completions.add("lock");
             completions.add("mastery");
+            completions.add("recipebook");
             return completions;
         }
 
@@ -30,9 +31,9 @@ public class TabCompletion implements TabCompleter {
                 case "cook":
                     return getOnlinePlayerNames();
                 case "unlock":
-                    return getAvailableRecipes();
+                    return getOnlinePlayerNames();
                 case "lock":
-                    return getAvailableRecipes();
+                    return getOnlinePlayerNames();
                 case "mastery":
                     return getOnlinePlayerNames();
                 default:
@@ -47,9 +48,9 @@ public class TabCompletion implements TabCompleter {
                 case "mastery":
                     return getAvailableRecipes();
                 case "unlock":
-                    return getOnlinePlayerNames();
+                    return getAvailableRecipes();
                 case "lock":
-                    return getOnlinePlayerNames();
+                    return getAvailableRecipes();
                 default:
                     break;
             }
@@ -60,7 +61,7 @@ public class TabCompletion implements TabCompleter {
                 case "cook":
                     return Collections.singletonList("auto");
                 case "mastery":
-                    return Collections.singletonList("count");
+                    return Collections.singletonList("<count>");
                 default:
                     break;
             }

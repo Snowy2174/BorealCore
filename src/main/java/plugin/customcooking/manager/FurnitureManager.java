@@ -47,8 +47,8 @@ public class FurnitureManager extends Function {
             if (!cooldowns.containsKey(player) || (System.currentTimeMillis() - cooldowns.get(player) >= 2000)) {
                 // Set a cooldown of 2 seconds
                 cooldowns.put(player, System.currentTimeMillis());
-            // Check if the player right-clicked with flint and steel
-            if (player.getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
+                // Check if the player right-clicked with flint and steel
+                if (player.getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
 
                     ItemFrame unlitpot = (ItemFrame) Objects.requireNonNull(clickedFurniture).getArmorstand();
                     Rotation rot = unlitpot.getRotation();
@@ -61,11 +61,13 @@ public class FurnitureManager extends Function {
 
                     AdventureUtil.playerMessage(player, "<grey>[<green><bold>!</bold><grey>] <green>You replaced the furniture with the lit version!");
                 } else {
-                AdventureUtil.playerMessage(player, "<grey>[<red><bold>!</bold><grey>] <red>You can't cook in an cold pot.. try heating it up");
-            }
+                    AdventureUtil.playerMessage(player, "<grey>[<red><bold>!</bold><grey>] <red>You can't cook in an cold pot.. try heating it up");
+                }
             } else {
                 AdventureUtil.playerMessage(player, "<grey>[<red><bold>!</bold><grey>] <red>You need to wait " + ((2000 - (System.currentTimeMillis() - cooldowns.get(player))) / 1000) + " seconds before interacting with that again.");
             }
+        } else if (clickedFurniture.getId().equals("cooking_pot_lit")) {
+            // TODO: implement code for handling the recipe book
         }
     }
 }

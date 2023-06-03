@@ -15,6 +15,9 @@ import java.time.Duration;
 
 public class AdventureUtil {
 
+    public static Component getComponentFromMiniMessage(String text) {
+        return MiniMessage.miniMessage().deserialize(replaceLegacy(text));
+    }
     public static void sendMessage(CommandSender sender, String s) {
         if (sender instanceof Player player) playerMessage(player, s);
         else consoleMessage(s);

@@ -1,5 +1,6 @@
 package plugin.customcooking.commands;
 
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -7,16 +8,28 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.customcooking.configs.MasteryManager;
 import plugin.customcooking.configs.RecipeManager;
+import plugin.customcooking.gui.InventoryPopulator;
+import plugin.customcooking.manager.CookingManager;
+import plugin.customcooking.minigame.Product;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
 import plugin.customcooking.util.InventoryUtil;
 
+import java.util.List;
+
+import static net.kyori.adventure.key.Key.key;
+import static plugin.customcooking.configs.RecipeManager.successItems;
+import static plugin.customcooking.util.AdventureUtil.playerSound;
+import static plugin.customcooking.util.RecipeDataUtil.setRecipeData;
+
 public class MainCommand implements CommandExecutor {
 
     private final InventoryUtil inventoryUtil;
+    private final CookingManager cookingManager;
 
     public MainCommand() {
         this.inventoryUtil = new InventoryUtil();
+        this.cookingManager = new CookingManager();
     }
 
     @Override
@@ -45,7 +58,10 @@ public class MainCommand implements CommandExecutor {
             handleLockCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("mastery")) {
             handleMasteryCommand(sender, subargs);
-        } else {
+        } else if (subcommand.equalsIgnoreCase("recipebook")) {
+            handleRecipeBookCommand(sender, subargs);
+        }
+        else {
             // Unknown subcommand
             AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> Unknown subcommand: " + subcommand);
         }
@@ -71,13 +87,20 @@ public class MainCommand implements CommandExecutor {
         String recipe = args[0];
         String username = args[1];
         boolean auto = args.length == 3 && args[2].equalsIgnoreCase("auto");
-        cook(recipe, username, auto);
+
+        Player player = Bukkit.getPlayer(username);
+        if (player != null) {
+            cookingManager.handleCooking(recipe, player, auto);
+        } else {
+            AdventureUtil.consoleMessage("<Red> [!] Player " + username + " not found.");
+        }
+
     }
 
     private void handleReloadCommand(CommandSender sender) {
         long startTime = System.currentTimeMillis();
         ConfigUtil.reload();
-        AdventureUtil.sendMessage(sender, "<gray>[CustomCooking] Reloaded plugin in <green>" + (System.currentTimeMillis() - startTime) + " <gray>seconds");
+        AdventureUtil.sendMessage(sender, "<gray>[CustomCooking] Reloaded plugin in <green>" + (System.currentTimeMillis() - startTime) + "ms");
     }
 
     private void handleUnlockCommand(CommandSender sender, String[] args) {
@@ -95,8 +118,12 @@ public class MainCommand implements CommandExecutor {
         if (args.length == 1) {
             RecipeManager.checkAndAddRandomRecipe(player);
         } else if (args.length == 2) {
-            String recipe = args[1];
-            RecipeManager.addRecipe(player, recipe);
+            if (args[1].equalsIgnoreCase("all")) {
+                RecipeManager.unlockAllRecipes(player);
+            } else {
+                String recipe = args[1];
+                RecipeManager.unlockRecipe(player, recipe);
+            }
         } else {
             AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking unlock <player> <recipe>");
         }
@@ -115,7 +142,7 @@ public class MainCommand implements CommandExecutor {
                 AdventureUtil.consoleMessage("<Red> [!] Player " + args[0] + " not found.");
                 return;
             }
-            RecipeManager.removeRecipe(player, recipe);
+            RecipeManager.lockRecipe(player, recipe);
         } else {
             AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking lock <player> <recipe>");
         }
@@ -135,19 +162,15 @@ public class MainCommand implements CommandExecutor {
                 AdventureUtil.consoleMessage("<Red> [!] Player " + args[0] + " not found.");
                 return;
             }
-            MasteryManager.setMasteryCount(player, recipe, count);
+            setRecipeData(player, recipe, count);
         } else {
             AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking mastery <player> <recipe> <count>\"");
-            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking unlock <player> <recipe>");
         }
     }
 
-    private void cook(String recipe, String username, boolean auto) {
-        Player player = Bukkit.getPlayer(username);
-        if (player != null) {
-            inventoryUtil.ingredientCheck(player, recipe, auto);
-        } else {
-            AdventureUtil.consoleMessage("<Red> [!] Player " + username + " not found.");
+    private void handleRecipeBookCommand(CommandSender sender, String[] args) {
+        if (sender instanceof Player player) {
+            InventoryPopulator.RECIPEBOOK.open(player);
         }
     }
 }

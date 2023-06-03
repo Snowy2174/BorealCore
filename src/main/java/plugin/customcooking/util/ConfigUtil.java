@@ -1,7 +1,5 @@
 package plugin.customcooking.util;
 
-import net.luckperms.api.model.user.User;
-import net.luckperms.api.node.Node;
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.customcooking.configs.ConfigManager;
 import plugin.customcooking.CustomCooking;

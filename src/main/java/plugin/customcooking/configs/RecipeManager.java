@@ -1,20 +1,22 @@
 package plugin.customcooking.configs;
 
 import dev.lone.itemsadder.api.ItemsAdder;
-import net.luckperms.api.model.user.User;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.PermissionAttachmentInfo;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.minigame.*;
 import plugin.customcooking.util.AdventureUtil;
-import plugin.customcooking.util.PermUtil;
+import plugin.customcooking.util.ConfigUtil;
 
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static plugin.customcooking.configs.MasteryManager.*;
+import static plugin.customcooking.util.RecipeDataUtil.removeRecipeMasteryData;
+import static plugin.customcooking.util.RecipeDataUtil.setRecipeData;
 
 public class RecipeManager extends Function {
 
@@ -25,7 +27,6 @@ public class RecipeManager extends Function {
     public static final Map<String, String> successItems = new HashMap<>();
     protected static final Map<String, String> burnedItems = new HashMap<>();
     protected static final Map<String, Integer> masteryreqs = new HashMap<>();
-    private static final String PERMISSION_PREFIX = "customcooking.recipe.";
 
 
     @Override
@@ -51,11 +52,14 @@ public class RecipeManager extends Function {
         for (File file : files) {
             if (!file.getName().endsWith(".yml")) continue;
             YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-            Set<String> keys = config.getKeys(false);
+            Set<String> recipes = config.getKeys(false);
 
-            for (String key : keys) {
+            for (String key : recipes) {
 
                 ConfigurationSection recipeSection = config.getConfigurationSection(key);
+
+                // Gui settings
+
 
                 // Bar mechanic
                 List<Difficulty> difficulties = new ArrayList<>();
@@ -85,7 +89,22 @@ public class RecipeManager extends Function {
                 String burnedItemString = recipeSection.getString("burnedItems");
 
                 // Set nick
-                recipe.setNick(recipeSection.getString("nick"));
+                recipe.setNick(recipeSection.getString("nick", key));
+                // Set slot
+                recipe.setSlot(recipeSection.getInt("slot"));
+                // Set layout
+                if (recipeSection.contains("layout")) {
+                    List<Layout> layoutList = new ArrayList<>();
+                    for (String layoutName : recipeSection.getStringList( "layout")) {
+                        Layout layout = LayoutManager.LAYOUTS.get(layoutName);
+                        if (layout == null) {
+                            AdventureUtil.consoleMessage("<red>[CustomCooking] Bar " + layoutName + " doesn't exist");
+                            continue;
+                        }
+                        layoutList.add(layout);
+                    }
+                    recipe.setLayout(layoutList.toArray(new Layout[0]));
+                }
 
                 if (recipeSection.contains("layout")) {
                     List<Layout> layoutList = new ArrayList<>();
@@ -100,6 +119,31 @@ public class RecipeManager extends Function {
                     recipe.setLayout(layoutList.toArray(new Layout[0]));
                 }
 
+                // Check if any errors occurred during recipe loading
+                if (difficulties.isEmpty()) {
+                    AdventureUtil.consoleMessage("<red>[CustomCooking] Recipe '" + key + "' doesn't have valid difficulty");
+                    continue;
+                }
+
+                if (ingredientStrings.isEmpty()) {
+                    AdventureUtil.consoleMessage("<red>[CustomCooking] Recipe '" + key + "' doesn't have any ingredients");
+                    continue;
+                }
+
+                if (perfectItemString == null || perfectItemString.isEmpty()) {
+                    AdventureUtil.consoleMessage("<red>[CustomCooking] Recipe '" + key + "' doesn't have perfectItems defined");
+                    continue;
+                }
+
+                if (cookedItemString == null || cookedItemString.isEmpty()) {
+                    AdventureUtil.consoleMessage("<red>[CustomCooking] Recipe '" + key + "' doesn't have cookedItems defined");
+                    continue;
+                }
+
+                if (burnedItemString == null || burnedItemString.isEmpty()) {
+                    AdventureUtil.consoleMessage("<red>[CustomCooking] Recipe '" + key + "' doesn't have burnedItems defined");
+                    continue;
+                }
 
                 RECIPES.put(key, recipe);
 
@@ -111,12 +155,10 @@ public class RecipeManager extends Function {
                 burnedItems.put(key, burnedItemString);
                 // stores the mastery requirements
                 masteryreqs.put(key, mastery);
-
-
-
             }
         }
     }
+
 
     public static void checkAndAddRandomRecipe(Player player) {
         List<String> unlockedRecipes = getUnlockedRecipes(player);
@@ -128,37 +170,51 @@ public class RecipeManager extends Function {
         }
 
         String randomRecipe = getRandomRecipe(lockedRecipes);
-        addRecipe(player, randomRecipe);
+        unlockRecipe(player, randomRecipe);
     }
 
-    public static void addRecipe(Player player, String recipe) {
-        String permission = "customcooking.recipe." + recipe;
-        String recipeFormatted = RECIPES.get(recipe).getNick();
+    public static void unlockAllRecipes(Player player) {
+        List<String> unlockedRecipes = getUnlockedRecipes(player);
+        List<String> lockedRecipes = getLockedRecipes(unlockedRecipes);
 
-        PermUtil.addPermission(player.getUniqueId(), permission);
+        for (String recipe : lockedRecipes) {
+            unlockRecipe(player, recipe);
+        }
+    }
+
+
+    public static void unlockRecipe(Player player, String recipe) {
+        String recipeFormatted = RECIPES.get(recipe).getNick();
+        setRecipeData(player, recipe, 0);
 
         ItemsAdder.playTotemAnimation(player, recipe + "_particle");
         AdventureUtil.playerMessage(player, "<gray>[<green>!<gray>]<green> You have unlocked the recipe " + recipeFormatted);
     }
 
-    public static void removeRecipe(Player player, String recipe) {
-        String permission = "customcooking.recipe." + recipe;
+    public static void lockRecipe(Player player, String recipe) {
         String recipeFormatted = RECIPES.get(recipe).getNick();
 
-        PermUtil.removePermission(player.getUniqueId(), permission);
+        removeRecipeMasteryData(player, recipe);
 
         ItemsAdder.playTotemAnimation(player, recipe + "_particle");
-        AdventureUtil.playerTitle(player, "<red> You have lost the recipe " + recipe, " ", 20, 40, 20);
         AdventureUtil.playerMessage(player, "<gray>[<red>!<gray>]<red> You have lost the recipe " + recipeFormatted);
     }
 
-    private static List<String> getUnlockedRecipes(Player player) {
-        return player.getEffectivePermissions().stream()
-                .map(PermissionAttachmentInfo::getPermission)
-                .filter(perm -> perm.startsWith(PERMISSION_PREFIX))
-                .map(perm -> perm.substring(PERMISSION_PREFIX.length()))
-                .collect(Collectors.toList());
+    public static List<String> getUnlockedRecipes(Player player) {
+        YamlConfiguration config = ConfigUtil.getConfig("playerdata.yml");
+        String playerName = player.getName();
+
+        if (!config.contains("players." + playerName)) {
+            return Collections.emptyList();
+        }
+
+        ConfigurationSection playerSection = config.getConfigurationSection("players." + playerName);
+        if (playerSection != null) {
+            return new ArrayList<>(playerSection.getKeys(false));
+        }
+        return Collections.emptyList();
     }
+
 
     private static List<String> getLockedRecipes(List<String> unlockedRecipes) {
         return RECIPES.keySet().stream()
@@ -171,6 +227,4 @@ public class RecipeManager extends Function {
         int index = random.nextInt(recipes.size());
         return recipes.get(index);
     }
-
-
 }
