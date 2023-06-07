@@ -1,5 +1,6 @@
 package plugin.customcooking.gui;
 
+import dev.lone.itemsadder.api.CustomFurniture;
 import dev.lone.itemsadder.api.CustomStack;
 import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
 import fr.minuskube.inv.ClickableItem;
@@ -29,17 +30,20 @@ import static plugin.customcooking.util.InventoryUtil.build;
 public class InventoryPopulator implements InventoryProvider {
 
     private final CookingManager cookingManager;
+    private static CustomFurniture clickedFurniture;
 
-    public static final SmartInventory RECIPEBOOK = SmartInventory.builder()
-            .manager(CustomCooking.getInventoryManager())
-            .id("recipeBook")
-            .provider(new InventoryPopulator())
-            .size(6, 9)
-            .title(ChatColor.WHITE + new FontImageWrapper("customcooking:recipe_book").applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString("Recipe Book", -175))
-            .build();
-
-    public InventoryPopulator() {
+    public static SmartInventory getRecipeBook(CustomFurniture clickedFurniture, Player player) {
+        return  SmartInventory.builder()
+                .manager(CustomCooking.getInventoryManager())
+                .id("recipeBook")
+                .provider(new InventoryPopulator(clickedFurniture))
+                .size(6, 9)
+                .title(ChatColor.WHITE + new FontImageWrapper("customcooking:recipe_book").applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString( ChatColor.DARK_AQUA + player.getName() + ChatColor.RESET + "'sRecipe Book", -185))
+                .build();
+    }
+    public InventoryPopulator(CustomFurniture clickedFurniture) {
         this.cookingManager = new CookingManager();
+        this.clickedFurniture = clickedFurniture;
     }
 
     @Override
@@ -72,11 +76,9 @@ public class InventoryPopulator implements InventoryProvider {
             if (slot != -1) {
                 int row = (slot - 1) / 9; // Calculate the row based on the slot
                 int column = (slot - 1) % 9;  // Calculate the column based on the slot
-                System.out.println("Row: " + row + ", Column: " + column);
 
                 contents.set(row, column, ClickableItem.of(itemStack, e -> handleItemClick(e, player, recipe, hasRecipe, hasMastery)));
             }
-            System.out.println(recipe);
         }
     }
 
@@ -95,8 +97,7 @@ public class InventoryPopulator implements InventoryProvider {
     private ItemStack buildUnknownItem(String recipe){
         CustomStack customStack = CustomStack.getInstance(recipe);
         if (customStack == null) {
-            System.out.println("CustomStack is INVALID! for recipe: " + recipe);
-            return new ItemStack(Material.STONE);
+            return new ItemStack(CustomStack.getInstance("unknownrecipe").getItemStack());
         } else {
             ItemStack stack = customStack.getItemStack();
             ItemMeta itemMeta = stack.getItemMeta();
@@ -119,14 +120,14 @@ public class InventoryPopulator implements InventoryProvider {
                 if (event.isLeftClick()) {
                     if (hasMastery) {
                         // Left-click handling logic for autocooking the recipe
-                        cookingManager.handleCooking(recipe, player, true);
+                        cookingManager.handleCooking(recipe, player, clickedFurniture, true);
                     } else {
                         // Left-click handling logic for cooking the recipe
-                        cookingManager.handleCooking(recipe, player, false);
+                        cookingManager.handleCooking(recipe, player, clickedFurniture, false);
                     }
                 } else if (event.isRightClick()) {
                     // Right click handling for cooking the recipe
-                    cookingManager.handleCooking(recipe, player, false);
+                    cookingManager.handleCooking(recipe, player, clickedFurniture, false);
                 }
                 event.setCancelled(true);
             } else {
@@ -154,9 +155,11 @@ public class InventoryPopulator implements InventoryProvider {
 
 
         lore.add(" ");
-        lore.add("<!italic><#ffcc33>[Right Click] <#ffcc99>to Cook");
         if (hasMastery) {
+            lore.add("<!italic><#ffcc33>[Right Click] <#ffcc99>to Cook");
             lore.add("<!italic><#ffcc33>[Left Click] <#ffcc99>to Autocook");
+        } else {
+            lore.add("<!italic><#ffcc33>[Click] <#ffcc99>to Cook");
         }
 
         // Create a new list to store parsed lore
@@ -166,8 +169,6 @@ public class InventoryPopulator implements InventoryProvider {
         for (String line : lore) {
             parsedLore.add(AdventureUtil.getComponentFromMiniMessage(line));
         }
-
-
 
         itemMeta.lore(parsedLore);
         itemStack.setItemMeta(itemMeta);
@@ -183,7 +184,7 @@ public class InventoryPopulator implements InventoryProvider {
         } else {
             lore.add(" ");
             lore.add("<!italic><#ff9900>Mastery [" + MasteryManager.getMasteryCount(player, recipe) + "/" + MasteryManager.getRequiredMastery(recipe) + "]");
-            lore.add("<!italic><#ffcc33>[" + appendProgressBar((MasteryManager.getMasteryCount(player, recipe) / MasteryManager.getRequiredMastery(recipe)) * 100) + "<#ffcc33>]");
+            lore.add("<!italic><#ffcc33>[" + appendProgressBar(MasteryManager.getMasteryCount(player, recipe) / MasteryManager.getRequiredMastery(recipe)) + "<#ffcc33>]");
             lore.add("<!italic><#ffcc99>This dish has not been mastered");
             lore.add("<!italic><#ffcc99>and will have to be manually cooked.");
         }
@@ -203,7 +204,6 @@ public class InventoryPopulator implements InventoryProvider {
                 progressBar.append("<#ffcc99>■"); // color code for remaining blocks
             }
         }
-
         return progressBar.toString();
     }
 
@@ -220,7 +220,7 @@ public class InventoryPopulator implements InventoryProvider {
             }
             String ingredientFormatted = formatString(parts[0]);
 
-            if (InventoryUtil.playerHasIngredient(player.getInventory(), ingredient)) {
+            if (InventoryUtil.playerHasIngredient(player.getInventory(), parts[0])) {
                 lore.add(ChatColor.GREEN + "- (x" + parts[1] + ") " + ingredientFormatted );
             } else {
                 lore.add(ChatColor.RED + "- (x" + parts[1] + ") " + ingredientFormatted );

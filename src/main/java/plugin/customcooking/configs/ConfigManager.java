@@ -3,9 +3,10 @@ package plugin.customcooking.configs;
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.customcooking.util.ConfigUtil;
 
+import java.util.List;
+
 public class ConfigManager {
     public static String lang;
-    public static boolean otherProductBar;
     public static String[] successTitle;
     public static String[] successSubTitle;
     public static int successFadeIn;
@@ -16,18 +17,19 @@ public class ConfigManager {
     public static int failureFadeIn;
     public static int failureFadeStay;
     public static int failureFadeOut;
-    public static boolean vaultHook;
-    public static boolean instantBar;
+    public static Integer perfectChance;
+    public static int splashTime;
+    public static List<String> starterRecipes;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
 
         lang = config.getString("lang", "english");
 
-        instantBar = config.getBoolean("mechanics.instant-bar", false);
-        otherProductBar = config.getBoolean("mechanics.other-recipes.cooking-bar", true);
+        perfectChance = config.getInt("mechanics.perfect-chance", 30) / 100;
+        splashTime = config.getInt("mechanics.splash-time", 100);
 
-        vaultHook = config.getBoolean("integration.Vault", true);
+        starterRecipes = config.getStringList("mechanics.starter-recipes");
 
         successTitle = config.getStringList("titles.success.title").toArray(new String[0]);
         successSubTitle = config.getStringList("titles.success.subtitle").toArray(new String[0]);

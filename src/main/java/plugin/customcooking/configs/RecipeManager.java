@@ -1,10 +1,16 @@
 package plugin.customcooking.configs;
 
 import dev.lone.itemsadder.api.ItemsAdder;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.Node;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.minigame.*;
 import plugin.customcooking.util.AdventureUtil;
@@ -182,6 +188,20 @@ public class RecipeManager extends Function {
         }
     }
 
+    public static void unlockStarterRecipes(Player player) {
+            List<String> unlockedRecipes = getUnlockedRecipes(player);
+            List<String> recipesToUnlock = new ArrayList<>();
+
+            for (String recipe : ConfigManager.starterRecipes) {
+                if (!unlockedRecipes.contains(recipe)) {
+                    recipesToUnlock.add(recipe);
+                }
+            }
+
+            for (String recipe : recipesToUnlock) {
+                unlockRecipe(player, recipe);
+            }
+        }
 
     public static void unlockRecipe(Player player, String recipe) {
         String recipeFormatted = RECIPES.get(recipe).getNick();
@@ -227,4 +247,36 @@ public class RecipeManager extends Function {
         int index = random.nextInt(recipes.size());
         return recipes.get(index);
     }
+
+    // Permissions Migrater
+    public static int migratePermissions() {
+        String permissionPrefix = "customcooking.";
+        int migratedCount = 0;
+
+        LuckPerms luckPerms = LuckPermsProvider.get();
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+            if (user != null) {
+                for (PermissionAttachmentInfo attachmentInfo : player.getEffectivePermissions()) {
+                    String permission = attachmentInfo.getPermission();
+
+                    if (permission.startsWith(permissionPrefix + "recipe.")) {
+                        String recipeName = permission.substring(permissionPrefix.length() + 7);
+                        unlockRecipe(player, recipeName);
+                        user.data().remove(Node.builder(permission).build());
+                        migratedCount++;
+                    }
+                    if (permission.startsWith(permissionPrefix + "mastery.")) {
+                        String recipeName = permission.substring(permissionPrefix.length() + 8);
+                        setRecipeData(player, recipeName, 1000);
+                        user.data().remove(Node.builder(permission).build());
+                        migratedCount++;
+                    }
+                }
+                luckPerms.getUserManager().saveUser(user);
+            }
+        }
+        return migratedCount;
+    }
+
 }

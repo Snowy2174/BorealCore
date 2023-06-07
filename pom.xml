@@ -106,6 +106,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>fr.minuskube.inv</groupId>
             <artifactId>smart-invs</artifactId>
             <version>1.2.7</version>

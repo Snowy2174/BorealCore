@@ -1,5 +1,6 @@
 package plugin.customcooking.listener;
 
+import dev.lone.itemsadder.api.Events.FurnitureBreakEvent;
 import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,5 +17,10 @@ public class FurnitureListener implements Listener {
     @EventHandler
     public void onFurnitureInteract(FurnitureInteractEvent event) {
         furnitureManager.onFurnitureInteract(event);
+    }
+
+    @EventHandler
+    public void onFurnitureBreak(FurnitureBreakEvent event) {
+        furnitureManager.onFurnitureBreak(event);
     }
 }

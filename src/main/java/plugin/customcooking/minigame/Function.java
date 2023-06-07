@@ -29,10 +29,6 @@ public class Function {
     public void onInteract(PlayerInteractEvent event) {
     }
 
-//   public void onWindowTitlePacketSend(PacketContainer packet, Player receiver) {
-
-    //  }
-
     public void onCloseInventory(InventoryCloseEvent event) {
     }
 

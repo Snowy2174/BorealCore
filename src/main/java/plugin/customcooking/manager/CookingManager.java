@@ -1,5 +1,6 @@
 package plugin.customcooking.manager;
 
+import dev.lone.itemsadder.api.CustomFurniture;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -24,6 +25,8 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.kyori.adventure.key.Key.key;
+import static plugin.customcooking.configs.ConfigManager.perfectChance;
+import static plugin.customcooking.configs.MasteryManager.hasMastery;
 import static plugin.customcooking.configs.RecipeManager.*;
 import static plugin.customcooking.util.AdventureUtil.playerSound;
 import static plugin.customcooking.util.InventoryUtil.*;
@@ -52,31 +55,34 @@ public class CookingManager extends Function {
         HandlerList.unregisterAll(this.interactListener);
     }
 
-    public void handleCooking(String recipe, Player player, boolean auto) {
-            if (isPlayerCooking(player)) {
-                AdventureUtil.playerMessage(player, "<grey>[<bold><red>!</bold><grey>] <red>You're already cooking something.");
-            } else {
-                // get the bar config
-                Product bar = RecipeManager.RECIPES.get(recipe);
-                // checks if player has required ingredients
-                List<String> ingredients = RecipeManager.itemIngredients.get(recipe);
-                if (playerHasIngredients(player.getInventory(), ingredients)) {
-                    removeIngredients(player.getInventory(), ingredients);
-                    playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.ingredient"), 1f, 1f);
-                    if (auto) {
-                        giveItem(player, String.valueOf(successItems.get(recipe)));
-                        playerSound(player, Sound.Source.AMBIENT, key("customcooking", "done"), 1f, 1f);
-                        AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have auto-cooked one " + RECIPES.get(recipe).getNick());
-                    } else {
-                        onCookedItem(player, bar);
-                    }
-                } else {
-                    AdventureUtil.playerMessage(player, "<grey>[<bold><red>!</bold><grey>] <red>You do not have the required ingredients to cook this item.</red>");
+    public void handleCooking(String recipe, Player player, @Nullable CustomFurniture clickedFurniture, boolean auto) {
+        if (isPlayerCooking(player)) {
+            AdventureUtil.playerMessage(player, "<grey>[<bold><red>!</bold><grey>] <red>You're already cooking something.");
+        } else {
+            // get the bar config
+            Product bar = RecipeManager.RECIPES.get(recipe);
+            // checks if player has required ingredients
+            List<String> ingredients = RecipeManager.itemIngredients.get(recipe);
+            if (playerHasIngredients(player.getInventory(), ingredients)) {
+                // Delay removal of items if furniture is not null
+                if (clickedFurniture != null) {
+                    FurnitureManager.ingredientsSFX(player, ingredients, clickedFurniture);
                 }
+                removeIngredients(player.getInventory(), ingredients);
+                if (auto) {
+                    giveItem(player, String.valueOf(successItems.get(recipe)));
+                    playerSound(player, Sound.Source.AMBIENT, key("customcooking", "done"), 1f, 1f);
+                    AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have auto-cooked one " + RECIPES.get(recipe).getNick());
+                } else {
+                    onCookedItem(player, bar, clickedFurniture);
+                }
+            } else {
+                AdventureUtil.playerMessage(player, "<grey>[<bold><red>!</bold><grey>] <red>You do not have the required ingredients to cook this item.</red>");
             }
+        }
     }
 
-    public void onCookedItem(Player player, Product recipe) {
+    public void onCookedItem(Player player, Product recipe, @Nullable CustomFurniture clickedFurniture) {
 
         player.closeInventory();
         cookedRecipe.put(player, recipe);
@@ -89,7 +95,7 @@ public class CookingManager extends Function {
                 if (recipe == null) {
                     AdventureUtil.playerMessage(player, "There ain't no custom recipe");
                 } else {
-                    showPlayerBar(player, recipe);
+                    showPlayerBar(player, recipe, clickedFurniture);
                 }
             }
         }
@@ -116,8 +122,8 @@ public class CookingManager extends Function {
         if (!(loot instanceof DroppedItem droppedItem)) {
             return;
         }
-        if (Math.random() < 0.3) {
-            if (!player.hasPermission("customcooking.mastery." + droppedItem.getKey())) {
+        if (Math.random() < perfectChance) {
+            if (!hasMastery(player, droppedItem.getKey())) {
                 MasteryManager.handleMastery(player, droppedItem.getKey());
             }
             playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.done"), 1f, 1f);
@@ -160,7 +166,7 @@ public class CookingManager extends Function {
         giveItem(player, "failureitem");
     }
 
-    private void showPlayerBar(Player player, @Nullable Product recipe) {
+    private void showPlayerBar(Player player, @Nullable Product recipe, @Nullable CustomFurniture clickedFurniture) {
         Layout layout;
         if (recipe != null && recipe.getLayout() != null) {
             layout = recipe.getLayout()[new Random().nextInt(recipe.getLayout().length)];
@@ -222,7 +228,7 @@ public class CookingManager extends Function {
                 playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking"), 1f, 1f);
             }
         };
-        soundTask.runTaskTimer(CustomCooking.plugin, 0L, 60L); // run every 20 ticks (1 second)
+        soundTask.runTaskTimerAsynchronously(CustomCooking.plugin, 0L, 60L); // run every 20 ticks (1 second)
     }
 
     public void stopSoundLoop() {

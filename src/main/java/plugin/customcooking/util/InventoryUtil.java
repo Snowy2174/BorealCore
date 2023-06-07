@@ -139,7 +139,14 @@ public class InventoryUtil {
     @NotNull
     public static ItemStack build(String key) {
         ItemStack itemStack = buildia(key);
-        return itemStack == null ? new ItemStack(Material.AIR) : itemStack;
+        if (itemStack == null) {
+            if (Material.valueOf(key) != null) {
+                itemStack = new ItemStack(Material.valueOf(key));
+            } else {
+                itemStack = new ItemStack(Material.AIR);
+            }
+        }
+        return itemStack;
     }
 
     public static boolean playerHasIngredient(Inventory playerInventory, String ingredient) {

@@ -7,7 +7,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static plugin.customcooking.configs.RecipeManager.RECIPES;
@@ -15,59 +14,27 @@ import static plugin.customcooking.configs.RecipeManager.RECIPES;
 public class TabCompletion implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
+        List<String> completions = new ArrayList<>();
+
         if (args.length == 1) {
-            List<String> completions = new ArrayList<>();
             completions.add("cook");
             completions.add("reload");
             completions.add("unlock");
             completions.add("lock");
             completions.add("mastery");
             completions.add("recipebook");
-            return completions;
+            completions.add("migrateperms");
+        } else if (args.length == 2) {
+            completions.addAll(getOnlinePlayerNames());
+        } else if (args.length == 3 || args.length == 4) {
+            completions.addAll(getAvailableRecipes());
+        } else if (args.length == 4 && args[0].equalsIgnoreCase("cook")) {
+            completions.add("auto");
+        } else if (args.length == 4 && args[0].equalsIgnoreCase("mastery")) {
+            completions.add("<count>");
         }
 
-        if (args.length == 2) {
-            switch (args[0].toLowerCase()) {
-                case "cook":
-                    return getOnlinePlayerNames();
-                case "unlock":
-                    return getOnlinePlayerNames();
-                case "lock":
-                    return getOnlinePlayerNames();
-                case "mastery":
-                    return getOnlinePlayerNames();
-                default:
-                    break;
-            }
-        }
-
-        if (args.length == 3) {
-            switch (args[0].toLowerCase()) {
-                case "cook":
-                    return getAvailableRecipes();
-                case "mastery":
-                    return getAvailableRecipes();
-                case "unlock":
-                    return getAvailableRecipes();
-                case "lock":
-                    return getAvailableRecipes();
-                default:
-                    break;
-            }
-        }
-
-        if (args.length == 4) {
-            switch (args[0].toLowerCase()) {
-                case "cook":
-                    return Collections.singletonList("auto");
-                case "mastery":
-                    return Collections.singletonList("<count>");
-                default:
-                    break;
-            }
-        }
-
-        return null; // No tab completion for other cases
+        return completions;
     }
 
     private List<String> getOnlinePlayerNames() {
@@ -81,5 +48,4 @@ public class TabCompletion implements TabCompleter {
     private List<String> getAvailableRecipes() {
         return new ArrayList<>(RECIPES.keySet());
     }
-
 }

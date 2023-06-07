@@ -1,5 +1,7 @@
 package plugin.customcooking;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
@@ -21,6 +23,7 @@ public class CustomCooking extends JavaPlugin {
 
     public static Plugin plugin;
     public static BukkitAudiences adventure;
+    public static ProtocolManager protocolManager;
     private static CookingManager cookingManager;
     private static RecipeManager recipeManager;
     private static LayoutManager layoutManager;
@@ -36,6 +39,7 @@ public class CustomCooking extends JavaPlugin {
     @Override
     public void onEnable() {
         adventure = BukkitAudiences.create(this);
+        protocolManager = ProtocolLibrary.getProtocolManager();
 
         cookingManager = new CookingManager();
         layoutManager = new LayoutManager();

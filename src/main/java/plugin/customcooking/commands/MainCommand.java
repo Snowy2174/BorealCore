@@ -1,25 +1,18 @@
 package plugin.customcooking.commands;
 
-import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import plugin.customcooking.configs.MasteryManager;
 import plugin.customcooking.configs.RecipeManager;
 import plugin.customcooking.gui.InventoryPopulator;
 import plugin.customcooking.manager.CookingManager;
-import plugin.customcooking.minigame.Product;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
 import plugin.customcooking.util.InventoryUtil;
 
-import java.util.List;
-
 import static net.kyori.adventure.key.Key.key;
-import static plugin.customcooking.configs.RecipeManager.successItems;
-import static plugin.customcooking.util.AdventureUtil.playerSound;
 import static plugin.customcooking.util.RecipeDataUtil.setRecipeData;
 
 public class MainCommand implements CommandExecutor {
@@ -52,6 +45,8 @@ public class MainCommand implements CommandExecutor {
             handleCookCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("reload")) {
             handleReloadCommand(sender);
+        } else if (subcommand.equalsIgnoreCase("migrateperms")) {
+            handleMigratePermsCommand(sender);
         } else if (subcommand.equalsIgnoreCase("unlock")) {
             handleUnlockCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("lock")) {
@@ -76,6 +71,7 @@ public class MainCommand implements CommandExecutor {
         AdventureUtil.sendMessage(sender, "<gold>/cook unlock <player> <recipe>");
         AdventureUtil.sendMessage(sender, "<gold>/cook lock <player> <recipe>");
         AdventureUtil.sendMessage(sender, "<gold>/cook reload");
+        AdventureUtil.sendMessage(sender, "<gold>/cook migrateperms");
     }
 
     private void handleCookCommand(CommandSender sender, String[] args) {
@@ -90,7 +86,7 @@ public class MainCommand implements CommandExecutor {
 
         Player player = Bukkit.getPlayer(username);
         if (player != null) {
-            cookingManager.handleCooking(recipe, player, auto);
+            cookingManager.handleCooking(recipe, player, null, auto);
         } else {
             AdventureUtil.consoleMessage("<Red> [!] Player " + username + " not found.");
         }
@@ -101,6 +97,12 @@ public class MainCommand implements CommandExecutor {
         long startTime = System.currentTimeMillis();
         ConfigUtil.reload();
         AdventureUtil.sendMessage(sender, "<gray>[CustomCooking] Reloaded plugin in <green>" + (System.currentTimeMillis() - startTime) + "ms");
+    }
+
+    private void handleMigratePermsCommand(CommandSender sender) {
+        long startTime = System.currentTimeMillis();
+        int migratedCount = RecipeManager.migratePermissions();
+        AdventureUtil.sendMessage(sender, "<gray>[CustomCooking] Migrated and Updated the perms for <green>" + migratedCount + "Recipes and Masteries <gray> in <green>" + (System.currentTimeMillis() - startTime) + "ms" );
     }
 
     private void handleUnlockCommand(CommandSender sender, String[] args) {
@@ -120,6 +122,8 @@ public class MainCommand implements CommandExecutor {
         } else if (args.length == 2) {
             if (args[1].equalsIgnoreCase("all")) {
                 RecipeManager.unlockAllRecipes(player);
+            } else if (args[1].equalsIgnoreCase("player")) {
+                RecipeManager.unlockStarterRecipes(player);
             } else {
                 String recipe = args[1];
                 RecipeManager.unlockRecipe(player, recipe);
@@ -170,7 +174,7 @@ public class MainCommand implements CommandExecutor {
 
     private void handleRecipeBookCommand(CommandSender sender, String[] args) {
         if (sender instanceof Player player) {
-            InventoryPopulator.RECIPEBOOK.open(player);
+            InventoryPopulator.getRecipeBook(null, player).open(player);
         }
     }
 }

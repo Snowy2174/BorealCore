@@ -52,8 +52,8 @@
       <excludeFolder url="file://$MODULE_DIR$/.idea/sonarlint/issuestore/d" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/sonarlint/securityhotspotstore/d" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/libraries" />
-      <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/sonarlint" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -97,6 +97,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.LoneDev6:api-itemsadder:3.2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.comphenix.protocol:ProtocolLib:4.7.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.bytebuddy:byte-buddy:1.11.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.luckperms:api:5.4" level="project" />
     <orderEntry type="library" name="Maven: fr.minuskube.inv:smart-invs:1.2.7" level="project" />
     <orderEntry type="library" name="Maven: org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
