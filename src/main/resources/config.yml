@@ -1,3 +1,13 @@
+lang: english
+
+mechanics:
+  perfect-chance: 30
+  splash-time: 100
+  starter-recipes:
+    - recipe1
+    - recipe2
+    - recipe3
+
 titles:
   success:
     title:
@@ -5,8 +15,9 @@ titles:
       - '<green>GG!</green>'
       - '<green>Good Job!</green>'
     subtitle:
-      - 'You have captured a {loot}'
-      - '{loot} Here we go!'
+      - 'You have made a {recipe}'
+      - "Whoa! Well done!"
+      - '{recipe} Well done!'
     fade:
       # ticks
       in: 10
@@ -14,12 +25,14 @@ titles:
       out: 10
   failure:
     title:
-      - '<red>Be concentrated!</red>'
+      - '<red>Be more concentrated!</red>'
       - '<red>Failure!</red>'
+      - '<red>What a pity!</red>'
       - '<red>Try next time!</red>'
     subtitle:
-      - 'The fish escaped'
-      - 'Pay more attention on it!'
+      - 'The dish burned!'
+      - 'Pay more attention to it!'
+      - 'Blame it on the lag'
     fade:
       in: 10
       stay: 30

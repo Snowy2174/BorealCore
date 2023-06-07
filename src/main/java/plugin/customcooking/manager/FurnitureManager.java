@@ -23,13 +23,12 @@ import static net.kyori.adventure.key.Key.key;
 import static plugin.customcooking.configs.ConfigManager.splashTime;
 import static plugin.customcooking.util.AdventureUtil.playerSound;
 import static plugin.customcooking.util.InventoryUtil.build;
+import static plugin.customcooking.util.InventoryUtil.buildia;
 
 public class FurnitureManager extends Function {
 
     private final FurnitureListener furnitureListener;
     private final Map<Player, Long> cooldowns;
-
-    private Set<Location> activeFXLocations = new HashSet<>();
     private Map<Location, BukkitTask> activeFXTasks = new HashMap<>();
 
     public FurnitureManager() {
@@ -115,46 +114,53 @@ public class FurnitureManager extends Function {
         });
         spawnSplashItem(loc);
         Random random = new Random();
-        playerSound(player, net.kyori.adventure.sound.Sound.Source.AMBIENT, key("customcooking", "ingredient"+ random.nextInt(3) + 1), 1f, 1f);
+        int i = random.nextInt(3);
+        playerSound(player, net.kyori.adventure.sound.Sound.Source.AMBIENT, key("customcooking", "ingredient"+ i), 1f, 1f);
     }
 
     private static void spawnFakeIngredientItem(Location loc, String ingredient, Runnable onComplete) {
-        // Create a dropped item entity at the specified location
-        Item itemEntity = loc.getWorld().dropItem(loc.add(0,1,0), build(ingredient));
-        itemEntity.setCanPlayerPickup(false);
 
-        // Schedule a task to remove the item entity after a set time (e.g., 10 seconds)
-        int removalDelayTicks = 2 * 20; // 2 seconds (20 ticks per second)
+        Location spawnLocation = loc.clone().add(0,2,0);
+
+        // Create a dropped item entity at the specified location
+        Item itemEntity = loc.getWorld().dropItem(spawnLocation, build(ingredient));
+        itemEntity.setCanPlayerPickup(false);
+        itemEntity.setVelocity(itemEntity.getVelocity().zero());
+
         new BukkitRunnable() {
             @Override
             public void run() {
                 itemEntity.remove(); // Remove the item entity from the world
                 onComplete.run(); // Invoke the callback when the removal is complete
             }
-        }.runTaskLater(CustomCooking.plugin, removalDelayTicks);
+        }.runTaskLater(CustomCooking.plugin, 10);
     }
 
     private static void spawnFakeRecipeItem(Location loc, ItemStack cookedStack) {
+
+        Location spawnLocation = loc.clone().add(0,2,0);
+
         // Create a dropped item entity at the specified location
-        Item itemEntity = loc.getWorld().dropItem(loc.add(0,1,0), cookedStack);
+        Item itemEntity = loc.getWorld().dropItem(spawnLocation, cookedStack);
         itemEntity.setCanPlayerPickup(false);
         itemEntity.setGravity(false);
 
-        // Schedule a task to remove the item entity after a set time (e.g., 10 seconds)
-        int removalDelayTicks = 2 * 20; // 2 seconds (20 ticks per second)
+        // Schedule a task to remove the item entity after a set time
         new BukkitRunnable() {
             @Override
             public void run() {
                 itemEntity.remove(); // Remove the item entity from the world
             }
-        }.runTaskLater(CustomCooking.plugin, removalDelayTicks);
+        }.runTaskLater(CustomCooking.plugin, 20);
     }
 
 
     private static void spawnSplashItem(Location loc) {
 
+        Location spawnLocation = loc.clone().subtract(0,0.1,0);
+
         // Create an ArmorStand entity at the specified location
-        ArmorStand armorStand = (ArmorStand) loc.getWorld().spawnEntity(loc.subtract(0,0.1, 0), EntityType.ARMOR_STAND);
+        ArmorStand armorStand = (ArmorStand) loc.getWorld().spawnEntity(spawnLocation, EntityType.ARMOR_STAND);
         armorStand.setVisible(false);
         armorStand.setGravity(false);
 
@@ -172,7 +178,8 @@ public class FurnitureManager extends Function {
         }.runTaskLater(CustomCooking.plugin, splashTime);
     }
 
-    public void playCookingResult(Location loc, Boolean success) {
+
+    static void playCookingResultSFX(Location loc, ItemStack item, Boolean success) {
         if (success) {
             // Particles: composter
             loc.getWorld().spawnParticle(Particle.COMPOSTER, loc.add(0, 1.25, 0), 15, 0.5, 0.5, 0.5);
@@ -181,9 +188,10 @@ public class FurnitureManager extends Function {
             // Particles: squid_ink
             loc.getWorld().spawnParticle(Particle.SQUID_INK, loc.add(0, 1.25, 0), 15, 0.5, 0.5, 0.5);
         }
+        playCookingPreview(loc, item);
     }
 
-    public void playCookingPreview(Location loc, ItemStack item) {
+    private static void playCookingPreview(Location loc, ItemStack item) {
         // Particles: crit
         loc.getWorld().spawnParticle(Particle.CRIT, loc.add(0, 1.5, 0), 15, 0.25, 0.25, 0.25, 0.2);
         // Spawn recipe item preview
@@ -203,7 +211,7 @@ public class FurnitureManager extends Function {
             public void run() {
                 playAmbientEffects(location);
             }
-        }.runTaskTimerAsynchronously(CustomCooking.plugin, 0L, 20L);
+        }.runTaskTimerAsynchronously(CustomCooking.plugin, 0L, 40L);
 
         activeFXTasks.put(location, task);
     }
@@ -212,8 +220,13 @@ public class FurnitureManager extends Function {
         // Particles: flame
         loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
 
-        // Particles: campfire_cosy_smoke
-        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 2, 0.25, 0.25, 0.25, 0.01, null, true);
+        // Particles: campfire_cosy_smoke TODO: FIX PARTICLE DIRECTION
+        Location smokeLocation = loc.clone().add(0,1,0);
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, smokeLocation, 0, 0, 1, 0, 0.02, null, true);
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, smokeLocation, 0, 0, 1, 0, 0.02, null, true);
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, smokeLocation, 0, 0, 1, 0, 0.02, null, true);
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, smokeLocation, 0, 0, 1, 0, 0.02, null, true);
+
 
         // Sound: block.fire.ambient
         loc.getWorld().playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 1f);

@@ -1,8 +1,8 @@
 bar_1:
   range: 16
-  title: 'The fish is hooked, focus on it!'
+  title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customfishing:default>'
+    start: '<font:customcooking:default>'
     bar: '뀂'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -22,9 +22,9 @@ bar_1:
     11: 0
 bar_2:
   range: 16
-  title: 'The fish is hooked, focus on it!'
+  title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customfishing:default>'
+    start: '<font:customcooking:default>'
     bar: '뀃'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -44,9 +44,9 @@ bar_2:
     11: 0
 bar_3:
   range: 16
-  title: 'The fish is hooked, focus on it!'
+  title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customfishing:default>'
+    start: '<font:customcooking:default>'
     bar: '뀄'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -66,9 +66,9 @@ bar_3:
     11: 0
 bar_4:
   range: 8
-  title: 'The fish is hooked, focus on it!'
+  title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customfishing:default>'
+    start: '<font:customcooking:default>'
     bar: '뀅'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -99,9 +99,9 @@ bar_4:
     22: 0
 bar_5:
   range: 8
-  title: 'The fish is hooked, focus on it!'
+  title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customfishing:default>'
+    start: '<font:customcooking:default>'
     bar: '뀆'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -132,9 +132,9 @@ bar_5:
     22: 0
 bar_6:
   range: 8
-  title: 'The fish is hooked, focus on it!'
+  title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customfishing:default>'
+    start: '<font:customcooking:default>'
     bar: '뀇'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -165,9 +165,9 @@ bar_6:
     22: 0.1
 bar_7:
   range: 4
-  title: 'The fish is hooked, focus on it!'
+  title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customfishing:default>'
+    start: '<font:customcooking:default>'
     bar: '뀈'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -220,9 +220,9 @@ bar_7:
     44: 0.3
 bar_8:
   range: 4
-  title: 'The fish is hooked, focus on it!'
+  title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customfishing:default>'
+    start: '<font:customcooking:default>'
     bar: '뀉'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -275,9 +275,9 @@ bar_8:
     44: 0
 bar_9:
   range: 4
-  title: 'The fish is hooked, focus on it!'
+  title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customfishing:default>'
+    start: '<font:customcooking:default>'
     bar: '뀊'
     pointer_offset: '넁'
     pointer: '뀁'

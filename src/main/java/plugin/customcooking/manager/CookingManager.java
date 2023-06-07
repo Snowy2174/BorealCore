@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -28,6 +29,7 @@ import static net.kyori.adventure.key.Key.key;
 import static plugin.customcooking.configs.ConfigManager.perfectChance;
 import static plugin.customcooking.configs.MasteryManager.hasMastery;
 import static plugin.customcooking.configs.RecipeManager.*;
+import static plugin.customcooking.manager.FurnitureManager.*;
 import static plugin.customcooking.util.AdventureUtil.playerSound;
 import static plugin.customcooking.util.InventoryUtil.*;
 
@@ -55,7 +57,7 @@ public class CookingManager extends Function {
         HandlerList.unregisterAll(this.interactListener);
     }
 
-    public void handleCooking(String recipe, Player player, @Nullable CustomFurniture clickedFurniture, boolean auto) {
+    public void handleCooking(String recipe, Player player, CustomFurniture clickedFurniture, boolean auto) {
         if (isPlayerCooking(player)) {
             AdventureUtil.playerMessage(player, "<grey>[<bold><red>!</bold><grey>] <red>You're already cooking something.");
         } else {
@@ -65,10 +67,10 @@ public class CookingManager extends Function {
             List<String> ingredients = RecipeManager.itemIngredients.get(recipe);
             if (playerHasIngredients(player.getInventory(), ingredients)) {
                 // Delay removal of items if furniture is not null
+                removeIngredients(player.getInventory(), ingredients);
                 if (clickedFurniture != null) {
                     FurnitureManager.ingredientsSFX(player, ingredients, clickedFurniture);
                 }
-                removeIngredients(player.getInventory(), ingredients);
                 if (auto) {
                     giveItem(player, String.valueOf(successItems.get(recipe)));
                     playerSound(player, Sound.Source.AMBIENT, key("customcooking", "done"), 1f, 1f);
@@ -82,7 +84,7 @@ public class CookingManager extends Function {
         }
     }
 
-    public void onCookedItem(Player player, Product recipe, @Nullable CustomFurniture clickedFurniture) {
+    public void onCookedItem(Player player, Product recipe, CustomFurniture clickedFurniture) {
 
         player.closeInventory();
         cookedRecipe.put(player, recipe);
@@ -104,39 +106,74 @@ public class CookingManager extends Function {
     public void onBarInteract(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         CookingPlayer cookingPlayer = cookingPlayerCache.remove(player);
-        if (cookingPlayer != null) {
-            proceedBarInteract(player, cookingPlayer);
-        }
+        proceedBarInteract(player, cookingPlayer, cookingPlayer.getCookingPot());
     }
 
-    public void proceedBarInteract(Player player, CookingPlayer cookingPlayer) {
+    public void proceedBarInteract(Player player, CookingPlayer cookingPlayer, @Nullable CustomFurniture cookingPot) {
         cookingPlayer.cancel();
         Product loot = cookedRecipe.remove(player);
         stopSoundLoop();
         player.removePotionEffect(PotionEffectType.SLOW);
+
         if (!cookingPlayer.isSuccess()) {
-            playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.fail"), 1f, 1f);
-            fail(player);
+            if (cookingPot != null) {
+                playCookingResultSFX(cookingPot.getArmorstand().getLocation(), build("failureitem"), false);
+            }
+            handleFailureResult(player);
             return;
         }
+
         if (!(loot instanceof DroppedItem droppedItem)) {
             return;
         }
+
         if (Math.random() < perfectChance) {
-            if (!hasMastery(player, droppedItem.getKey())) {
-                MasteryManager.handleMastery(player, droppedItem.getKey());
-            }
-            playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.done"), 1f, 1f);
-            String drop = perfectItems.get(droppedItem.getKey());
-            giveItem(player, drop);
-            sendSuccessTitle(player, ("Perfect " + droppedItem.getNick()));
+            handlePerfectResult(player, cookingPot, droppedItem);
         } else {
-            playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.done"), 1f, 1f);
-            String drop = successItems.get(droppedItem.getKey());
-            giveItem(player, drop);
-            sendSuccessTitle(player, droppedItem.getNick());
+            handleRegularResult(player, cookingPot, droppedItem);
         }
     }
+
+    private void handlePerfectResult(Player player, @Nullable CustomFurniture cookingPot, DroppedItem droppedItem) {
+        if (!hasMastery(player, droppedItem.getKey())) {
+            MasteryManager.handleMastery(player, droppedItem.getKey());
+        }
+        playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.done"), 1f, 1f);
+        String drop = perfectItems.get(droppedItem.getKey());
+
+        if (cookingPot != null) {
+            playCookingResultSFX(cookingPot.getArmorstand().getLocation(), build(drop), true);
+        }
+
+        giveItem(player, drop);
+        sendSuccessTitle(player, "Perfect " + droppedItem.getNick());
+    }
+
+    private void handleRegularResult(Player player, @Nullable CustomFurniture cookingPot, DroppedItem droppedItem) {
+        playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.done"), 1f, 1f);
+        String drop = successItems.get(droppedItem.getKey());
+
+        if (cookingPot != null) {
+            playCookingResultSFX(cookingPot.getArmorstand().getLocation(), build(drop), true);
+        }
+
+        giveItem(player, drop);
+        sendSuccessTitle(player, droppedItem.getNick());
+    }
+
+    private void handleFailureResult(Player player) {
+        playerSound(player, Sound.Source.AMBIENT, key("customcooking", "fail"), 1f, 1f);
+        AdventureUtil.playerTitle(
+                player,
+                ConfigManager.failureTitle[new Random().nextInt(ConfigManager.failureTitle.length)],
+                ConfigManager.failureSubTitle[new Random().nextInt(ConfigManager.failureSubTitle.length)],
+                ConfigManager.failureFadeIn,
+                ConfigManager.failureFadeStay,
+                ConfigManager.failureFadeOut
+        );
+        giveItem(player, "failureitem");
+    }
+
 
     private void sendSuccessTitle(Player player, String recipe) {
         AdventureUtil.playerTitle(
@@ -151,19 +188,6 @@ public class CookingManager extends Function {
                 ConfigManager.successFadeStay,
                 ConfigManager.successFadeOut
         );
-    }
-
-    private void fail(Player player) {
-        playerSound(player, Sound.Source.AMBIENT, key("customcooking", "fail"), 1f, 1f);
-        AdventureUtil.playerTitle(
-                player,
-                ConfigManager.failureTitle[new Random().nextInt(ConfigManager.failureTitle.length)],
-                ConfigManager.failureSubTitle[new Random().nextInt(ConfigManager.failureSubTitle.length)],
-                ConfigManager.failureFadeIn,
-                ConfigManager.failureFadeStay,
-                ConfigManager.failureFadeOut
-        );
-        giveItem(player, "failureitem");
     }
 
     private void showPlayerBar(Player player, @Nullable Product recipe, @Nullable CustomFurniture clickedFurniture) {
@@ -191,7 +215,7 @@ public class CookingManager extends Function {
         }
         Difficulty difficult = new Difficulty(timer, speed);
 
-        CookingPlayer cookingPlayer = new CookingPlayer(System.currentTimeMillis() + time, player, layout, difficult, this);
+        CookingPlayer cookingPlayer = new CookingPlayer(System.currentTimeMillis() + time, player, layout, difficult, clickedFurniture, this);
         cookingPlayer.runTaskTimerAsynchronously(CustomCooking.plugin, 0, 1);
         cookingPlayerCache.put(player, cookingPlayer);
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, time / 50, 3));

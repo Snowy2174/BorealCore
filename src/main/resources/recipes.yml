@@ -1,46 +1,386 @@
-recipes:
-  steak:
-    name: "steak"
-    lore:
-      - "&7A juicy steak!"
-    material: COOKED_BEEF
-    ingredients:
-      - "BEEF:1"
-    perfectItems:
-      - "DIAMOND:1"
-    cookedItems:
-      - "COOKED_BEEF:1"
-    burnedItems:
-      - "COAL:1"
+## Combat ⚔️
+## Common
+custardpie:
+  nick: "Custard Pie"
+  slot: 2
+  ingredients:
+    - "dough:1"
+    - "EGG:2"
+    - "SUGAR:1"
+  perfectItems:
+    - "custardpie_perfect"
+  cookedItems:
+    - "custardpie"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  difficulty: 1-1
+tomatosoup:
+  nick: "Tomato Soup"
+  slot: 3
+  ingredients:
+    - "stock:1"
+    - "tomato*:2"
+  perfectItems:
+    - "tomatosoup_perfect"
+  cookedItems:
+    - "tomatosoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  difficulty: 1-1
+## Uncommon
+blazingsoup:
+  nick: "Blazing Soup"
+  slot: 4
+  mastery: 15
+  ingredients:
+    - "stock:1"
+    - "pepper*:1"
+    - "BLAZE_POWDER:1"
+  perfectItems:
+    - "blazingsoup_perfect"
+  cookedItems:
+    - "blazingsoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  difficulty: 1-3
+raspberrypie:
+  nick: "Raspberry Pie"
+  slot: 5
+  mastery: 15
+  ingredients:
+    - "dough:1"
+    - "raspberry*:2"
+    - "SUGAR:1"
+  perfectItems:
+    - "raspberrypie_perfect"
+  cookedItems:
+    - "raspberrypie"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  difficulty: 1-3
+## Rare
+hotandsoursoup:
+  nick: "Hot and Sour Soup"
+  slot: 6
+  mastery: 20
+  ingredients:
+    - "stock:1"
+    - "PORKCHOP:1"
+    - "pineapple*:1"
+    - "pepper*:1"
+  perfectItems:
+    - "hotandsoursoup_perfect"
+  cookedItems:
+    - "hotandsoursoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_6
+    - bar_7
+    - bar_8
+  difficulty: 1-4
 
-  cake:
-    name: "cake"
-    lore:
-      - "&7The best ever cake!"
-    material: CAKE
-    ingredients:
-      - "EGG:1"
-      - "SUGAR:1"
-    perfectItems:
-      - "DIAMOND:1"
-    cookedItems:
-      - "CAKE:1"
-    burnedItems:
-      - "COAL:1"
-    permission: "customcooking.cake"
 
-  pie:
-    name: "pie"
-    lore:
-      - "&7The best ever pie!"
-    material: CAKE
-    ingredients:
-      - "EGG:1"
-      - "SUGAR:1"
-    perfectItems:
-      - "DIAMOND:1"
-    cookedItems:
-      - "CAKE:1"
-    burnedItems:
-      - "COAL:1"
-    permission: "customcooking.pie"
+## Fortification🛡️
+## Common
+carrotsoup:
+  nick: "Carrot Soup"
+  slot: 7
+  ingredients:
+    - "stock:1"
+    - "CARROT:2"
+  perfectItems:
+    - "carrotsoup_perfect"
+  cookedItems:
+    - "carrotsoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  difficulty: 1-1
+seedsoup:
+  nick: "Seed Soup"
+  slot: 8
+  ingredients:
+    - "stock:1"
+    - "WHEAT_SEEDS:2"
+  perfectItems:
+    - "seedsoup_perfect"
+  cookedItems:
+    - "seedsoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  difficulty: 1-1
+## Uncommon
+blueberrypie:
+  nick: "Blueberry Pie"
+  slot: 11
+  mastery: 15
+  ingredients:
+    - "dough:1"
+    - "blueberry*:2"
+    - "SUGAR:1"
+  perfectItems:
+    - "blueberrypie_perfect"
+  cookedItems:
+    - "blueberrypie"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  difficulty: 1-3
+onionsoup:
+  nick: "Onion Soup"
+  slot: 12
+  mastery: 15
+  ingredients:
+    - "stock:1"
+    - "BREAD:1"
+    - "onion*:1"
+  perfectItems:
+    - "onionsoup_perfect"
+  cookedItems:
+    - "onionsoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  difficulty: 1-3
+## Rare
+chickennoodlesoup:
+  nick: "Chicken Ramen"
+  slot: 13
+  mastery: 20
+  ingredients:
+    - "stock:1"
+    - "CHICKEN:1"
+    - "dough:1"
+    - "CARROT:2"
+  perfectItems:
+    - "chickennoodlesoup_perfect"
+  cookedItems:
+    - "chickennoodlesoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_6
+    - bar_7
+    - bar_8
+  difficulty: 1-4
+
+## Hearty ❤️
+## Common
+applepie:
+  nick: "Apple Pie"
+  slot: 14
+  ingredients:
+    - "dough:1"
+    - "APPLE:2"
+    - "SUGAR:1"
+  perfectItems:
+    - "applepie_perfect"
+  cookedItems:
+    - "applepie"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  difficulty: 1-1
+pumpkinsoup:
+  nick: "Pumpkin Soup"
+  slot: 15
+  ingredients:
+    - "stock:1"
+    - "PUMPKIN:2"
+  perfectItems:
+    - "pumpkinsoup_perfect"
+  cookedItems:
+    - "pumpkinsoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  difficulty: 1-1
+## Uncommon
+creamedbroccolisoup:
+  nick: "Broccoli Soup"
+  slot: 16
+  mastery: 15
+  ingredients:
+    - "stock:1"
+    - "broccoli*:2"
+  perfectItems:
+    - "creamedbroccolisoup_perfect"
+  cookedItems:
+    - "creamedbroccolisoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  difficulty: 1-3
+ricesoup:
+  nick: "Congee"
+  slot: 17
+  mastery: 15
+  ingredients:
+    - "stock:1"
+    - "rice:2"
+  perfectItems:
+    - "ricesoup_perfect"
+  cookedItems:
+    - "ricesoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  difficulty: 1-3
+## Rare
+lambbarleysoup:
+  nick: "Lamb Barley Soup"
+  slot: 20
+  mastery: 20
+  ingredients:
+    - "stock:1"
+    - "MUTTON:1"
+    - "CARROT:1"
+    - "barley*:1"
+  perfectItems:
+    - "lambbarleysoup_perfect"
+  cookedItems:
+    - "lambbarleysoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_6
+    - bar_7
+    - bar_8
+  difficulty: 1-4
+
+## Agility  🌬️
+## Common
+cactussoup:
+  nick: "Cactus Soup"
+  slot: 21
+  ingredients:
+    - "stock:1"
+    - "CACTUS:1"
+  perfectItems:
+    - "cactussoup_perfect"
+  cookedItems:
+    - "cactussoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  difficulty: 1-1
+potatosoup:
+  nick: "Potato Soup"
+  slot: 22
+  ingredients:
+    - "stock:1"
+    - "POTATO:1"
+  perfectItems:
+    - "potatosoup_perfect"
+  cookedItems:
+    - "potatosoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  difficulty: 1-1
+## Uncommon
+misosoup:
+  nick: "Miso Soup"
+  slot: 23
+  mastery: 15
+  ingredients:
+    - "stock:1"
+    - "tofu:1"
+  perfectItems:
+    - "misosoup_perfect"
+  cookedItems:
+    - "misosoup"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  difficulty: 1-3
+strawberrypie:
+  nick: "Strawberry Pie"
+  slot: 24
+  mastery: 15
+  ingredients:
+    - "dough:1"
+    - "strawberry:2"
+    - "SUGAR:1"
+  perfectItems:
+    - "strawberrypie_perfect"
+  cookedItems:
+    - "strawberrypie"
+  burnedItems:
+    - "COAL:1"
+  time: 20000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  difficulty: 1-3
+## Rare

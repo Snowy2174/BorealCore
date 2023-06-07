@@ -1,5 +1,6 @@
 package plugin.customcooking.minigame;
 
+import dev.lone.itemsadder.api.CustomFurniture;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import plugin.customcooking.manager.CookingManager;
@@ -11,6 +12,7 @@ public class CookingPlayer extends BukkitRunnable {
     private final Player player;
     private final Difficulty difficulty;
     private final CookingManager cookingManager;
+    private final CustomFurniture cookingPot;
     private int progress;
     private int internalTimer;
     private final int size;
@@ -26,11 +28,12 @@ public class CookingPlayer extends BukkitRunnable {
     private final int range;
 
 
-    public CookingPlayer(long deadline, Player player, Layout layout, Difficulty difficulty, CookingManager cookingManager) {
+    public CookingPlayer(long deadline, Player player, Layout layout, Difficulty difficulty, CustomFurniture cookingPot, CookingManager cookingManager) {
         this.deadline = deadline;
         this.player = player;
         this.difficulty = difficulty;
         this.cookingManager = cookingManager;
+        this.cookingPot = cookingPot;
         this.size = layout.getSize();
         this.start = layout.getStart();
         this.bar = layout.getBar();
@@ -84,6 +87,11 @@ public class CookingPlayer extends BukkitRunnable {
         int last = progress / range;
         return (Math.random() < successRate[last]);
     }
+
+    public CustomFurniture getCookingPot() {
+        return cookingPot;
+    }
+
 }
 
 

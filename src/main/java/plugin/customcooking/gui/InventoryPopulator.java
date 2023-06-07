@@ -38,7 +38,7 @@ public class InventoryPopulator implements InventoryProvider {
                 .id("recipeBook")
                 .provider(new InventoryPopulator(clickedFurniture))
                 .size(6, 9)
-                .title(ChatColor.WHITE + new FontImageWrapper("customcooking:recipe_book").applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString( ChatColor.DARK_AQUA + player.getName() + ChatColor.RESET + "'sRecipe Book", -185))
+                .title(ChatColor.WHITE + new FontImageWrapper("customcooking:recipe_book").applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString( ChatColor.RESET + "Recipe Book", -185))
                 .build();
     }
     public InventoryPopulator(CustomFurniture clickedFurniture) {
@@ -54,6 +54,7 @@ public class InventoryPopulator implements InventoryProvider {
         contents.fill( ClickableItem.of(build("unknownrecipe"),
                 e -> AdventureUtil.playerMessage(player, "<gray>[<red>!<gray>]<red> You haven't unlocked this recipe yet..")));
         contents.fillBorders(ClickableItem.empty(new ItemStack (Material.AIR)));
+        contents.set(5, 5, ClickableItem.of(buildIngredientsItem(), e -> handleIngredientsMenuClick(e, player)));
 
         List<String> list = getUnlockedRecipes(player);
 
@@ -86,7 +87,7 @@ public class InventoryPopulator implements InventoryProvider {
         CustomStack customStack = CustomStack.getInstance(recipe);
         if (customStack == null) {
             System.out.println("CustomStack is INVALID! for recipe: " + recipe);
-            return new ItemStack(Material.AIR);
+            return new ItemStack(CustomStack.getInstance("unknownrecipe").getItemStack());
         } else {
             ItemStack stack = customStack.getItemStack();
             modifyLore(stack, player, recipe, hasMastery);
@@ -112,6 +113,10 @@ public class InventoryPopulator implements InventoryProvider {
         }
     }
 
+    private ItemStack buildIngredientsItem(){
+            return new ItemStack(CustomStack.getInstance("grinder").getItemStack());
+    }
+
     private void handleItemClick(InventoryClickEvent event, Player player, String recipe, boolean hasRecipe, boolean hasMastery) {
         ItemStack clickedItem = event.getCurrentItem();
 
@@ -128,12 +133,23 @@ public class InventoryPopulator implements InventoryProvider {
                 } else if (event.isRightClick()) {
                     // Right click handling for cooking the recipe
                     cookingManager.handleCooking(recipe, player, clickedFurniture, false);
+                } else if (event.isShiftClick()) {
+                    // TODO: Recipe Shift-click handling
                 }
                 event.setCancelled(true);
             } else {
                 AdventureUtil.playerMessage(player, "<gray>[<red>!<gray>]<red> You haven't unlocked this recipe yet..");
             }
         }
+    }
+
+    private void handleIngredientsMenuClick(InventoryClickEvent event, Player player) {
+        ItemStack clickedItem = event.getCurrentItem();
+
+        if (clickedItem != null && clickedItem.getType() != Material.AIR) {
+        //TODO: Implement Code to Open Ingredients Deluxe Menu?
+        }
+
     }
 
     private void modifyLore(ItemStack itemStack, Player player, String recipe, Boolean hasMastery) {
@@ -238,7 +254,6 @@ public class InventoryPopulator implements InventoryProvider {
                 result.append(capitalizedWord).append(" ");
             }
         }
-
         return result.toString().trim();
     }
 
