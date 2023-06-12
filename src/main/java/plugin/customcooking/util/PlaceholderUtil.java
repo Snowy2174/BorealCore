@@ -1,10 +1,12 @@
 package plugin.customcooking.util;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import plugin.customcooking.configs.MasteryManager;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.configs.MasteryManager;
 
 public class PlaceholderUtil extends PlaceholderExpansion {
 
@@ -62,7 +64,14 @@ public class PlaceholderUtil extends PlaceholderExpansion {
                 return String.valueOf(((float) masteryCount / requiredMastery) * 100);
             }
         }
-
         return null;
+    }
+
+    public static String setPlaceholders(Player player, String text) {
+        return PlaceholderAPI.setPlaceholders(player, text);
+    }
+
+    public static String setPlaceholders(OfflinePlayer player, String text) {
+        return PlaceholderAPI.setPlaceholders(player, text);
     }
 }

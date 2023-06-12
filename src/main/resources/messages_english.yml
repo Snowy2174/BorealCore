@@ -1,0 +1,35 @@
+messages:
+  prefix: "<gradient:#FB5A00:#FDF300>[CustomCooking] </gradient>"
+  prefix-negative: "<gray>[<red>!<gray>] "
+  prefix-positive: "<gray>[<green>!<gray>] "
+
+  reload: "<white>Reloaded. Took <green>{time}ms."
+  no-perms: "<red>You don't have permission to use this command."
+  none-args: "Arguments cannot be none."
+  invalid-args: "Invalid arguments."
+  item-not-exist: "That item does not exist."
+  player-not-exist: "That player does not exist."
+  no-console: "This command cannot be executed from the console."
+  wrong-amount: "You can''t set a negative amount of items."
+  lack-args: "Insufficient arguments."
+
+  mastery-message: "<green>You have achieved mastery for the dish: {recipe}"
+  mastery-reward: "<green>You have been given 5 ₪ for gaining {recipe} mastery"
+
+  recipe-locked: "<red>You have lost the recipe: {recipe}"
+  recipe-unlocked: "<green>You have unlocked the recipe: {recipe}"
+  recipe-unknown: "<red>You haven't unlocked this recipe yet.."
+
+  already-cooking: "<red>You're already cooking something!"
+  no-ingredients: "<red>You do not have the required ingredients to cook this item."
+  too-slow: "You've failed to produce the dish in the required time"
+  cooking-autocooked: "<green>You have autocooked one {recipe}"
+
+  pot-light-up: "<green>You lit up the cooking pot!"
+  pot-cold: "<red>You can't cook in a cold pot.. try heating it up"
+  pot-cooldown: "You need to wait {time} seconds before interacting with this again!"
+
+  not-online: "That player is not online."
+  
+  players-not-enough: "The number of players is not enough for the fishing competition to be started as scheduled."
+  plugin-error: "<red>Please contact @Snow'eh on discord with a full report of this error"

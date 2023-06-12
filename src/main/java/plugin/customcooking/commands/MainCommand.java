@@ -11,11 +11,7 @@ import plugin.customcooking.gui.InventoryPopulator;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
-import plugin.customcooking.util.InventoryUtil;
 
-import static net.kyori.adventure.key.Key.key;
-import static plugin.customcooking.configs.MessageManager.infoNegative;
-import static plugin.customcooking.configs.MessageManager.noPerms;
 import static plugin.customcooking.util.RecipeDataUtil.setRecipeData;
 
 public class MainCommand implements CommandExecutor {

@@ -2,7 +2,6 @@ package plugin.customcooking.configs;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.eclipse.aether.util.ConfigUtils;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.util.ConfigUtil;
 
@@ -23,6 +22,15 @@ public class MessageManager {
     public static String noConsole;
     public static String wrongAmount;
     public static String lackArgs;
+    public static String notEnoughPlayers;
+    public static String noRank;
+    public static String competitionOn;
+    public static String forceSuccess;
+    public static String forceFailure;
+    public static String forceEnd;
+    public static String forceCancel;
+    public static String noPlayer;
+    public static String noScore;
     public static String masteryMessage;
     public static String masteryReward;
     public static String recipeLocked;
@@ -36,8 +44,9 @@ public class MessageManager {
     public static String potCold;
     public static String potCooldown;
     public static String notOnline;
-    public static String notEnoughPlayers;
     public static String pluginError;
+    public static String TOTAL_SCORE;
+    public static String CATCH_AMOUNT;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang +".yml");
@@ -72,9 +81,19 @@ public class MessageManager {
         potCooldown = getOrSet(config, "pot-cooldown", "You need to wait {time} seconds before interacting with this again!");
 
         notOnline = getOrSet(config, "not-online", "That player is not online.");
-        notEnoughPlayers = getOrSet(config, "players-not-enough", "The number of players is not enough for the fishing competition to be started as scheduled.");
+        notEnoughPlayers = getOrSet(config, "players-not-enough", "The number of players who can cook is not enough for the cooking competition to be started as scheduled.");
+        noRank = getOrSet(config, "no-rank", "No Rank");
+        competitionOn = getOrSet(config, "competition-ongoing", "There is currently a cooking tournament in progress! Start cooking to join the contest for a prize!");
+        forceSuccess = getOrSet(config, "force-competition-success", "Forced to start a cooking competition.");
+        forceFailure = getOrSet(config, "force-competition-failure", "The competition does not exist.");
+        forceEnd = getOrSet(config, "force-competition-end", "Forced to end the current competition.");
+        forceCancel = getOrSet(config, "force-competition-cancel", "Forced to cancel the competition");
+        noPlayer = getOrSet(config, "no-player", "No player");
+        noScore = getOrSet(config, "no-score", "No score");
 
         pluginError = getOrSet(config, "plugin-error", "<red>Please contact @Snow'eh on discord with a full report of this error");
+        TOTAL_SCORE = getOrSet(config, "total_score", "Total score");
+        CATCH_AMOUNT = getOrSet(config, "catch_amount", "Catch amount");
         try {
             config.save(new File(CustomCooking.getInstance().getDataFolder(), "messages_" + ConfigManager.lang +".yml"));
         } catch (IOException ignore) {

@@ -6,7 +6,27 @@ mechanics:
   starter-recipes:
     - recipe1
     - recipe2
-    - recipe3
+  namespace: 'customcooking'
+  failure-item: 'failureitem'
+  unlit-cooking-pot: 'cooking_pot_unlit'
+  lit-cooking-pot: 'cooking_pot_lit'
+  pot-effect: 'pot_effect'
+
+gui:
+  config:
+    recipe-book: 'customcooking:recipe_book'
+    mastery-line: "<!italic><#ff9900>Mastery [{mastery}]"
+    mastery-bar: "<!italic><#ffcc33>[{bar}<#ffcc33>]"
+    mastery-true: "<!italic><#ffcc99>This item has been mastered /<!italic><#ffcc99>and will be cooked automatically."
+    mastery-false: "<!italic><#ffcc99>This dish has not been mastered /<!italic><#ffcc99>and will have to be manually cooked."
+    ingredients-line: "<!italic><#ffcc33>Ingredients:"
+    info-cook: "<!italic><#ffcc33>[Click] <#ffcc99>to Cook"
+    info-right-cook: "<!italic><#ffcc33>[Right Click] <#ffcc99>to Cook"
+    info-left-cook: "<!italic><#ffcc33>[Left Click] <#ffcc99>to Autocook"
+  items:
+    unknown-item: 'unknownrecipe'
+    grinder-item: 'grinder'
+
 
 titles:
   success:

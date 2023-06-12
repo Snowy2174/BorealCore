@@ -11,8 +11,6 @@ import plugin.customcooking.CustomCooking;
 import java.util.HashMap;
 import java.util.Map;
 
-import static plugin.customcooking.util.InventoryUtil.buildia;
-
 public class HologramUtil {
 
     private static final Map<Location, Hologram> holograms = new HashMap<>();

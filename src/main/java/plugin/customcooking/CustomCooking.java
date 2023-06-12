@@ -5,16 +5,16 @@ import com.comphenix.protocol.ProtocolManager;
 import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.customcooking.commands.MainCommand;
 import plugin.customcooking.commands.TabCompletion;
 import plugin.customcooking.configs.LayoutManager;
 import plugin.customcooking.configs.MasteryManager;
 import plugin.customcooking.configs.RecipeManager;
+import plugin.customcooking.manager.CompetitionManager;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.manager.FurnitureManager;
+import plugin.customcooking.manager.PlaceholderManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
 import plugin.customcooking.util.PlaceholderUtil;
@@ -25,7 +25,9 @@ public class CustomCooking extends JavaPlugin {
     public static BukkitAudiences adventure;
     public static ProtocolManager protocolManager;
     private static CookingManager cookingManager;
+    private static CompetitionManager competitionManager;
     private static RecipeManager recipeManager;
+    private static PlaceholderManager placeholderManager;
     private static LayoutManager layoutManager;
     private static FurnitureManager furnitureManager;
     private static MasteryManager masteryManager;
@@ -42,6 +44,8 @@ public class CustomCooking extends JavaPlugin {
         protocolManager = ProtocolLibrary.getProtocolManager();
 
         cookingManager = new CookingManager();
+        competitionManager = new CompetitionManager();
+        placeholderManager = new PlaceholderManager();
         layoutManager = new LayoutManager();
         furnitureManager = new FurnitureManager();
         masteryManager = new MasteryManager();
@@ -64,6 +68,8 @@ public class CustomCooking extends JavaPlugin {
     public void onDisable() {
 
         cookingManager.unload();
+        competitionManager.unload();
+        placeholderManager.unload();
         recipeManager.unload();
         layoutManager.unload();
 
@@ -86,7 +92,12 @@ public class CustomCooking extends JavaPlugin {
     public static CookingManager getCookingManager() {
         return cookingManager;
     }
-
+    public CompetitionManager getCompetitionManager() {
+        return competitionManager;
+    }
+    public PlaceholderManager getPlaceholderManager() {
+        return placeholderManager;
+    }
     public static LayoutManager getLayoutManager() {
         return layoutManager;
     }
