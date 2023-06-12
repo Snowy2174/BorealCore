@@ -19,7 +19,7 @@ public class MasteryManager extends Function {
 
     @Override
     public void load() {
-        AdventureUtil.consoleMessage("[CustomCooking] Loaded mastery values");
+        AdventureUtil.consoleMessage(MessageManager.prefix + "Loaded mastery values");
     }
 
     public static void handleMastery(Player player, String recipe) {
@@ -49,8 +49,8 @@ public class MasteryManager extends Function {
             String recipeFormatted = RECIPES.get(recipe).getNick();
 
             ItemsAdder.playTotemAnimation(player, recipe + "_particle");
-            AdventureUtil.consoleMessage("[CustomCooking] Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
-            AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have achieved mastery for the dish: " + recipeFormatted);
+            AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", recipeFormatted ));
 
             // Give the player reward
             giveReward(player, recipeFormatted);
@@ -62,8 +62,8 @@ public class MasteryManager extends Function {
         String command = "av user " + player.getName() + " addpoints 5";
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
 
-        AdventureUtil.consoleMessage("[CustomCooking] Player <green>" + player.getName() + "</green> has been given 5 ₪ for gaining " + recipeFormatted + " mastery");
-        AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have been given 5 ₪ for gaining " + recipeFormatted + " mastery");
+        AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + player.getName() + "</green> has been given 5 ₪ for gaining " + recipeFormatted + " mastery");
+        AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryReward.replace("{recipe}", recipeFormatted));
     }
 
     public static int getMasteryCount(Player player, String recipe) {
@@ -75,7 +75,6 @@ public class MasteryManager extends Function {
     public static int getRequiredMastery(String recipe) {
         Integer mastery = masteryreqs.get(recipe);
         if (mastery == null) {
-            System.out.println("No Mastery Value found for " + recipe);
             return 10;
         }
         return mastery;

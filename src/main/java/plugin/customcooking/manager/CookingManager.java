@@ -12,11 +12,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
-import plugin.customcooking.configs.ConfigManager;
-import plugin.customcooking.configs.LayoutManager;
-import plugin.customcooking.configs.MasteryManager;
+import plugin.customcooking.configs.*;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.configs.RecipeManager;
 import plugin.customcooking.listener.InteractListener;
 import plugin.customcooking.minigame.*;
 import plugin.customcooking.util.AdventureUtil;
@@ -62,7 +59,7 @@ public class CookingManager extends Function {
 
     public void handleCooking(String recipe, Player player, CustomFurniture clickedFurniture, boolean auto) {
         if (isPlayerCooking(player)) {
-            AdventureUtil.playerMessage(player, "<grey>[<bold><red>!</bold><grey>] <red>You're already cooking something.");
+            AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.alreadyCooking);
         } else {
             // get the bar config
             Product bar = RecipeManager.RECIPES.get(recipe);
@@ -77,13 +74,13 @@ public class CookingManager extends Function {
                 }
                 if (auto) {
                     giveItem(player, String.valueOf(successItems.get(recipe)));
-                    playerSound(player, Sound.Source.AMBIENT, key("customcooking", "done"), 1f, 1f);
-                    AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have auto-cooked one " + RECIPES.get(recipe).getNick());
+                    playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
+                    AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingAutocooked.replace("{recipe}", RECIPES.get(recipe).getNick()));
                 } else {
                     onCookedItem(player, bar, clickedFurniture);
                 }
             } else {
-                AdventureUtil.playerMessage(player, "<grey>[<bold><red>!</bold><grey>] <red>You do not have the required ingredients to cook this item.</red>");
+                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.noIngredients);
             }
         }
     }
@@ -102,7 +99,7 @@ public class CookingManager extends Function {
             if (recipe != Product.EMPTY) {
                 // No custom recipe
                 if (recipe == null) {
-                    AdventureUtil.playerMessage(player, "There ain't no custom recipe");
+                    AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>There ain't no custom recipe");
                 } else {
                     showPlayerBar(player, recipe);
                 }
@@ -125,7 +122,7 @@ public class CookingManager extends Function {
 
         if (!cookingPlayer.isSuccess()) {
             if (cookingPot != null) {
-                playCookingResultSFX(cookingPot, build("failureitem"), false);
+                playCookingResultSFX(cookingPot, build(ConfigManager.failureItem), false);
             }
             handleFailureResult(player);
             return;
@@ -146,7 +143,7 @@ public class CookingManager extends Function {
         if (!hasMastery(player, droppedItem.getKey())) {
             MasteryManager.handleMastery(player, droppedItem.getKey());
         }
-        playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.done"), 1f, 1f);
+        playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking.done"), 1f, 1f);
         String drop = perfectItems.get(droppedItem.getKey());
 
         if (cookingPot != null) {
@@ -158,7 +155,7 @@ public class CookingManager extends Function {
     }
 
     private void handleRegularResult(Player player, @Nullable Location cookingPot, DroppedItem droppedItem) {
-        playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking.done"), 1f, 1f);
+        playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking.done"), 1f, 1f);
         String drop = successItems.get(droppedItem.getKey());
 
         if (cookingPot != null) {
@@ -170,7 +167,7 @@ public class CookingManager extends Function {
     }
 
     private void handleFailureResult(Player player) {
-        playerSound(player, Sound.Source.AMBIENT, key("customcooking", "fail"), 1f, 1f);
+        playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "fail"), 1f, 1f);
         AdventureUtil.playerTitle(
                 player,
                 ConfigManager.failureTitle[new Random().nextInt(ConfigManager.failureTitle.length)],
@@ -179,7 +176,7 @@ public class CookingManager extends Function {
                 ConfigManager.failureFadeStay,
                 ConfigManager.failureFadeOut
         );
-        giveItem(player, "failureitem");
+        giveItem(player, ConfigManager.failureItem);
     }
 
 
@@ -254,7 +251,7 @@ public class CookingManager extends Function {
         soundTask = new BukkitRunnable() {
             @Override
             public void run() {
-                playerSound(player, Sound.Source.AMBIENT, key("customcooking", "cooking"), 1f, 1f);
+                playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking"), 1f, 1f);
             }
         };
         soundTask.runTaskTimerAsynchronously(CustomCooking.plugin, 0L, 60L);

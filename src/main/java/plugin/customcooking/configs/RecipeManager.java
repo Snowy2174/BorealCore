@@ -207,7 +207,7 @@ public class RecipeManager extends Function {
         setRecipeData(player, recipe, 0);
 
         ItemsAdder.playTotemAnimation(player, recipe + "_particle");
-        AdventureUtil.playerMessage(player, "<gray>[<green>!<gray>]<green> You have unlocked the recipe " + recipeFormatted);
+        AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.recipeUnlocked.replace("{recipe}", recipeFormatted));
     }
 
     public static void lockRecipe(Player player, String recipe) {
@@ -216,7 +216,7 @@ public class RecipeManager extends Function {
         removeRecipeMasteryData(player, recipe);
 
         ItemsAdder.playTotemAnimation(player, recipe + "_particle");
-        AdventureUtil.playerMessage(player, "<gray>[<red>!<gray>]<red> You have lost the recipe " + recipeFormatted);
+        AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeLocked.replace("{recipe}", recipeFormatted));
     }
 
     public static List<String> getUnlockedRecipes(Player player) {

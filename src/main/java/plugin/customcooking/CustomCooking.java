@@ -21,7 +21,7 @@ import plugin.customcooking.util.PlaceholderUtil;
 
 public class CustomCooking extends JavaPlugin {
 
-    public static Plugin plugin;
+    public static CustomCooking plugin;
     public static BukkitAudiences adventure;
     public static ProtocolManager protocolManager;
     private static CookingManager cookingManager;
@@ -80,6 +80,9 @@ public class CustomCooking extends JavaPlugin {
         ConfigUtil.reload();
     }
 
+    public static CustomCooking getInstance() {
+        return plugin;
+    }
     public static CookingManager getCookingManager() {
         return cookingManager;
     }

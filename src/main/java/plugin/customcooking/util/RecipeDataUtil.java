@@ -4,6 +4,7 @@ import dev.lone.itemsadder.api.ItemsAdder;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.configs.MessageManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +34,8 @@ public class RecipeDataUtil {
         if (count >= requiredMastery) {
             config.set(playerRecipePath, requiredMastery);
             ItemsAdder.playTotemAnimation(player, recipe + "_particle");
-            AdventureUtil.consoleMessage("[CustomCooking] Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
-            AdventureUtil.playerMessage(player, "<gray>[<green><bold>!</bold><gray>] <green>You have achieved mastery for the dish: " + RECIPES.get(recipe).getNick());
+            AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", RECIPES.get(recipe).getNick()));
         }
     }
 

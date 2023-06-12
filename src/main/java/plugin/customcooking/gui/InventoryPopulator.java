@@ -16,7 +16,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.configs.ConfigManager;
 import plugin.customcooking.configs.MasteryManager;
+import plugin.customcooking.configs.MessageManager;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.InventoryUtil;
@@ -31,6 +33,7 @@ public class InventoryPopulator implements InventoryProvider {
 
     private final CookingManager cookingManager;
     private static CustomFurniture clickedFurniture;
+    private static ItemStack unknownRecipeStack;
 
     public static SmartInventory getRecipeBook(CustomFurniture clickedFurniture) {
         return  SmartInventory.builder()
@@ -38,12 +41,13 @@ public class InventoryPopulator implements InventoryProvider {
                 .id("recipeBook")
                 .provider(new InventoryPopulator(clickedFurniture))
                 .size(6, 9)
-                .title(ChatColor.WHITE + new FontImageWrapper("customcooking:recipe_book").applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString( ChatColor.RESET + "Recipe Book", -185))
+                .title(ChatColor.WHITE + new FontImageWrapper(ConfigManager.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString( ChatColor.RESET + "Recipe Book", -185))
                 .build();
     }
     public InventoryPopulator(CustomFurniture clickedFurniture) {
         this.cookingManager = new CookingManager();
         this.clickedFurniture = clickedFurniture;
+        this.unknownRecipeStack = build(ConfigManager.unknownItem);
     }
 
     @Override
@@ -53,8 +57,8 @@ public class InventoryPopulator implements InventoryProvider {
 
     @Override
     public void init(Player player, InventoryContents contents) {
-        contents.fill( ClickableItem.of(build("unknownrecipe"),
-                e -> AdventureUtil.playerMessage(player, "<gray>[<red>!<gray>]<red> You haven't unlocked this recipe yet..")));
+        contents.fill( ClickableItem.of(unknownRecipeStack,
+                e -> AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown)));
         contents.fillBorders(ClickableItem.empty(new ItemStack (Material.AIR)));
         contents.set(5, 5, ClickableItem.of(buildIngredientsItem(), e -> handleIngredientsMenuClick(e, player)));
 
@@ -88,7 +92,7 @@ public class InventoryPopulator implements InventoryProvider {
     private ItemStack buildRecipeItem(String recipe, Player player, boolean hasMastery){
         CustomStack customStack = CustomStack.getInstance(recipe);
         if (customStack == null) {
-            return new ItemStack(CustomStack.getInstance("unknownrecipe").getItemStack());
+            return unknownRecipeStack;
         } else {
             ItemStack stack = customStack.getItemStack();
             modifyLore(stack, player, recipe, hasMastery);
@@ -99,13 +103,13 @@ public class InventoryPopulator implements InventoryProvider {
     private ItemStack buildUnknownItem(String recipe){
         CustomStack customStack = CustomStack.getInstance(recipe);
         if (customStack == null) {
-            return new ItemStack(CustomStack.getInstance("unknownrecipe").getItemStack());
+            return unknownRecipeStack;
         } else {
             ItemStack stack = customStack.getItemStack();
             ItemMeta itemMeta = stack.getItemMeta();
             if (itemMeta != null) {
-                itemMeta.setLore(CustomStack.getInstance("unknownrecipe").getItemStack().getItemMeta().getLore());
-                itemMeta.setDisplayName(CustomStack.getInstance("unknownrecipe").getItemStack().getItemMeta().getDisplayName());
+                itemMeta.setLore(unknownRecipeStack.getItemMeta().getLore());
+                itemMeta.setDisplayName(unknownRecipeStack.getItemMeta().getDisplayName());
                 stack.setItemMeta(itemMeta);
             } else {
                 System.out.println("ItemMeta is null!");
@@ -115,7 +119,7 @@ public class InventoryPopulator implements InventoryProvider {
     }
 
     private ItemStack buildIngredientsItem(){
-            return new ItemStack(CustomStack.getInstance("grinder").getItemStack());
+            return new ItemStack(CustomStack.getInstance(ConfigManager.grinderItem).getItemStack());
     }
 
     private void handleItemClick(InventoryClickEvent event, Player player, String recipe, boolean hasRecipe, boolean hasMastery) {
@@ -139,7 +143,7 @@ public class InventoryPopulator implements InventoryProvider {
                 }
                 event.setCancelled(true);
             } else {
-                AdventureUtil.playerMessage(player, "<gray>[<red>!<gray>]<red> You haven't unlocked this recipe yet..");
+                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown);
             }
         }
     }
@@ -173,10 +177,10 @@ public class InventoryPopulator implements InventoryProvider {
 
         lore.add(" ");
         if (Boolean.TRUE.equals(hasMastery)) {
-            lore.add("<!italic><#ffcc33>[Right Click] <#ffcc99>to Cook");
-            lore.add("<!italic><#ffcc33>[Left Click] <#ffcc99>to Autocook");
+            lore.add(ConfigManager.cookLineRight);
+            lore.add(ConfigManager.cookLineLeft);
         } else {
-            lore.add("<!italic><#ffcc33>[Click] <#ffcc99>to Cook");
+            lore.add(ConfigManager.cookLine);
         }
 
         // Create a new list to store parsed lore
@@ -195,15 +199,19 @@ public class InventoryPopulator implements InventoryProvider {
 
         if (Boolean.TRUE.equals(hasMastery)) {
             lore.add(" ");
-            lore.add("<!italic><#ff9900>Mastery [" + MasteryManager.getMasteryCount(player, recipe) + "/" + MasteryManager.getRequiredMastery(recipe) + "]");
-            lore.add("<!italic><#ffcc99>This item has been mastered");
-            lore.add("<!italic><#ffcc99>and will be cooked automatically.");
+            lore.add(ConfigManager.masteryLine + MasteryManager.getMasteryCount(player, recipe) + "/" + MasteryManager.getRequiredMastery(recipe) + "]");
+            String[] masteryInfo = ConfigManager.masteryInfoTrue.split("/");
+            lore.add(masteryInfo[0]);
+            lore.add(masteryInfo[1]);
         } else {
+            Integer masteryCount = MasteryManager.getMasteryCount(player, recipe);
+            Integer requiredMastery = MasteryManager.getRequiredMastery(recipe);
             lore.add(" ");
-            lore.add("<!italic><#ff9900>Mastery [" + MasteryManager.getMasteryCount(player, recipe) + "/" + MasteryManager.getRequiredMastery(recipe) + "]");
-            lore.add("<!italic><#ffcc33>[" + appendProgressBar(MasteryManager.getMasteryCount(player, recipe) / MasteryManager.getRequiredMastery(recipe)) + "<#ffcc33>]");
-            lore.add("<!italic><#ffcc99>This dish has not been mastered");
-            lore.add("<!italic><#ffcc99>and will have to be manually cooked.");
+            lore.add(ConfigManager.masteryLine.replace("{mastery}", (masteryCount + "/" + requiredMastery)));
+            lore.add(ConfigManager.masteryBar.replace("{bar}", appendProgressBar(masteryCount/requiredMastery)));
+            String[] masteryInfo = ConfigManager.masteryInfoFalse.split("/");
+            lore.add(masteryInfo[0]);
+            lore.add(masteryInfo[1]);
         }
     }
 
@@ -226,7 +234,7 @@ public class InventoryPopulator implements InventoryProvider {
 
     private void appendIngredients(List<String> lore, Player player, List<String> ingredients) {
         lore.add(" ");
-        lore.add("<!italic><#ffcc33>Ingredients:");
+        lore.add(ConfigManager.ingredientsLine);
 
         for (String ingredient : ingredients) {
             String[] parts = ingredient.split(":");

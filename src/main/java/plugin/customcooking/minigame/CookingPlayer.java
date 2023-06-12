@@ -2,6 +2,7 @@ package plugin.customcooking.minigame;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import plugin.customcooking.configs.MessageManager;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.util.AdventureUtil;
 
@@ -46,7 +47,7 @@ public class CookingPlayer extends BukkitRunnable {
     @Override
     public void run() {
         if (System.currentTimeMillis() > deadline) {
-            AdventureUtil.playerMessage(player, "You've failed to produce the dish in the required time");
+            AdventureUtil.playerMessage(player, MessageManager.tooSlow);
             cookingManager.removeCookingPlayer(player);
             cancel();
             return;

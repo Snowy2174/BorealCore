@@ -7,6 +7,25 @@ import java.util.List;
 
 public class ConfigManager {
     public static String lang;
+    public static Integer perfectChance;
+    public static int splashTime;
+    public static List<String> starterRecipes;
+    public static String customNamespace;
+    public static String failureItem;
+    public static String unlitCookingPot;
+    public static String litCookingPot;
+    public static String splashEffect;
+    public static String recipeBookTextureNamespace;
+    public static String masteryLine;
+    public static String masteryBar;
+    public static String masteryInfoTrue;
+    public static String masteryInfoFalse;
+    public static String ingredientsLine;
+    public static String cookLine;
+    public static String cookLineRight;
+    public static String cookLineLeft;
+    public static String unknownItem;
+    public static String grinderItem;
     public static String[] successTitle;
     public static String[] successSubTitle;
     public static int successFadeIn;
@@ -17,9 +36,6 @@ public class ConfigManager {
     public static int failureFadeIn;
     public static int failureFadeStay;
     public static int failureFadeOut;
-    public static Integer perfectChance;
-    public static int splashTime;
-    public static List<String> starterRecipes;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
@@ -30,6 +46,24 @@ public class ConfigManager {
         splashTime = config.getInt("mechanics.splash-time", 100);
 
         starterRecipes = config.getStringList("mechanics.starter-recipes");
+        customNamespace = config.getString("mechanics.namespace", "customcooking");
+        failureItem = config.getString("mechanics.failure-item", "failureitem");
+        unlitCookingPot = config.getString("mechanics.unlit-cooking-pot", "cooking_pot_unlit");
+        litCookingPot = config.getString("mechanics.lit-cooking-pot", "cooking_pot_lit");
+        splashEffect = config.getString("mechanics.pot-effect", "pot_effect");
+
+        recipeBookTextureNamespace = config.getString("gui.config.recipe-book", "customcooking:recipe_book");
+        masteryLine = config.getString("gui.config.mastery-line", "<!italic><#ff9900>Mastery [{mastery}]");
+        masteryBar = config.getString("gui.config.mastery-bar", "<!italic><#ffcc33>[{bar}<#ffcc33>]");
+        masteryInfoTrue = config.getString("gui.config.mastery-true", "<!italic><#ffcc99>This item has been mastered /<!italic><#ffcc99>and will be cooked automatically.");
+        masteryInfoFalse = config.getString("gui.config.mastery-false", "<!italic><#ffcc99>This dish has not been mastered /<!italic><#ffcc99>and will have to be manually cooked.");
+        ingredientsLine = config.getString("gui.config.ingredients-line", "<!italic><#ffcc33>Ingredients:");
+        cookLine = config.getString("gui.config.info-cook", "<!italic><#ffcc33>[Click] <#ffcc99>to Cook");
+        cookLineRight = config.getString("gui.config.info-right-cook", "<!italic><#ffcc33>[Right Click] <#ffcc99>to Cook");
+        cookLineLeft = config.getString("gui.config.info-left-cook", "<!italic><#ffcc33>[Left Click] <#ffcc99>to Autocook");
+        unknownItem = config.getString("gui.items.unknown-item", "unknownrecipe");
+        grinderItem = config.getString("gui.items.grinder-item", "grinder");
+
 
         successTitle = config.getStringList("titles.success.title").toArray(new String[0]);
         successSubTitle = config.getStringList("titles.success.subtitle").toArray(new String[0]);

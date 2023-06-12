@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import plugin.customcooking.configs.MessageManager;
 import plugin.customcooking.configs.RecipeManager;
 import plugin.customcooking.gui.InventoryPopulator;
 import plugin.customcooking.manager.CookingManager;
@@ -13,22 +14,22 @@ import plugin.customcooking.util.ConfigUtil;
 import plugin.customcooking.util.InventoryUtil;
 
 import static net.kyori.adventure.key.Key.key;
+import static plugin.customcooking.configs.MessageManager.infoNegative;
+import static plugin.customcooking.configs.MessageManager.noPerms;
 import static plugin.customcooking.util.RecipeDataUtil.setRecipeData;
 
 public class MainCommand implements CommandExecutor {
 
-    private final InventoryUtil inventoryUtil;
     private final CookingManager cookingManager;
 
     public MainCommand() {
-        this.inventoryUtil = new InventoryUtil();
         this.cookingManager = new CookingManager();
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("customcooking.admin")) {
-            AdventureUtil.sendMessage(sender, "<red>You don't have permission to use this command.");
+            AdventureUtil.sendMessage(sender, MessageManager.noPerms);
             return true;
         }
 
@@ -58,7 +59,7 @@ public class MainCommand implements CommandExecutor {
         }
         else {
             // Unknown subcommand
-            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> Unknown subcommand: " + subcommand);
+            AdventureUtil.sendMessage(sender,  MessageManager.infoNegative + MessageManager.unavailableArgs);
         }
 
         return true;
@@ -76,7 +77,7 @@ public class MainCommand implements CommandExecutor {
 
     private void handleCookCommand(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking cook <recipe> <player> <auto>");
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking cook <recipe> <player> <auto>");
             return;
         }
 
@@ -88,7 +89,7 @@ public class MainCommand implements CommandExecutor {
         if (player != null) {
             cookingManager.handleCooking(recipe, player, null, auto);
         } else {
-            AdventureUtil.consoleMessage("<Red> [!] Player " + username + " not found.");
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
         }
 
     }
@@ -96,24 +97,24 @@ public class MainCommand implements CommandExecutor {
     private void handleReloadCommand(CommandSender sender) {
         long startTime = System.currentTimeMillis();
         ConfigUtil.reload();
-        AdventureUtil.sendMessage(sender, "<gray>[CustomCooking] Reloaded plugin in <green>" + (System.currentTimeMillis() - startTime) + "ms");
+        AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.reload.replace("{time}", String.valueOf(System.currentTimeMillis() - startTime)));
     }
 
     private void handleMigratePermsCommand(CommandSender sender) {
         long startTime = System.currentTimeMillis();
         int migratedCount = RecipeManager.migratePermissions();
-        AdventureUtil.sendMessage(sender, "<gray>[CustomCooking] Migrated and Updated the perms for <green>" + migratedCount + "Recipes and Masteries <gray> in <green>" + (System.currentTimeMillis() - startTime) + "ms" );
+        AdventureUtil.sendMessage(sender, MessageManager.prefix + " Migrated and Updated the perms for <green>" + migratedCount + "Recipes and Masteries <gray> in <green>" + (System.currentTimeMillis() - startTime) + "ms" );
     }
 
     private void handleUnlockCommand(CommandSender sender, String[] args) {
         if (args.length < 1) {
-            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking unlock <player> <recipe>");
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking unlock <player> <recipe>");
             return;
         }
 
         Player player = Bukkit.getPlayer(args[0]);
         if (player == null) {
-            AdventureUtil.consoleMessage("<Red> [!] Player " + args[0] + " not found.");
+            AdventureUtil.consoleMessage(MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
 
@@ -129,13 +130,13 @@ public class MainCommand implements CommandExecutor {
                 RecipeManager.unlockRecipe(player, recipe);
             }
         } else {
-            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking unlock <player> <recipe>");
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking unlock <player> <recipe>");
         }
     }
 
     private void handleLockCommand(CommandSender sender, String[] args) {
         if (args.length < 1) {
-            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking lock <player> <recipe>");
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking lock <player> <recipe>");
             return;
         }
 
@@ -148,13 +149,13 @@ public class MainCommand implements CommandExecutor {
             }
             RecipeManager.lockRecipe(player, recipe);
         } else {
-            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking lock <player> <recipe>");
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking lock <player> <recipe>");
         }
     }
 
     private void handleMasteryCommand(CommandSender sender, String[] args) {
         if (args.length < 1) {
-            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking mastery <player> <recipe> <count>");
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking mastery <player> <recipe> <count>");
             return;
         }
 
@@ -168,7 +169,7 @@ public class MainCommand implements CommandExecutor {
             }
             setRecipeData(player, recipe, count);
         } else {
-            AdventureUtil.sendMessage(sender, "<grey>[<red><bold>!</bold><grey>]<red> /cooking mastery <player> <recipe> <count>\"");
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking mastery <player> <recipe> <count>");
         }
     }
 

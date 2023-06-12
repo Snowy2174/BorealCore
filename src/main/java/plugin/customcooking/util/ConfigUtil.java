@@ -3,6 +3,7 @@ package plugin.customcooking.util;
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.customcooking.configs.ConfigManager;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.configs.MessageManager;
 
 import java.io.File;
 
@@ -16,6 +17,7 @@ public class ConfigUtil {
 
     public static void reload() {
         ConfigManager.load();
+        MessageManager.load();
         CustomCooking.getLayoutManager().unload();
         CustomCooking.getLayoutManager().load();
         CustomCooking.getRecipeManager().unload();
