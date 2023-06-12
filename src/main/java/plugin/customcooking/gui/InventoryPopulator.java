@@ -32,7 +32,7 @@ public class InventoryPopulator implements InventoryProvider {
     private final CookingManager cookingManager;
     private static CustomFurniture clickedFurniture;
 
-    public static SmartInventory getRecipeBook(CustomFurniture clickedFurniture, Player player) {
+    public static SmartInventory getRecipeBook(CustomFurniture clickedFurniture) {
         return  SmartInventory.builder()
                 .manager(CustomCooking.getInventoryManager())
                 .id("recipeBook")
@@ -47,7 +47,9 @@ public class InventoryPopulator implements InventoryProvider {
     }
 
     @Override
-    public void update(Player player, InventoryContents contents) {}
+    public void update(Player player, InventoryContents contents) {
+        // Doesn't do anything yet, eventually will update ingredients?
+    }
 
     @Override
     public void init(Player player, InventoryContents contents) {
@@ -86,7 +88,6 @@ public class InventoryPopulator implements InventoryProvider {
     private ItemStack buildRecipeItem(String recipe, Player player, boolean hasMastery){
         CustomStack customStack = CustomStack.getInstance(recipe);
         if (customStack == null) {
-            System.out.println("CustomStack is INVALID! for recipe: " + recipe);
             return new ItemStack(CustomStack.getInstance("unknownrecipe").getItemStack());
         } else {
             ItemStack stack = customStack.getItemStack();
@@ -171,7 +172,7 @@ public class InventoryPopulator implements InventoryProvider {
 
 
         lore.add(" ");
-        if (hasMastery) {
+        if (Boolean.TRUE.equals(hasMastery)) {
             lore.add("<!italic><#ffcc33>[Right Click] <#ffcc99>to Cook");
             lore.add("<!italic><#ffcc33>[Left Click] <#ffcc99>to Autocook");
         } else {
@@ -192,7 +193,7 @@ public class InventoryPopulator implements InventoryProvider {
 
     private void appendMastery(List<String> lore, Player player, String recipe, Boolean hasMastery) {
 
-        if (hasMastery) {
+        if (Boolean.TRUE.equals(hasMastery)) {
             lore.add(" ");
             lore.add("<!italic><#ff9900>Mastery [" + MasteryManager.getMasteryCount(player, recipe) + "/" + MasteryManager.getRequiredMastery(recipe) + "]");
             lore.add("<!italic><#ffcc99>This item has been mastered");
@@ -226,7 +227,6 @@ public class InventoryPopulator implements InventoryProvider {
     private void appendIngredients(List<String> lore, Player player, List<String> ingredients) {
         lore.add(" ");
         lore.add("<!italic><#ffcc33>Ingredients:");
-        System.out.println(ingredients);
 
         for (String ingredient : ingredients) {
             String[] parts = ingredient.split(":");

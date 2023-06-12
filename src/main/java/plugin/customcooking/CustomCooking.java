@@ -75,6 +75,7 @@ public class CustomCooking extends JavaPlugin {
         }
     }
 
+    @Override
     public void reloadConfig() {
         ConfigUtil.reload();
     }

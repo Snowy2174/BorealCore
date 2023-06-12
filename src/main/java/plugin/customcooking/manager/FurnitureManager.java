@@ -15,15 +15,14 @@ import plugin.customcooking.gui.InventoryPopulator;
 import plugin.customcooking.listener.FurnitureListener;
 import plugin.customcooking.minigame.Function;
 import plugin.customcooking.util.AdventureUtil;
-import plugin.customcooking.util.FakeItemUtil;
 
 import java.util.*;
 
 import static net.kyori.adventure.key.Key.key;
 import static plugin.customcooking.configs.ConfigManager.splashTime;
 import static plugin.customcooking.util.AdventureUtil.playerSound;
+import static plugin.customcooking.util.HologramUtil.createHologram;
 import static plugin.customcooking.util.InventoryUtil.build;
-import static plugin.customcooking.util.InventoryUtil.buildia;
 
 public class FurnitureManager extends Function {
 
@@ -78,7 +77,7 @@ public class FurnitureManager extends Function {
             }
         } else if (clickedFurniture.getId().equals("cooking_pot_lit")) {
             playCookingPotFX(clickedFurniture.getArmorstand().getLocation());
-            InventoryPopulator.getRecipeBook(clickedFurniture, player).open(player);
+            InventoryPopulator.getRecipeBook(clickedFurniture).open(player);
         }
     }
 
@@ -90,32 +89,37 @@ public class FurnitureManager extends Function {
         }
     }
 
-    public static void ingredientsSFX(Player player, List<String> ingredients, CustomFurniture clickedFurniture) {
-        Location loc = clickedFurniture.getArmorstand().getLocation();
+    public static void ingredientsSFX(Player player, List<String> ingredients, Location loc) {
         spawnNextIngredient(loc, player, ingredients, 0); // Start spawning ingredients from index 0
     }
 
     private static void spawnNextIngredient(Location loc, Player player, List<String> ingredients, int currentIndex) {
         if (currentIndex >= ingredients.size()) {
             // All ingredients have been spawned
+            // TODO: add code to continue cooking the recipe
             return;
         }
 
         String ingredient = ingredients.get(currentIndex);
         String[] parts = ingredient.split(":");
+        Random random = new Random();
+        int i = random.nextInt(3);
 
         if (parts[0].endsWith("*")) {
             parts[0] = parts[0].replaceAll("\\*", "");
         }
 
-        spawnFakeIngredientItem(loc, parts[0], () -> {
-            // After the fake ingredient is removed, spawn the next ingredient
-            spawnNextIngredient(loc, player, ingredients, currentIndex + 1);
-        });
-        spawnSplashItem(loc);
-        Random random = new Random();
-        int i = random.nextInt(3);
-        playerSound(player, net.kyori.adventure.sound.Sound.Source.AMBIENT, key("customcooking", "ingredient"+ i), 1f, 1f);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                spawnFakeIngredientItem(loc, parts[0], () -> {
+                    // After the fake ingredient is removed, spawn the next ingredient
+                    spawnNextIngredient(loc, player, ingredients, currentIndex + 1);
+                });
+                spawnSplashItem(loc);
+                playerSound(player, net.kyori.adventure.sound.Sound.Source.AMBIENT, key("customcooking", "ingredient"+ i), 1f, 1f);
+            }
+        }.runTaskLater(CustomCooking.plugin, 20);
     }
 
     private static void spawnFakeIngredientItem(Location loc, String ingredient, Runnable onComplete) {
@@ -135,26 +139,6 @@ public class FurnitureManager extends Function {
             }
         }.runTaskLater(CustomCooking.plugin, 10);
     }
-
-    private static void spawnFakeRecipeItem(Location loc, ItemStack cookedStack) {
-
-        Location spawnLocation = loc.clone().add(0,2,0);
-
-        // Create a dropped item entity at the specified location
-        Item itemEntity = loc.getWorld().dropItem(spawnLocation, cookedStack);
-        itemEntity.setCanPlayerPickup(false);
-        itemEntity.setGravity(false);
-
-        // Schedule a task to remove the item entity after a set time
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                itemEntity.remove(); // Remove the item entity from the world
-            }
-        }.runTaskLater(CustomCooking.plugin, 20);
-    }
-
-
     private static void spawnSplashItem(Location loc) {
 
         Location spawnLocation = loc.clone().subtract(0,0.1,0);
@@ -180,22 +164,27 @@ public class FurnitureManager extends Function {
 
 
     static void playCookingResultSFX(Location loc, ItemStack item, Boolean success) {
-        if (success) {
-            // Particles: composter
-            loc.getWorld().spawnParticle(Particle.COMPOSTER, loc.add(0, 1.25, 0), 15, 0.5, 0.5, 0.5);
-        }
-        else {
-            // Particles: squid_ink
-            loc.getWorld().spawnParticle(Particle.SQUID_INK, loc.add(0, 1.25, 0), 15, 0.5, 0.5, 0.5);
-        }
-        playCookingPreview(loc, item);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (success) {
+                    // Particles: composter
+                    loc.getWorld().spawnParticle(Particle.COMPOSTER, loc.add(0, 1.25, 0), 15, 0.5, 0.5, 0.5);
+                }
+                else {
+                    // Particles: squid_ink
+                    loc.getWorld().spawnParticle(Particle.SQUID_INK, loc.add(0, 1.25, 0), 15, 0.5, 0.5, 0.5);
+                }
+                playCookingPreview(loc, item, success);
+            }
+        }.runTaskLater(CustomCooking.plugin, 10);
     }
 
-    private static void playCookingPreview(Location loc, ItemStack item) {
+    private static void playCookingPreview(Location loc, ItemStack item, Boolean success) {
         // Particles: crit
         loc.getWorld().spawnParticle(Particle.CRIT, loc.add(0, 1.5, 0), 15, 0.25, 0.25, 0.25, 0.2);
         // Spawn recipe item preview
-        spawnFakeRecipeItem(loc, item);
+        createHologram(item, loc.clone().add(0,2,0), success);
     }
 
 
@@ -220,13 +209,9 @@ public class FurnitureManager extends Function {
         // Particles: flame
         loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
 
-        // Particles: campfire_cosy_smoke TODO: FIX PARTICLE DIRECTION
+        // Particles: campfire_cosy_smoke
         Location smokeLocation = loc.clone().add(0,1,0);
-        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, smokeLocation, 0, 0, 1, 0, 0.02, null, true);
-        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, smokeLocation, 0, 0, 1, 0, 0.02, null, true);
-        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, smokeLocation, 0, 0, 1, 0, 0.02, null, true);
-        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, smokeLocation, 0, 0, 1, 0, 0.02, null, true);
-
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, smokeLocation, 0, 0, 1, 0, 0.03, null, true);
 
         // Sound: block.fire.ambient
         loc.getWorld().playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 1f);

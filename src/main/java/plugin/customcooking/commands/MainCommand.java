@@ -174,7 +174,7 @@ public class MainCommand implements CommandExecutor {
 
     private void handleRecipeBookCommand(CommandSender sender, String[] args) {
         if (sender instanceof Player player) {
-            InventoryPopulator.getRecipeBook(null, player).open(player);
+            InventoryPopulator.getRecipeBook(null).open(player);
         }
     }
 }

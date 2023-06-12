@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static plugin.customcooking.configs.MasteryManager.*;
 import static plugin.customcooking.util.RecipeDataUtil.removeRecipeMasteryData;
 import static plugin.customcooking.util.RecipeDataUtil.setRecipeData;
 

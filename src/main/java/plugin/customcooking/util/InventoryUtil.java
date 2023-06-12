@@ -1,33 +1,20 @@
 package plugin.customcooking.util;
 
 import dev.lone.itemsadder.api.CustomStack;
-import net.kyori.adventure.sound.Sound;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.customcooking.configs.RecipeManager;
-import plugin.customcooking.CustomCooking;
-import plugin.customcooking.manager.CookingManager;
-import plugin.customcooking.minigame.Product;
 
 import java.util.List;
 
-import static net.kyori.adventure.key.Key.key;
-import static plugin.customcooking.configs.RecipeManager.successItems;
-import static plugin.customcooking.util.AdventureUtil.playerSound;
-
 public class InventoryUtil {
 
-    private static CookingManager cookingManager;
+    public InventoryUtil() {}
 
-    public InventoryUtil() {
-        this.cookingManager = CustomCooking.getCookingManager();
-    }
-
-    public static boolean playerHasIngredients(Inventory playerInventory, List<String> ingredients) {
+    public static boolean handleIngredientCheck(Inventory playerInventory, List<String> ingredients) {
         if (ingredients == null || ingredients.isEmpty()) {
             return true; // consider inventory as having all ingredients if list is empty
         }
@@ -50,7 +37,7 @@ public class InventoryUtil {
                         return false; // invalid material name
                     }
                     int amount = Integer.parseInt(parts[1]);
-                    if (!playerInventory.contains(material, amount)) {
+                    if (!playerInventory.containsAtLeast(new ItemStack(material), amount)) {
                         return false; // ingredient not found in player's inventory
                     }
                 }
@@ -160,9 +147,8 @@ public class InventoryUtil {
             } else {
                 Material material = Material.getMaterial(ingredient);
                 if (material != null) {
-                    return playerInventory.contains(material);
+                    return playerInventory.containsAtLeast(new ItemStack(material), 1);
                 } else {
-                    System.out.println("Invalid ingredient: " + ingredient);
                     return false;
                 }
             }
