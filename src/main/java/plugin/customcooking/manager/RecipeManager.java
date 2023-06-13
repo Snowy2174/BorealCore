@@ -15,7 +15,8 @@ import plugin.customcooking.CustomCooking;
 import plugin.customcooking.configs.ConfigManager;
 import plugin.customcooking.configs.LayoutManager;
 import plugin.customcooking.configs.MessageManager;
-import plugin.customcooking.minigame.*;
+import plugin.customcooking.cooking.*;
+import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
 

@@ -14,7 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.configs.*;
 import plugin.customcooking.listener.InteractListener;
-import plugin.customcooking.minigame.*;
+import plugin.customcooking.cooking.*;
+import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
 
 import java.util.HashMap;

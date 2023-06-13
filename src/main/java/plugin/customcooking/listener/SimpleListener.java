@@ -4,7 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import plugin.customcooking.minigame.Function;
+import plugin.customcooking.object.Function;
 
 public record SimpleListener(Function function) implements Listener {
 

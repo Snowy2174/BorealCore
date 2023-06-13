@@ -1,10 +1,10 @@
-package plugin.customcooking.competition;
+package plugin.customcooking.cooking.competition;
 
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.manager.CompetitionManager;
-import plugin.customcooking.minigame.Function;
+import plugin.customcooking.object.Function;
 
 import java.time.LocalTime;
 

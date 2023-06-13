@@ -1,4 +1,4 @@
-package plugin.customcooking.competition.bossbar;
+package plugin.customcooking.cooking.competition.bossbar;
 
 import org.bukkit.boss.BarColor;
 

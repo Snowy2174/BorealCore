@@ -1,7 +1,7 @@
-package plugin.customcooking.competition;
+package plugin.customcooking.cooking.competition;
 
-import plugin.customcooking.action.ActionInterface;
-import plugin.customcooking.competition.bossbar.BossBarConfig;
+import plugin.customcooking.cooking.action.ActionInterface;
+import plugin.customcooking.cooking.competition.bossbar.BossBarConfig;
 
 import java.util.Calendar;
 import java.util.HashMap;

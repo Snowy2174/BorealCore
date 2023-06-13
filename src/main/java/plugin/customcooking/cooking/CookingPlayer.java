@@ -1,4 +1,4 @@
-package plugin.customcooking.minigame;
+package plugin.customcooking.cooking;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;

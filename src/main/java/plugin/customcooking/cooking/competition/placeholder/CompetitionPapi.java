@@ -1,10 +1,10 @@
-package plugin.customcooking.competition.placeholder;
+package plugin.customcooking.cooking.competition.placeholder;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import plugin.customcooking.competition.Competition;
-import plugin.customcooking.competition.ranking.RankingInterface;
+import plugin.customcooking.cooking.competition.Competition;
+import plugin.customcooking.cooking.competition.ranking.RankingInterface;
 import plugin.customcooking.configs.MessageManager;
 
 import javax.annotation.Nullable;

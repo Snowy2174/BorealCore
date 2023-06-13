@@ -1,14 +1,14 @@
-package plugin.customcooking.competition;
+package plugin.customcooking.cooking.competition;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.action.ActionInterface;
-import plugin.customcooking.competition.bossbar.BossBarManager;
-import plugin.customcooking.competition.ranking.LocalRankingImpl;
-import plugin.customcooking.competition.ranking.RankingInterface;
+import plugin.customcooking.cooking.action.ActionInterface;
+import plugin.customcooking.cooking.competition.bossbar.BossBarManager;
+import plugin.customcooking.cooking.competition.ranking.LocalRankingImpl;
+import plugin.customcooking.cooking.competition.ranking.RankingInterface;
 import plugin.customcooking.configs.MessageManager;
 import plugin.customcooking.manager.PlaceholderManager;
 import plugin.customcooking.util.AdventureUtil;

@@ -1,7 +1,7 @@
-package plugin.customcooking.competition.ranking;
+package plugin.customcooking.cooking.competition.ranking;
 
 import org.jetbrains.annotations.Nullable;
-import plugin.customcooking.competition.CompetitionPlayer;
+import plugin.customcooking.cooking.competition.CompetitionPlayer;
 
 import java.util.Iterator;
 

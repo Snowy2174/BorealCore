@@ -1,6 +1,6 @@
-package plugin.customcooking.competition.ranking;
+package plugin.customcooking.cooking.competition.ranking;
 
-import plugin.customcooking.competition.CompetitionPlayer;
+import plugin.customcooking.cooking.competition.CompetitionPlayer;
 
 import java.util.*;
 

@@ -1,4 +1,4 @@
-package plugin.customcooking.minigame;
+package plugin.customcooking.cooking;
 
 public class Layout {
 

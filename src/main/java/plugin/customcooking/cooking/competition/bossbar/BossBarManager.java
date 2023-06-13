@@ -1,13 +1,13 @@
-package plugin.customcooking.competition.bossbar;
+package plugin.customcooking.cooking.competition.bossbar;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.competition.Competition;
+import plugin.customcooking.cooking.competition.Competition;
 import plugin.customcooking.configs.MessageManager;
 import plugin.customcooking.listener.SimpleListener;
-import plugin.customcooking.minigame.Function;
+import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
 
 import java.util.HashMap;

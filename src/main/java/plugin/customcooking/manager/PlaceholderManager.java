@@ -2,8 +2,8 @@ package plugin.customcooking.manager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import plugin.customcooking.competition.placeholder.CompetitionPapi;
-import plugin.customcooking.minigame.Function;
+import plugin.customcooking.cooking.competition.placeholder.CompetitionPapi;
+import plugin.customcooking.object.Function;
 import plugin.customcooking.util.PlaceholderUtil;
 
 import java.util.ArrayList;

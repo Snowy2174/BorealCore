@@ -1,4 +1,4 @@
-package plugin.customcooking.action;
+package plugin.customcooking.cooking.action;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

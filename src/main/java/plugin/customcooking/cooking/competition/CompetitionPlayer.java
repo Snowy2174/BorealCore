@@ -1,4 +1,4 @@
-package plugin.customcooking.competition;
+package plugin.customcooking.cooking.competition;
 
 import org.jetbrains.annotations.NotNull;
 

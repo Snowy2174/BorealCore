@@ -1,4 +1,4 @@
-package plugin.customcooking.gui;
+package plugin.customcooking.manager;
 
 import dev.lone.itemsadder.api.CustomFurniture;
 import dev.lone.itemsadder.api.CustomStack;
@@ -19,7 +19,6 @@ import plugin.customcooking.CustomCooking;
 import plugin.customcooking.configs.ConfigManager;
 import plugin.customcooking.configs.MasteryManager;
 import plugin.customcooking.configs.MessageManager;
-import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.InventoryUtil;
 
@@ -29,7 +28,7 @@ import java.util.List;
 import static plugin.customcooking.manager.RecipeManager.*;
 import static plugin.customcooking.util.InventoryUtil.build;
 
-public class InventoryPopulator implements InventoryProvider {
+public class RecipeBookManager implements InventoryProvider {
 
     private final CookingManager cookingManager;
     private static CustomFurniture clickedFurniture;
@@ -39,12 +38,12 @@ public class InventoryPopulator implements InventoryProvider {
         return  SmartInventory.builder()
                 .manager(CustomCooking.getInventoryManager())
                 .id("recipeBook")
-                .provider(new InventoryPopulator(clickedFurniture))
+                .provider(new RecipeBookManager(clickedFurniture))
                 .size(6, 9)
                 .title(ChatColor.WHITE + new FontImageWrapper(ConfigManager.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString( ChatColor.RESET + "Recipe Book", -190))
                 .build();
     }
-    public InventoryPopulator(CustomFurniture clickedFurniture) {
+    public RecipeBookManager(CustomFurniture clickedFurniture) {
         this.cookingManager = new CookingManager();
         this.clickedFurniture = clickedFurniture;
         this.unknownRecipeStack = build(ConfigManager.unknownItem);

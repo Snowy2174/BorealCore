@@ -1,4 +1,4 @@
-package plugin.customcooking.competition;
+package plugin.customcooking.cooking.competition;
 
 public enum CompetitionGoal {
 

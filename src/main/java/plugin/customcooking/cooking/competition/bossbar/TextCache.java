@@ -1,9 +1,9 @@
-package plugin.customcooking.competition.bossbar;
+package plugin.customcooking.cooking.competition.bossbar;
 
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.competition.Competition;
-import plugin.customcooking.competition.ranking.RankingInterface;
+import plugin.customcooking.cooking.competition.Competition;
+import plugin.customcooking.cooking.competition.ranking.RankingInterface;
 import plugin.customcooking.configs.MessageManager;
 import plugin.customcooking.manager.PlaceholderManager;
 

@@ -1,4 +1,4 @@
-package plugin.customcooking.competition.bossbar;
+package plugin.customcooking.cooking.competition.bossbar;
 
 
 import com.comphenix.protocol.PacketType;
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.competition.Competition;
+import plugin.customcooking.cooking.competition.Competition;
 import plugin.customcooking.util.AdventureUtil;
 
 import java.lang.reflect.Constructor;
