@@ -11,10 +11,13 @@ public class ConfigManager {
     public static int splashTime;
     public static List<String> starterRecipes;
     public static String customNamespace;
+    public static String perfectItemSuffix;
+    public static String particleItemSuffix;
     public static String failureItem;
     public static String unlitCookingPot;
     public static String litCookingPot;
     public static String splashEffect;
+    public static Integer masteryJadeReward;
     public static String recipeBookTextureNamespace;
     public static String masteryLine;
     public static String masteryBar;
@@ -43,14 +46,19 @@ public class ConfigManager {
         lang = config.getString("lang", "english");
 
         perfectChance = config.getInt("mechanics.perfect-chance", 30) / 100;
-        splashTime = config.getInt("mechanics.splash-time", 100);
 
         starterRecipes = config.getStringList("mechanics.starter-recipes");
         customNamespace = config.getString("mechanics.namespace", "customcooking");
+        perfectItemSuffix = config.getString("mechanics.perfect-item-suffix", "_perfect");
+        particleItemSuffix = config.getString("mechanics.particle-item-suffix", "_particle");
+
         failureItem = config.getString("mechanics.failure-item", "failureitem");
         unlitCookingPot = config.getString("mechanics.unlit-cooking-pot", "cooking_pot_unlit");
         litCookingPot = config.getString("mechanics.lit-cooking-pot", "cooking_pot_lit");
+
         splashEffect = config.getString("mechanics.pot-effect", "pot_effect");
+        splashTime = config.getInt("mechanics.splash-time", 100);
+        masteryJadeReward = config.getInt("mechanics.mastery-reward", 5);
 
         recipeBookTextureNamespace = config.getString("gui.config.recipe-book", "customcooking:recipe_book");
         masteryLine = config.getString("gui.config.mastery-line", "<!italic><#ff9900>Mastery [{mastery}]");

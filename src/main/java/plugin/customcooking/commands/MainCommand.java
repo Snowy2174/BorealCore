@@ -5,8 +5,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import plugin.customcooking.competition.CompetitionSchedule;
 import plugin.customcooking.configs.MessageManager;
-import plugin.customcooking.configs.RecipeManager;
+import plugin.customcooking.manager.RecipeManager;
 import plugin.customcooking.gui.InventoryPopulator;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.util.AdventureUtil;
@@ -52,6 +53,8 @@ public class MainCommand implements CommandExecutor {
             handleMasteryCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("recipebook")) {
             handleRecipeBookCommand(sender, subargs);
+        } else if (subcommand.equalsIgnoreCase("competition")){
+            handleCompetitionCommand(sender, subargs);
         }
         else {
             // Unknown subcommand
@@ -64,11 +67,12 @@ public class MainCommand implements CommandExecutor {
     private void showCommandHelp(CommandSender sender) {
         AdventureUtil.sendMessage(sender, "<gold><bold>CustomCooking</bold><grey> version 1.0.0");
         AdventureUtil.sendMessage(sender, "<grey>Created by <gold>SnowyOwl217");
-        AdventureUtil.sendMessage(sender, "<gold>/cook cook <recipe> <player> [auto]");
-        AdventureUtil.sendMessage(sender, "<gold>/cook unlock <player> <recipe>");
-        AdventureUtil.sendMessage(sender, "<gold>/cook lock <player> <recipe>");
-        AdventureUtil.sendMessage(sender, "<gold>/cook reload");
-        AdventureUtil.sendMessage(sender, "<gold>/cook migrateperms");
+        AdventureUtil.sendMessage(sender, "<gold>/cooking cook <recipe> <player> [auto]");
+        AdventureUtil.sendMessage(sender, "<gold>/cooking unlock <player> <recipe>");
+        AdventureUtil.sendMessage(sender, "<gold>/cooking lock <player> <recipe>");
+        AdventureUtil.sendMessage(sender, "<gold>/cooking competition <start/end/cancel>");
+        AdventureUtil.sendMessage(sender, "<gold>/cooking reload");
+        AdventureUtil.sendMessage(sender, "<gold>/cooking migrateperms");
     }
 
     private void handleCookCommand(CommandSender sender, String[] args) {
@@ -166,6 +170,30 @@ public class MainCommand implements CommandExecutor {
             setRecipeData(player, recipe, count);
         } else {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking mastery <player> <recipe> <count>");
+        }
+    }
+
+    private void handleCompetitionCommand(CommandSender sender, String[] args) {
+        if (args.length < 1){
+            AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.lackArgs);
+            return;
+        }
+        if (args[0].equals("start")){
+            if (args.length < 2){
+                AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.lackArgs);
+                return;
+            }
+            if (CompetitionSchedule.startCompetition(args[1])){
+                AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.forceSuccess);
+            } else {
+                AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.forceFailure);
+            }
+        } else if (args[0].equals("end")) {
+            CompetitionSchedule.endCompetition();
+            AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.forceEnd);
+        } else if (args[0].equals("cancel")) {
+            CompetitionSchedule.cancelCompetition();
+            AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.forceCancel);
         }
     }
 

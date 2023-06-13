@@ -16,6 +16,8 @@ import plugin.customcooking.util.AdventureUtil;
 import java.time.Instant;
 import java.util.*;
 
+import static plugin.customcooking.util.RecipeDataUtil.playerDataExists;
+
 public class Competition {
 
     public static Competition currentCompetition;
@@ -42,7 +44,15 @@ public class Competition {
         this.startTime = Instant.now().getEpochSecond();
 
         Collection<? extends Player> playerCollections = Bukkit.getOnlinePlayers();
-        if (playerCollections.size() >= competitionConfig.getMinPlayers() || forceStart) {
+        List<Player> validPlayers = new ArrayList<>();
+
+        for (Player player : playerCollections) {
+            if (playerDataExists(player)) {
+                validPlayers.add(player);
+            }
+        }
+
+        if (validPlayers.size() >= competitionConfig.getMinPlayers() || forceStart) {
 
             ranking = new LocalRankingImpl();
             startTimer();

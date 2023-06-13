@@ -170,7 +170,7 @@ public class BossBarSender {
                 throw new RuntimeException("Cannot send packet " + packet, e);
             }
         } catch (ClassNotFoundException e){
-            AdventureUtil.consoleMessage("<red>[CustomFishing] Failed to remove bossbar for " + player.getName());
+            AdventureUtil.consoleMessage("<red>[CustomCooking] Failed to remove bossbar for " + player.getName());
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

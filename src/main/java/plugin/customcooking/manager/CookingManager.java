@@ -25,8 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import static net.kyori.adventure.key.Key.key;
 import static plugin.customcooking.configs.ConfigManager.perfectChance;
 import static plugin.customcooking.configs.MasteryManager.hasMastery;
-import static plugin.customcooking.configs.RecipeManager.*;
 import static plugin.customcooking.manager.FurnitureManager.playCookingResultSFX;
+import static plugin.customcooking.manager.RecipeManager.*;
 import static plugin.customcooking.util.AdventureUtil.playerSound;
 import static plugin.customcooking.util.InventoryUtil.*;
 
@@ -72,7 +72,7 @@ public class CookingManager extends Function {
                     FurnitureManager.ingredientsSFX(player, ingredients, loc);
                 }
                 if (auto) {
-                    giveItem(player, String.valueOf(successItems.get(recipe)));
+                    giveItem(player, String.valueOf(cookedItems.get(recipe)));
                     playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
                     AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingAutocooked.replace("{recipe}", RECIPES.get(recipe).getNick()));
                 } else {
@@ -109,7 +109,9 @@ public class CookingManager extends Function {
     public void onBarInteract(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         CookingPlayer cookingPlayer = cookingPlayerCache.remove(player);
-        proceedBarInteract(player, cookingPlayer);
+        if (cookingPlayer != null) {
+            proceedBarInteract(player, cookingPlayer);
+        }
     }
 
     public void proceedBarInteract(Player player, CookingPlayer cookingPlayer) {
@@ -143,7 +145,7 @@ public class CookingManager extends Function {
             MasteryManager.handleMastery(player, droppedItem.getKey());
         }
         playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking.done"), 1f, 1f);
-        String drop = perfectItems.get(droppedItem.getKey());
+        String drop = cookedItems.get(droppedItem.getKey()) + ConfigManager.perfectItemSuffix;
 
         if (cookingPot != null) {
             playCookingResultSFX(cookingPot, build(drop), true);
@@ -155,7 +157,7 @@ public class CookingManager extends Function {
 
     private void handleRegularResult(Player player, @Nullable Location cookingPot, DroppedItem droppedItem) {
         playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking.done"), 1f, 1f);
-        String drop = successItems.get(droppedItem.getKey());
+        String drop = cookedItems.get(droppedItem.getKey());
 
         if (cookingPot != null) {
             playCookingResultSFX(cookingPot, build(drop), true);

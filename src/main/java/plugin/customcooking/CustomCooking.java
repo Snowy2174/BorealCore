@@ -10,7 +10,7 @@ import plugin.customcooking.commands.MainCommand;
 import plugin.customcooking.commands.TabCompletion;
 import plugin.customcooking.configs.LayoutManager;
 import plugin.customcooking.configs.MasteryManager;
-import plugin.customcooking.configs.RecipeManager;
+import plugin.customcooking.manager.RecipeManager;
 import plugin.customcooking.manager.CompetitionManager;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.manager.FurnitureManager;
@@ -92,10 +92,10 @@ public class CustomCooking extends JavaPlugin {
     public static CookingManager getCookingManager() {
         return cookingManager;
     }
-    public CompetitionManager getCompetitionManager() {
+    public static CompetitionManager getCompetitionManager() {
         return competitionManager;
     }
-    public PlaceholderManager getPlaceholderManager() {
+    public static PlaceholderManager getPlaceholderManager() {
         return placeholderManager;
     }
     public static LayoutManager getLayoutManager() {

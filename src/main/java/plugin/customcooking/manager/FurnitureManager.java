@@ -3,6 +3,8 @@ package plugin.customcooking.manager;
 import dev.lone.itemsadder.api.CustomFurniture;
 import dev.lone.itemsadder.api.Events.FurnitureBreakEvent;
 import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
+import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
+import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.HandlerList;
@@ -23,13 +25,13 @@ import java.util.*;
 import static net.kyori.adventure.key.Key.key;
 import static plugin.customcooking.configs.ConfigManager.splashTime;
 import static plugin.customcooking.util.AdventureUtil.playerSound;
-import static plugin.customcooking.util.HologramUtil.createHologram;
 import static plugin.customcooking.util.InventoryUtil.build;
 
 public class FurnitureManager extends Function {
 
     private final FurnitureListener furnitureListener;
     private final Map<Player, Long> cooldowns;
+    private static final Map<Location, Hologram> holograms = new HashMap<>();
     private Map<Location, BukkitTask> activeFXTasks = new HashMap<>();
 
     public FurnitureManager() {
@@ -99,7 +101,6 @@ public class FurnitureManager extends Function {
     private static void spawnNextIngredient(Location loc, Player player, List<String> ingredients, int currentIndex) {
         if (currentIndex >= ingredients.size()) {
             // All ingredients have been spawned
-            // TODO: add code to continue cooking the recipe
             return;
         }
 
@@ -126,7 +127,6 @@ public class FurnitureManager extends Function {
     }
 
     private static void spawnFakeIngredientItem(Location loc, String ingredient, Runnable onComplete) {
-
         Location spawnLocation = loc.clone().add(0,2,0);
 
         // Create a dropped item entity at the specified location
@@ -142,8 +142,8 @@ public class FurnitureManager extends Function {
             }
         }.runTaskLater(CustomCooking.plugin, 10);
     }
-    private static void spawnSplashItem(Location loc) {
 
+    private static void spawnSplashItem(Location loc) {
         Location spawnLocation = loc.clone().subtract(0,0.1,0);
 
         // Create an ArmorStand entity at the specified location
@@ -165,33 +165,25 @@ public class FurnitureManager extends Function {
         }.runTaskLater(CustomCooking.plugin, splashTime);
     }
 
+    public static void playCookingResultSFX(Location loc, ItemStack item, Boolean success) {
+        Location location = loc.add(0, 1.25, 0);
 
-    static void playCookingResultSFX(Location loc, ItemStack item, Boolean success) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (success) {
-                    // Particles: composter
-                    loc.getWorld().spawnParticle(Particle.COMPOSTER, loc.add(0, 1.25, 0), 15, 0.5, 0.5, 0.5);
-                }
-                else {
-                    // Particles: squid_ink
-                    loc.getWorld().spawnParticle(Particle.SQUID_INK, loc.add(0, 1.25, 0), 15, 0.5, 0.5, 0.5);
-                }
-                playCookingPreview(loc, item, success);
-            }
-        }.runTaskLater(CustomCooking.plugin, 10);
+        if (success) {
+            // Particles: composter
+            loc.getWorld().spawnParticle(Particle.COMPOSTER, location, 15, 0.5, 0.5, 0.5);
+        } else {
+            // Particles: squid_ink
+            loc.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, location, 15, 0.5, 0.5, 0.5);
+        }
+        playCookingPreview(location, item, success);
     }
 
     private static void playCookingPreview(Location loc, ItemStack item, Boolean success) {
         // Particles: crit
-        loc.getWorld().spawnParticle(Particle.CRIT, loc.add(0, 1.5, 0), 15, 0.25, 0.25, 0.25, 0.2);
+        loc.getWorld().spawnParticle(Particle.CRIT, loc, 15, 0.25, 0.25, 0.25, 0.2);
         // Spawn recipe item preview
-        createHologram(item, loc.clone().add(0,2,0), success);
+        createHologram(item, loc, success);
     }
-
-
-    // Ambient Cooking pot SFX
 
     public void playCookingPotFX(Location location) {
         if (activeFXTasks.containsKey(location)) {
@@ -203,18 +195,31 @@ public class FurnitureManager extends Function {
             public void run() {
                 playAmbientEffects(location);
             }
-        }.runTaskTimerAsynchronously(CustomCooking.plugin, 0L, 40L);
+        }.runTaskTimerAsynchronously(CustomCooking.plugin, 0L, 80L);
 
         activeFXTasks.put(location, task);
     }
 
     public void playAmbientEffects(Location loc) {
+        if (!loc.getChunk().isLoaded()) {
+            cancelCookingPotFX(loc);
+            return;
+        }
         // Particles: flame
         loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
 
         // Particles: campfire_cosy_smoke
-        Location smokeLocation = loc.clone().add(0,1,0);
-        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, smokeLocation, 0, 0, 1, 0, 0.03, null, true);
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0,1,0), 0, 0, 1, 0, 0.03, null, true);
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0,1,0), 0, 0, 1, 0, 0.03, null, true);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
+                loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0,1,0), 0, 0, 1, 0, 0.03, null, true);
+                loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0,1,0), 0, 0, 1, 0, 0.03, null, true);
+            }
+        }.runTaskLaterAsynchronously(CustomCooking.plugin,40L);
 
         // Sound: block.fire.ambient
         loc.getWorld().playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 1f);
@@ -227,6 +232,44 @@ public class FurnitureManager extends Function {
         BukkitTask task = activeFXTasks.remove(location);
         if (task != null) {
             task.cancel();
+        }
+    }
+
+    public void cancelAllHolograms() {
+        for (Hologram hologram : holograms.values()) {
+            hologram.delete();
+        }
+        holograms.clear();
+    }
+
+    public static void createHologram(ItemStack recipe, Location location, Boolean success) {
+
+        if (holograms.containsKey(location)) {
+            holograms.get(location).delete(); // Remove the hologram
+            holograms.remove(location);
+        } else {
+            HolographicDisplaysAPI api = HolographicDisplaysAPI.get(CustomCooking.plugin);
+            Hologram hologram = api.createHologram(location);
+
+            if (success) {
+                hologram.getLines().appendText(ChatColor.GREEN + "Success!");
+            } else {
+                hologram.getLines().appendText(ChatColor.RED + "Failure!");
+            }
+
+            hologram.getLines().appendText(recipe.getItemMeta().getDisplayName());
+            hologram.getLines().appendItem(recipe);
+
+            holograms.put(location, hologram);
+
+            // Schedule a task to remove the hologram after a set time
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    holograms.remove(location);
+                    hologram.delete(); // Remove the hologram
+                }
+            }.runTaskLater(CustomCooking.plugin, 40);
         }
     }
 }

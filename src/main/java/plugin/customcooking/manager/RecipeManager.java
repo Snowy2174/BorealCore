@@ -1,4 +1,4 @@
-package plugin.customcooking.configs;
+package plugin.customcooking.manager;
 
 import dev.lone.itemsadder.api.ItemsAdder;
 import net.luckperms.api.LuckPerms;
@@ -12,6 +12,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.configs.ConfigManager;
+import plugin.customcooking.configs.LayoutManager;
+import plugin.customcooking.configs.MessageManager;
 import plugin.customcooking.minigame.*;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
@@ -28,10 +31,8 @@ public class RecipeManager extends Function {
     public static HashMap<String, Product> RECIPES;
 
     public static final Map<String, List<String>> itemIngredients = new HashMap<>();
-    public static final Map<String, String> perfectItems = new HashMap<>();
-    public static final Map<String, String> successItems = new HashMap<>();
-    protected static final Map<String, String> burnedItems = new HashMap<>();
-    protected static final Map<String, Integer> masteryreqs = new HashMap<>();
+    public static final Map<String, String> cookedItems = new HashMap<>();
+    public static final Map<String, Integer> masteryreqs = new HashMap<>();
 
 
     @Override
@@ -155,9 +156,7 @@ public class RecipeManager extends Function {
                 // store the list of required ingredients for this item
                 itemIngredients.put(key, ingredientStrings);
                 // store the output options
-                perfectItems.put(key, perfectItemString);
-                successItems.put(key, cookedItemString);
-                burnedItems.put(key, burnedItemString);
+                cookedItems.put(key, cookedItemString);
                 // stores the mastery requirements
                 masteryreqs.put(key, mastery);
             }

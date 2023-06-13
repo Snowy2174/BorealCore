@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.customcooking.configs.RecipeManager.RECIPES;
+import static plugin.customcooking.manager.RecipeManager.RECIPES;
 
 public class TabCompletion implements TabCompleter {
     @Override
@@ -22,8 +22,11 @@ public class TabCompletion implements TabCompleter {
             completions.add("unlock");
             completions.add("lock");
             completions.add("mastery");
+            completions.add("competition");
             completions.add("recipebook");
             completions.add("migrateperms");
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("competition")) {
+            completions.addAll(List.of("start", "end", "cancel"));
         } else if (args.length == 2) {
             completions.addAll(getOnlinePlayerNames());
         } else if (args.length == 3 || args.length == 4) {

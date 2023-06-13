@@ -26,7 +26,7 @@ import plugin.customcooking.util.InventoryUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.customcooking.configs.RecipeManager.*;
+import static plugin.customcooking.manager.RecipeManager.*;
 import static plugin.customcooking.util.InventoryUtil.build;
 
 public class InventoryPopulator implements InventoryProvider {
@@ -41,7 +41,7 @@ public class InventoryPopulator implements InventoryProvider {
                 .id("recipeBook")
                 .provider(new InventoryPopulator(clickedFurniture))
                 .size(6, 9)
-                .title(ChatColor.WHITE + new FontImageWrapper(ConfigManager.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString( ChatColor.RESET + "Recipe Book", -185))
+                .title(ChatColor.WHITE + new FontImageWrapper(ConfigManager.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString( ChatColor.RESET + "Recipe Book", -190))
                 .build();
     }
     public InventoryPopulator(CustomFurniture clickedFurniture) {
@@ -60,7 +60,7 @@ public class InventoryPopulator implements InventoryProvider {
         contents.fill( ClickableItem.of(unknownRecipeStack,
                 e -> AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown)));
         contents.fillBorders(ClickableItem.empty(new ItemStack (Material.AIR)));
-        contents.set(5, 5, ClickableItem.of(buildIngredientsItem(), e -> handleIngredientsMenuClick(e, player)));
+        contents.set(5, 4, ClickableItem.of(buildIngredientsItem(), e -> handleIngredientsMenuClick(e, player)));
 
         List<String> list = getUnlockedRecipes(player);
 
@@ -258,7 +258,7 @@ public class InventoryPopulator implements InventoryProvider {
 
         for (String word : words) {
             if (!word.isEmpty()) {
-                String capitalizedWord = word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
+                String capitalizedWord = word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase().replace("*", "");
                 result.append(capitalizedWord).append(" ");
             }
         }

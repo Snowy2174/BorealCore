@@ -12,8 +12,8 @@ import plugin.customcooking.util.ConfigUtil;
 import java.io.File;
 import java.io.IOException;
 
-import static plugin.customcooking.configs.RecipeManager.RECIPES;
-import static plugin.customcooking.configs.RecipeManager.masteryreqs;
+import static plugin.customcooking.manager.RecipeManager.RECIPES;
+import static plugin.customcooking.manager.RecipeManager.masteryreqs;
 
 public class MasteryManager extends Function {
 
@@ -59,10 +59,10 @@ public class MasteryManager extends Function {
 
     private static void giveReward(Player player, String recipeFormatted) {
         // Give the player a reward (e.g., points)
-        String command = "av user " + player.getName() + " addpoints 5";
+        String command = "av user " + player.getName() + " addpoints " + ConfigManager.masteryJadeReward;
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
 
-        AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + player.getName() + "</green> has been given 5 ₪ for gaining " + recipeFormatted + " mastery");
+        AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + player.getName() + "</green> has been given" + ConfigManager.masteryJadeReward + " ₪ for gaining " + recipeFormatted + " mastery");
         AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryReward.replace("{recipe}", recipeFormatted));
     }
 

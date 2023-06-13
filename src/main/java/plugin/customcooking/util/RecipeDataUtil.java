@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static plugin.customcooking.configs.MasteryManager.getRequiredMastery;
-import static plugin.customcooking.configs.RecipeManager.RECIPES;
+import static plugin.customcooking.manager.RecipeManager.RECIPES;
 
 public class RecipeDataUtil {
 
@@ -53,5 +53,13 @@ public class RecipeDataUtil {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static boolean playerDataExists(Player player){
+        YamlConfiguration config = ConfigUtil.getConfig("playerdata.yml");
+        String playerName = player.getName();
+        String playerDataPath = "players." + playerName;
+
+        return config.contains(playerDataPath);
     }
 }
