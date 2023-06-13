@@ -1,0 +1,147 @@
+dish-buffs:
+
+  ## Combat ⚔️
+
+  combat-common:
+    potion_effect_1:
+      type: INCREASE_DAMAGE
+      duration: 4 #Mins
+      amplifier: 1
+    potion_effect:
+      type: HEAL
+      amplifier: 1
+
+  combat-uncommon:
+    potion_effect_1:
+      type: INCREASE_DAMAGE
+      duration: 4
+      amplifier: 2
+    potion_effect:
+      type: HEAL
+      amplifier: 1
+
+  combat-rare:
+    potion_effect_1:
+      type: INCREASE_DAMAGE
+      duration: 8
+      amplifier: 3
+    potion_effect:
+      type: HEAL
+      amplifier: 2
+
+  ## Fortification🛡️
+
+  fortification-common:
+    potion_effect_1:
+      type: DAMAGE_RESISTANCE
+      duration: 4
+      amplifier: 1
+    potion_effect:
+      type: ABSORPTION
+      duration: 4
+      amplifier: 1
+
+  fortification-uncommon:
+    potion_effect_1:
+      type: DAMAGE_RESISTANCE
+      duration: 4
+      amplifier: 2
+    potion_effect:
+      type: ABSORPTION
+      duration: 4
+      amplifier: 1
+
+  fortification-rare:
+    potion_effect_1:
+      type: DAMAGE_RESISTANCE
+      duration: 8
+      amplifier: 2
+    potion_effect:
+      type: ABSORPTION
+      duration: 8
+      amplifier: 1
+
+  ## Hearty ❤️
+
+  hearty-common:
+    potion_effect_1:
+      type: SATURATION
+      duration: 4
+      amplifier: 1
+    potion_effect_2:
+      type: REGENERATION
+      duration: 4
+      amplifier: 1
+    potion_effect_3:
+      type: HEAL
+      amplifier: 1
+
+  hearty-uncommon:
+    potion_effect_1:
+      type: SATURATION
+      duration: 4
+      amplifier: 2
+    potion_effect_2:
+      type: REGENERATION
+      duration: 4
+      amplifier: 1
+    potion_effect_3:
+      type: HEAL
+      amplifier: 1
+
+  hearty-rare:
+    potion_effect_1:
+      type: SATURATION
+      duration: 8
+      amplifier: 2
+    potion_effect_2:
+      type: REGENERATION
+      duration: 6
+      amplifier: 3
+    potion_effect_3:
+      type: HEAL
+      amplifier: 2
+
+  ## Agility  🌬️
+
+  agility-common:
+    potion_effect_1:
+      type: SPEED
+      duration: 6
+      amplifier: 1
+    potion_effect_2:
+      type: JUMP
+      duration: 6
+      amplifier: 2
+    potion_effect_3:
+      type: FAST_DIGGING
+      duration: 6
+      amplifier: 1
+
+  agility-uncommon:
+    potion_effect_1:
+      type: SPEED
+      duration: 8
+      amplifier: 3
+    potion_effect_2:
+      type: JUMP
+      duration: 8
+      amplifier: 2
+    potion_effect_3:
+      type: FAST_DIGGING
+      duration: 8
+      amplifier: 2
+
+  agility-rare:
+    potion_effect_1:
+      type: SPEED
+      duration: 12
+      amplifier: 3
+    potion_effect_2:
+      type: JUMP
+      duration: 12
+      amplifier: 3
+    potion_effect_3:
+      type: FAST_DIGGING
+      duration: 12
+      amplifier: 3

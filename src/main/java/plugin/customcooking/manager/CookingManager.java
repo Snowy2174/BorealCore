@@ -1,5 +1,7 @@
 package plugin.customcooking.manager;
 
+import de.tr7zw.changeme.nbtapi.NBTCompound;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import dev.lone.itemsadder.api.CustomFurniture;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
@@ -7,12 +9,17 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.configs.*;
+import plugin.customcooking.cooking.action.Action;
+import plugin.customcooking.cooking.competition.Competition;
+import plugin.customcooking.cooking.competition.CompetitionGoal;
 import plugin.customcooking.listener.InteractListener;
 import plugin.customcooking.cooking.*;
 import plugin.customcooking.object.Function;
@@ -134,38 +141,34 @@ public class CookingManager extends Function {
             return;
         }
 
-        if (Math.random() < perfectChance) {
-            handlePerfectResult(player, cookingPot, droppedItem);
-        } else {
-            handleRegularResult(player, cookingPot, droppedItem);
-        }
-    }
-
-    private void handlePerfectResult(Player player, @Nullable Location cookingPot, DroppedItem droppedItem) {
-        if (!hasMastery(player, droppedItem.getKey())) {
-            MasteryManager.handleMastery(player, droppedItem.getKey());
-        }
-        playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking.done"), 1f, 1f);
-        String drop = cookedItems.get(droppedItem.getKey()) + ConfigManager.perfectItemSuffix;
-
-        if (cookingPot != null) {
-            playCookingResultSFX(cookingPot, build(drop), true);
-        }
-
-        giveItem(player, drop);
-        sendSuccessTitle(player, "Perfect " + droppedItem.getNick());
-    }
-
-    private void handleRegularResult(Player player, @Nullable Location cookingPot, DroppedItem droppedItem) {
-        playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking.done"), 1f, 1f);
+        boolean perfect = Math.random() < perfectChance;
         String drop = cookedItems.get(droppedItem.getKey());
 
+        if (perfect) {
+            drop = cookedItems.get(droppedItem.getKey()) + ConfigManager.perfectItemSuffix;
+            if (!hasMastery(player, droppedItem.getKey())) {
+                MasteryManager.handleMastery(player, droppedItem.getKey());
+            }
+        }
+
         if (cookingPot != null) {
             playCookingResultSFX(cookingPot, build(drop), true);
         }
 
+        if (droppedItem.getSuccessActions() != null)
+            for (Action action : droppedItem.getSuccessActions())
+                action.doOn(player, null);
+
+        if (Competition.currentCompetition != null) {
+            float score = ((float) droppedItem.getScore());
+            Competition.currentCompetition.refreshData(player, score, perfect);
+            Competition.currentCompetition.tryAddBossBarToPlayer(player);
+        }
+
+        playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking.done"), 1f, 1f);
         giveItem(player, drop);
         sendSuccessTitle(player, droppedItem.getNick());
+
     }
 
     private void handleFailureResult(Player player) {
@@ -263,5 +266,20 @@ public class CookingManager extends Function {
         if (soundTask != null) {
             soundTask.cancel();
         }
+    }
+
+    @Override
+    public void onConsumeItem(PlayerItemConsumeEvent event) {
+        ItemStack itemStack = event.getItem();
+        NBTCompound nbtCompound = new NBTItem(itemStack).getCompound("CustomCooking");
+        if (nbtCompound == null) return;
+        String lootKey = nbtCompound.getString("id");
+        Product product = RECIPES.get(lootKey);
+        if (product == null) return;
+        if (!(product instanceof DroppedItem droppedItem)) return;
+        final Player player = event.getPlayer();
+        if (droppedItem.getConsumeActions() != null)
+            for (Action action : droppedItem.getConsumeActions())
+                action.doOn(player, null);
     }
 }

@@ -2,7 +2,7 @@ package plugin.customcooking.manager;
 
 import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.customcooking.cooking.action.ActionInterface;
+import plugin.customcooking.cooking.action.Action;
 import plugin.customcooking.cooking.action.CommandActionImpl;
 import plugin.customcooking.cooking.action.MessageActionImpl;
 import plugin.customcooking.cooking.competition.CompetitionConfig;
@@ -51,14 +51,14 @@ public class CompetitionManager extends Function {
                     config.getInt(key + ".bossbar.switch-interval", 200)
             );
 
-            HashMap<String, ActionInterface[]> rewardsMap = new HashMap<>();
+            HashMap<String, Action[]> rewardsMap = new HashMap<>();
             Objects.requireNonNull(config.getConfigurationSection(key + ".prize")).getKeys(false).forEach(rank -> {
-                List<ActionInterface> rewards = new ArrayList<>();
+                List<Action> rewards = new ArrayList<>();
                 if (config.contains(key + ".prize." + rank + ".messages"))
                     rewards.add(new MessageActionImpl(config.getStringList(key + ".prize." + rank + ".messages").toArray(new String[0]), null));
                 if (config.contains(key + ".prize." + rank + ".commands"))
                     rewards.add(new CommandActionImpl(config.getStringList(key + ".prize." + rank + ".commands").toArray(new String[0]), null));
-                rewardsMap.put(rank, rewards.toArray(new ActionInterface[0]));
+                rewardsMap.put(rank, rewards.toArray(new Action[0]));
             });
 
             CompetitionConfig competitionConfig = new CompetitionConfig(

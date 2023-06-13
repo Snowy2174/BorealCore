@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ConfigManager {
     public static String lang;
-    public static Integer perfectChance;
+    public static double perfectChance;
     public static int splashTime;
     public static List<String> starterRecipes;
     public static String customNamespace;
@@ -45,7 +45,7 @@ public class ConfigManager {
 
         lang = config.getString("lang", "english");
 
-        perfectChance = config.getInt("mechanics.perfect-chance", 30) / 100;
+        perfectChance = config.getDouble("mechanics.perfect-chance", 0.35);
 
         starterRecipes = config.getStringList("mechanics.starter-recipes");
         customNamespace = config.getString("mechanics.namespace", "customcooking");

@@ -6,7 +6,7 @@ import plugin.customcooking.CustomCooking;
 
 import javax.annotation.Nullable;
 
-public record CommandActionImpl(String[] commands, String nick) implements ActionInterface {
+public record CommandActionImpl(String[] commands, String nick) implements Action {
 
     public CommandActionImpl(String[] commands, @Nullable String nick) {
         this.commands = commands;

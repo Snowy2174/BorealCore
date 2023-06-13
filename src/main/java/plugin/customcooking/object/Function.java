@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 public class Function {
 
@@ -27,14 +28,22 @@ public class Function {
     }
 
     public void onInteract(PlayerInteractEvent event) {
+        //empty
     }
 
     public void onCloseInventory(InventoryCloseEvent event) {
+        //empty
     }
 
     public void onClickInventory(InventoryClickEvent event) {
+        //empty
     }
 
     public void onOpenInventory(InventoryOpenEvent event) {
+        //empty
+    }
+
+    public void onConsumeItem(PlayerItemConsumeEvent event) {
+        //empty
     }
 }

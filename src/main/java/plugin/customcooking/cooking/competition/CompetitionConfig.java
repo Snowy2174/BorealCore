@@ -1,6 +1,6 @@
 package plugin.customcooking.cooking.competition;
 
-import plugin.customcooking.cooking.action.ActionInterface;
+import plugin.customcooking.cooking.action.Action;
 import plugin.customcooking.cooking.competition.bossbar.BossBarConfig;
 
 import java.util.Calendar;
@@ -21,9 +21,9 @@ public class CompetitionConfig {
     private final CompetitionGoal goal;
     private final BossBarConfig bossBarConfig;
     private final boolean enableBossBar;
-    private final HashMap<String, ActionInterface[]> rewards;
+    private final HashMap<String, Action[]> rewards;
 
-    public CompetitionConfig(int duration, int minPlayers, List<String> startMessage, List<String> endMessage, List<String> startCommand, List<String> endCommand, List<String> joinCommand, CompetitionGoal goal, BossBarConfig bossBarConfig, boolean enableBossBar, HashMap<String, ActionInterface[]> rewards) {
+    public CompetitionConfig(int duration, int minPlayers, List<String> startMessage, List<String> endMessage, List<String> startCommand, List<String> endCommand, List<String> joinCommand, CompetitionGoal goal, BossBarConfig bossBarConfig, boolean enableBossBar, HashMap<String, Action[]> rewards) {
         this.duration = duration;
         this.minPlayers = minPlayers;
         this.startMessage = startMessage;
@@ -77,7 +77,7 @@ public class CompetitionConfig {
         return enableBossBar;
     }
 
-    public HashMap<String, ActionInterface[]> getRewards() {
+    public HashMap<String, Action[]> getRewards() {
         return rewards;
     }
 

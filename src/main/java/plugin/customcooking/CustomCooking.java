@@ -10,11 +10,7 @@ import plugin.customcooking.commands.MainCommand;
 import plugin.customcooking.commands.TabCompletion;
 import plugin.customcooking.configs.LayoutManager;
 import plugin.customcooking.configs.MasteryManager;
-import plugin.customcooking.manager.RecipeManager;
-import plugin.customcooking.manager.CompetitionManager;
-import plugin.customcooking.manager.CookingManager;
-import plugin.customcooking.manager.FurnitureManager;
-import plugin.customcooking.manager.PlaceholderManager;
+import plugin.customcooking.manager.*;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
 import plugin.customcooking.util.PlaceholderUtil;
@@ -29,6 +25,7 @@ public class CustomCooking extends JavaPlugin {
     private static RecipeManager recipeManager;
     private static PlaceholderManager placeholderManager;
     private static LayoutManager layoutManager;
+    private static EffectManager effectManager;
     private static FurnitureManager furnitureManager;
     private static MasteryManager masteryManager;
     private static InventoryManager inventoryManager;
@@ -47,6 +44,7 @@ public class CustomCooking extends JavaPlugin {
         competitionManager = new CompetitionManager();
         placeholderManager = new PlaceholderManager();
         layoutManager = new LayoutManager();
+        effectManager = new EffectManager();
         furnitureManager = new FurnitureManager();
         masteryManager = new MasteryManager();
         recipeManager = new RecipeManager();
@@ -72,6 +70,7 @@ public class CustomCooking extends JavaPlugin {
         placeholderManager.unload();
         recipeManager.unload();
         layoutManager.unload();
+        effectManager.unload();
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Disabled!");
 
@@ -108,6 +107,9 @@ public class CustomCooking extends JavaPlugin {
 
     public static RecipeManager getRecipeManager() {
         return recipeManager;
+    }
+    public static EffectManager getEffectManager() {
+        return effectManager;
     }
 
     public static MasteryManager getMasteryManager() {

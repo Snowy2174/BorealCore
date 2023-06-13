@@ -65,9 +65,6 @@ public class RecipeManager extends Function {
 
                 ConfigurationSection recipeSection = config.getConfigurationSection(key);
 
-                // Gui settings
-
-
                 // Bar mechanic
                 List<Difficulty> difficulties = new ArrayList<>();
                 List<String> difficultyList = recipeSection.getStringList("difficulty");
@@ -82,23 +79,19 @@ public class RecipeManager extends Function {
                         difficulties.add(difficulty);
                     }
                 }
-                int time = recipeSection.getInt("time", 10000);
-                int mastery = recipeSection.getInt("mastery", 10);
                 DroppedItem recipe = new DroppedItem(
                         key,
+                        config.getString("nick", key),
                         difficulties.toArray(new Difficulty[0]),
-                        time
+                        recipeSection.getInt("time", 10000),
+                        recipeSection.getInt("mastery", 10),
+                        recipeSection.getInt("slot", 1),
+                        recipeSection.getDouble("score", 1)
                 );
                 // Input Outputs
                 List<String> ingredientStrings = recipeSection.getStringList("ingredients");
-                String perfectItemString = recipeSection.getString("perfectItems");
                 String cookedItemString = recipeSection.getString("cookedItems");
-                String burnedItemString = recipeSection.getString("burnedItems");
 
-                // Set nick
-                recipe.setNick(recipeSection.getString("nick", key));
-                // Set slot
-                recipe.setSlot(recipeSection.getInt("slot"));
                 // Set layout
                 if (recipeSection.contains("layout")) {
                     List<Layout> layoutList = new ArrayList<>();
@@ -126,31 +119,7 @@ public class RecipeManager extends Function {
                     recipe.setLayout(layoutList.toArray(new Layout[0]));
                 }
 
-                // Check if any errors occurred during recipe loading
-                if (difficulties.isEmpty()) {
-                    AdventureUtil.consoleMessage("<red>[CustomCooking] Recipe '" + key + "' doesn't have valid difficulty");
-                    continue;
-                }
-
-                if (ingredientStrings.isEmpty()) {
-                    AdventureUtil.consoleMessage("<red>[CustomCooking] Recipe '" + key + "' doesn't have any ingredients");
-                    continue;
-                }
-
-                if (perfectItemString == null || perfectItemString.isEmpty()) {
-                    AdventureUtil.consoleMessage("<red>[CustomCooking] Recipe '" + key + "' doesn't have perfectItems defined");
-                    continue;
-                }
-
-                if (cookedItemString == null || cookedItemString.isEmpty()) {
-                    AdventureUtil.consoleMessage("<red>[CustomCooking] Recipe '" + key + "' doesn't have cookedItems defined");
-                    continue;
-                }
-
-                if (burnedItemString == null || burnedItemString.isEmpty()) {
-                    AdventureUtil.consoleMessage("<red>[CustomCooking] Recipe '" + key + "' doesn't have burnedItems defined");
-                    continue;
-                }
+                setActions(recipeSection, recipe);
 
                 RECIPES.put(key, recipe);
 
@@ -158,10 +127,14 @@ public class RecipeManager extends Function {
                 itemIngredients.put(key, ingredientStrings);
                 // store the output options
                 cookedItems.put(key, cookedItemString);
-                // stores the mastery requirements
-                masteryreqs.put(key, mastery);
             }
         }
+    }
+
+    private void setActions(ConfigurationSection section, Product recipe) {
+        recipe.setSuccessActions(EffectManager.getActions(section.getConfigurationSection("action.success"), recipe.getNick()));
+        recipe.setFailureActions(EffectManager.getActions(section.getConfigurationSection("action.failure"), recipe.getNick()));
+        recipe.setConsumeActions(EffectManager.getActions(section.getConfigurationSection("action.consume"), recipe.getNick()));
     }
 
 

@@ -1,14 +1,24 @@
 package plugin.customcooking.util;
 
+import de.tr7zw.changeme.nbtapi.NBTCompound;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import dev.lone.itemsadder.api.CustomStack;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import plugin.customcooking.cooking.action.Action;
+import plugin.customcooking.cooking.action.PotionEffectImpl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static plugin.customcooking.manager.RecipeManager.RECIPES;
 
 public class InventoryUtil {
 
@@ -133,6 +143,7 @@ public class InventoryUtil {
                 itemStack = new ItemStack(Material.AIR);
             }
         }
+        addIdentifier(itemStack, key);
         return itemStack;
     }
 
@@ -168,5 +179,12 @@ public class InventoryUtil {
             }
         }
         return false;
+    }
+
+    public static void addIdentifier(ItemStack itemStack, String id){
+        NBTItem nbtItem = new NBTItem(itemStack);
+        NBTCompound nbtCompound = nbtItem.addCompound("CustomCooking");
+        nbtCompound.setString("id", id);
+        itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
     }
 }

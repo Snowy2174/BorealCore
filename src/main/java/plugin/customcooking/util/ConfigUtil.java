@@ -1,11 +1,17 @@
 package plugin.customcooking.util;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.configs.ConfigManager;
 import plugin.customcooking.configs.MessageManager;
+import plugin.customcooking.cooking.action.*;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigUtil {
 
@@ -20,6 +26,8 @@ public class ConfigUtil {
         MessageManager.load();
         CustomCooking.getLayoutManager().unload();
         CustomCooking.getLayoutManager().load();
+        CustomCooking.getEffectManager().unload();
+        CustomCooking.getEffectManager().load();
         CustomCooking.getRecipeManager().unload();
         CustomCooking.getRecipeManager().load();
         CustomCooking.getCookingManager().unload();

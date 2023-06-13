@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import plugin.customcooking.util.AdventureUtil;
 
-public record MessageActionImpl(String[] messages, String nick) implements ActionInterface {
+public record MessageActionImpl(String[] messages, String nick) implements Action {
 
     public MessageActionImpl(String[] messages, String nick) {
         this.messages = messages;
