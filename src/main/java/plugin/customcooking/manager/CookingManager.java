@@ -16,12 +16,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.configs.*;
+import plugin.customcooking.configs.ConfigManager;
+import plugin.customcooking.configs.LayoutManager;
+import plugin.customcooking.configs.MasteryManager;
+import plugin.customcooking.configs.MessageManager;
+import plugin.customcooking.cooking.*;
 import plugin.customcooking.cooking.action.Action;
 import plugin.customcooking.cooking.competition.Competition;
-import plugin.customcooking.cooking.competition.CompetitionGoal;
 import plugin.customcooking.listener.InteractListener;
-import plugin.customcooking.cooking.*;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
 
@@ -34,7 +36,8 @@ import static net.kyori.adventure.key.Key.key;
 import static plugin.customcooking.configs.ConfigManager.perfectChance;
 import static plugin.customcooking.configs.MasteryManager.hasMastery;
 import static plugin.customcooking.manager.FurnitureManager.playCookingResultSFX;
-import static plugin.customcooking.manager.RecipeManager.*;
+import static plugin.customcooking.manager.RecipeManager.RECIPES;
+import static plugin.customcooking.manager.RecipeManager.cookedItems;
 import static plugin.customcooking.util.AdventureUtil.playerSound;
 import static plugin.customcooking.util.InventoryUtil.*;
 
@@ -160,6 +163,7 @@ public class CookingManager extends Function {
                 action.doOn(player, null);
 
         if (Competition.currentCompetition != null) {
+            System.out.println("Competition: " + Competition.currentCompetition);
             float score = ((float) droppedItem.getScore());
             Competition.currentCompetition.refreshData(player, score, perfect);
             Competition.currentCompetition.tryAddBossBarToPlayer(player);
@@ -224,6 +228,10 @@ public class CookingManager extends Function {
             speed = 1;
         }
         Difficulty difficult = new Difficulty(timer, speed);
+
+        if (Competition.currentCompetition != null) {
+            Competition.currentCompetition.tryAddBossBarToPlayer(player);
+        }
 
         CookingPlayer cookingPlayer = new CookingPlayer(System.currentTimeMillis() + time, player, layout, difficult, this);
         cookingPlayer.runTaskTimerAsynchronously(CustomCooking.plugin, 0, 1);

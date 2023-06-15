@@ -5,8 +5,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import plugin.customcooking.manager.CookingManager;
 
-import java.util.function.Function;
-
 public class ConsumeItemListener implements Listener {
 
     private final CookingManager cookingManager;

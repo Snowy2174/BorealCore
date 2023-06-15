@@ -1,11 +1,16 @@
 lang: english
 
 mechanics:
-  perfect-chance: 30
-  splash-time: 100
+  perfect-chance: 0.3
+  splash-time: 80
   starter-recipes:
-    - recipe1
-    - recipe2
+    - custardpie
+    - tomatosoup
+    - carrotsoup
+    - seedsoup
+    - pumpkinsoup
+    - cactussoup
+    - potatosoup
   namespace: 'customcooking'
   failure-item: 'failureitem'
   unlit-cooking-pot: 'cooking_pot_unlit'

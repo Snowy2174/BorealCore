@@ -2,8 +2,6 @@ package plugin.customcooking.manager;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import plugin.customcooking.cooking.action.*;
@@ -11,10 +9,10 @@ import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
 
-import java.util.*;
-
-import static plugin.customcooking.manager.RecipeManager.RECIPES;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 public class EffectManager extends Function {
     public static Map<String, List<PotionEffect>> EFFECTS;
 
@@ -82,9 +80,7 @@ public class EffectManager extends Function {
                         }
                         actions.add(new PotionEffectImpl(potionEffectList.toArray(new PotionEffect[0])));
                     }
-                    case "dish-buff" -> {
-                            actions.add(new PotionEffectImpl(EFFECTS.get(section.getString(action)).toArray(new PotionEffect[0])));
-                    }
+                    case "dish-buff" -> actions.add(new PotionEffectImpl(EFFECTS.get(section.getString(action)).toArray(new PotionEffect[0])));
                 }
             }
             return actions.toArray(new Action[0]);

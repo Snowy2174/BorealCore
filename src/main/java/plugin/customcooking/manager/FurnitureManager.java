@@ -80,8 +80,14 @@ public class FurnitureManager extends Function {
                 AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCooldown.replace("{time}", cooldown));
             }
         } else if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
-            playCookingPotFX(clickedFurniture.getArmorstand().getLocation());
-            RecipeBookManager.getRecipeBook(clickedFurniture).open(player);
+            if (!cooldowns.containsKey(player) || (System.currentTimeMillis() - cooldowns.get(player) >= 2000)) {
+                cooldowns.put(player, System.currentTimeMillis());
+                playCookingPotFX(clickedFurniture.getArmorstand().getLocation());
+                RecipeBookManager.getRecipeBook(clickedFurniture).open(player);
+            } else {
+                String cooldown = String.valueOf((2000 - (System.currentTimeMillis() - cooldowns.get(player)) / 1000));
+                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCooldown.replace("{time}", cooldown));
+            }
         }
     }
 
@@ -248,7 +254,7 @@ public class FurnitureManager extends Function {
             holograms.remove(location);
         } else {
             HolographicDisplaysAPI api = HolographicDisplaysAPI.get(CustomCooking.plugin);
-            Hologram hologram = api.createHologram(location);
+            Hologram hologram = api.createHologram(location.clone().add(0,1.5,0));
 
             if (success) {
                 hologram.getLines().appendText(ChatColor.GREEN + "Success!");

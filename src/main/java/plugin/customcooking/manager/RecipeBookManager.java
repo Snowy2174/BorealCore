@@ -152,6 +152,8 @@ public class RecipeBookManager implements InventoryProvider {
 
         if (clickedItem != null && clickedItem.getType() != Material.AIR) {
         //TODO: Implement Code to Open Ingredients Deluxe Menu?
+            String command = "dm open ingredients_menu " + player.getName();
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
         }
 
     }

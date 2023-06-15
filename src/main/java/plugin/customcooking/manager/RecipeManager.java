@@ -15,7 +15,10 @@ import plugin.customcooking.CustomCooking;
 import plugin.customcooking.configs.ConfigManager;
 import plugin.customcooking.configs.LayoutManager;
 import plugin.customcooking.configs.MessageManager;
-import plugin.customcooking.cooking.*;
+import plugin.customcooking.cooking.Difficulty;
+import plugin.customcooking.cooking.DroppedItem;
+import plugin.customcooking.cooking.Layout;
+import plugin.customcooking.cooking.Product;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
@@ -81,7 +84,7 @@ public class RecipeManager extends Function {
                 }
                 DroppedItem recipe = new DroppedItem(
                         key,
-                        config.getString("nick", key),
+                        recipeSection.getString("nick", key),
                         difficulties.toArray(new Difficulty[0]),
                         recipeSection.getInt("time", 10000),
                         recipeSection.getInt("mastery", 10),
@@ -93,19 +96,6 @@ public class RecipeManager extends Function {
                 String cookedItemString = recipeSection.getString("cookedItems");
 
                 // Set layout
-                if (recipeSection.contains("layout")) {
-                    List<Layout> layoutList = new ArrayList<>();
-                    for (String layoutName : recipeSection.getStringList( "layout")) {
-                        Layout layout = LayoutManager.LAYOUTS.get(layoutName);
-                        if (layout == null) {
-                            AdventureUtil.consoleMessage("<red>[CustomCooking] Bar " + layoutName + " doesn't exist");
-                            continue;
-                        }
-                        layoutList.add(layout);
-                    }
-                    recipe.setLayout(layoutList.toArray(new Layout[0]));
-                }
-
                 if (recipeSection.contains("layout")) {
                     List<Layout> layoutList = new ArrayList<>();
                     for (String layoutName : recipeSection.getStringList( "layout")) {

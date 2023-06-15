@@ -1,8 +1,8 @@
 package plugin.customcooking.configs;
 
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.customcooking.object.Function;
 import plugin.customcooking.cooking.Layout;
+import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
 
