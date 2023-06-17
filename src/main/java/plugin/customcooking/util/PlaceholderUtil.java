@@ -6,7 +6,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.configs.MasteryManager;
+import plugin.customcooking.manager.configs.MasteryManager;
 
 public class PlaceholderUtil extends PlaceholderExpansion {
 

@@ -5,7 +5,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import plugin.customcooking.configs.MessageManager;
+import plugin.customcooking.manager.configs.MasteryManager;
+import plugin.customcooking.manager.configs.MessageManager;
+import plugin.customcooking.cooking.competition.Competition;
 import plugin.customcooking.cooking.competition.CompetitionSchedule;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.manager.RecipeBookManager;
@@ -83,11 +85,15 @@ public class MainCommand implements CommandExecutor {
 
         String recipe = args[0];
         String username = args[1];
-        boolean auto = args.length == 3 && args[2].equalsIgnoreCase("auto");
+        boolean auto = args.length == 4 && args[3].equalsIgnoreCase("auto");
 
         Player player = Bukkit.getPlayer(username);
         if (player != null) {
-            cookingManager.handleCooking(recipe, player, null, auto);
+            if (auto) {
+                cookingManager.handleAutocooking(recipe, player, Integer.valueOf(args[2]));
+            } else {
+                cookingManager.handleCooking(recipe, player, null);
+            }
         } else {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
         }
@@ -159,6 +165,16 @@ public class MainCommand implements CommandExecutor {
             return;
         }
 
+        if (args.length == 2) {
+            Player player = Bukkit.getPlayer(args[0]);
+            String recipe = args[1];
+            if (player == null) {
+                AdventureUtil.consoleMessage("<Red> [!] Player " + args[0] + " not found.");
+                return;
+            }
+            setRecipeData(player, recipe, MasteryManager.getRequiredMastery(recipe));
+        }
+
         if (args.length == 3) {
             Player player = Bukkit.getPlayer(args[0]);
             String recipe = args[1];
@@ -194,6 +210,10 @@ public class MainCommand implements CommandExecutor {
         } else if (args[0].equals("cancel")) {
             CompetitionSchedule.cancelCompetition();
             AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.forceCancel);
+        } else if (args[0].equals("join")) {
+            if (sender instanceof Player player) {
+                Competition.currentCompetition.tryAddBossBarToPlayer(player);
+            }
         }
     }
 

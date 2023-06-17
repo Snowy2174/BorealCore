@@ -1,4 +1,4 @@
-package plugin.customcooking.configs;
+package plugin.customcooking.manager.configs;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.customcooking.util.ConfigUtil;
@@ -27,6 +27,7 @@ public class ConfigManager {
     public static String cookLine;
     public static String cookLineRight;
     public static String cookLineLeft;
+    public static String cookLineShift;
     public static String unknownItem;
     public static String grinderItem;
     public static String[] successTitle;
@@ -69,6 +70,7 @@ public class ConfigManager {
         cookLine = config.getString("gui.config.info-cook", "<!italic><#ffcc33>[Click] <#ffcc99>to Cook");
         cookLineRight = config.getString("gui.config.info-right-cook", "<!italic><#ffcc33>[Right Click] <#ffcc99>to Cook");
         cookLineLeft = config.getString("gui.config.info-left-cook", "<!italic><#ffcc33>[Left Click] <#ffcc99>to Autocook");
+        cookLineShift = config.getString("gui.config.info-left-cook", "<!italic><#ffcc33>[Shift Click] <#ffcc99>to Autocook x15");
         unknownItem = config.getString("gui.items.unknown-item", "unknownrecipe");
         grinderItem = config.getString("gui.items.grinder-item", "grinder");
 

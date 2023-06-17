@@ -1,4 +1,4 @@
-package plugin.customcooking.configs;
+package plugin.customcooking.manager.configs;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.customcooking.cooking.Layout;

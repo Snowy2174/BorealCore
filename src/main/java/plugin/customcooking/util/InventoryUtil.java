@@ -16,20 +16,20 @@ public class InventoryUtil {
 
     public InventoryUtil() {}
 
-    public static boolean handleIngredientCheck(Inventory playerInventory, List<String> ingredients) {
+    public static boolean handleIngredientCheck(Inventory playerInventory, List<String> ingredients, Integer instances) {
         if (ingredients == null || ingredients.isEmpty()) {
             return true; // consider inventory as having all ingredients if list is empty
         }
         for (String ingredientString : ingredients) {
             String[] parts = ingredientString.split(":");
+            int amount = Integer.parseInt(parts[1]) * instances;;
 
             if (parts[0].endsWith("*")) {
-                tieredIngredientCheck(playerInventory, parts[0].replace("*", ""), parts[1]);
+                tieredIngredientCheck(playerInventory, parts[0].replace("*", ""), amount);
             } else {
                 CustomStack customStack = CustomStack.getInstance(parts[0]);
                 if (customStack != null) {
                     ItemStack itemStack = customStack.getItemStack();
-                    int amount = Integer.parseInt(parts[1]);
                     if (!playerInventory.containsAtLeast(itemStack, amount)) {
                         return false; // ingredient not found in player's inventory
                     }
@@ -38,7 +38,7 @@ public class InventoryUtil {
                     if (material == null) {
                         return false; // invalid material name
                     }
-                    int amount = Integer.parseInt(parts[1]);
+
                     if (!playerInventory.containsAtLeast(new ItemStack(material), amount)) {
                         return false; // ingredient not found in player's inventory
                     }
@@ -48,7 +48,7 @@ public class InventoryUtil {
         return true; // all ingredients found in player's inventory
     }
 
-    public static boolean tieredIngredientCheck(Inventory playerInventory, String ingredient, String amount) {
+    public static boolean tieredIngredientCheck(Inventory playerInventory, String ingredient, Integer amount) {
         CustomStack customStack = CustomStack.getInstance(ingredient);
         if (customStack == null) {
             return false; // Invalid ingredient
@@ -58,7 +58,7 @@ public class InventoryUtil {
             String tieredIngredient = ingredient + (tier > 0 ? "_t" + tier : "");
             CustomStack customStackTiered = CustomStack.getInstance(tieredIngredient);
             ItemStack itemStackTiered = customStackTiered.getItemStack();
-            if (playerInventory.containsAtLeast(itemStackTiered, Integer.parseInt(amount))) {
+            if (playerInventory.containsAtLeast(itemStackTiered, amount)) {
                 return true; // Found ingredient in player's inventory
             }
         }
@@ -66,7 +66,7 @@ public class InventoryUtil {
     }
 
 
-    public static void removeIngredients(Inventory playerInventory, List<String> ingredients) {
+    public static void removeIngredients(Inventory playerInventory, List<String> ingredients, Integer instances) {
         if (ingredients == null || ingredients.isEmpty()) {
             return; // No ingredients to remove
         }
@@ -74,7 +74,7 @@ public class InventoryUtil {
         for (String ingredient : ingredients) {
             String[] parts = ingredient.split(":");
             String ingredientName = parts[0];
-            int amount = Integer.parseInt(parts[1]);
+            int amount = Integer.parseInt(parts[1]) * instances;
 
             if (ingredientName.endsWith("*")) {
                 removeTieredIngredient(playerInventory, ingredientName, amount);
@@ -113,7 +113,7 @@ public class InventoryUtil {
     }
 
 
-    public static void giveItem(Player player, String item) {
+    public static void giveItem(Player player, String item, Integer amount) {
         ItemStack drop = build(item);
         player.getLocation().getWorld().dropItem(player.getLocation(), drop);
     }

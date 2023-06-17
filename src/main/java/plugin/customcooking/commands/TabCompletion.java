@@ -26,7 +26,7 @@ public class TabCompletion implements TabCompleter {
             completions.add("recipebook");
             completions.add("migrateperms");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("competition")) {
-            completions.addAll(List.of("start", "end", "cancel"));
+            completions.addAll(List.of("start", "end", "cancel", "join"));
         } else if (args.length == 2) {
             completions.addAll(getOnlinePlayerNames());
         } else if (args.length == 3 || args.length == 4) {
@@ -34,6 +34,8 @@ public class TabCompletion implements TabCompleter {
         } else if (args.length == 4 && args[0].equalsIgnoreCase("cook")) {
             completions.add("auto");
         } else if (args.length == 4 && args[0].equalsIgnoreCase("mastery")) {
+            completions.add("<count>");
+        } else if (args.length == 5) {
             completions.add("<count>");
         }
 

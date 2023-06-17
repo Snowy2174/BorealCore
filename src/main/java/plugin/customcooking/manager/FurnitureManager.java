@@ -13,8 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.configs.ConfigManager;
-import plugin.customcooking.configs.MessageManager;
+import plugin.customcooking.manager.configs.ConfigManager;
+import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.listener.FurnitureListener;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
@@ -22,7 +22,7 @@ import plugin.customcooking.util.AdventureUtil;
 import java.util.*;
 
 import static net.kyori.adventure.key.Key.key;
-import static plugin.customcooking.configs.ConfigManager.splashTime;
+import static plugin.customcooking.manager.configs.ConfigManager.splashTime;
 import static plugin.customcooking.util.AdventureUtil.playerSound;
 import static plugin.customcooking.util.InventoryUtil.build;
 
@@ -80,14 +80,8 @@ public class FurnitureManager extends Function {
                 AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCooldown.replace("{time}", cooldown));
             }
         } else if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
-            if (!cooldowns.containsKey(player) || (System.currentTimeMillis() - cooldowns.get(player) >= 2000)) {
-                cooldowns.put(player, System.currentTimeMillis());
                 playCookingPotFX(clickedFurniture.getArmorstand().getLocation());
                 RecipeBookManager.getRecipeBook(clickedFurniture).open(player);
-            } else {
-                String cooldown = String.valueOf((2000 - (System.currentTimeMillis() - cooldowns.get(player)) / 1000));
-                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCooldown.replace("{time}", cooldown));
-            }
         }
     }
 

@@ -1,4 +1,4 @@
-package plugin.customcooking.configs;
+package plugin.customcooking.manager.configs;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -40,6 +40,7 @@ public class MessageManager {
     public static String noIngredients;
     public static String tooSlow;
     public static String cookingAutocooked;
+    public static String cookingPerfect;
     public static String potLight;
     public static String potCold;
     public static String potCooldown;
@@ -75,6 +76,7 @@ public class MessageManager {
         noIngredients = getOrSet(config, "no-ingredients", "<red>You do not have the required ingredients to cook this item.");
         tooSlow = getOrSet(config, "too-slow", "You've failed to produce the dish in the required time");
         cookingAutocooked = getOrSet(config, "cooking-autocooked", "<green>You have autocooked one {recipe}");
+        cookingPerfect = getOrSet(config, "cooking-perfect", "<green>You have cooked the dish {recipe} perfectly!");
 
         potLight = getOrSet(config, "pot-light-up", "<green>You lit up the cooking pot!");
         potCold = getOrSet(config, "pot-cold", "<red>You can't cook int a cold pot.. try heating it up");

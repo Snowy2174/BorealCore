@@ -1,4 +1,4 @@
-package plugin.customcooking.configs;
+package plugin.customcooking.manager.configs;
 
 import dev.lone.itemsadder.api.ItemsAdder;
 import org.bukkit.Bukkit;

@@ -12,9 +12,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.configs.ConfigManager;
-import plugin.customcooking.configs.LayoutManager;
-import plugin.customcooking.configs.MessageManager;
+import plugin.customcooking.manager.configs.ConfigManager;
+import plugin.customcooking.manager.configs.LayoutManager;
+import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.cooking.Difficulty;
 import plugin.customcooking.cooking.DroppedItem;
 import plugin.customcooking.cooking.Layout;
@@ -125,6 +125,8 @@ public class RecipeManager extends Function {
         recipe.setSuccessActions(EffectManager.getActions(section.getConfigurationSection("action.success"), recipe.getNick()));
         recipe.setFailureActions(EffectManager.getActions(section.getConfigurationSection("action.failure"), recipe.getNick()));
         recipe.setConsumeActions(EffectManager.getActions(section.getConfigurationSection("action.consume"), recipe.getNick()));
+
+        System.out.println(EffectManager.getActions(section.getConfigurationSection("action.success"), recipe.getNick()));
     }
 
 
@@ -166,6 +168,9 @@ public class RecipeManager extends Function {
         }
 
     public static void unlockRecipe(Player player, String recipe) {
+        if (getUnlockedRecipes(player).contains(recipe)) {
+            return;
+        }
         String recipeFormatted = RECIPES.get(recipe).getNick();
         setRecipeData(player, recipe, 0);
 

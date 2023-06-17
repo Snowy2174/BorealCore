@@ -11,14 +11,15 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.configs.ConfigManager;
-import plugin.customcooking.configs.MasteryManager;
-import plugin.customcooking.configs.MessageManager;
+import plugin.customcooking.manager.configs.ConfigManager;
+import plugin.customcooking.manager.configs.MasteryManager;
+import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.InventoryUtil;
 
@@ -56,6 +57,7 @@ public class RecipeBookManager implements InventoryProvider {
 
     @Override
     public void init(Player player, InventoryContents contents) {
+        player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1, 1);
         contents.fill( ClickableItem.of(unknownRecipeStack,
                 e -> AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown)));
         contents.fillBorders(ClickableItem.empty(new ItemStack (Material.AIR)));
@@ -69,13 +71,9 @@ public class RecipeBookManager implements InventoryProvider {
             ItemStack itemStack;
 
             if (hasRecipe) {
-                if (hasMastery) {
-                    itemStack = buildRecipeItem(recipe + "_perfect", player, true);
-                } else {
-                    itemStack = buildRecipeItem(recipe, player, false);
-                }
+                itemStack = buildRecipeItem(recipe, player, hasMastery);
             } else {
-                itemStack = buildUnknownItem(recipe + "_unknown");
+                itemStack = buildUnknownRecipeItem(recipe + "_unknown");
             }
 
             int slot = RECIPES.get(recipe).getSlot(); // Retrieve the slot from the configuration
@@ -90,6 +88,7 @@ public class RecipeBookManager implements InventoryProvider {
 
     private ItemStack buildRecipeItem(String recipe, Player player, boolean hasMastery){
         CustomStack customStack = CustomStack.getInstance(recipe);
+        if (hasMastery) {customStack = CustomStack.getInstance(recipe+ConfigManager.perfectItemSuffix);}
         if (customStack == null) {
             return unknownRecipeStack;
         } else {
@@ -99,7 +98,7 @@ public class RecipeBookManager implements InventoryProvider {
         }
     }
 
-    private ItemStack buildUnknownItem(String recipe){
+    private ItemStack buildUnknownRecipeItem(String recipe){
         CustomStack customStack = CustomStack.getInstance(recipe);
         if (customStack == null) {
             return unknownRecipeStack;
@@ -126,19 +125,19 @@ public class RecipeBookManager implements InventoryProvider {
 
         if (clickedItem != null && clickedItem.getType() != Material.AIR) {
             if (hasRecipe) {
-                if (event.isLeftClick()) {
-                    if (hasMastery) {
+                if (hasMastery) {
+                    if (event.isLeftClick()) {
                         // Left-click handling logic for autocooking the recipe
-                        cookingManager.handleCooking(recipe, player, clickedFurniture, true);
-                    } else {
-                        // Left-click handling logic for cooking the recipe
-                        cookingManager.handleCooking(recipe, player, clickedFurniture, false);
+                        cookingManager.handleAutocooking(recipe, player, 1);
+                    } else if (event.isRightClick()) {
+                        // Right click handling for cooking the recipe
+                        cookingManager.handleCooking(recipe, player, clickedFurniture);
+                    } else if (event.isShiftClick()) {
+                        // Shift click handling for cooking 15 Recipes
+                    cookingManager.handleAutocooking(recipe, player, 15);
                     }
-                } else if (event.isRightClick()) {
-                    // Right click handling for cooking the recipe
-                    cookingManager.handleCooking(recipe, player, clickedFurniture, false);
-                } else if (event.isShiftClick()) {
-                    // TODO: Recipe Shift-click handling
+                } else {
+                    cookingManager.handleCooking(recipe, player, clickedFurniture);
                 }
                 event.setCancelled(true);
             } else {
@@ -165,7 +164,6 @@ public class RecipeBookManager implements InventoryProvider {
             itemStack.setItemMeta(itemMeta);
         }
         List<String> lore = itemMeta.getLore();
-        List<String> ingredients = itemIngredients.get(recipe);
 
         if (!itemMeta.hasLore()) {
             lore = new ArrayList<>();
@@ -173,13 +171,17 @@ public class RecipeBookManager implements InventoryProvider {
         }
 
         appendMastery(lore, player, recipe, hasMastery);
-        appendIngredients(lore, player, ingredients);
+
+        if (itemIngredients.get(recipe) != null) {
+            appendIngredients(lore, player, itemIngredients.get(recipe));
+        }
 
 
         lore.add(" ");
         if (Boolean.TRUE.equals(hasMastery)) {
             lore.add(ConfigManager.cookLineRight);
             lore.add(ConfigManager.cookLineLeft);
+            lore.add(ConfigManager.cookLineShift);
         } else {
             lore.add(ConfigManager.cookLine);
         }

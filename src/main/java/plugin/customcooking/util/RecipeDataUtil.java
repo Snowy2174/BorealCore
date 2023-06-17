@@ -4,12 +4,12 @@ import dev.lone.itemsadder.api.ItemsAdder;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.configs.MessageManager;
+import plugin.customcooking.manager.configs.MessageManager;
 
 import java.io.File;
 import java.io.IOException;
 
-import static plugin.customcooking.configs.MasteryManager.getRequiredMastery;
+import static plugin.customcooking.manager.configs.MasteryManager.getRequiredMastery;
 import static plugin.customcooking.manager.RecipeManager.RECIPES;
 
 public class RecipeDataUtil {

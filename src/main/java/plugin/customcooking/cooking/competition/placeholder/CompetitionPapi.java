@@ -3,7 +3,7 @@ package plugin.customcooking.cooking.competition.placeholder;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import plugin.customcooking.configs.MessageManager;
+import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.cooking.competition.Competition;
 import plugin.customcooking.cooking.competition.ranking.RankingInterface;
 

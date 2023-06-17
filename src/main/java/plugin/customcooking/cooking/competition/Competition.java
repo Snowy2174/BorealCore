@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.configs.MessageManager;
+import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.cooking.action.Action;
 import plugin.customcooking.cooking.competition.bossbar.BossBarManager;
 import plugin.customcooking.cooking.competition.ranking.LocalRankingImpl;
