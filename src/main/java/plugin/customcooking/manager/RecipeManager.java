@@ -12,13 +12,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.manager.configs.ConfigManager;
-import plugin.customcooking.manager.configs.LayoutManager;
-import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.cooking.Difficulty;
 import plugin.customcooking.cooking.DroppedItem;
 import plugin.customcooking.cooking.Layout;
-import plugin.customcooking.cooking.Product;
+import plugin.customcooking.cooking.Recipe;
+import plugin.customcooking.manager.configs.ConfigManager;
+import plugin.customcooking.manager.configs.LayoutManager;
+import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
@@ -32,12 +32,7 @@ import static plugin.customcooking.util.RecipeDataUtil.setRecipeData;
 
 public class RecipeManager extends Function {
 
-    public static HashMap<String, Product> RECIPES;
-
-    public static final Map<String, List<String>> itemIngredients = new HashMap<>();
-    public static final Map<String, String> cookedItems = new HashMap<>();
-    public static final Map<String, Integer> masteryreqs = new HashMap<>();
-
+    public static HashMap<String, Recipe> RECIPES;
 
     @Override
     public void load() {
@@ -86,14 +81,13 @@ public class RecipeManager extends Function {
                         key,
                         recipeSection.getString("nick", key),
                         difficulties.toArray(new Difficulty[0]),
+                        recipeSection.getStringList("ingredients"),
+                        recipeSection.getString("cookedItems"),
                         recipeSection.getInt("time", 10000),
                         recipeSection.getInt("mastery", 10),
                         recipeSection.getInt("slot", 1),
                         recipeSection.getDouble("score", 1)
                 );
-                // Input Outputs
-                List<String> ingredientStrings = recipeSection.getStringList("ingredients");
-                String cookedItemString = recipeSection.getString("cookedItems");
 
                 // Set layout
                 if (recipeSection.contains("layout")) {
@@ -112,21 +106,14 @@ public class RecipeManager extends Function {
                 setActions(recipeSection, recipe);
 
                 RECIPES.put(key, recipe);
-
-                // store the list of required ingredients for this item
-                itemIngredients.put(key, ingredientStrings);
-                // store the output options
-                cookedItems.put(key, cookedItemString);
             }
         }
     }
 
-    private void setActions(ConfigurationSection section, Product recipe) {
+    private void setActions(ConfigurationSection section, Recipe recipe) {
         recipe.setSuccessActions(EffectManager.getActions(section.getConfigurationSection("action.success"), recipe.getNick()));
         recipe.setFailureActions(EffectManager.getActions(section.getConfigurationSection("action.failure"), recipe.getNick()));
         recipe.setConsumeActions(EffectManager.getActions(section.getConfigurationSection("action.consume"), recipe.getNick()));
-
-        System.out.println(EffectManager.getActions(section.getConfigurationSection("action.success"), recipe.getNick()));
     }
 
 

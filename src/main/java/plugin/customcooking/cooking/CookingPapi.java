@@ -1,24 +1,15 @@
-package plugin.customcooking.util;
+package plugin.customcooking.cooking;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import plugin.customcooking.CustomCooking;
 import plugin.customcooking.manager.configs.MasteryManager;
+import plugin.customcooking.util.InventoryUtil;
 
-public class PlaceholderUtil extends PlaceholderExpansion {
-
-    private final CustomCooking plugin;
-
-    public PlaceholderUtil(CustomCooking plugin) {
-        this.plugin = plugin;
-    }
-
+public class CookingPapi extends PlaceholderExpansion {
     @Override
     public @NotNull String getIdentifier() {
-        return "ccooking";
+        return "customcooking";
     }
 
     @Override
@@ -28,7 +19,7 @@ public class PlaceholderUtil extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return "1.0.0";
+        return "1.0";
     }
 
     @Override
@@ -65,13 +56,5 @@ public class PlaceholderUtil extends PlaceholderExpansion {
             }
         }
         return null;
-    }
-
-    public static String setPlaceholders(Player player, String text) {
-        return PlaceholderAPI.setPlaceholders(player, text);
-    }
-
-    public static String setPlaceholders(OfflinePlayer player, String text) {
-        return PlaceholderAPI.setPlaceholders(player, text);
     }
 }

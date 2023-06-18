@@ -2,10 +2,10 @@ package plugin.customcooking.cooking.competition.bossbar;
 
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.cooking.competition.Competition;
 import plugin.customcooking.cooking.competition.ranking.RankingInterface;
 import plugin.customcooking.manager.PlaceholderManager;
+import plugin.customcooking.manager.configs.MessageManager;
 
 import java.util.ArrayList;
 import java.util.List;

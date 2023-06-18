@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 
 import static plugin.customcooking.manager.RecipeManager.RECIPES;
-import static plugin.customcooking.manager.RecipeManager.masteryreqs;
 
 public class MasteryManager extends Function {
 
@@ -73,7 +72,7 @@ public class MasteryManager extends Function {
     }
 
     public static int getRequiredMastery(String recipe) {
-        Integer mastery = masteryreqs.get(recipe);
+        Integer mastery = RECIPES.get(recipe).getMasteryreq();
         if (mastery == null) {
             return 10;
         }

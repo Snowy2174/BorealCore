@@ -4,16 +4,15 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.customcooking.commands.MainCommand;
 import plugin.customcooking.commands.TabCompletion;
+import plugin.customcooking.gui.GuiManager;
+import plugin.customcooking.manager.*;
 import plugin.customcooking.manager.configs.LayoutManager;
 import plugin.customcooking.manager.configs.MasteryManager;
-import plugin.customcooking.manager.*;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
-import plugin.customcooking.util.PlaceholderUtil;
 
 public class CustomCooking extends JavaPlugin {
 
@@ -22,6 +21,7 @@ public class CustomCooking extends JavaPlugin {
     public static ProtocolManager protocolManager;
     private static CookingManager cookingManager;
     private static CompetitionManager competitionManager;
+    private static GuiManager guiManager;
     private static RecipeManager recipeManager;
     private static PlaceholderManager placeholderManager;
     private static LayoutManager layoutManager;
@@ -39,23 +39,21 @@ public class CustomCooking extends JavaPlugin {
     public void onEnable() {
         adventure = BukkitAudiences.create(this);
         protocolManager = ProtocolLibrary.getProtocolManager();
+        inventoryManager = new InventoryManager(this);
 
         cookingManager = new CookingManager();
         competitionManager = new CompetitionManager();
-        placeholderManager = new PlaceholderManager();
         layoutManager = new LayoutManager();
         effectManager = new EffectManager();
         furnitureManager = new FurnitureManager();
         masteryManager = new MasteryManager();
         recipeManager = new RecipeManager();
-        inventoryManager = new InventoryManager(this);
+        guiManager = new GuiManager();
+        placeholderManager = new PlaceholderManager();
 
         inventoryManager.init();
 
         reloadConfig();
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new PlaceholderUtil(this).register();
-        }
         getCommand("cooking").setExecutor(new MainCommand());
         getCommand("cooking").setTabCompleter(new TabCompletion());
 
@@ -71,6 +69,7 @@ public class CustomCooking extends JavaPlugin {
         recipeManager.unload();
         layoutManager.unload();
         effectManager.unload();
+        guiManager.unload();
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Disabled!");
 
@@ -100,7 +99,9 @@ public class CustomCooking extends JavaPlugin {
     public static LayoutManager getLayoutManager() {
         return layoutManager;
     }
-
+    public static GuiManager getGuiManager() {
+        return guiManager;
+    }
     public static FurnitureManager getFurnitureManager() {
         return furnitureManager;
     }

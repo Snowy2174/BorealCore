@@ -8,6 +8,7 @@ depend:
   - PlaceholderAPI
 softdepend:
   - ItemsAdder
+  - HolographicDisplays
 
 commands:
   cooking:

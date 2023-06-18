@@ -11,6 +11,7 @@ public class ConfigManager {
     public static int splashTime;
     public static List<String> starterRecipes;
     public static String customNamespace;
+    public static String unknownItemSuffix;
     public static String perfectItemSuffix;
     public static String particleItemSuffix;
     public static String failureItem;
@@ -50,6 +51,7 @@ public class ConfigManager {
 
         starterRecipes = config.getStringList("mechanics.starter-recipes");
         customNamespace = config.getString("mechanics.namespace", "customcooking");
+        unknownItemSuffix = config.getString("mechanics.unknown-item-suffix", "_unknown");
         perfectItemSuffix = config.getString("mechanics.perfect-item-suffix", "_perfect");
         particleItemSuffix = config.getString("mechanics.particle-item-suffix", "_particle");
 
@@ -70,7 +72,7 @@ public class ConfigManager {
         cookLine = config.getString("gui.config.info-cook", "<!italic><#ffcc33>[Click] <#ffcc99>to Cook");
         cookLineRight = config.getString("gui.config.info-right-cook", "<!italic><#ffcc33>[Right Click] <#ffcc99>to Cook");
         cookLineLeft = config.getString("gui.config.info-left-cook", "<!italic><#ffcc33>[Left Click] <#ffcc99>to Autocook");
-        cookLineShift = config.getString("gui.config.info-left-cook", "<!italic><#ffcc33>[Shift Click] <#ffcc99>to Autocook x15");
+        cookLineShift = config.getString("gui.config.info-shift-cook", "<!italic><#ffcc33>[Shift Click] <#ffcc99>to Autocook x15");
         unknownItem = config.getString("gui.items.unknown-item", "unknownrecipe");
         grinderItem = config.getString("gui.items.grinder-item", "grinder");
 

@@ -3,12 +3,17 @@ package plugin.customcooking.cooking;
 
 import plugin.customcooking.cooking.action.Action;
 
-public class Product {
+import java.util.Collections;
+import java.util.List;
 
-    public static Product EMPTY = new Product("null", "null", new Difficulty[]{new Difficulty(1, 1)}, 5000, 0, 0, 0);
+public class Recipe {
+
+    public static Recipe EMPTY = new Recipe("null", "null", new Difficulty[]{new Difficulty(1, 1)}, Collections.singletonList("null"), "null", 5000, 0, 0, 0);
 
     protected String key;
     protected String nick;
+    protected List<String> ingredients;
+    protected String cookedItems;
     protected Difficulty[] difficulty;
     protected Layout[] layout;
     protected int time;
@@ -19,10 +24,12 @@ public class Product {
     protected Action[] consumeActions;
     protected final double score;
 
-    public Product(String key, String nick, Difficulty[] difficulty, int time, int masteryreq, int slot, double score) {
+    public Recipe(String key, String nick, Difficulty[] difficulty, List<String> ingredients, String cookedItems, int time, int masteryreq, int slot, double score) {
         this.key = key;
         this.nick = nick;
         this.difficulty = difficulty;
+        this.ingredients = ingredients;
+        this.cookedItems = cookedItems;
         this.time = time;
         this.masteryreq = masteryreq;
         this.slot = slot;
@@ -37,15 +44,14 @@ public class Product {
         return nick;
     }
 
-    public int getSlot() {
-        return slot;
-    }
-    public double getScore() {
-        return score;
-    }
-
     public Difficulty[] getDifficulty() {
         return difficulty;
+    }
+    public List<String> getIngredients() {
+        return ingredients;
+    }
+    public String getCookedItems() {
+        return cookedItems;
     }
 
     public void setDifficulty(Difficulty[] difficulty) {
@@ -66,6 +72,12 @@ public class Product {
 
     public void setTime(int time) {
         this.time = time;
+    }
+    public int getSlot() {
+        return slot;
+    }
+    public double getScore() {
+        return score;
     }
 
     public int getMasteryreq() {

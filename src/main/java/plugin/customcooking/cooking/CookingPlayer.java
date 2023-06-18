@@ -2,8 +2,8 @@ package plugin.customcooking.cooking;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.manager.CookingManager;
+import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.util.AdventureUtil;
 
 public class CookingPlayer extends BukkitRunnable {

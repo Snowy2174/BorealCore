@@ -5,13 +5,13 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import plugin.customcooking.manager.configs.MasteryManager;
-import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.cooking.competition.Competition;
 import plugin.customcooking.cooking.competition.CompetitionSchedule;
+import plugin.customcooking.gui.GuiManager;
 import plugin.customcooking.manager.CookingManager;
-import plugin.customcooking.manager.RecipeBookManager;
 import plugin.customcooking.manager.RecipeManager;
+import plugin.customcooking.manager.configs.MasteryManager;
+import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
 
@@ -219,7 +219,7 @@ public class MainCommand implements CommandExecutor {
 
     private void handleRecipeBookCommand(CommandSender sender, String[] args) {
         if (sender instanceof Player player) {
-            RecipeBookManager.getRecipeBook(null).open(player);
+            GuiManager.getRecipeBook(null).open(player);
         }
     }
 }

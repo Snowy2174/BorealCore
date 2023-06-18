@@ -9,8 +9,8 @@ import plugin.customcooking.manager.configs.MessageManager;
 import java.io.File;
 import java.io.IOException;
 
-import static plugin.customcooking.manager.configs.MasteryManager.getRequiredMastery;
 import static plugin.customcooking.manager.RecipeManager.RECIPES;
+import static plugin.customcooking.manager.configs.MasteryManager.getRequiredMastery;
 
 public class RecipeDataUtil {
 

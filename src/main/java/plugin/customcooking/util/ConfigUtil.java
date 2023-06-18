@@ -26,6 +26,8 @@ public class ConfigUtil {
         CustomCooking.getRecipeManager().load();
         CustomCooking.getCookingManager().unload();
         CustomCooking.getCookingManager().load();
+        CustomCooking.getGuiManager().unload();
+        CustomCooking.getGuiManager().load();
         CustomCooking.getCompetitionManager().unload();
         CustomCooking.getCompetitionManager().load();
         CustomCooking.getFurnitureManager().unload();

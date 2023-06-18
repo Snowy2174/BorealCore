@@ -13,9 +13,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.gui.GuiManager;
+import plugin.customcooking.listener.FurnitureListener;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
-import plugin.customcooking.listener.FurnitureListener;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
 
@@ -81,7 +82,7 @@ public class FurnitureManager extends Function {
             }
         } else if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
                 playCookingPotFX(clickedFurniture.getArmorstand().getLocation());
-                RecipeBookManager.getRecipeBook(clickedFurniture).open(player);
+                GuiManager.getRecipeBook(clickedFurniture).open(player);
         }
     }
 

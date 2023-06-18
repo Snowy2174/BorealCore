@@ -36,6 +36,7 @@ public class MessageManager {
     public static String recipeLocked;
     public static String recipeUnlocked;
     public static String recipeUnknown;
+    public static String recipeNoPot;
     public static String alreadyCooking;
     public static String noIngredients;
     public static String tooSlow;
@@ -71,6 +72,7 @@ public class MessageManager {
         recipeLocked = getOrSet(config, "recipe-locked", "<red>You have lost the recipe: {recipe}");
         recipeUnlocked = getOrSet(config, "recipe-unlocked", "<green>You have unlocked the recipe: {recipe}");
         recipeUnknown = getOrSet(config, "recipe-unknown", "<red>You haven't unlocked this recipe yet..");
+        recipeNoPot = getOrSet(config, "recipe-no-pot", "<red>You need to use a cooking pot to cook this recipe!");
 
         alreadyCooking = getOrSet(config, "already-cooking", "<red>You're already cooking something!");
         noIngredients = getOrSet(config, "no-ingredients", "<red>You do not have the required ingredients to cook this item.");

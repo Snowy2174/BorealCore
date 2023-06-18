@@ -1,0 +1,6 @@
+dough:
+  nick: "Dough"
+  slot: 2
+  ingredients:
+    - "flour:1"
+    - "SUGAR:1"

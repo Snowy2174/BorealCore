@@ -21,32 +21,42 @@ public class InventoryUtil {
             return true; // consider inventory as having all ingredients if list is empty
         }
         for (String ingredientString : ingredients) {
-            String[] parts = ingredientString.split(":");
-            int amount = Integer.parseInt(parts[1]) * instances;;
+            String[] options = ingredientString.split("/");
+            boolean optionFound = handleOptions(playerInventory, options, instances);
+            if (!optionFound) {
+                return false; // option not found in player's inventory, return false immediately
+            }
+        }
+        return true; // all ingredients found in player's inventory for at least one option
+    }
+
+    private static boolean handleOptions(Inventory playerInventory, String[] options, Integer instances) {
+        for (String option : options) {
+            String[] parts = option.split(":");
+            int amount = Integer.parseInt(parts[1]) * instances;
 
             if (parts[0].endsWith("*")) {
-                tieredIngredientCheck(playerInventory, parts[0].replace("*", ""), amount);
+                if (tieredIngredientCheck(playerInventory, parts[0].replace("*", ""), amount)) {
+                    return true; // ingredient found in player's inventory for this option
+                }
             } else {
                 CustomStack customStack = CustomStack.getInstance(parts[0]);
                 if (customStack != null) {
                     ItemStack itemStack = customStack.getItemStack();
-                    if (!playerInventory.containsAtLeast(itemStack, amount)) {
-                        return false; // ingredient not found in player's inventory
+                    if (playerInventory.containsAtLeast(itemStack, amount)) {
+                        return true; // ingredient found in player's inventory for this option
                     }
                 } else {
                     Material material = Material.getMaterial(parts[0]);
-                    if (material == null) {
-                        return false; // invalid material name
-                    }
-
-                    if (!playerInventory.containsAtLeast(new ItemStack(material), amount)) {
-                        return false; // ingredient not found in player's inventory
+                    if (material != null && playerInventory.containsAtLeast(new ItemStack(material), amount)) {
+                        return true; // ingredient found in player's inventory for this option
                     }
                 }
             }
         }
-        return true; // all ingredients found in player's inventory
+        return false; // none of the options found in player's inventory
     }
+
 
     public static boolean tieredIngredientCheck(Inventory playerInventory, String ingredient, Integer amount) {
         CustomStack customStack = CustomStack.getInstance(ingredient);
@@ -65,23 +75,65 @@ public class InventoryUtil {
         return false; // Ingredient not found in player's inventory
     }
 
-
     public static void removeIngredients(Inventory playerInventory, List<String> ingredients, Integer instances) {
         if (ingredients == null || ingredients.isEmpty()) {
             return; // No ingredients to remove
         }
 
         for (String ingredient : ingredients) {
-            String[] parts = ingredient.split(":");
-            String ingredientName = parts[0];
-            int amount = Integer.parseInt(parts[1]) * instances;
+            String[] options = ingredient.split("/");
+            for (String option : options) {
+                String[] parts = option.split(":");
+                String ingredientName = parts[0];
+                int amount = Integer.parseInt(parts[1]) * instances;
 
-            if (ingredientName.endsWith("*")) {
-                removeTieredIngredient(playerInventory, ingredientName, amount);
-            } else {
-                removeNonTieredIngredient(playerInventory, ingredientName, amount);
+                if (ingredientName.endsWith("*")) {
+                    if (playerHasIngredient(playerInventory, ingredientName)) {
+                        removeTieredIngredient(playerInventory, ingredientName, amount);
+                        break; // Exit the loop after removing one tiered ingredient
+                    }
+                } else {
+                    if (playerHasIngredient(playerInventory, ingredientName)) {
+                        removeNonTieredIngredient(playerInventory, ingredientName, amount);
+                        break; // Exit the loop after removing one non-tiered ingredient
+                    }
+                }
             }
         }
+    }
+
+    public static boolean playerHasIngredient(Inventory playerInventory, String ingredient) {
+        if (ingredient.endsWith("*")) {
+            return hasTieredIngredient(playerInventory, ingredient);
+        } else {
+            CustomStack customStack = CustomStack.getInstance(ingredient);
+            if (customStack != null) {
+                ItemStack itemStack = customStack.getItemStack();
+                return playerInventory.containsAtLeast(itemStack, 1);
+            } else {
+                Material material = Material.getMaterial(ingredient);
+                if (material != null) {
+                    return playerInventory.containsAtLeast(new ItemStack(material), 1);
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+
+    private static boolean hasTieredIngredient(Inventory playerInventory, String ingredient) {
+        String baseIngredient = ingredient.replace("*", "");
+        for (int tier = 0; tier <= 2; tier++) {
+            String tieredIngredient = baseIngredient + (tier > 0 ? "_t" + tier : "");
+            CustomStack customStackTiered = CustomStack.getInstance(tieredIngredient);
+            if (customStackTiered != null) {
+                ItemStack itemStackTiered = customStackTiered.getItemStack();
+                if (playerInventory.containsAtLeast(itemStackTiered, 1)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static void removeTieredIngredient(Inventory playerInventory, String ingredient, int amount) {
@@ -120,6 +172,9 @@ public class InventoryUtil {
 
     @Nullable
     public static ItemStack buildia(String key) {
+        if (key == null) {
+            return null;
+        }
         String material = key.replaceAll("[\\[\\]]", "");
         CustomStack customStack = CustomStack.getInstance(material);
         return customStack == null ? null : customStack.getItemStack();
@@ -137,40 +192,6 @@ public class InventoryUtil {
         }
         addIdentifier(itemStack, key);
         return itemStack;
-    }
-
-    public static boolean playerHasIngredient(Inventory playerInventory, String ingredient) {
-        if (ingredient.endsWith("*")) {
-            return hasTieredIngredient(playerInventory, ingredient);
-        } else {
-            CustomStack customStack = CustomStack.getInstance(ingredient);
-            if (customStack != null) {
-                ItemStack itemStack = customStack.getItemStack();
-                return playerInventory.containsAtLeast(itemStack, 1);
-            } else {
-                Material material = Material.getMaterial(ingredient);
-                if (material != null) {
-                    return playerInventory.containsAtLeast(new ItemStack(material), 1);
-                } else {
-                    return false;
-                }
-            }
-        }
-    }
-
-    private static boolean hasTieredIngredient(Inventory playerInventory, String ingredient) {
-        String baseIngredient = ingredient.replace("*", "");
-        for (int tier = 0; tier <= 2; tier++) {
-            String tieredIngredient = baseIngredient + (tier > 0 ? "_t" + tier : "");
-            CustomStack customStackTiered = CustomStack.getInstance(tieredIngredient);
-            if (customStackTiered != null) {
-                ItemStack itemStackTiered = customStackTiered.getItemStack();
-                if (playerInventory.containsAtLeast(itemStackTiered, 1)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     public static void addIdentifier(ItemStack itemStack, String id){

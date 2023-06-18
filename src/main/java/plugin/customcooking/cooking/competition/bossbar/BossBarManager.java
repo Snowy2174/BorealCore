@@ -4,9 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.cooking.competition.Competition;
 import plugin.customcooking.listener.SimpleListener;
+import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
 
