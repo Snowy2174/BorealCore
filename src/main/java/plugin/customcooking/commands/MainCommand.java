@@ -9,13 +9,12 @@ import plugin.customcooking.cooking.competition.Competition;
 import plugin.customcooking.cooking.competition.CompetitionSchedule;
 import plugin.customcooking.gui.GuiManager;
 import plugin.customcooking.manager.CookingManager;
-import plugin.customcooking.manager.RecipeManager;
-import plugin.customcooking.manager.configs.MasteryManager;
+import plugin.customcooking.manager.DataManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
+import plugin.customcooking.util.RecipeDataUtil;
 
-import static plugin.customcooking.util.RecipeDataUtil.setRecipeData;
 
 public class MainCommand implements CommandExecutor {
 
@@ -108,7 +107,7 @@ public class MainCommand implements CommandExecutor {
 
     private void handleMigratePermsCommand(CommandSender sender) {
         long startTime = System.currentTimeMillis();
-        int migratedCount = RecipeManager.migratePermissions();
+        int migratedCount = DataManager.migratePermissions();
         AdventureUtil.sendMessage(sender, MessageManager.prefix + " Migrated and Updated the perms for <green>" + migratedCount + "Recipes and Masteries <gray> in <green>" + (System.currentTimeMillis() - startTime) + "ms" );
     }
 
@@ -125,15 +124,15 @@ public class MainCommand implements CommandExecutor {
         }
 
         if (args.length == 1) {
-            RecipeManager.checkAndAddRandomRecipe(player);
+            RecipeDataUtil.checkAndAddRandomRecipe(player);
         } else if (args.length == 2) {
             if (args[1].equalsIgnoreCase("all")) {
-                RecipeManager.unlockAllRecipes(player);
+                RecipeDataUtil.unlockAllRecipes(player);
             } else if (args[1].equalsIgnoreCase("player")) {
-                RecipeManager.unlockStarterRecipes(player);
+                RecipeDataUtil.unlockStarterRecipes(player);
             } else {
                 String recipe = args[1];
-                RecipeManager.unlockRecipe(player, recipe);
+                RecipeDataUtil.setRecipeStatus(player, recipe, true);
             }
         } else {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking unlock <player> <recipe>");
@@ -153,7 +152,7 @@ public class MainCommand implements CommandExecutor {
                 AdventureUtil.consoleMessage("<Red> [!] Player " + args[0] + " not found.");
                 return;
             }
-            RecipeManager.lockRecipe(player, recipe);
+            RecipeDataUtil.setRecipeStatus(player, recipe, false);
         } else {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking lock <player> <recipe>");
         }
@@ -172,7 +171,7 @@ public class MainCommand implements CommandExecutor {
                 AdventureUtil.consoleMessage("<Red> [!] Player " + args[0] + " not found.");
                 return;
             }
-            setRecipeData(player, recipe, MasteryManager.getRequiredMastery(recipe));
+            RecipeDataUtil.setRecipeData(player, recipe, RecipeDataUtil.getDefaultRequiredMastery(recipe));
         }
 
         if (args.length == 3) {
@@ -183,7 +182,7 @@ public class MainCommand implements CommandExecutor {
                 AdventureUtil.consoleMessage("<Red> [!] Player " + args[0] + " not found.");
                 return;
             }
-            setRecipeData(player, recipe, count);
+            RecipeDataUtil.setRecipeData(player, recipe, count);
         } else {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking mastery <player> <recipe> <count>");
         }

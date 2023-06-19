@@ -12,11 +12,10 @@ import plugin.customcooking.cooking.competition.ranking.RankingInterface;
 import plugin.customcooking.manager.PlaceholderManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.util.RecipeDataUtil;
 
 import java.time.Instant;
 import java.util.*;
-
-import static plugin.customcooking.util.RecipeDataUtil.playerDataExists;
 
 public class Competition {
 
@@ -47,7 +46,7 @@ public class Competition {
         List<Player> validPlayers = new ArrayList<>();
 
         for (Player player : playerCollections) {
-            if (playerDataExists(player)) {
+            if (RecipeDataUtil.playerDataExists(player)) {
                 validPlayers.add(player);
             }
         }

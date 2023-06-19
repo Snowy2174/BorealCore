@@ -10,7 +10,8 @@ import plugin.customcooking.commands.TabCompletion;
 import plugin.customcooking.gui.GuiManager;
 import plugin.customcooking.manager.*;
 import plugin.customcooking.manager.configs.LayoutManager;
-import plugin.customcooking.manager.configs.MasteryManager;
+import plugin.customcooking.manager.DataManager;
+import plugin.customcooking.manager.configs.RecipeManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
 
@@ -27,7 +28,7 @@ public class CustomCooking extends JavaPlugin {
     private static LayoutManager layoutManager;
     private static EffectManager effectManager;
     private static FurnitureManager furnitureManager;
-    private static MasteryManager masteryManager;
+    private static DataManager dataManager;
     private static InventoryManager inventoryManager;
 
     @Override
@@ -46,7 +47,7 @@ public class CustomCooking extends JavaPlugin {
         layoutManager = new LayoutManager();
         effectManager = new EffectManager();
         furnitureManager = new FurnitureManager();
-        masteryManager = new MasteryManager();
+        dataManager = new DataManager();
         recipeManager = new RecipeManager();
         guiManager = new GuiManager();
         placeholderManager = new PlaceholderManager();
@@ -113,8 +114,8 @@ public class CustomCooking extends JavaPlugin {
         return effectManager;
     }
 
-    public static MasteryManager getMasteryManager() {
-        return masteryManager;
+    public static DataManager getMasteryManager() {
+        return dataManager;
     }
     public static InventoryManager getInventoryManager() {
         return inventoryManager;

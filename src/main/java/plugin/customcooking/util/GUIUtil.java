@@ -1,20 +1,16 @@
 package plugin.customcooking.util;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import plugin.customcooking.manager.configs.ConfigManager;
-import plugin.customcooking.manager.configs.MasteryManager;
 
 import java.util.List;
-
-import static plugin.customcooking.util.InventoryUtil.playerHasIngredient;
 
 public class GUIUtil {
 
     public static void appendMastery(List<String> lore, Player player, String recipe, Boolean hasMastery) {
 
-        Integer masteryCount = MasteryManager.getMasteryCount(player, recipe);
-        Integer requiredMastery = MasteryManager.getRequiredMastery(recipe);
+        Integer masteryCount = RecipeDataUtil.getMasteryCount(player, recipe);
+        Integer requiredMastery = RecipeDataUtil.getDefaultRequiredMastery(recipe);
         String[] masteryInfo;
 
         lore.add(" ");
@@ -23,7 +19,7 @@ public class GUIUtil {
             masteryInfo = ConfigManager.masteryInfoTrue.split("/");
         } else {
             lore.add(ConfigManager.masteryLine.replace("{mastery}", (masteryCount + "/" + requiredMastery)));
-            lore.add(ConfigManager.masteryBar.replace("{bar}", GUIUtil.appendProgressBar(masteryCount/requiredMastery)));
+            lore.add(ConfigManager.masteryBar.replace("{bar}", GUIUtil.appendProgressBar((double) masteryCount/requiredMastery)));
             masteryInfo = ConfigManager.masteryInfoFalse.split("/");
         }
         lore.add(masteryInfo[0]);
@@ -81,8 +77,6 @@ public class GUIUtil {
         // If none of the options were found, add the red lore for the ingredient
         lore.add("<red><!italic>- (x" + options[0].split(":")[1] + ") " + formatString(options[0].split(":")[0]));
     }
-
-
 
     public static String formatString(String input) {
         String[] words = input.split("_");

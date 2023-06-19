@@ -111,7 +111,7 @@ public class IngredientBookProvider implements InventoryProvider {
             if (event.isShiftClick()) {
                 // Shift click handling for cooking 15 Recipes
                 cookingManager.handleMaterialAutocooking(recipe, player, 15);
-            } else {
+            } else if (event.isLeftClick() || event.isRightClick()) {
                 // Left-click handling logic for autocooking the recipe
                 cookingManager.handleMaterialAutocooking(recipe, player, 1);
             }

@@ -1,7 +1,9 @@
 package plugin.customcooking.manager.configs;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.customcooking.util.ConfigUtil;
+import plugin.customcooking.util.GUIUtil;
 
 import java.util.List;
 
@@ -14,6 +16,7 @@ public class ConfigManager {
     public static String unknownItemSuffix;
     public static String perfectItemSuffix;
     public static String particleItemSuffix;
+    public static String effectLore;
     public static String failureItem;
     public static String unlitCookingPot;
     public static String litCookingPot;
@@ -55,6 +58,7 @@ public class ConfigManager {
         perfectItemSuffix = config.getString("mechanics.perfect-item-suffix", "_perfect");
         particleItemSuffix = config.getString("mechanics.particle-item-suffix", "_particle");
 
+        effectLore = config.getString("mechanics.effect-lore", " <gold>\uD83E\uDDEA <white>{effect} <gold>{amplifier} <white>for <gold>{duration}s");
         failureItem = config.getString("mechanics.failure-item", "failureitem");
         unlitCookingPot = config.getString("mechanics.unlit-cooking-pot", "cooking_pot_unlit");
         litCookingPot = config.getString("mechanics.lit-cooking-pot", "cooking_pot_lit");

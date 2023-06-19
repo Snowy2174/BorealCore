@@ -9,6 +9,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import plugin.customcooking.manager.EffectManager;
 
 import java.util.List;
 
@@ -164,9 +165,12 @@ public class InventoryUtil {
         }
     }
 
-
-    public static void giveItem(Player player, String item, Integer amount) {
+    public static void giveItem(Player player, String item, Integer amount, boolean potionEffects) {
         ItemStack drop = build(item);
+        drop.setAmount(amount);
+        if (potionEffects) {
+            EffectManager.addPotionEffectLore(drop, item);
+        }
         player.getLocation().getWorld().dropItem(player.getLocation(), drop);
     }
 
@@ -194,11 +198,12 @@ public class InventoryUtil {
         return itemStack;
     }
 
-    public static void addIdentifier(ItemStack itemStack, String id){
+    private static void addIdentifier(ItemStack itemStack, String id){
         NBTItem nbtItem = new NBTItem(itemStack);
         NBTCompound nbtCompound = nbtItem.addCompound("CustomCooking");
         String identifier = id.replaceAll("[\\[\\]]", "");
         nbtCompound.setString("id", identifier);
         itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
     }
+
 }

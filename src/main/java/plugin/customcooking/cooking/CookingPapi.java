@@ -1,10 +1,12 @@
 package plugin.customcooking.cooking;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import plugin.customcooking.manager.configs.MasteryManager;
+import plugin.customcooking.manager.DataManager;
 import plugin.customcooking.util.InventoryUtil;
+import plugin.customcooking.util.RecipeDataUtil;
 
 public class CookingPapi extends PlaceholderExpansion {
     @Override
@@ -38,23 +40,36 @@ public class CookingPapi extends PlaceholderExpansion {
             return "";
         }
 
-        if (parts[0].equalsIgnoreCase("ingcheck")) {
-            String ingredient = parts[1];
-            boolean playerHasIngredient = InventoryUtil.playerHasIngredient(player.getInventory(), ingredient);
-            return playerHasIngredient ? "&a" : "&c"; // returns green if player has the item, red otherwise
-        } else {
-            String recipe = parts[1];
-            int masteryCount = MasteryManager.getMasteryCount(player, recipe);
-            int requiredMastery = MasteryManager.getRequiredMastery(recipe);
-
-            if (parts[0].equalsIgnoreCase("masterycount")) {
+        String recipe;
+        Integer masteryCount;
+        Integer requiredMastery;
+        switch (parts[0].toLowerCase()) {
+            case "ingcheck":
+                String ingredient = parts[1];
+                boolean playerHasIngredient = InventoryUtil.playerHasIngredient(player.getInventory(), ingredient);
+                return playerHasIngredient ? "&a" : "&c"; // returns green if player has the item, red otherwise
+            case "cooking-stats":
+                String playerName = parts[1];
+                return String.valueOf(DataManager.getRecipeCount(playerName));
+            case "masterycount":
+                recipe = parts[1];
+                masteryCount = RecipeDataUtil.getMasteryCount(player, recipe);
                 return String.valueOf(masteryCount);
-            } else if (parts[0].equalsIgnoreCase("requiredmastery")) {
+            case "requiredmastery":
+                recipe = parts[1];
+                requiredMastery = RecipeDataUtil.getDefaultRequiredMastery(recipe);
                 return String.valueOf(requiredMastery);
-            } else if (parts[0].equalsIgnoreCase("masteryprogress")) {
-                return String.valueOf(((float) masteryCount / requiredMastery) * 100);
-            }
+            case "masteryprogress":
+                recipe = parts[1];
+                masteryCount = RecipeDataUtil.getMasteryCount(player, recipe);
+                requiredMastery = RecipeDataUtil.getDefaultRequiredMastery(recipe);
+                float masteryProgress = ((float) masteryCount / requiredMastery) * 100;
+                return String.valueOf(masteryProgress);
+            default:
+                // Invalid or unrecognized placeholder identifier
+                return "Invalid Placeholder";
         }
-        return null;
     }
+
+
 }

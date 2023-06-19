@@ -15,16 +15,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.manager.configs.ConfigManager;
-import plugin.customcooking.manager.configs.MasteryManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.GUIUtil;
+import plugin.customcooking.util.RecipeDataUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.customcooking.manager.RecipeManager.RECIPES;
-import static plugin.customcooking.manager.RecipeManager.getUnlockedRecipes;
+import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 import static plugin.customcooking.util.InventoryUtil.build;
 
 public class RecipeBookProvider implements InventoryProvider {
@@ -50,10 +49,10 @@ public class RecipeBookProvider implements InventoryProvider {
         contents.fillBorders(ClickableItem.empty(new ItemStack(Material.AIR)));
         contents.set(5, 4, ClickableItem.of(buildIngredientsItem(), e -> handleIngredientsMenuClick(e, player)));
 
-        List<String> list = getUnlockedRecipes(player);
+        List<String> list = RecipeDataUtil.getUnlockedRecipes(player);
 
         for (String recipe : RECIPES.keySet()) {
-            boolean hasMastery = MasteryManager.hasMastery(player, recipe);
+            boolean hasMastery = RecipeDataUtil.hasMastery(player, recipe);
             boolean hasRecipe = list.contains(recipe);
             ItemStack itemStack;
 
@@ -169,15 +168,15 @@ public class RecipeBookProvider implements InventoryProvider {
                 return;
             }
             if (hasMastery) {
-                if (event.isLeftClick()) {
-                    // Left-click handling logic for autocooking the recipe
-                    cookingManager.handleAutocooking(recipe, player, 1);
+                if (event.isShiftClick()) {
+                    // Shift click handling for cooking 15 Recipes
+                    cookingManager.handleAutocooking(recipe, player, 15);
                 } else if (event.isRightClick()) {
                     // Right click handling for cooking the recipe
                     cookingManager.handleCooking(recipe, player, clickedFurniture);
-                } else if (event.isShiftClick()) {
-                    // Shift click handling for cooking 15 Recipes
-                    cookingManager.handleAutocooking(recipe, player, 15);
+                } else if (event.isLeftClick()) {
+                    // Left-click handling logic for autocooking the recipe
+                    cookingManager.handleAutocooking(recipe, player, 1);
                 }
             } else {
                 cookingManager.handleCooking(recipe, player, clickedFurniture);

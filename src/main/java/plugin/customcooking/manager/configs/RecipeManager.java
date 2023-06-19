@@ -1,0 +1,107 @@
+package plugin.customcooking.manager.configs;
+
+import org.apache.commons.lang3.StringUtils;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
+import plugin.customcooking.CustomCooking;
+import plugin.customcooking.cooking.Difficulty;
+import plugin.customcooking.cooking.DroppedItem;
+import plugin.customcooking.cooking.Layout;
+import plugin.customcooking.cooking.Recipe;
+import plugin.customcooking.manager.EffectManager;
+import plugin.customcooking.object.Function;
+import plugin.customcooking.util.AdventureUtil;
+
+import java.io.File;
+import java.util.*;
+
+import static plugin.customcooking.manager.EffectManager.EFFECTS;
+
+public class RecipeManager extends Function {
+
+    public static HashMap<String, Recipe> RECIPES;
+
+    @Override
+    public void load() {
+        RECIPES = new HashMap<>();
+        loadItems();
+        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (RECIPES.size()) + " <gray>recipes");
+    }
+
+    @Override
+    public void unload() {
+        if (RECIPES != null) RECIPES.clear();
+    }
+
+    private void loadItems() {
+        File recipe_file = new File(CustomCooking.plugin.getDataFolder() + File.separator + "recipes");
+        if (!recipe_file.exists()) {
+            if (!recipe_file.mkdir()) return;
+            CustomCooking.plugin.saveResource(CustomCooking.plugin.getDataFolder() + File.separator + "recipes.yml", false);
+        }
+        File[] files = recipe_file.listFiles();
+        if (files == null) return;
+        for (File file : files) {
+            if (!file.getName().endsWith(".yml")) continue;
+            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+            Set<String> recipes = config.getKeys(false);
+
+            for (String key : recipes) {
+
+                ConfigurationSection recipeSection = config.getConfigurationSection(key);
+
+                // Bar mechanic
+                List<Difficulty> difficulties = new ArrayList<>();
+                List<String> difficultyList = recipeSection.getStringList("difficulty");
+                if (difficultyList.size() == 0) {
+                    String[] diff = StringUtils.split(recipeSection.getString("difficulty", "1-1"), "-");
+                    Difficulty difficulty = new Difficulty(Integer.parseInt(diff[0]), Integer.parseInt(diff[1]));
+                    difficulties.add(difficulty);
+                } else {
+                    for (String difficultyStr : difficultyList) {
+                        String[] diff = StringUtils.split(difficultyStr, "-");
+                        Difficulty difficulty = new Difficulty(Integer.parseInt(diff[0]), Integer.parseInt(diff[1]));
+                        difficulties.add(difficulty);
+                    }
+                }
+                DroppedItem recipe = new DroppedItem(
+                        key,
+                        recipeSection.getString("nick", key),
+                        EffectManager.buildEffectLore(EFFECTS.get(recipeSection.getString("action.consume.dish-buff", key))),
+                        difficulties.toArray(new Difficulty[0]),
+                        recipeSection.getStringList("ingredients"),
+                        recipeSection.getString("cookedItems"),
+                        recipeSection.getInt("time", 10000),
+                        recipeSection.getInt("mastery", 10),
+                        recipeSection.getInt("slot", 1),
+                        recipeSection.getDouble("score", 1)
+                );
+
+                // Set layout
+                if (recipeSection.contains("layout")) {
+                    List<Layout> layoutList = new ArrayList<>();
+                    for (String layoutName : recipeSection.getStringList( "layout")) {
+                        Layout layout = LayoutManager.LAYOUTS.get(layoutName);
+                        if (layout == null) {
+                            AdventureUtil.consoleMessage("<red>[CustomCooking] Bar " + layoutName + " doesn't exist");
+                            continue;
+                        }
+                        layoutList.add(layout);
+                    }
+                    recipe.setLayout(layoutList.toArray(new Layout[0]));
+                }
+
+                setActions(recipeSection, recipe);
+
+                RECIPES.put(key, recipe);
+            }
+        }
+    }
+
+    private void setActions(ConfigurationSection section, Recipe recipe) {
+        recipe.setSuccessActions(EffectManager.getActions(section.getConfigurationSection("action.success"), recipe.getNick()));
+        recipe.setFailureActions(EffectManager.getActions(section.getConfigurationSection("action.failure"), recipe.getNick()));
+        recipe.setConsumeActions(EffectManager.getActions(section.getConfigurationSection("action.consume"), recipe.getNick()));
+    }
+
+}

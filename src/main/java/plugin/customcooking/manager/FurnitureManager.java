@@ -257,7 +257,7 @@ public class FurnitureManager extends Function {
                 hologram.getLines().appendText(ChatColor.RED + "Failure!");
             }
 
-            hologram.getLines().appendText(recipe.getItemMeta().getDisplayName());
+            hologram.getLines().appendText(String.valueOf(recipe.getItemMeta().displayName()));
             hologram.getLines().appendItem(recipe);
 
             holograms.put(location, hologram);

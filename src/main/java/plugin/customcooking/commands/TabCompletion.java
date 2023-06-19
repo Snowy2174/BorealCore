@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.customcooking.manager.RecipeManager.RECIPES;
+import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 
 public class TabCompletion implements TabCompleter {
     @Override
