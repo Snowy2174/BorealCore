@@ -13,7 +13,12 @@ import plugin.customcooking.manager.DataManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
+import plugin.customcooking.util.InventoryUtil;
 import plugin.customcooking.util.RecipeDataUtil;
+
+import java.util.List;
+
+import static plugin.customcooking.manager.DataManager.getRecipeCount;
 
 
 public class MainCommand implements CommandExecutor {
@@ -27,7 +32,7 @@ public class MainCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("customcooking.admin")) {
-            AdventureUtil.sendMessage(sender, MessageManager.noPerms);
+            showStatsCommand(sender);
             return true;
         }
 
@@ -56,6 +61,8 @@ public class MainCommand implements CommandExecutor {
             handleRecipeBookCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("competition")){
             handleCompetitionCommand(sender, subargs);
+        } else if (subcommand.equalsIgnoreCase("give")){
+            handleGiveItemCommand(sender, subargs);
         }
         else {
             // Unknown subcommand
@@ -63,6 +70,19 @@ public class MainCommand implements CommandExecutor {
         }
 
         return true;
+    }
+
+    private void showStatsCommand(CommandSender sender) {
+        if (sender instanceof Player player) {
+            List<String> unlockedRecipes = RecipeDataUtil.getUnlockedRecipes(player);
+
+            AdventureUtil.sendMessage(sender, "<gold><bold>CustomCooking</bold><grey> version 1.1.4");
+            AdventureUtil.sendMessage(sender, "<grey>Created by <gold>SnowyOwl217");
+            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Cooked: " + getRecipeCount(player.getName()));
+            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Unlocked: " + unlockedRecipes.size());
+            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Mastered: " + RecipeDataUtil.getMasteredRecipes(player, unlockedRecipes).size());
+            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Unknown: " + RecipeDataUtil.getLockedRecipes(unlockedRecipes).size());
+        }
     }
 
     private void showCommandHelp(CommandSender sender) {
@@ -220,5 +240,34 @@ public class MainCommand implements CommandExecutor {
         if (sender instanceof Player player) {
             GuiManager.getRecipeBook(null).open(player);
         }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+        GuiManager.getRecipeBook(null).open(player);
     }
+
+    private void handleGiveItemCommand(CommandSender sender, String[] args) {
+        if (args.length < 3) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking give <player> <item> <amount>");
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+
+        String itemName = args[1];
+        int amount = Integer.parseInt(args[2]);
+
+        InventoryUtil.giveItem(player, itemName, amount, true);
+
+        AdventureUtil.sendMessage(sender, "Gave " + amount + " " + itemName + " to " + player.getName());
+    }
+
+
 }

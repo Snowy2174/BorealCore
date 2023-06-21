@@ -13,7 +13,6 @@ softdepend:
 commands:
   cooking:
     description: The main plugin command
-    permission: customcooking.admin
 
 permissions:
   customcooking.*:

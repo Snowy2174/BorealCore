@@ -317,7 +317,7 @@ public class CookingManager extends Function {
             return;
         }
         String lootKey = nbtCompound.getString("id");
-        Recipe recipe = RECIPES.get(lootKey);
+        Recipe recipe = RECIPES.get(lootKey.replace(ConfigManager.perfectItemSuffix, ""));
         if (recipe == null) {
             return;
         }
@@ -325,9 +325,17 @@ public class CookingManager extends Function {
             return;
         }
         final Player player = event.getPlayer();
-        if (droppedItem.getConsumeActions() != null) {
-            for (Action action : droppedItem.getConsumeActions()) {
-                action.doOn(player, null);
+        if (lootKey.contains(ConfigManager.perfectItemSuffix)) {
+            if (droppedItem.getPerfectConsumeActions() != null) {
+                for (Action action : droppedItem.getPerfectConsumeActions()) {
+                    action.doOn(player, null);
+                }
+            }
+        } else {
+            if (droppedItem.getConsumeActions() != null) {
+                for (Action action : droppedItem.getConsumeActions()) {
+                    action.doOn(player, null);
+                }
             }
         }
     }

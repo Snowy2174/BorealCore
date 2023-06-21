@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -49,11 +50,11 @@ public class RecipeBookProvider implements InventoryProvider {
         contents.fillBorders(ClickableItem.empty(new ItemStack(Material.AIR)));
         contents.set(5, 4, ClickableItem.of(buildIngredientsItem(), e -> handleIngredientsMenuClick(e, player)));
 
-        List<String> list = RecipeDataUtil.getUnlockedRecipes(player);
+        List<String> unlockedRecipes = RecipeDataUtil.getUnlockedRecipes(player);
 
         for (String recipe : RECIPES.keySet()) {
             boolean hasMastery = RecipeDataUtil.hasMastery(player, recipe);
-            boolean hasRecipe = list.contains(recipe);
+            boolean hasRecipe = unlockedRecipes.contains(recipe);
             ItemStack itemStack;
 
             if (hasRecipe) {
@@ -74,7 +75,7 @@ public class RecipeBookProvider implements InventoryProvider {
 
     private ItemStack buildRecipeItem(String recipe, Player player, boolean hasMastery){
         CustomStack customStack = CustomStack.getInstance(recipe);
-        if (hasMastery) {customStack = CustomStack.getInstance(recipe+ ConfigManager.perfectItemSuffix);}
+        if (hasMastery) {customStack = CustomStack.getInstance(recipe + ConfigManager.perfectItemSuffix);}
         if (customStack == null) {
             return unknownRecipeStack;
         } else {
@@ -85,7 +86,7 @@ public class RecipeBookProvider implements InventoryProvider {
     }
 
     private ItemStack buildUnknownRecipeItem(String recipe){
-        CustomStack customStack = CustomStack.getInstance(recipe+ConfigManager.unknownItemSuffix);
+        CustomStack customStack = CustomStack.getInstance(recipe + ConfigManager.unknownItemSuffix);
         if (customStack == null) {
             return unknownRecipeStack;
         } else {
@@ -107,7 +108,9 @@ public class RecipeBookProvider implements InventoryProvider {
     private void handleIngredientsMenuClick(InventoryClickEvent event, Player player) {
         ItemStack clickedItem = event.getCurrentItem();
         if (clickedItem != null && clickedItem.getType() != Material.AIR) {
-            GuiManager.INGREDIENTS_MENU.open(player);
+            String command = "dm open ingredients_menu " + player.getName();
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+            //GuiManager.INGREDIENTS_MENU.open(player);
         }
     }
 
@@ -168,7 +171,7 @@ public class RecipeBookProvider implements InventoryProvider {
                 return;
             }
             if (hasMastery) {
-                if (event.isShiftClick()) {
+                if (event.getClick().equals(ClickType.SHIFT_LEFT) || event.getClick().equals(ClickType.SHIFT_RIGHT)) {
                     // Shift click handling for cooking 15 Recipes
                     cookingManager.handleAutocooking(recipe, player, 15);
                 } else if (event.isRightClick()) {

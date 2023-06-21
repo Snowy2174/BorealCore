@@ -1,13 +1,13 @@
 package plugin.customcooking.manager;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 import plugin.customcooking.cooking.Recipe;
 import plugin.customcooking.cooking.action.*;
 import plugin.customcooking.manager.configs.ConfigManager;
@@ -43,6 +43,7 @@ public class EffectManager extends Function {
         for (String sectionName : config.getKeys(false)) {
             ConfigurationSection section = config.getConfigurationSection(sectionName);
             List<PotionEffect> effectsList = new ArrayList<>();
+            List<PotionEffect> perfectEffectsList = new ArrayList<>();
 
             // Iterate over the keys in each section
             for (String levelKey : section.getKeys(false)) {
@@ -56,13 +57,14 @@ public class EffectManager extends Function {
                     continue;
                 }
 
-                int duration = levelSection.getInt("duration");
+                int duration = levelSection.getInt("duration") * 1200;
                 int amplifier = levelSection.getInt("amplifier");
 
-                PotionEffect potionEffect = new PotionEffect(type, duration*1200, amplifier);
-                effectsList.add(potionEffect);
+                effectsList.add(new PotionEffect(type, duration, amplifier));
+                perfectEffectsList.add(new PotionEffect(type, duration + 2400, amplifier + 1));
             }
             EFFECTS.put(sectionName, effectsList);
+            EFFECTS.put(sectionName + ConfigManager.perfectItemSuffix, perfectEffectsList);
         }
     }
 
@@ -95,9 +97,6 @@ public class EffectManager extends Function {
                         }
                         actions.add(new PotionEffectImpl(potionEffectList.toArray(new PotionEffect[0])));
                     }
-                    case "dish-buff" -> {
-                        actions.add(new PotionEffectImpl(EFFECTS.get(section.getString(action)).toArray(new PotionEffect[0])));
-                    }
                 }
             }
             return actions.toArray(new Action[0]);
@@ -105,9 +104,43 @@ public class EffectManager extends Function {
         return null;
     }
 
-    public static List<Component> buildEffectLore(List<PotionEffect> effectsList) {
+    public static Action[] getConsumeActions(ConfigurationSection section, Boolean perfect) {
+        if (section != null) {
+            List<Action> actions = new ArrayList<>();
+            for (String action : section.getKeys(false)) {
+                switch (action) {
+                    case "potion-effect" -> {
+                        List<PotionEffect> potionEffectList = new ArrayList<>();
+                        for (String key : section.getConfigurationSection(action).getKeys(false)) {
+                            PotionEffectType type = PotionEffectType.getByName(section.getString(action + "." + key + ".type", "BLINDNESS").toUpperCase());
+                            if (type == null)
+                                AdventureUtil.consoleMessage("<red>[CustomCooking] Potion effect " + section.getString(action + "." + key + ".type", "BLINDNESS") + " doesn't exists");
+                            potionEffectList.add(new PotionEffect(
+                                    type == null ? PotionEffectType.LUCK : type,
+                                    section.getInt(action + "." + key + ".duration"),
+                                    section.getInt(action + "." + key + ".amplifier")
+                            ));
+                        }
+                        actions.add(new PotionEffectImpl(potionEffectList.toArray(new PotionEffect[0])));
+                    }
+                    case "dish-buff" -> {
+                        String actionKey = section.getString(action);
+                        if (Boolean.TRUE.equals(perfect)) {
+                            actionKey += ConfigManager.perfectItemSuffix;
+                        }
+                        actions.add(new PotionEffectImpl(EFFECTS.get(actionKey).toArray(new PotionEffect[0])));
+                    }
+
+                }
+            }
+            return actions.toArray(new Action[0]);
+        }
+        return null;
+    }
+
+    public static List<Component> buildEffectLore(String effectsList) {
         List<Component> lore = new ArrayList<>();
-        for (PotionEffect potionEffect : effectsList) {
+        for (PotionEffect potionEffect : EFFECTS.get(effectsList)) {
             lore.add(getComponentFromMiniMessage(ConfigManager.effectLore
                     .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
                     .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier())

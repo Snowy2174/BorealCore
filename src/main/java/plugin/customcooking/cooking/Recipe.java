@@ -24,6 +24,7 @@ public class Recipe {
     protected Action[] successActions;
     protected Action[] failureActions;
     protected Action[] consumeActions;
+    public Action[] perfectConsumeActions;
     protected final double score;
 
     public Recipe(String key, String nick, List<Component> dishEffects, Difficulty[] difficulty, List<String> ingredients, String cookedItems, int time, int masteryreq, int slot, double score) {
@@ -94,6 +95,9 @@ public class Recipe {
     public void setSuccessActions(Action[] successActions) {
         this.successActions = successActions;
     }
+    public void setPerfectConsumeActions(Action[] perfectConsumeActions) {
+        this.perfectConsumeActions = perfectConsumeActions;
+    }
 
     public Action[] getFailureActions() {
         return failureActions;
@@ -101,6 +105,9 @@ public class Recipe {
 
     public Action[] getConsumeActions() {
         return consumeActions;
+    }
+    public Action[] getPerfectConsumeActions() {
+        return perfectConsumeActions;
     }
 
     public void setConsumeActions(Action[] consumeActions) {

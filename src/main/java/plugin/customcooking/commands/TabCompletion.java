@@ -29,12 +29,12 @@ public class TabCompletion implements TabCompleter {
             completions.addAll(List.of("start", "end", "cancel", "join"));
         } else if (args.length == 2) {
             completions.addAll(getOnlinePlayerNames());
-        } else if (args.length == 3 || args.length == 4) {
-            completions.addAll(getAvailableRecipes());
         } else if (args.length == 4 && args[0].equalsIgnoreCase("cook")) {
             completions.add("auto");
         } else if (args.length == 4 && args[0].equalsIgnoreCase("mastery")) {
             completions.add("<count>");
+        } else if (args.length == 3 || args.length == 4) {
+            completions.addAll(getAvailableRecipes());
         } else if (args.length == 5) {
             completions.add("<count>");
         }

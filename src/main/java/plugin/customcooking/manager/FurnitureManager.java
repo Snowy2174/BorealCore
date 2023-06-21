@@ -257,7 +257,7 @@ public class FurnitureManager extends Function {
                 hologram.getLines().appendText(ChatColor.RED + "Failure!");
             }
 
-            hologram.getLines().appendText(String.valueOf(recipe.getItemMeta().displayName()));
+            hologram.getLines().appendText(recipe.getItemMeta().getDisplayName());
             hologram.getLines().appendItem(recipe);
 
             holograms.put(location, hologram);
@@ -269,7 +269,7 @@ public class FurnitureManager extends Function {
                     holograms.remove(location);
                     hologram.delete(); // Remove the hologram
                 }
-            }.runTaskLater(CustomCooking.plugin, 40);
+            }.runTaskLater(CustomCooking.plugin, 60);
         }
     }
 }

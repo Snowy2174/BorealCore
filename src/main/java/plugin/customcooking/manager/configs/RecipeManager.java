@@ -3,11 +3,13 @@ package plugin.customcooking.manager.configs;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.potion.PotionEffect;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.cooking.Difficulty;
 import plugin.customcooking.cooking.DroppedItem;
 import plugin.customcooking.cooking.Layout;
 import plugin.customcooking.cooking.Recipe;
+import plugin.customcooking.cooking.action.PotionEffectImpl;
 import plugin.customcooking.manager.EffectManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
@@ -53,7 +55,7 @@ public class RecipeManager extends Function {
                 // Bar mechanic
                 List<Difficulty> difficulties = new ArrayList<>();
                 List<String> difficultyList = recipeSection.getStringList("difficulty");
-                if (difficultyList.size() == 0) {
+                if (difficultyList.isEmpty()) {
                     String[] diff = StringUtils.split(recipeSection.getString("difficulty", "1-1"), "-");
                     Difficulty difficulty = new Difficulty(Integer.parseInt(diff[0]), Integer.parseInt(diff[1]));
                     difficulties.add(difficulty);
@@ -67,7 +69,7 @@ public class RecipeManager extends Function {
                 DroppedItem recipe = new DroppedItem(
                         key,
                         recipeSection.getString("nick", key),
-                        EffectManager.buildEffectLore(EFFECTS.get(recipeSection.getString("action.consume.dish-buff", key))),
+                        EffectManager.buildEffectLore(recipeSection.getString("action.consume.dish-buff", key)),
                         difficulties.toArray(new Difficulty[0]),
                         recipeSection.getStringList("ingredients"),
                         recipeSection.getString("cookedItems"),
@@ -101,7 +103,8 @@ public class RecipeManager extends Function {
     private void setActions(ConfigurationSection section, Recipe recipe) {
         recipe.setSuccessActions(EffectManager.getActions(section.getConfigurationSection("action.success"), recipe.getNick()));
         recipe.setFailureActions(EffectManager.getActions(section.getConfigurationSection("action.failure"), recipe.getNick()));
-        recipe.setConsumeActions(EffectManager.getActions(section.getConfigurationSection("action.consume"), recipe.getNick()));
+        recipe.setConsumeActions(EffectManager.getConsumeActions(section.getConfigurationSection("action.consume"), false));
+        recipe.setPerfectConsumeActions(EffectManager.getConsumeActions(section.getConfigurationSection("action.consume"), true));
     }
 
 }

@@ -2,13 +2,13 @@ package plugin.customcooking.util;
 
 import dev.lone.itemsadder.api.ItemsAdder;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,23 +42,9 @@ public class RecipeDataUtil {
         return count >= requiredMastery;
     }
 
-    private static void updateRecipeStatus(Player player, String recipe, boolean unlock) {
-        String recipeFormatted = RECIPES.get(recipe).getNick();
-
-        if (unlock) {
-            ItemsAdder.playTotemAnimation(player, recipe + "_particle");
-            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.recipeUnlocked.replace("{recipe}", recipeFormatted));
-        } else {
-            ItemsAdder.playTotemAnimation(player, recipe + "_particle");
-            AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeLocked.replace("{recipe}", recipeFormatted));
-        }
-
-        setRecipeData(player, recipe, unlock ? getDefaultRequiredMastery(recipe) : 0);
-    }
-
     public static void unlockRecipes(Player player, List<String> recipes) {
         for (String recipe : recipes) {
-            updateRecipeStatus(player, recipe, true);
+            setRecipeStatus(player, recipe, true);
         }
     }
 
@@ -68,6 +54,7 @@ public class RecipeDataUtil {
 
         if (lockedRecipes.isEmpty()) {
             // Player has unlocked all recipes
+            AdventureUtil.playerMessage(player,MessageManager.infoPositive + "You have already unlocked all recipes!");
             return;
         }
 
@@ -93,26 +80,16 @@ public class RecipeDataUtil {
 
         unlockRecipes(player, recipesToUnlock);
     }
-
-    public static void setRecipeStatus(Player player, String recipe, boolean unlock) {
-        List<String> unlockedRecipes = getUnlockedRecipes(player);
-        if (unlock) {
-            if (unlockedRecipes.contains(recipe)) {
-                return; // Recipe already unlocked
+    public static List<String> getMasteredRecipes(Player player, List<String> unlockedRecipes) {
+        List<String> masteredRecipes = new ArrayList<>();
+        for (String recipe : unlockedRecipes) {
+            int count = getMasteryCount(player, recipe);
+            int requiredMastery = getDefaultRequiredMastery(recipe);
+            if (count >= requiredMastery) {
+                masteredRecipes.add(recipe);
             }
-            updateRecipeStatus(player, recipe, true);
-            String recipeFormatted = RECIPES.get(recipe).getNick();
-            ItemsAdder.playTotemAnimation(player, recipe + "_particle");
-            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.recipeUnlocked.replace("{recipe}", recipeFormatted));
-        } else {
-            if (!unlockedRecipes.contains(recipe)) {
-                return; // Recipe already locked
-            }
-            updateRecipeStatus(player, recipe, false);
-            String recipeFormatted = RECIPES.get(recipe).getNick();
-            ItemsAdder.playTotemAnimation(player, recipe + "_particle");
-            AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeLocked.replace("{recipe}", recipeFormatted));
         }
+        return masteredRecipes;
     }
 
     public static List<String> getUnlockedRecipes(Player player) {
@@ -130,7 +107,7 @@ public class RecipeDataUtil {
         return Collections.emptyList();
     }
 
-    private static List<String> getLockedRecipes(List<String> unlockedRecipes) {
+    public static List<String> getLockedRecipes(List<String> unlockedRecipes) {
         return RECIPES.keySet().stream()
                 .filter(recipe -> !unlockedRecipes.contains(recipe))
                 .collect(Collectors.toList());
@@ -142,7 +119,28 @@ public class RecipeDataUtil {
         return recipes.get(index);
     }
 
-    public static void setRecipeData(Player player, String recipe, int count) {
+    public static void setRecipeStatus(Player player, String recipe, boolean unlock) {
+        List<String> unlockedRecipes = getUnlockedRecipes(player);
+        if (unlock) {
+            if (unlockedRecipes.contains(recipe)) {
+                return; // Recipe already unlocked
+            }
+            setRecipeData(player, recipe, 0);
+            String recipeFormatted = RECIPES.get(recipe).getNick();
+            ItemsAdder.playTotemAnimation(player, recipe + ConfigManager.particleItemSuffix);
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.recipeUnlocked.replace("{recipe}", recipeFormatted));
+        } else {
+            if (!unlockedRecipes.contains(recipe)) {
+                return; // Recipe already locked
+            }
+            setRecipeData(player, recipe, null);
+            String recipeFormatted = RECIPES.get(recipe).getNick();
+            ItemsAdder.playTotemAnimation(player, recipe + ConfigManager.particleItemSuffix);
+            AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeLocked.replace("{recipe}", recipeFormatted));
+        }
+    }
+
+    public static void setRecipeData(Player player, String recipe, @Nullable Integer count) {
         YamlConfiguration config = getConfig("playerdata.yml");
         File file = new File(CustomCooking.plugin.getDataFolder(), "playerdata.yml");
 
@@ -158,9 +156,9 @@ public class RecipeDataUtil {
         }
 
         int requiredMastery = getDefaultRequiredMastery(recipe);
-        if (count >= requiredMastery) {
+        if (count != null && count >= requiredMastery) {
             config.set(playerRecipePath, requiredMastery);
-            ItemsAdder.playTotemAnimation(player, recipe + "_particle");
+            ItemsAdder.playTotemAnimation(player, recipe + ConfigManager.particleItemSuffix);
             AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
             AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", RECIPES.get(recipe).getNick()));
         }
