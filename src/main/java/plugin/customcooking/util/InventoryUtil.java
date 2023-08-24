@@ -1,7 +1,8 @@
 package plugin.customcooking.util;
 
-import de.tr7zw.changeme.nbtapi.NBTCompound;
-import de.tr7zw.changeme.nbtapi.NBTItem;
+
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTItem;
 import dev.lone.itemsadder.api.CustomStack;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -165,11 +166,12 @@ public class InventoryUtil {
         }
     }
 
-    public static void giveItem(Player player, String item, Integer amount, boolean potionEffects) {
+    public static void giveItem(Player player, String item, Integer amount, boolean customCookingItem) {
         ItemStack drop = build(item);
         drop.setAmount(amount);
-        if (potionEffects) {
+        if (customCookingItem) {
             EffectManager.addPotionEffectLore(drop, item);
+            addIdentifier(drop, item);
         }
         player.getLocation().getWorld().dropItem(player.getLocation(), drop);
     }
@@ -194,7 +196,6 @@ public class InventoryUtil {
                 itemStack = new ItemStack(Material.AIR);
             }
         }
-        addIdentifier(itemStack, key);
         return itemStack;
     }
 
@@ -205,5 +206,4 @@ public class InventoryUtil {
         nbtCompound.setString("id", identifier);
         itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
     }
-
 }

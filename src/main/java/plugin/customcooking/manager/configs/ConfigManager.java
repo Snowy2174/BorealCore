@@ -2,6 +2,7 @@ package plugin.customcooking.manager.configs;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.intellij.lang.annotations.Subst;
 import plugin.customcooking.util.ConfigUtil;
 import plugin.customcooking.util.GUIUtil;
 
@@ -10,6 +11,7 @@ import java.util.List;
 public class ConfigManager {
     public static String lang;
     public static double perfectChance;
+    public static double ingredientRefundChance;
     public static int splashTime;
     public static List<String> starterRecipes;
     public static String customNamespace;
@@ -51,6 +53,7 @@ public class ConfigManager {
         lang = config.getString("lang", "english");
 
         perfectChance = config.getDouble("mechanics.perfect-chance", 0.35);
+        ingredientRefundChance = config.getDouble("mechanics.ingredients-refund-chance", 0.1);
 
         starterRecipes = config.getStringList("mechanics.starter-recipes");
         customNamespace = config.getString("mechanics.namespace", "customcooking");

@@ -6,7 +6,7 @@
 
     <groupId>CustomCooking</groupId>
     <artifactId>CustomCooking</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
     <packaging>jar</packaging>
     <name>CustomCooking</name>
 
@@ -32,7 +32,6 @@
                                 <includes>
                                     <include>net.kyori:*</include>
                                     <include>fr.minuskube.inv:*</include>
-                                    <include>de.tr7zw:*</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
@@ -75,15 +74,15 @@
             <id>dmulloy2-repo</id>
             <url>https://repo.dmulloy2.net/repository/public/</url>
         </repository>
-            <repository>
-                <id>codemc-repo</id>
-                <url>https://repo.codemc.io/repository/maven-public/</url>
-                <layout>default</layout>
-            </repository>
-            <repository>
-                <id>placeholderapi</id>
-                <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-            </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -96,7 +95,7 @@
         <dependency>
             <groupId>com.github.LoneDev6</groupId>
             <artifactId>api-itemsadder</artifactId>
-            <version>3.2.5</version>
+            <version>3.5.0b</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -139,7 +138,7 @@
         </dependency>
         <dependency>
             <groupId>de.tr7zw</groupId>
-            <artifactId>item-nbt-api</artifactId>
+            <artifactId>item-nbt-api-plugin</artifactId>
             <version>2.11.3</version>
         </dependency>
         <dependency>

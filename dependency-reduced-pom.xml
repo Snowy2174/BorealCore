@@ -4,7 +4,7 @@
   <groupId>CustomCooking</groupId>
   <artifactId>CustomCooking</artifactId>
   <name>CustomCooking</name>
-  <version>1.1.4</version>
+  <version>1.1.5</version>
   <build>
     <resources>
       <resource>
@@ -27,7 +27,6 @@
                 <includes>
                   <include>net.kyori:*</include>
                   <include>fr.minuskube.inv:*</include>
-                  <include>de.tr7zw:*</include>
                 </includes>
               </artifactSet>
             </configuration>
@@ -79,7 +78,7 @@
     <dependency>
       <groupId>com.github.LoneDev6</groupId>
       <artifactId>api-itemsadder</artifactId>
-      <version>3.2.5</version>
+      <version>3.5.0b</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -99,6 +98,12 @@
       <artifactId>holographicdisplays-api</artifactId>
       <version>3.0.0</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.tr7zw</groupId>
+      <artifactId>item-nbt-api-plugin</artifactId>
+      <version>2.11.3</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>me.clip</groupId>

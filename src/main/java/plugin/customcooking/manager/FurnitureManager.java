@@ -62,17 +62,11 @@ public class FurnitureManager extends Function {
                 // Check if the player right-clicked with flint and steel
                 if (player.getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
 
-                    ItemFrame unlitpot = (ItemFrame) Objects.requireNonNull(clickedFurniture).getArmorstand();
-                    Rotation rot = unlitpot.getRotation();
-                    ItemFrame litpot = (ItemFrame) CustomFurniture.spawnPreciseNonSolid(ConfigManager.litCookingPot, unlitpot.getLocation()).getArmorstand();
-                    litpot.setRotation(rot);
-
                     // Replace the furniture block with the lit furniture
-                    clickedFurniture.remove(false);
-                    unlitpot.getLocation().getBlock().setType(Material.BARRIER);
+                    clickedFurniture.replaceFurniture(ConfigManager.litCookingPot);
 
                     AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.potLight);
-                    playCookingPotFX(clickedFurniture.getArmorstand().getLocation());
+                    playCookingPotFX(clickedFurniture.getEntity().getLocation());
                 } else {
                     AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCold);
                 }
@@ -81,7 +75,7 @@ public class FurnitureManager extends Function {
                 AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCooldown.replace("{time}", cooldown));
             }
         } else if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
-                playCookingPotFX(clickedFurniture.getArmorstand().getLocation());
+                playCookingPotFX(clickedFurniture.getEntity().getLocation());
                 GuiManager.getRecipeBook(clickedFurniture).open(player);
         }
     }
