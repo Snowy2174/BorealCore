@@ -19,6 +19,7 @@ public class TabCompletion implements TabCompleter {
         if (args.length == 1) {
             completions.add("cook");
             completions.add("reload");
+            completions.add("give");
             completions.add("unlock");
             completions.add("lock");
             completions.add("mastery");
@@ -27,6 +28,8 @@ public class TabCompletion implements TabCompleter {
             completions.add("migrateperms");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("competition")) {
             completions.addAll(List.of("start", "end", "cancel", "join"));
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("cook")){
+            completions.addAll(getAvailableRecipes());
         } else if (args.length == 2) {
             completions.addAll(getOnlinePlayerNames());
         } else if (args.length == 4 && args[0].equalsIgnoreCase("cook")) {

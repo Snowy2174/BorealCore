@@ -83,6 +83,8 @@ public class EffectManager extends Function {
                             (float) section.getDouble(action + ".volume"),
                             (float) section.getDouble(action + ".pitch")
                     ));
+                    case "hunger" -> actions.add(new HungerEffectImpl(section.getInt(action)));
+                    case "saturation" -> actions.add(new SaturationEffectImpl(section.getInt(action)));
                     case "potion-effect" -> {
                         List<PotionEffect> potionEffectList = new ArrayList<>();
                         for (String key : section.getConfigurationSection(action).getKeys(false)) {
@@ -109,6 +111,8 @@ public class EffectManager extends Function {
             List<Action> actions = new ArrayList<>();
             for (String action : section.getKeys(false)) {
                 switch (action) {
+                    case "hunger" -> actions.add(new HungerEffectImpl(section.getInt(action)));
+                    case "saturation" -> actions.add(new SaturationEffectImpl(section.getInt(action)));
                     case "potion-effect" -> {
                         List<PotionEffect> potionEffectList = new ArrayList<>();
                         for (String key : section.getConfigurationSection(action).getKeys(false)) {
@@ -143,24 +147,46 @@ public class EffectManager extends Function {
         for (PotionEffect potionEffect : EFFECTS.get(effectsList)) {
             lore.add(getComponentFromMiniMessage(ConfigManager.effectLore
                     .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
-                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier())
-                    .replace("{duration}", String.valueOf(potionEffect.getDuration()/20))))
-        );}
+                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier()))
+                    .replace("{duration}", getDuration(potionEffect.getDuration()/20))));
+        }
         return lore;
     }
 
+    private static String getDuration(int durationInSeconds) {
+        if (durationInSeconds <= 0) {
+            return " "; // Return an empty string or any default value as needed
+        }
+
+        int minutes = durationInSeconds / 60;
+        int seconds = durationInSeconds % 60;
+        StringBuilder durationString = new StringBuilder().append("<gold>for ");
+
+        if (minutes > 0) {
+            durationString.append(minutes).append(minutes > 1 ? " mins " : " min ");
+        }
+        if (seconds > 0) {
+            durationString.append(seconds).append("s");
+        }
+
+        return durationString.toString();
+    }
+
+
     private static String amplifierToRoman(int amplifier) {
-        int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
-        String[] romanLetters = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+        int[] values = {10, 9, 5, 4, 1};
+        String[] romanLetters = {"X", "IX", "V", "IV", "I"};
+
         StringBuilder roman = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
             while (amplifier >= values[i]) {
-                amplifier = amplifier - values[i];
+                amplifier -= values[i];
                 roman.append(romanLetters[i]);
             }
         }
         return roman.toString();
     }
+
 
     public static void addPotionEffectLore(ItemStack itemStack, String key) {
         Recipe recipe = RECIPES.get(key.replaceAll("[\\[\\]]", ""));
@@ -176,7 +202,7 @@ public class EffectManager extends Function {
             int insertIndex = Math.min(2, lore.size()); // Insert after the second line, or at the end if there are fewer than two lines
 
             // Insert the new lore lines
-            lore.add(insertIndex, Component.newline());
+            lore.add(insertIndex, Component.text(" "));
             lore.addAll(insertIndex + 1, new ArrayList<>(recipe.getDishEffectsLore()));
 
             itemMeta.lore(lore);

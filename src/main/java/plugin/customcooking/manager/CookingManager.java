@@ -29,9 +29,7 @@ import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.GUIUtil;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.kyori.adventure.key.Key.key;
@@ -163,7 +161,9 @@ public class CookingManager extends Function {
         cookingPlayer.cancel();
         Recipe loot = cookedRecipe.remove(player);
         Location cookingPot = cookingPotLocations.remove(player);
+
         stopSoundLoop();
+
         player.removePotionEffect(PotionEffectType.SLOW);
 
         if (!cookingPlayer.isSuccess()) {
@@ -331,32 +331,32 @@ public class CookingManager extends Function {
 
     @Override
     public void onConsumeItem(PlayerItemConsumeEvent event) {
-        final Player player = event.getPlayer();
-        ItemStack itemStack = event.getItem();
+        Player player = event.getPlayer();
 
-        NBTCompound nbtCompound = new NBTItem(itemStack).getCompound("CustomCooking");
-        if (nbtCompound == null) {
-            return;
-        }
+            ItemStack itemStack = event.getItem();
 
-        String lootKey = nbtCompound.getString("id");
-        String recipeKey = lootKey;
-        Recipe recipe = RECIPES.get(recipeKey);
-        if (!(recipe instanceof DroppedItem)) {
-            return;
-        }
-
-        DroppedItem droppedItem = (DroppedItem) recipe;
-        Action[] actions = droppedItem.getConsumeActions();
-        if (lootKey.contains(ConfigManager.perfectItemSuffix)) {
-            actions = droppedItem.getPerfectConsumeActions();
-        }
-
-        if (actions != null) {
-            for (Action action : actions) {
-                action.doOn(player, null);
+            NBTCompound nbtCompound = new NBTItem(itemStack).getCompound("CustomCooking");
+            if (nbtCompound == null) {
+                return;
             }
-        }
-    }
 
+            String lootKey = nbtCompound.getString("id");
+            String recipeKey = lootKey;
+            Recipe recipe = RECIPES.get(recipeKey);
+            if (!(recipe instanceof DroppedItem)) {
+                return;
+            }
+
+            DroppedItem droppedItem = (DroppedItem) recipe;
+            Action[] actions = droppedItem.getConsumeActions();
+            if (lootKey.contains(ConfigManager.perfectItemSuffix)) {
+                actions = droppedItem.getPerfectConsumeActions();
+            }
+
+            if (actions != null) {
+                for (Action action : actions) {
+                    action.doOn(player, null);
+                }
+            }
+    }
 }

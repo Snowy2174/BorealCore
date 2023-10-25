@@ -6,7 +6,7 @@ api-version: 1.18
 depend:
   - ProtocolLib
   - PlaceholderAPI
-  - [NBTAPI]
+  - NBTAPI
 softdepend:
   - ItemsAdder
   - HolographicDisplays

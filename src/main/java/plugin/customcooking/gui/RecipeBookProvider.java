@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import plugin.customcooking.CustomCooking;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
@@ -32,7 +33,7 @@ public class RecipeBookProvider implements InventoryProvider {
     private static CustomFurniture clickedFurniture;
     private static ItemStack unknownRecipeStack;
     RecipeBookProvider(CustomFurniture clickedFurniture) {
-        this.cookingManager = new CookingManager();
+        this.cookingManager = CustomCooking.getCookingManager();
         this.clickedFurniture = clickedFurniture;
         this.unknownRecipeStack = build(ConfigManager.unknownItem);
     }

@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import plugin.customcooking.CustomCooking;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
@@ -28,10 +29,9 @@ import static plugin.customcooking.util.InventoryUtil.build;
 
 public class IngredientBookProvider implements InventoryProvider {
     private final CookingManager cookingManager;
-    private static ItemStack unknownRecipeStack;
 
     IngredientBookProvider() {
-        this.cookingManager = new CookingManager();
+        this.cookingManager = CustomCooking.getCookingManager();
     }
 
     @Override

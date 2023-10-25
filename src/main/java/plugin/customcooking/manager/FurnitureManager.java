@@ -63,7 +63,15 @@ public class FurnitureManager extends Function {
                 if (player.getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
 
                     // Replace the furniture block with the lit furniture
-                    clickedFurniture.replaceFurniture(ConfigManager.litCookingPot);
+                    //clickedFurniture.replaceFurniture(ConfigManager.litCookingPot);
+                    ItemFrame unlitpot = (ItemFrame) Objects.requireNonNull(clickedFurniture).getArmorstand();
+                    Rotation rot = unlitpot.getRotation();
+                    ItemFrame litpot = (ItemFrame) CustomFurniture.spawnPreciseNonSolid(ConfigManager.litCookingPot, unlitpot.getLocation()).getArmorstand();
+                    litpot.setRotation(rot);
+
+                    // Replace the furniture block with the lit furniture
+                    clickedFurniture.remove(false);
+                    unlitpot.getLocation().getBlock().setType(Material.BARRIER);
 
                     AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.potLight);
                     playCookingPotFX(clickedFurniture.getEntity().getLocation());

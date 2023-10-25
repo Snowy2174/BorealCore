@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import plugin.customcooking.CustomCooking;
 import plugin.customcooking.cooking.competition.Competition;
 import plugin.customcooking.cooking.competition.CompetitionSchedule;
 import plugin.customcooking.gui.GuiManager;
@@ -26,7 +27,7 @@ public class MainCommand implements CommandExecutor {
     private final CookingManager cookingManager;
 
     public MainCommand() {
-        this.cookingManager = new CookingManager();
+        this.cookingManager = CustomCooking.getCookingManager();
     }
 
     @Override
