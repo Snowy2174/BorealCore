@@ -10,10 +10,13 @@ depend:
 softdepend:
   - ItemsAdder
   - HolographicDisplays
+  - DecentHolograms
 
 commands:
   cooking:
     description: The main plugin command
+  jade:
+    description: The command to manage Jade
 
 permissions:
   customcooking.*:

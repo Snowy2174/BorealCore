@@ -1,6 +1,7 @@
 package plugin.customcooking.manager;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -190,23 +191,29 @@ public class EffectManager extends Function {
 
     public static void addPotionEffectLore(ItemStack itemStack, String key) {
         Recipe recipe = RECIPES.get(key.replaceAll("[\\[\\]]", ""));
+
         if (recipe != null && recipe.getDishEffectsLore() != null) {
             ItemMeta itemMeta = itemStack.getItemMeta();
-            List<Component> lore = itemMeta.lore();
+            if (itemMeta == null) {
+                // Handle the case where ItemMeta is null
+                itemMeta = Bukkit.getItemFactory().getItemMeta(itemStack.getType());
+                itemStack.setItemMeta(itemMeta);
+            }
 
+            List<Component> lore = itemMeta.lore();
             if (lore == null) {
                 lore = new ArrayList<>();
             }
 
-            // Find the index to insert the new lore lines
-            int insertIndex = Math.min(2, lore.size()); // Insert after the second line, or at the end if there are fewer than two lines
-
-            // Insert the new lore lines
-            lore.add(insertIndex, Component.text(" "));
-            lore.addAll(insertIndex + 1, new ArrayList<>(recipe.getDishEffectsLore()));
+            int insertIndex = Math.min(2, lore.size()); // Insert after the second line or at the end if there are fewer than two lines
+            lore.add(insertIndex, Component.text(" ")); // Add a blank line for spacing
+            lore.addAll(insertIndex + 1, recipe.getDishEffectsLore()); // Add new lore after the blank line
 
             itemMeta.lore(lore);
             itemStack.setItemMeta(itemMeta);
+        } else {
+            // Log or handle the case where the recipe is null or has no effects
+            Bukkit.getLogger().warning("No valid recipe found for key: " + key);
         }
     }
 }

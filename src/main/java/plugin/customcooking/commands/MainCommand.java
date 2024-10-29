@@ -11,6 +11,7 @@ import plugin.customcooking.cooking.competition.CompetitionSchedule;
 import plugin.customcooking.gui.GuiManager;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.manager.DataManager;
+import plugin.customcooking.manager.JadeManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
@@ -60,10 +61,14 @@ public class MainCommand implements CommandExecutor {
             handleMasteryCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("recipebook")) {
             handleRecipeBookCommand(sender, subargs);
+        } else if (subcommand.equalsIgnoreCase("progression")) {
+            handleProgressionCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("competition")){
             handleCompetitionCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("give")){
             handleGiveItemCommand(sender, subargs);
+        } else if (subcommand.equalsIgnoreCase("givejade")){
+            JadeManager.handleGiveJadeCommand(sender, subargs);
         }
         else {
             // Unknown subcommand
@@ -250,6 +255,19 @@ public class MainCommand implements CommandExecutor {
         GuiManager.getRecipeBook(null).open(player);
     }
 
+    private void handleProgressionCommand(CommandSender sender, String[] args) {
+        if (sender instanceof Player player) {
+            GuiManager.PROGRESSION_MENU.open(player);
+        }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+        GuiManager.PROGRESSION_MENU.open(player);
+    }
+
     private void handleGiveItemCommand(CommandSender sender, String[] args) {
         if (args.length < 3) {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking give <player> <item> <amount>");
@@ -269,6 +287,5 @@ public class MainCommand implements CommandExecutor {
 
         AdventureUtil.sendMessage(sender, "Gave " + amount + " " + itemName + " to " + player.getName());
     }
-
 
 }

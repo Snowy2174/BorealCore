@@ -3,8 +3,8 @@ package plugin.customcooking.manager;
 import dev.lone.itemsadder.api.CustomFurniture;
 import dev.lone.itemsadder.api.Events.FurnitureBreakEvent;
 import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
-import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
-import me.filoghost.holographicdisplays.api.hologram.Hologram;
+import eu.decentsoftware.holograms.api.DHAPI;
+import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.HandlerList;
@@ -207,27 +207,35 @@ public class FurnitureManager extends Function {
             cancelCookingPotFX(loc);
             return;
         }
-        // Particles: flame
-        loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
 
-        // Particles: campfire_cosy_smoke
-        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0,1,0), 0, 0, 1, 0, 0.03, null, true);
-        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0,1,0), 0, 0, 1, 0, 0.03, null, true);
+        // Schedule all world interactions on the main thread
+        Bukkit.getScheduler().runTask(CustomCooking.plugin, () -> {
+            // Particles: flame
+            loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
 
+            // Particles: campfire_cosy_smoke
+            loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);
+            loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);
+
+            // Sound: block.fire.ambient
+            loc.getWorld().playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 1f);
+
+            // Sound: block.lava.ambient
+            loc.getWorld().playSound(loc, Sound.BLOCK_LAVA_AMBIENT, 1f, 1f);
+        });
+
+        // Schedule the repeated particle effects asynchronously
         new BukkitRunnable() {
             @Override
             public void run() {
-                loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
-                loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0,1,0), 0, 0, 1, 0, 0.03, null, true);
-                loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0,1,0), 0, 0, 1, 0, 0.03, null, true);
+                Bukkit.getScheduler().runTask(CustomCooking.plugin, () -> {
+                    // Repeated particles
+                    loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
+                    loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);
+                    loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);
+                });
             }
-        }.runTaskLaterAsynchronously(CustomCooking.plugin,40L);
-
-        // Sound: block.fire.ambient
-        loc.getWorld().playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 1f);
-
-        // Sound: block.lava.ambient
-        loc.getWorld().playSound(loc, Sound.BLOCK_LAVA_AMBIENT, 1f, 1f);
+        }.runTaskLaterAsynchronously(CustomCooking.plugin, 40L);
     }
 
     public void cancelCookingPotFX(Location location) {
@@ -237,42 +245,31 @@ public class FurnitureManager extends Function {
         }
     }
 
-    public void cancelAllHolograms() {
-        for (Hologram hologram : holograms.values()) {
-            hologram.delete();
-        }
-        holograms.clear();
-    }
-
     public static void createHologram(ItemStack recipe, Location location, Boolean success) {
 
-        if (holograms.containsKey(location)) {
-            holograms.get(location).delete(); // Remove the hologram
-            holograms.remove(location);
-        } else {
-            HolographicDisplaysAPI api = HolographicDisplaysAPI.get(CustomCooking.plugin);
-            Hologram hologram = api.createHologram(location.clone().add(0,1.5,0));
+        String name = recipe.displayName().examinableName() + "_" +  success.toString() + "_" + location.getBlockX() + "_" + location.getBlockY();
+        if(DHAPI.getHologram(name) != null)
+            return;
+
+        List<String> contents = new ArrayList<>();
 
             if (success) {
-                hologram.getLines().appendText(ChatColor.GREEN + "Success!");
+                contents.add("&aSuccess!");
             } else {
-                hologram.getLines().appendText(ChatColor.RED + "Failure!");
+                contents.add("&aFailure!");
             }
 
-            hologram.getLines().appendText(recipe.getItemMeta().getDisplayName());
-            hologram.getLines().appendItem(recipe);
-
-            holograms.put(location, hologram);
+            contents.add(recipe.getItemMeta().getDisplayName());
+            Hologram hologram = DHAPI.createHologram(name, location.clone().add(0,1.5,0), contents);
+            DHAPI.addHologramLine(hologram, recipe);
 
             // Schedule a task to remove the hologram after a set time
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    holograms.remove(location);
                     hologram.delete(); // Remove the hologram
                 }
             }.runTaskLater(CustomCooking.plugin, 60);
         }
     }
-}
 

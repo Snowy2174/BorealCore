@@ -32,6 +32,8 @@ public class ConfigUtil {
         CustomCooking.getCompetitionManager().load();
         CustomCooking.getFurnitureManager().unload();
         CustomCooking.getFurnitureManager().load();
+        CustomCooking.getJadeManager().unload();
+        CustomCooking.getJadeManager().load();
     }
 }
 

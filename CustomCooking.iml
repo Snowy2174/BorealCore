@@ -121,5 +121,11 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: me.clip:placeholderapi:2.11.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.bstats:bstats-bukkit:3.0.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.bstats:bstats-base:3.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.decentsoftware-eu:decentholograms:2.8.11" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: de.tr7zw:item-nbt-api:2.13.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.cryptomorin:XSeries:10.0.0" level="project" />
+  </component>
+  <component name="SonarLintModuleSettings">
+    <option name="uniqueId" value="87fa3336-7f22-4af3-a231-ba08369f8ec8" />
   </component>
 </module>

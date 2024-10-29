@@ -48,7 +48,7 @@ public class CookingManager extends Function {
     private final HashMap<Player, Recipe> cookedRecipe;
     private final HashMap<Player, Location> cookingPotLocations;
     public final ConcurrentHashMap<Player, CookingPlayer> cookingPlayerCache;
-    private BukkitRunnable soundTask;
+    private Map<UUID, BukkitRunnable> playerSoundTasks = new HashMap<>();
 
     public CookingManager() {
         this.random = new Random();
@@ -162,7 +162,7 @@ public class CookingManager extends Function {
         Recipe loot = cookedRecipe.remove(player);
         Location cookingPot = cookingPotLocations.remove(player);
 
-        stopSoundLoop();
+        stopSoundLoop(player);
 
         player.removePotionEffect(PotionEffectType.SLOW);
 
@@ -287,7 +287,7 @@ public class CookingManager extends Function {
         }
 
         CookingPlayer cookingPlayer = new CookingPlayer(System.currentTimeMillis() + time, player, layout, difficult, this);
-        cookingPlayer.runTaskTimerAsynchronously(CustomCooking.plugin, 0, 1);
+        cookingPlayer.runTaskTimer(CustomCooking.plugin, 0, 1);
         cookingPlayerCache.put(player, cookingPlayer);
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, time / 50, 3));
         playSoundLoop(player);
@@ -314,18 +314,29 @@ public class CookingManager extends Function {
 
 
     public void playSoundLoop(Player player) {
-        soundTask = new BukkitRunnable() {
+        // Create a new sound task for the player
+        BukkitRunnable soundTask = new BukkitRunnable() {
             @Override
             public void run() {
                 playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking"), 1f, 1f);
             }
         };
         soundTask.runTaskTimerAsynchronously(CustomCooking.plugin, 0L, 60L);
+        playerSoundTasks.put(player.getUniqueId(), soundTask);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                stopSoundLoop(player);
+            }
+        }.runTaskLater(CustomCooking.plugin, 600L);
     }
 
-    public void stopSoundLoop() {
+    public void stopSoundLoop(Player player) {
+        UUID playerId = player.getUniqueId();
+        BukkitRunnable soundTask = playerSoundTasks.get(playerId);
         if (soundTask != null) {
             soundTask.cancel();
+            playerSoundTasks.remove(playerId);
         }
     }
 

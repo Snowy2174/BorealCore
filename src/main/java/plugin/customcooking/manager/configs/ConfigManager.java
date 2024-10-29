@@ -46,6 +46,9 @@ public class ConfigManager {
     public static int failureFadeIn;
     public static int failureFadeStay;
     public static int failureFadeOut;
+    public static int cropsLimit;
+    public static int cookingLimit;
+    public static int fishingLimit;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
@@ -83,6 +86,9 @@ public class ConfigManager {
         unknownItem = config.getString("gui.items.unknown-item", "unknownrecipe");
         grinderItem = config.getString("gui.items.grinder-item", "grinder");
 
+        fishingLimit = config.getInt("jade.limits.fishing", 100);
+        cookingLimit = config.getInt("jade.limits.fishing", 100);
+        cropsLimit = config.getInt("jade.limits.crops", 15);
 
         successTitle = config.getStringList("titles.success.title").toArray(new String[0]);
         successSubTitle = config.getStringList("titles.success.subtitle").toArray(new String[0]);

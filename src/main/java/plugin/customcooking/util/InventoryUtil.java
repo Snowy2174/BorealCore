@@ -4,6 +4,7 @@ package plugin.customcooking.util;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import dev.lone.itemsadder.api.CustomStack;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -190,9 +191,11 @@ public class InventoryUtil {
     public static ItemStack build(String key) {
         ItemStack itemStack = buildia(key);
         if (itemStack == null) {
-            if (Material.valueOf(key) != null) {
-                itemStack = new ItemStack(Material.valueOf(key));
-            } else {
+            try {
+                Material material = Material.valueOf(key.toUpperCase());
+                itemStack = new ItemStack(material);
+            } catch (IllegalArgumentException e) {
+                Bukkit.getLogger().warning("Invalid material name: " + key);
                 itemStack = new ItemStack(Material.AIR);
             }
         }

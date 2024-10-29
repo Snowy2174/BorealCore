@@ -5,6 +5,7 @@ import com.comphenix.protocol.ProtocolManager;
 import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
+import plugin.customcooking.commands.JadeCommand;
 import plugin.customcooking.commands.MainCommand;
 import plugin.customcooking.commands.TabCompletion;
 import plugin.customcooking.gui.GuiManager;
@@ -30,6 +31,7 @@ public class CustomCooking extends JavaPlugin {
     private static FurnitureManager furnitureManager;
     private static DataManager dataManager;
     private static InventoryManager inventoryManager;
+    private static JadeManager jadeManager;
 
     @Override
     public void onLoad() {
@@ -51,12 +53,14 @@ public class CustomCooking extends JavaPlugin {
         recipeManager = new RecipeManager();
         guiManager = new GuiManager();
         placeholderManager = new PlaceholderManager();
+        jadeManager = new JadeManager();
 
         inventoryManager.init();
 
         reloadConfig();
         getCommand("cooking").setExecutor(new MainCommand());
         getCommand("cooking").setTabCompleter(new TabCompletion());
+        getCommand("jade").setExecutor(new JadeCommand());
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Enabled!");
     }
@@ -116,6 +120,9 @@ public class CustomCooking extends JavaPlugin {
 
     public static DataManager getMasteryManager() {
         return dataManager;
+    }
+    public static JadeManager getJadeManager() {
+        return jadeManager;
     }
     public static InventoryManager getInventoryManager() {
         return inventoryManager;
