@@ -8,7 +8,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.Nullable;
 import plugin.customcooking.cooking.Recipe;
 import plugin.customcooking.cooking.action.*;
 import plugin.customcooking.manager.configs.ConfigManager;
@@ -62,7 +61,7 @@ public class EffectManager extends Function {
                 int amplifier = levelSection.getInt("amplifier");
 
                 effectsList.add(new PotionEffect(type, duration, amplifier));
-                perfectEffectsList.add(new PotionEffect(type, duration + 2400, amplifier + 1));
+                perfectEffectsList.add(new PotionEffect(type, duration/2 * 3, amplifier + 1));
             }
             EFFECTS.put(sectionName, effectsList);
             EFFECTS.put(sectionName + ConfigManager.perfectItemSuffix, perfectEffectsList);
@@ -143,20 +142,30 @@ public class EffectManager extends Function {
         return null;
     }
 
-    public static List<Component> buildEffectLore(String effectsList) {
-        List<Component> lore = new ArrayList<>();
+    public static List<List<Component>> buildEffectLore(String effectsList) {
+        List<Component> standard = new ArrayList<>();
         for (PotionEffect potionEffect : EFFECTS.get(effectsList)) {
-            lore.add(getComponentFromMiniMessage(ConfigManager.effectLore
+            standard.add(getComponentFromMiniMessage(ConfigManager.effectLore
                     .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
-                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier()))
+                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier()+1))
                     .replace("{duration}", getDuration(potionEffect.getDuration()/20))));
         }
+        List<Component> perfect = new ArrayList<>();
+        for (PotionEffect potionEffect : EFFECTS.get(effectsList+ ConfigManager.perfectItemSuffix)) {
+            perfect.add(getComponentFromMiniMessage(ConfigManager.effectLore
+                    .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
+                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier()+1))
+                    .replace("{duration}", getDuration(potionEffect.getDuration()/20))));
+        }
+        List<List<Component>> lore = new ArrayList<>();
+        lore.add(perfect);
+        lore.add(standard);
         return lore;
     }
 
     private static String getDuration(int durationInSeconds) {
         if (durationInSeconds <= 0) {
-            return " "; // Return an empty string or any default value as needed
+            return " ";
         }
 
         int minutes = durationInSeconds / 60;
@@ -189,8 +198,8 @@ public class EffectManager extends Function {
     }
 
 
-    public static void addPotionEffectLore(ItemStack itemStack, String key) {
-        Recipe recipe = RECIPES.get(key.replaceAll("[\\[\\]]", ""));
+    public static void addPotionEffectLore(ItemStack itemStack, String key, Boolean perfect) {
+        Recipe recipe = RECIPES.get(key.replaceAll("[\\[\\]]", "").replace(ConfigManager.perfectItemSuffix, ""));
 
         if (recipe != null && recipe.getDishEffectsLore() != null) {
             ItemMeta itemMeta = itemStack.getItemMeta();
@@ -207,7 +216,7 @@ public class EffectManager extends Function {
 
             int insertIndex = Math.min(2, lore.size()); // Insert after the second line or at the end if there are fewer than two lines
             lore.add(insertIndex, Component.text(" ")); // Add a blank line for spacing
-            lore.addAll(insertIndex + 1, recipe.getDishEffectsLore()); // Add new lore after the blank line
+            lore.addAll(insertIndex + 1, (perfect ? recipe.getDishEffectsLore().get(0) : recipe.getDishEffectsLore().get(1))); // Add new lore after the blank line
 
             itemMeta.lore(lore);
             itemStack.setItemMeta(itemMeta);

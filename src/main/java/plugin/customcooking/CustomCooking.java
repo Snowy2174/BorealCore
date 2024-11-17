@@ -75,6 +75,7 @@ public class CustomCooking extends JavaPlugin {
         layoutManager.unload();
         effectManager.unload();
         guiManager.unload();
+        jadeManager.unload();
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Disabled!");
 

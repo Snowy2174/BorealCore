@@ -159,7 +159,7 @@ public class CookingManager extends Function {
 
     public void proceedBarInteract(Player player, CookingPlayer cookingPlayer) {
         cookingPlayer.cancel();
-        Recipe loot = cookedRecipe.remove(player);
+        Recipe recipe = cookedRecipe.remove(player);
         Location cookingPot = cookingPotLocations.remove(player);
 
         stopSoundLoop(player);
@@ -174,12 +174,13 @@ public class CookingManager extends Function {
             return;
         }
 
-        if (!(loot instanceof DroppedItem droppedItem)) {
+        if (!(recipe instanceof DroppedItem droppedItem)) {
             return;
         }
 
-        boolean perfect = cookingPlayer.isPerfect() && (Math.random() < perfectChance);
-        String drop = loot.getCookedItems();
+        double masteryPerfectionMultiplier = hasMastery(player, droppedItem.getKey()) ? 0 : 1.5;
+        boolean perfect = cookingPlayer.isPerfect() && (Math.random() < perfectChance*masteryPerfectionMultiplier);
+        String drop = recipe.getCookedItems();
 
         CookResultEvent cookResultEvent = new CookResultEvent(player, perfect, build(drop), drop);
         Bukkit.getPluginManager().callEvent(cookResultEvent);
@@ -189,6 +190,7 @@ public class CookingManager extends Function {
 
         if (perfect) {
             AdventureUtil.playerMessage(player,MessageManager.infoPositive + MessageManager.cookingPerfect.replace("{recipe}", droppedItem.getNick()));
+            drop = drop + ConfigManager.perfectItemSuffix;
             if (!hasMastery(player, droppedItem.getKey())) {
                 DataManager.handleMastery(player, droppedItem.getKey());
             }
@@ -210,7 +212,7 @@ public class CookingManager extends Function {
         }
 
         if (Math.random() < ConfigManager.ingredientRefundChance) {
-            refundIngredients(player, loot);
+            refundIngredients(player, recipe);
         }
 
         playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking.done"), 1f, 1f);
@@ -352,17 +354,15 @@ public class CookingManager extends Function {
             }
 
             String lootKey = nbtCompound.getString("id");
-            String recipeKey = lootKey;
+            boolean perfect = lootKey.contains(ConfigManager.perfectItemSuffix);
+            String recipeKey = lootKey.replace(ConfigManager.perfectItemSuffix, "");
             Recipe recipe = RECIPES.get(recipeKey);
             if (!(recipe instanceof DroppedItem)) {
                 return;
             }
 
             DroppedItem droppedItem = (DroppedItem) recipe;
-            Action[] actions = droppedItem.getConsumeActions();
-            if (lootKey.contains(ConfigManager.perfectItemSuffix)) {
-                actions = droppedItem.getPerfectConsumeActions();
-            }
+            Action[] actions = perfect ? droppedItem.getPerfectConsumeActions() : droppedItem.getConsumeActions();
 
             if (actions != null) {
                 for (Action action : actions) {

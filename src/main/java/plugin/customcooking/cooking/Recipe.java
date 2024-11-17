@@ -9,13 +9,13 @@ import java.util.List;
 
 public class Recipe {
 
-    public static Recipe EMPTY = new Recipe("null", "null", Collections.singletonList(Component.empty()), new Difficulty[]{new Difficulty(1, 1)}, Collections.singletonList("null"), "null", 5000, 0, 0, 0);
+    public static Recipe EMPTY = new Recipe("null", "null", Collections.singletonList(Collections.singletonList(Component.empty())), new Difficulty[]{new Difficulty(1, 1)}, Collections.singletonList("null"), "null", 5000, 0, 0, 0);
 
     protected String key;
     protected String nick;
     protected List<String> ingredients;
     protected String cookedItems;
-    protected List<Component> dishEffects;
+    protected List<List<Component>> dishEffects;
     protected Difficulty[] difficulty;
     protected Layout[] layout;
     protected int time;
@@ -27,7 +27,7 @@ public class Recipe {
     public Action[] perfectConsumeActions;
     protected final double score;
 
-    public Recipe(String key, String nick, List<Component> dishEffects, Difficulty[] difficulty, List<String> ingredients, String cookedItems, int time, int masteryreq, int slot, double score) {
+    public Recipe(String key, String nick, List<List<Component>> dishEffects, Difficulty[] difficulty, List<String> ingredients, String cookedItems, int time, int masteryreq, int slot, double score) {
         this.key = key;
         this.nick = nick;
         this.dishEffects = dishEffects;
@@ -56,7 +56,7 @@ public class Recipe {
     public String getCookedItems() {
         return cookedItems;
     }
-    public List<Component> getDishEffectsLore(){return dishEffects;}
+    public List<List<Component>> getDishEffectsLore(){return dishEffects;}
 
     public void setDifficulty(Difficulty[] difficulty) {
         this.difficulty = difficulty;

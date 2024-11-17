@@ -15,6 +15,7 @@ import java.util.Map;
 
 import static org.bukkit.Bukkit.getServer;
 import static plugin.customcooking.manager.configs.ConfigManager.*;
+import static plugin.customcooking.util.GUIUtil.formatString;
 
 public class JadeManager extends Function {
     public static Map<Player, Map<String, Integer>> LIMITS;
@@ -49,6 +50,7 @@ public class JadeManager extends Function {
             HashMap<String, Integer> sourceMap = new HashMap<>();
             sourceMap.put(source, amount);
             LIMITS.put(player, sourceMap);
+            giveJade(player, amount, source, true);
             return;
         }
 
@@ -61,23 +63,29 @@ public class JadeManager extends Function {
                 return;
             }
             jadeMap.replace(source, newJade);
-            giveJade(player, amount);
+            giveJade(player, amount, source, false);
 
         } else {
             LIMITS.get(player).put(source, amount);
-            AdventureUtil.sendMessage(player, MessageManager.infoPositive + "This is the first time you've gotten Jade from " + source + " today, you have " + getLimitForSource(source) + " remaining.");
-            giveJade(player, amount);
+            giveJade(player, amount, source, true);
         }
 
-        String bcast = MessageManager.infoPositive + "Whilst " + source + ", " + player.getName() + " has found " + amount.toString() + "₪";
-        getServer().broadcast(AdventureUtil.getComponentFromMiniMessage(bcast));
+
         AdventureUtil.sendMessage(sender, "Gave " + amount + " from " + source + " to " + player.getName());
     }
 
-    private static void giveJade(Player player, Integer amount) {
+    private static void giveJade(Player player, Integer amount, String source, boolean First) {
         String command = "av User " + player.getName() + " AddPoints " + amount.toString();
         Bukkit.dispatchCommand(getServer().getConsoleSender(), command);
-        AdventureUtil.sendMessage(player, MessageManager.infoPositive + "");
+
+        if (First) {
+            AdventureUtil.sendMessage(player, MessageManager.infoPositive + "This is the first time you've gotten Jade from " + formatString(source) + " today, you have " + getLimitForSource(source) + " remaining.");
+        } else {
+            AdventureUtil.sendMessage(player, MessageManager.infoPositive + "You have received " + amount + " Jade");
+        }
+
+        String bcast = MessageManager.infoPositive + "Whilst " + formatString(source) + ", " + player.getName() + " has found " + amount.toString() + "₪";
+        getServer().broadcast(AdventureUtil.getComponentFromMiniMessage(bcast));
     }
 
     private static int getLimitForSource(String source) {
@@ -86,12 +94,18 @@ public class JadeManager extends Function {
                 return fishingLimit;
             case "cooking":
                 return cookingLimit;
-            case "crops":
+            case "farming":
                 return cropsLimit;
             default:
                 throw new IllegalArgumentException("Unknown source: " + source);
         }
     }
 
+    public static String checkJadeLimit(Player player, String source) {
+        if (LIMITS.containsKey(player) && (LIMITS.get(player).containsKey(source))) {
+                return LIMITS.get(player).get(source) + "/" + getLimitForSource(source);
+        }
+        return "0/" + getLimitForSource(source);
+    }
 
 }

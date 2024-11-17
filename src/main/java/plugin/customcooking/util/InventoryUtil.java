@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.customcooking.manager.EffectManager;
+import plugin.customcooking.manager.configs.ConfigManager;
 
 import java.util.List;
 
@@ -171,7 +172,8 @@ public class InventoryUtil {
         ItemStack drop = build(item);
         drop.setAmount(amount);
         if (customCookingItem) {
-            EffectManager.addPotionEffectLore(drop, item);
+
+            EffectManager.addPotionEffectLore(drop, item, item.contains(ConfigManager.perfectItemSuffix));
             addIdentifier(drop, item);
         }
         player.getLocation().getWorld().dropItem(player.getLocation(), drop);

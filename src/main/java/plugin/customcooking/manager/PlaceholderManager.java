@@ -19,6 +19,7 @@ public class PlaceholderManager extends Function {
     private final Pattern placeholderPattern = Pattern.compile("%([^%]*)%");
     private CompetitionPapi competitionPapi;
     private CookingPapi cookingPapi;
+    private JadePapi jadePapi;
     private boolean hasPlaceholderAPI = false;
 
     public PlaceholderManager() {
@@ -26,6 +27,7 @@ public class PlaceholderManager extends Function {
             hasPlaceholderAPI = true;
             this.competitionPapi = new CompetitionPapi();
             this.cookingPapi = new CookingPapi();
+            this.jadePapi = new JadePapi();
         }
         load();
     }
@@ -40,12 +42,14 @@ public class PlaceholderManager extends Function {
     @Override
     public void load() {
         if (competitionPapi != null) competitionPapi.register();
+        if (jadePapi != null) jadePapi.register();
         if (cookingPapi != null) cookingPapi.register();
     }
 
     @Override
     public void unload() {
         if (this.competitionPapi != null) competitionPapi.unregister();
+        if (this.jadePapi != null) jadePapi.unregister();
         if (this.cookingPapi != null) cookingPapi.unregister();
     }
 

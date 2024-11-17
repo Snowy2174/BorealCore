@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.manager.CookingManager;
+import plugin.customcooking.manager.EffectManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.util.AdventureUtil;
@@ -81,6 +82,7 @@ public class RecipeBookProvider implements InventoryProvider {
             return unknownRecipeStack;
         } else {
             ItemStack stack = customStack.getItemStack();
+            EffectManager.addPotionEffectLore(stack, recipe, false);
             modifyLore(stack, player, recipe, hasMastery);
             return stack;
         }
