@@ -9,6 +9,9 @@ import plugin.customcooking.commands.JadeCommand;
 import plugin.customcooking.commands.MainCommand;
 import plugin.customcooking.commands.TabCompletion;
 import plugin.customcooking.gui.GuiManager;
+import plugin.customcooking.jade.JadeDatabase;
+import plugin.customcooking.manager.JadeManager;
+import plugin.customcooking.jade.SQLite;
 import plugin.customcooking.manager.*;
 import plugin.customcooking.manager.configs.LayoutManager;
 import plugin.customcooking.manager.DataManager;
@@ -32,6 +35,7 @@ public class CustomCooking extends JavaPlugin {
     private static DataManager dataManager;
     private static InventoryManager inventoryManager;
     private static JadeManager jadeManager;
+    private static JadeDatabase db;
 
     @Override
     public void onLoad() {
@@ -54,7 +58,9 @@ public class CustomCooking extends JavaPlugin {
         guiManager = new GuiManager();
         placeholderManager = new PlaceholderManager();
         jadeManager = new JadeManager();
+        db = new SQLite(this);
 
+        db.dbload();
         inventoryManager.init();
 
         reloadConfig();
@@ -127,5 +133,8 @@ public class CustomCooking extends JavaPlugin {
     }
     public static InventoryManager getInventoryManager() {
         return inventoryManager;
+    }
+    public static JadeDatabase getDatabase() {
+        return db;
     }
 }

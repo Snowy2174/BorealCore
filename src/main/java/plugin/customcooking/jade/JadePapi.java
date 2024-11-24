@@ -1,10 +1,9 @@
-package plugin.customcooking.manager;
+package plugin.customcooking.jade;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import plugin.customcooking.util.InventoryUtil;
-import plugin.customcooking.util.RecipeDataUtil;
+import plugin.customcooking.manager.JadeManager;
 
 public class JadePapi extends PlaceholderExpansion {
     @Override
@@ -42,6 +41,10 @@ public class JadePapi extends PlaceholderExpansion {
             case "lim":
                 String source = parts[1];
                 return JadeManager.checkJadeLimit(player, source);
+            case "source":
+
+            case "total":
+                return String.valueOf(JadeManager.getTotalJadeForPlayer(player));
             default:
                 // Invalid or unrecognized placeholder identifier
                 return "Invalid Placeholder";

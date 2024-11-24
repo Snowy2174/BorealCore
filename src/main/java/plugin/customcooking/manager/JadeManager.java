@@ -2,22 +2,32 @@ package plugin.customcooking.manager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import plugin.customcooking.CustomCooking;
+
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
+import plugin.customcooking.jade.Error;
+import plugin.customcooking.jade.Errors;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
-import plugin.customcooking.util.InventoryUtil;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.bukkit.Bukkit.getServer;
 import static plugin.customcooking.manager.configs.ConfigManager.*;
+import static plugin.customcooking.manager.configs.ConfigManager.spiritLimit;
 import static plugin.customcooking.util.GUIUtil.formatString;
 
 public class JadeManager extends Function {
+    static CustomCooking plugin;
+    Connection connection;
+    // The name of the table we created back in SQLite class.
+    public String table = "jade_transactions";
+    public int tokens = 0;
     public static Map<Player, Map<String, Integer>> LIMITS;
 
     @Override
@@ -70,7 +80,6 @@ public class JadeManager extends Function {
             giveJade(player, amount, source, true);
         }
 
-
         AdventureUtil.sendMessage(sender, "Gave " + amount + " from " + source + " to " + player.getName());
     }
 
@@ -84,9 +93,19 @@ public class JadeManager extends Function {
             AdventureUtil.sendMessage(player, MessageManager.infoPositive + "You have received " + amount + " Jade");
         }
 
+        CustomCooking.getDatabase().addTransaction(player, amount, source, LocalDateTime.now());
         String bcast = MessageManager.infoPositive + "Whilst " + formatString(source) + ", " + player.getName() + " has found " + amount.toString() + "₪";
         getServer().broadcast(AdventureUtil.getComponentFromMiniMessage(bcast));
+
     }
+
+    // Integer totalAmount = getAggregatedData("playerName", "amount", null, null);
+    // Integer sourceAmount = getAggregatedData("playerName", "amount", "source", "sourceName");
+    // int totalJadeForPlayer = getTotalFromTransactions("player", player);
+    // int totalJadeForSource = getTotalFromTransactions("source", source);
+    // @TODO Implement remove jade method
+    // @TODO Implement tab Autocomplete
+    // @TODO Implement migrate Legacy jade data
 
     private static int getLimitForSource(String source) {
         switch (source) {
@@ -96,6 +115,8 @@ public class JadeManager extends Function {
                 return cookingLimit;
             case "farming":
                 return cropsLimit;
+            case "spirit":
+                return spiritLimit;
             default:
                 throw new IllegalArgumentException("Unknown source: " + source);
         }
@@ -103,9 +124,12 @@ public class JadeManager extends Function {
 
     public static String checkJadeLimit(Player player, String source) {
         if (LIMITS.containsKey(player) && (LIMITS.get(player).containsKey(source))) {
-                return LIMITS.get(player).get(source) + "/" + getLimitForSource(source);
+            return LIMITS.get(player).get(source) + "/" + getLimitForSource(source);
         }
         return "0/" + getLimitForSource(source);
     }
 
+    public static int getTotalJadeForPlayer(Player player) {
+        return CustomCooking.getDatabase().getTotalJadeForPlayer(player);
+    }
 }

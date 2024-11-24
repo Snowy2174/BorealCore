@@ -174,7 +174,7 @@ public class RecipeBookProvider implements InventoryProvider {
                 return;
             }
             if (hasMastery) {
-                if (event.getClick().equals(ClickType.SHIFT_LEFT) || event.getClick().equals(ClickType.SHIFT_RIGHT)) {
+                if (event.getClick() == ClickType.MIDDLE) {
                     // Shift click handling for cooking 15 Recipes
                     cookingManager.handleAutocooking(recipe, player, 15);
                 } else if (event.isRightClick()) {

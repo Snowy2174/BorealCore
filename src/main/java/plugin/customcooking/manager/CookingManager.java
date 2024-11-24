@@ -178,7 +178,7 @@ public class CookingManager extends Function {
             return;
         }
 
-        double masteryPerfectionMultiplier = hasMastery(player, droppedItem.getKey()) ? 0 : 1.5;
+        double masteryPerfectionMultiplier = hasMastery(player, droppedItem.getKey()) ? 1.5 : 1;
         boolean perfect = cookingPlayer.isPerfect() && (Math.random() < perfectChance*masteryPerfectionMultiplier);
         String drop = recipe.getCookedItems();
 

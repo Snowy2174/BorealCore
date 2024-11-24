@@ -6,6 +6,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import plugin.customcooking.cooking.CookingPapi;
 import plugin.customcooking.cooking.competition.placeholder.CompetitionPapi;
+import plugin.customcooking.jade.JadePapi;
 import plugin.customcooking.object.Function;
 
 import java.util.ArrayList;

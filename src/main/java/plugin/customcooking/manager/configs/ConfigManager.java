@@ -49,6 +49,7 @@ public class ConfigManager {
     public static int cropsLimit;
     public static int cookingLimit;
     public static int fishingLimit;
+    public static int spiritLimit;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
@@ -82,13 +83,14 @@ public class ConfigManager {
         cookLine = config.getString("gui.config.info-cook", "<!italic><#ffcc33>[Click] <#ffcc99>to Cook");
         cookLineRight = config.getString("gui.config.info-right-cook", "<!italic><#ffcc33>[Right Click] <#ffcc99>to Cook");
         cookLineLeft = config.getString("gui.config.info-left-cook", "<!italic><#ffcc33>[Left Click] <#ffcc99>to Autocook");
-        cookLineShift = config.getString("gui.config.info-shift-cook", "<!italic><#ffcc33>[Shift Click] <#ffcc99>to Autocook x15");
+        cookLineShift = config.getString("gui.config.info-shift-cook", "<!italic><#ffcc33>[Middle Click] <#ffcc99>to Autocook x15");
         unknownItem = config.getString("gui.items.unknown-item", "unknownrecipe");
         grinderItem = config.getString("gui.items.grinder-item", "grinder");
 
         fishingLimit = config.getInt("jade.limits.fishing", 100);
-        cookingLimit = config.getInt("jade.limits.fishing", 100);
+        cookingLimit = config.getInt("jade.limits.cooking", 100);
         cropsLimit = config.getInt("jade.limits.crops", 15);
+        spiritLimit = config.getInt("jade.limits.spirit", 100);
 
         successTitle = config.getStringList("titles.success.title").toArray(new String[0]);
         successSubTitle = config.getStringList("titles.success.subtitle").toArray(new String[0]);

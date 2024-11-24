@@ -11,7 +11,6 @@ import plugin.customcooking.cooking.competition.CompetitionSchedule;
 import plugin.customcooking.gui.GuiManager;
 import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.manager.DataManager;
-import plugin.customcooking.manager.JadeManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
@@ -67,8 +66,6 @@ public class MainCommand implements CommandExecutor {
             handleCompetitionCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("give")){
             handleGiveItemCommand(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("givejade")){
-            JadeManager.handleGiveJadeCommand(sender, subargs);
         }
         else {
             // Unknown subcommand
