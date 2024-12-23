@@ -5,11 +5,14 @@ import com.comphenix.protocol.ProtocolManager;
 import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.w3c.dom.Node;
 import plugin.customcooking.commands.JadeCommand;
 import plugin.customcooking.commands.MainCommand;
+import plugin.customcooking.commands.NodeCommand;
 import plugin.customcooking.commands.TabCompletion;
 import plugin.customcooking.gui.GuiManager;
 import plugin.customcooking.jade.JadeDatabase;
+import plugin.customcooking.karmicnode.NodeManager;
 import plugin.customcooking.manager.JadeManager;
 import plugin.customcooking.jade.SQLite;
 import plugin.customcooking.manager.*;
@@ -34,6 +37,7 @@ public class CustomCooking extends JavaPlugin {
     private static FurnitureManager furnitureManager;
     private static DataManager dataManager;
     private static InventoryManager inventoryManager;
+    private static NodeManager nodeManager;
     private static JadeManager jadeManager;
     private static JadeDatabase db;
 
@@ -57,6 +61,7 @@ public class CustomCooking extends JavaPlugin {
         recipeManager = new RecipeManager();
         guiManager = new GuiManager();
         placeholderManager = new PlaceholderManager();
+        nodeManager = new NodeManager();
         jadeManager = new JadeManager();
         db = new SQLite(this);
 
@@ -67,6 +72,7 @@ public class CustomCooking extends JavaPlugin {
         getCommand("cooking").setExecutor(new MainCommand());
         getCommand("cooking").setTabCompleter(new TabCompletion());
         getCommand("jade").setExecutor(new JadeCommand());
+        getCommand("kn").setExecutor(new NodeCommand());
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Enabled!");
     }
@@ -82,6 +88,7 @@ public class CustomCooking extends JavaPlugin {
         effectManager.unload();
         guiManager.unload();
         jadeManager.unload();
+        nodeManager.unload();
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Disabled!");
 
@@ -136,5 +143,8 @@ public class CustomCooking extends JavaPlugin {
     }
     public static JadeDatabase getDatabase() {
         return db;
+    }
+    public static NodeManager getNodeManager() {
+        return nodeManager;
     }
 }

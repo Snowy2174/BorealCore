@@ -194,6 +194,9 @@ public class CookingManager extends Function {
             if (!hasMastery(player, droppedItem.getKey())) {
                 DataManager.handleMastery(player, droppedItem.getKey());
             }
+            if (Math.random() < ConfigManager.cookingJadeRewardRate) {
+                JadeManager.giveJade(player, ConfigManager.cookingJadeRewardRate, "cooking");
+            }
         }
 
         if (cookingPot != null) {

@@ -23,7 +23,7 @@ public class ConfigManager {
     public static String unlitCookingPot;
     public static String litCookingPot;
     public static String splashEffect;
-    public static Integer masteryJadeReward;
+    public static double masteryJadeReward;
     public static String recipeBookTextureNamespace;
     public static String masteryLine;
     public static String masteryBar;
@@ -50,6 +50,7 @@ public class ConfigManager {
     public static int cookingLimit;
     public static int fishingLimit;
     public static int spiritLimit;
+    public static double cookingJadeRewardRate;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
@@ -73,6 +74,7 @@ public class ConfigManager {
         splashEffect = config.getString("mechanics.pot-effect", "pot_effect");
         splashTime = config.getInt("mechanics.splash-time", 100);
         masteryJadeReward = config.getInt("mechanics.mastery-reward", 5);
+        cookingJadeRewardRate = config.getDouble("mechanics.cooking-reward-rate", 0.05);
 
         recipeBookTextureNamespace = config.getString("gui.config.recipe-book", "customcooking:recipe_book");
         masteryLine = config.getString("gui.config.mastery-line", "<!italic><#ff9900>Mastery [{mastery}]");
@@ -88,7 +90,7 @@ public class ConfigManager {
         grinderItem = config.getString("gui.items.grinder-item", "grinder");
 
         fishingLimit = config.getInt("jade.limits.fishing", 100);
-        cookingLimit = config.getInt("jade.limits.cooking", 100);
+        cookingLimit = config.getInt("jade.limits.cooking", 10);
         cropsLimit = config.getInt("jade.limits.crops", 15);
         spiritLimit = config.getInt("jade.limits.spirit", 100);
 

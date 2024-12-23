@@ -1,18 +1,16 @@
 package plugin.customcooking.manager;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import plugin.customcooking.CustomCooking;
 
-import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
-import plugin.customcooking.jade.Error;
-import plugin.customcooking.jade.Errors;
+import plugin.customcooking.jade.JadeTransaction;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
@@ -23,11 +21,6 @@ import static plugin.customcooking.manager.configs.ConfigManager.spiritLimit;
 import static plugin.customcooking.util.GUIUtil.formatString;
 
 public class JadeManager extends Function {
-    static CustomCooking plugin;
-    Connection connection;
-    // The name of the table we created back in SQLite class.
-    public String table = "jade_transactions";
-    public int tokens = 0;
     public static Map<Player, Map<String, Integer>> LIMITS;
 
     @Override
@@ -42,61 +35,88 @@ public class JadeManager extends Function {
     }
 
     public static void handleGiveJadeCommand(CommandSender sender, String[] args) {
-        if (args.length < 3) {
+        if (args.length < 2) {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade give <player> <source> <amount>");
             return;
         }
 
         Player player = Bukkit.getPlayer(args[0]);
+        String source = "";
+        int amount = 0;
         if (player == null) {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
 
-        String source = args[1];
-        Integer amount = Integer.parseInt(args[2]);
-
-        if (!LIMITS.containsKey(player)) {
-            HashMap<String, Integer> sourceMap = new HashMap<>();
-            sourceMap.put(source, amount);
-            LIMITS.put(player, sourceMap);
-            giveJade(player, amount, source, true);
+        if (args.length == 2 && args[1].matches("-?\\d+(\\.\\d+)?")) {
+            amount = Integer.parseInt(args[1]);
+        } else if (args.length == 3 && args[2].matches("-?\\d+(\\.\\d+)?")) {
+            source = args[1];
+            amount = Integer.parseInt(args[2]);
+        } else {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade give <player> <source> <amount>");
             return;
         }
 
-        Map<String, Integer> jadeMap = LIMITS.get(player);
+        JadeTransaction jadeTransaction = new JadeTransaction(player.getName(), amount, source, LocalDateTime.now());
 
-        if (LIMITS.get(player).containsKey(source)) {
-            Integer newJade = jadeMap.get(source) + amount;
-            if (newJade > getLimitForSource(source)) {
-                AdventureUtil.sendMessage(player, MessageManager.infoNegative + "You've reached your limit for Jade from " + source + " today, try again later.");
-                return;
-            }
-            jadeMap.replace(source, newJade);
-            giveJade(player, amount, source, false);
-
-        } else {
-            LIMITS.get(player).put(source, amount);
-            giveJade(player, amount, source, true);
+        if (isMoreThan24HoursLater(CustomCooking.getDatabase().getMostRecentPositiveTransactionTimestamp(player, source))) {
+            // Handle 24 hours check
         }
 
-        AdventureUtil.sendMessage(sender, "Gave " + amount + " from " + source + " to " + player.getName());
+        if (!source.isEmpty()) {
+            if (!LIMITS.containsKey(player)) {
+                HashMap<String, Integer> sourceMap = new HashMap<>();
+                sourceMap.put(source, amount);
+                LIMITS.put(player, sourceMap);
+                giveJade(player, amount, source);
+                return;
+            }
+
+            Map<String, Integer> jadeMap = LIMITS.get(player);
+
+            if (jadeMap.containsKey(source)) {
+                Integer newJade = jadeMap.get(source) + amount;
+                if (newJade > getLimitForSource(source)) {
+                    AdventureUtil.sendMessage(player, MessageManager.infoNegative + "You've reached your limit for Jade from " + source + " today, try again later.");
+                    return;
+                }
+                jadeMap.replace(source, newJade);
+            } else {
+                jadeMap.put(source, amount);
+            }
+
+            AdventureUtil.sendMessage(sender, "Gave " + amount + " from " + source + " to " + player.getName());
+        } else {
+            AdventureUtil.sendMessage(sender, "Gave " + amount + " jade to " + player.getName());
+        }
+        giveJade(player, amount, source);
     }
+    static void giveJade(Player player, double amount, String source) {
+        boolean first = source.isEmpty() || !LIMITS.get(player).containsKey(source) || LIMITS.get(player).get(source) == amount;
 
-    private static void giveJade(Player player, Integer amount, String source, boolean First) {
-        String command = "av User " + player.getName() + " AddPoints " + amount.toString();
-        Bukkit.dispatchCommand(getServer().getConsoleSender(), command);
-
-        if (First) {
+        if (first && !source.isEmpty()) {
             AdventureUtil.sendMessage(player, MessageManager.infoPositive + "This is the first time you've gotten Jade from " + formatString(source) + " today, you have " + getLimitForSource(source) + " remaining.");
         } else {
             AdventureUtil.sendMessage(player, MessageManager.infoPositive + "You have received " + amount + " Jade");
         }
 
         CustomCooking.getDatabase().addTransaction(player, amount, source, LocalDateTime.now());
-        String bcast = MessageManager.infoPositive + "Whilst " + formatString(source) + ", " + player.getName() + " has found " + amount.toString() + "₪";
+        String bcast = MessageManager.infoPositive + "Whilst " + (source.isEmpty() ? "playing" : formatString(source)) + ", " + player.getName() + " has found " + amount + "₪";
         getServer().broadcast(AdventureUtil.getComponentFromMiniMessage(bcast));
+    }
 
+    private static int getLimitForSource(String source) {
+        if (source.isEmpty()) {
+            return Integer.MAX_VALUE; // No limit if no source is specified
+        }
+        return switch (source) {
+            case "fishing" -> fishingLimit;
+            case "cooking" -> cookingLimit;
+            case "farming" -> cropsLimit;
+            case "spirit" -> spiritLimit;
+            default -> 0;
+        };
     }
 
     // Integer totalAmount = getAggregatedData("playerName", "amount", null, null);
@@ -107,21 +127,13 @@ public class JadeManager extends Function {
     // @TODO Implement tab Autocomplete
     // @TODO Implement migrate Legacy jade data
 
-    private static int getLimitForSource(String source) {
-        switch (source) {
-            case "fishing":
-                return fishingLimit;
-            case "cooking":
-                return cookingLimit;
-            case "farming":
-                return cropsLimit;
-            case "spirit":
-                return spiritLimit;
-            default:
-                throw new IllegalArgumentException("Unknown source: " + source);
+    public static boolean isMoreThan24HoursLater(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return false;
         }
+        LocalDateTime now = LocalDateTime.now();
+        return now.isAfter(dateTime.plusHours(24));
     }
-
     public static String checkJadeLimit(Player player, String source) {
         if (LIMITS.containsKey(player) && (LIMITS.get(player).containsKey(source))) {
             return LIMITS.get(player).get(source) + "/" + getLimitForSource(source);

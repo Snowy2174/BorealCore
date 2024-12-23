@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import plugin.customcooking.cooking.CookingPapi;
 import plugin.customcooking.cooking.competition.placeholder.CompetitionPapi;
 import plugin.customcooking.jade.JadePapi;
+import plugin.customcooking.karmicnode.NodePapi;
 import plugin.customcooking.object.Function;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class PlaceholderManager extends Function {
     private CompetitionPapi competitionPapi;
     private CookingPapi cookingPapi;
     private JadePapi jadePapi;
+    private NodePapi nodePapi;
     private boolean hasPlaceholderAPI = false;
 
     public PlaceholderManager() {
@@ -29,6 +31,7 @@ public class PlaceholderManager extends Function {
             this.competitionPapi = new CompetitionPapi();
             this.cookingPapi = new CookingPapi();
             this.jadePapi = new JadePapi();
+            this.nodePapi = new NodePapi();
         }
         load();
     }
@@ -45,6 +48,7 @@ public class PlaceholderManager extends Function {
         if (competitionPapi != null) competitionPapi.register();
         if (jadePapi != null) jadePapi.register();
         if (cookingPapi != null) cookingPapi.register();
+        if (nodePapi != null) nodePapi.register();
     }
 
     @Override
@@ -52,6 +56,7 @@ public class PlaceholderManager extends Function {
         if (this.competitionPapi != null) competitionPapi.unregister();
         if (this.jadePapi != null) jadePapi.unregister();
         if (this.cookingPapi != null) cookingPapi.unregister();
+        if (this.nodePapi != null) nodePapi.unregister();
     }
 
     public List<String> detectPlaceholders(String text){

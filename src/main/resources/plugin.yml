@@ -17,6 +17,8 @@ commands:
     description: The main plugin command
   jade:
     description: The command to manage Jade
+  kn:
+    description: The command to manage Nodes
 
 permissions:
   customcooking.*:

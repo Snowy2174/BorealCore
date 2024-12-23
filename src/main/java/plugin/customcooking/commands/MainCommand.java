@@ -266,7 +266,7 @@ public class MainCommand implements CommandExecutor {
     }
 
     private void handleGiveItemCommand(CommandSender sender, String[] args) {
-        if (args.length < 3) {
+        if (args.length < 2) {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking give <player> <item> <amount>");
             return;
         }
@@ -278,7 +278,7 @@ public class MainCommand implements CommandExecutor {
         }
 
         String itemName = args[1];
-        int amount = Integer.parseInt(args[2]);
+        int amount = (args[2] == null) ? 1 : Integer.parseInt(args[2]) ;
 
         InventoryUtil.giveItem(player, itemName, amount, true);
 

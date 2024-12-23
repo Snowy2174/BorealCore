@@ -134,7 +134,7 @@ public abstract class JadeDatabase {
 
     }
 
-    public void addTransaction(Player player, int amount, String source, LocalDateTime timestamp) {
+    public void addTransaction(Player player, double amount, String source, LocalDateTime timestamp) {
         Connection conn = null;
         PreparedStatement ps = null;
 
@@ -143,7 +143,7 @@ public abstract class JadeDatabase {
             String query = "INSERT INTO jade_transactions (player, amount, source, timestamp) VALUES (?, ?, ?, ?);";
             ps = conn.prepareStatement(query);
             ps.setString(1, player.getName().toLowerCase());
-            ps.setInt(2, amount);
+            ps.setDouble(2, amount);
             ps.setString(3, source);
             ps.setTimestamp(4, Timestamp.valueOf(timestamp));
             ps.executeUpdate();
@@ -290,6 +290,44 @@ public abstract class JadeDatabase {
 
         return var5;
     }
+
+    public LocalDateTime getMostRecentPositiveTransactionTimestamp(Player player, String source) {
+    Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    try {
+        conn = this.getSQLConnection();
+        String query = "SELECT timestamp FROM jade_transactions WHERE player = ? AND source = ? AND amount > 0 ORDER BY timestamp DESC LIMIT 1;";
+        ps = conn.prepareStatement(query);
+        ps.setString(1, player.getName().toLowerCase());
+        ps.setString(2, source);
+        rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getTimestamp("timestamp").toLocalDateTime();
+        }
+    } catch (SQLException var17) {
+        plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), var17);
+    } finally {
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+
+            if (ps != null) {
+                ps.close();
+            }
+
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException var16) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), var16);
+        }
+    }
+
+    return null;
+}
 
     public int getTotalTransactionsForPlayer(Player player) {
         Connection conn = null;
