@@ -34,8 +34,10 @@ public class ConfigUtil {
         CustomCooking.getFurnitureManager().load();
         CustomCooking.getJadeManager().unload();
         CustomCooking.getJadeManager().load();
+        CustomCooking.getNodeManager().unload();
         CustomCooking.getNodeManager().load();
-        CustomCooking.getNodeManager().load();
+        CustomCooking.getWikiManager().unload();
+        CustomCooking.getWikiManager().load();
     }
 }
 

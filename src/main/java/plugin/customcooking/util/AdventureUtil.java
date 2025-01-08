@@ -1,6 +1,7 @@
 package plugin.customcooking.util;
 
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -43,6 +44,11 @@ public class AdventureUtil {
         Title.Times times = Title.Times.times(Duration.ofMillis(in), Duration.ofMillis(duration), Duration.ofMillis(out));
         Title title = Title.title(mm.deserialize(replaceLegacy(s1)), mm.deserialize(replaceLegacy(s2)), times);
         au.showTitle(title);
+    }
+
+    public static void playerBook(Player player, Book book) {
+        Audience au = CustomCooking.adventure.player(player);
+        au.openBook(book);
     }
 
     public static void playerTitle(Player player, Component s1, Component s2, int in, int duration, int out) {
@@ -171,5 +177,58 @@ public class AdventureUtil {
         }
         return stringBuilder.toString();
     }
+    public static String replaceMarkdown(String s) {
+    StringBuilder stringBuilder = new StringBuilder();
+    char[] chars = s.toCharArray();
+    for (int i = 0; i < chars.length; i++) {
+        if (chars[i] == '*') {
+            if (i + 1 < chars.length && chars[i + 1] == '*') {
+                i += 2;
+                stringBuilder.append("<bold>");
+                while (i < chars.length && !(chars[i] == '*' && i + 1 < chars.length && chars[i + 1] == '*')) {
+                    stringBuilder.append(chars[i++]);
+                }
+                i++;
+                stringBuilder.append("</bold>");
+            } else {
+                i++;
+                stringBuilder.append("<italic>");
+                while (i < chars.length && chars[i] != '*') {
+                    stringBuilder.append(chars[i++]);
+                }
+                stringBuilder.append("</italic>");
+            }
+        } else if (chars[i] == '~' && i + 1 < chars.length && chars[i + 1] == '~') {
+            i += 2;
+            stringBuilder.append("<strikethrough>");
+            while (i < chars.length && !(chars[i] == '~' && i + 1 < chars.length && chars[i + 1] == '~')) {
+                stringBuilder.append(chars[i++]);
+            }
+            i++;
+            stringBuilder.append("</strikethrough>");
+        } else if (chars[i] == '`') {
+            i++;
+            stringBuilder.append("<code>");
+            while (i < chars.length && chars[i] != '`') {
+                stringBuilder.append(chars[i++]);
+            }
+            stringBuilder.append("</code>");
+        } else if (chars[i] == '[') {
+            int linkTextStart = i + 1;
+            int linkTextEnd = s.indexOf(']', linkTextStart);
+            int linkUrlStart = s.indexOf('(', linkTextEnd) + 1;
+            int linkUrlEnd = s.indexOf(')', linkUrlStart);
+            if (linkTextEnd > linkTextStart && linkUrlStart > linkTextEnd && linkUrlEnd > linkUrlStart) {
+                stringBuilder.append("<click:open_url:").append(s, linkUrlStart, linkUrlEnd).append("><hover:show_text:'").append(s, linkUrlStart, linkUrlEnd).append("'>").append(s, linkTextStart, linkTextEnd).append("</hover></click>");
+                i = linkUrlEnd;
+            } else {
+                stringBuilder.append(chars[i]);
+            }
+        } else {
+            stringBuilder.append(chars[i]);
+        }
+    }
+    return stringBuilder.toString();
+}
 }
 

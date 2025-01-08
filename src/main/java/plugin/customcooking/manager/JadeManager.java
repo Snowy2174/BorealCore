@@ -101,6 +101,9 @@ public class JadeManager extends Function {
             AdventureUtil.sendMessage(player, MessageManager.infoPositive + "You have received " + amount + " Jade");
         }
 
+        String command = "av User " + player.getName() + " AddPoints " + (int)amount;
+        Bukkit.dispatchCommand(getServer().getConsoleSender(), command);
+
         CustomCooking.getDatabase().addTransaction(player, amount, source, LocalDateTime.now());
         String bcast = MessageManager.infoPositive + "Whilst " + (source.isEmpty() ? "playing" : formatString(source)) + ", " + player.getName() + " has found " + amount + "₪";
         getServer().broadcast(AdventureUtil.getComponentFromMiniMessage(bcast));

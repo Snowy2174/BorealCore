@@ -19,6 +19,8 @@ commands:
     description: The command to manage Jade
   kn:
     description: The command to manage Nodes
+  wiki:
+    description: The command to manage the Wiki
 
 permissions:
   customcooking.*:

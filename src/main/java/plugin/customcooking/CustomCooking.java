@@ -6,10 +6,7 @@ import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.w3c.dom.Node;
-import plugin.customcooking.commands.JadeCommand;
-import plugin.customcooking.commands.MainCommand;
-import plugin.customcooking.commands.NodeCommand;
-import plugin.customcooking.commands.TabCompletion;
+import plugin.customcooking.commands.*;
 import plugin.customcooking.gui.GuiManager;
 import plugin.customcooking.jade.JadeDatabase;
 import plugin.customcooking.karmicnode.NodeManager;
@@ -21,6 +18,7 @@ import plugin.customcooking.manager.DataManager;
 import plugin.customcooking.manager.configs.RecipeManager;
 import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.ConfigUtil;
+import plugin.customcooking.wiki.WikiManager;
 
 public class CustomCooking extends JavaPlugin {
 
@@ -40,7 +38,7 @@ public class CustomCooking extends JavaPlugin {
     private static NodeManager nodeManager;
     private static JadeManager jadeManager;
     private static JadeDatabase db;
-
+    private static WikiManager wikiManager;
     @Override
     public void onLoad() {
         plugin = this;
@@ -63,6 +61,7 @@ public class CustomCooking extends JavaPlugin {
         placeholderManager = new PlaceholderManager();
         nodeManager = new NodeManager();
         jadeManager = new JadeManager();
+        wikiManager = new WikiManager();
         db = new SQLite(this);
 
         db.dbload();
@@ -73,6 +72,7 @@ public class CustomCooking extends JavaPlugin {
         getCommand("cooking").setTabCompleter(new TabCompletion());
         getCommand("jade").setExecutor(new JadeCommand());
         getCommand("kn").setExecutor(new NodeCommand());
+        getCommand("wiki").setExecutor(new WikiCommand());
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Enabled!");
     }
@@ -89,6 +89,7 @@ public class CustomCooking extends JavaPlugin {
         guiManager.unload();
         jadeManager.unload();
         nodeManager.unload();
+        wikiManager.unload();
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Disabled!");
 
@@ -146,5 +147,8 @@ public class CustomCooking extends JavaPlugin {
     }
     public static NodeManager getNodeManager() {
         return nodeManager;
+    }
+    public static WikiManager getWikiManager() {
+        return wikiManager;
     }
 }
