@@ -12,6 +12,7 @@ import plugin.customcooking.CustomCooking;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.wiki.WikiGuiProvider;
 
 import java.util.*;
 
@@ -24,6 +25,7 @@ public class GuiManager extends Function {
     public static HashMap<String, Ingredient> INGREDIENTS;
     public static SmartInventory INGREDIENTS_MENU;
     public static SmartInventory PROGRESSION_MENU;
+    public static SmartInventory WIKI_MENU;
     public static List<ItemStack> collectionItems;
 
     @Override
@@ -32,6 +34,7 @@ public class GuiManager extends Function {
         collectionItems = initCollectionItems();
         INGREDIENTS_MENU = getIngredientsBook();
         PROGRESSION_MENU = getProgressionTracker();
+        WIKI_MENU = getWikiMenu();
         loadItems();
         AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (INGREDIENTS.size()) + " <gray>ingredients");
         AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (collectionItems.size()) + " <gray>progression items");
@@ -63,6 +66,16 @@ public class GuiManager extends Function {
                 .provider(new RecipeBookProvider(clickedFurniture))
                 .size(6, 9)
                 .title(ChatColor.WHITE + new FontImageWrapper(ConfigManager.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString( ChatColor.RESET + "Recipe Book", -190))
+                .build();
+    }
+
+    public static SmartInventory getWikiMenu() {
+        return SmartInventory.builder()
+                .manager(CustomCooking.getInventoryManager())
+                .id("wikiMenu")
+                .provider(new WikiGuiProvider())
+                .size(6, 9)
+                .title(ChatColor.WHITE + "Wiki Menu")
                 .build();
     }
 

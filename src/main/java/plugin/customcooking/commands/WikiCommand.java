@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.gui.GuiManager;
 import plugin.customcooking.karmicnode.NodeManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.util.AdventureUtil;
@@ -23,12 +24,12 @@ public class WikiCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("customcooking.admin")) {
-            return true;
+        if (args.length == 0) {
+            GuiManager.getWikiMenu().open((Player) sender);
         }
 
-        if (args.length == 0) {
-            return false;
+        if (!sender.hasPermission("customcooking.admin")) {
+            return true;
         }
 
         String subcommand = args[0];

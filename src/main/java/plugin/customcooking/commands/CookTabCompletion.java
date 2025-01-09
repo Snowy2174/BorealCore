@@ -11,7 +11,7 @@ import java.util.List;
 
 import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 
-public class TabCompletion implements TabCompleter {
+public class CookTabCompletion implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
         List<String> completions = new ArrayList<>();

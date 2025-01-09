@@ -39,17 +39,17 @@ public class WikiManager extends Function {
             e.printStackTrace();
             return;
         }
-        loadEntryFromDirectory(wiki_file);
+        loadEntryFromDirectory(wiki_file, "");
         }
 
-        private static void loadEntryFromDirectory(File file) {
+        private static void loadEntryFromDirectory(File file, String path) {
             if (file.isDirectory()) {
                 for (File f : file.listFiles()) {
-                    loadEntryFromDirectory(f);
+                    loadEntryFromDirectory(f, path + f.getName() + "/");
                 }
             } else {
                 if (file.getName().endsWith(".md")) {
-                    String id = file.getName().replace(".md", "");
+                    String id = path.replace("/",":").replace(".md:", "");
                     Book wiki = Book.book(Component.text(id), Component.text("Author"), getBookContent(file));
                     WIKI.put(id, wiki);
                 }
@@ -89,7 +89,7 @@ public class WikiManager extends Function {
 
                     if (line.startsWith("## ")) {
                         if (currentSubsectionTitle != null) {
-                            addChunksToBookContent(bookContent, mainTitle, currentSubsectionTitle, currentSubsectionContent);
+                            appendBookContent(bookContent, mainTitle, currentSubsectionTitle, currentSubsectionContent);
                         }
                         currentSubsectionTitle = line.substring(2).trim();
                         currentSubsectionContent.setLength(0);
@@ -98,7 +98,7 @@ public class WikiManager extends Function {
                     }
 
                     if (currentSubsectionTitle != null) {
-                        addChunksToBookContent(bookContent, mainTitle, currentSubsectionTitle, currentSubsectionContent);
+                        appendBookContent(bookContent, mainTitle, currentSubsectionTitle, currentSubsectionContent);
                     }
                 }
             } catch (IOException e) {
@@ -107,18 +107,17 @@ public class WikiManager extends Function {
             return bookContent;
         }
 
-        private static void addChunksToBookContent(List<Component> bookContent, String mainTitle, String currentSubsectionTitle, StringBuilder currentSubsectionContent) {
-            String contentString = AdventureUtil.replaceMarkdown(currentSubsectionContent.toString().trim());
+        private static void appendBookContent(List<Component> bookContent, String mainTitle, String subsectionTitle, StringBuilder subsectionContent) {
+            String contentString = AdventureUtil.replaceMarkdown(subsectionContent.toString().trim());
             for (int i = 0; i < contentString.length(); i += 200) {
                 String chunk = contentString.substring(i, Math.min(contentString.length(), i + 200));
-                Component page = Component.text("= " + mainTitle).appendNewline()
-                        .append(Component.text("= " + currentSubsectionTitle)).appendNewline()
+                Component page = Component.text("= " + mainTitle).appendNewline().appendNewline()
+                        .append(Component.text("= " + subsectionTitle)).appendNewline().appendNewline()
                         .append(AdventureUtil.getComponentFromMiniMessage(chunk));
                 System.out.println(chunk);
                 bookContent.add(page);
             }
-            currentSubsectionContent.setLength(0);
-
+            subsectionContent.setLength(0);
         }
 
         public static void openBook(Player player, String id) {

@@ -22,11 +22,11 @@ import java.util.List;
 import static plugin.customcooking.manager.DataManager.getRecipeCount;
 
 
-public class MainCommand implements CommandExecutor {
+public class CookCommand implements CommandExecutor {
 
     private final CookingManager cookingManager;
 
-    public MainCommand() {
+    public CookCommand() {
         this.cookingManager = CustomCooking.getCookingManager();
     }
 

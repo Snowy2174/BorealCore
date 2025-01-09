@@ -5,7 +5,6 @@ import com.comphenix.protocol.ProtocolManager;
 import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.w3c.dom.Node;
 import plugin.customcooking.commands.*;
 import plugin.customcooking.gui.GuiManager;
 import plugin.customcooking.jade.JadeDatabase;
@@ -68,11 +67,12 @@ public class CustomCooking extends JavaPlugin {
         inventoryManager.init();
 
         reloadConfig();
-        getCommand("cooking").setExecutor(new MainCommand());
-        getCommand("cooking").setTabCompleter(new TabCompletion());
+        getCommand("cooking").setExecutor(new CookCommand());
+        getCommand("cooking").setTabCompleter(new CookTabCompletion());
         getCommand("jade").setExecutor(new JadeCommand());
         getCommand("kn").setExecutor(new NodeCommand());
         getCommand("wiki").setExecutor(new WikiCommand());
+        getCommand("wiki").setTabCompleter(new WikiTabCompletion());
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Enabled!");
     }

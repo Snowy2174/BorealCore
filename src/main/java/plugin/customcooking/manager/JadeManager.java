@@ -93,7 +93,7 @@ public class JadeManager extends Function {
         giveJade(player, amount, source);
     }
     static void giveJade(Player player, double amount, String source) {
-        boolean first = source.isEmpty() || !LIMITS.get(player).containsKey(source) || LIMITS.get(player).get(source) == amount;
+        boolean first = source.isBlank() ||  !LIMITS.containsKey(player) || !LIMITS.get(player).containsKey(source) || LIMITS.get(player).get(source) == amount;
 
         if (first && !source.isEmpty()) {
             AdventureUtil.sendMessage(player, MessageManager.infoPositive + "This is the first time you've gotten Jade from " + formatString(source) + " today, you have " + getLimitForSource(source) + " remaining.");
