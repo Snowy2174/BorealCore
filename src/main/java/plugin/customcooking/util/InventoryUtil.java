@@ -98,7 +98,7 @@ public class InventoryUtil {
                     }
                 } else {
                     if (playerHasIngredient(playerInventory, ingredientName)) {
-                        removeNonTieredIngredient(playerInventory, ingredientName, amount);
+                        removeItem(playerInventory, ingredientName, amount);
                         break; // Exit the loop after removing one non-tiered ingredient
                     }
                 }
@@ -154,7 +154,7 @@ public class InventoryUtil {
         }
     }
 
-    private static void removeNonTieredIngredient(Inventory playerInventory, String ingredient, int amount) {
+    public static void removeItem(Inventory playerInventory, String ingredient, int amount) {
         CustomStack customStack = CustomStack.getInstance(ingredient);
         if (customStack != null) {
             ItemStack itemStack = customStack.getItemStack();

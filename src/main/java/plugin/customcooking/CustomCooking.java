@@ -70,6 +70,7 @@ public class CustomCooking extends JavaPlugin {
         getCommand("cooking").setExecutor(new CookCommand());
         getCommand("cooking").setTabCompleter(new CookTabCompletion());
         getCommand("jade").setExecutor(new JadeCommand());
+        getCommand("jade").setTabCompleter(new JadeTabCompletion());
         getCommand("kn").setExecutor(new NodeCommand());
         getCommand("wiki").setExecutor(new WikiCommand());
         getCommand("wiki").setTabCompleter(new WikiTabCompletion());

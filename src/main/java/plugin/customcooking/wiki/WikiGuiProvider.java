@@ -23,6 +23,7 @@ import java.util.List;
 
 import static plugin.customcooking.gui.GuiManager.INGREDIENTS;
 import static plugin.customcooking.util.InventoryUtil.build;
+import static plugin.customcooking.wiki.WikiManager.CATEGORY;
 import static plugin.customcooking.wiki.WikiManager.WIKI;
 
 public class WikiGuiProvider implements InventoryProvider {
@@ -41,27 +42,26 @@ public class WikiGuiProvider implements InventoryProvider {
     @Override
     public void init(Player player, InventoryContents contents) {
         player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1, 1);
-        contents.fill( ClickableItem.of(build(ConfigManager.unknownItem),
-                e -> AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown)));
-        contents.fillBorders(ClickableItem.empty(new ItemStack(Material.AIR)));
 
-        int slot = 0;
-        for (String entry : WIKI.keySet()) {
-            ItemStack itemStack = buildWikiItem(entry, player);
+        int slot = 11;
+        for (String category : CATEGORY) {
             int row = slot / 9;
             int col = slot % 9;
-            contents.set(row, col, ClickableItem.of(itemStack, e -> handleItemClick(e, player, entry)));
-            slot++;
+            contents.set(row, col, ClickableItem.of(buildWikiItem(category), e -> handleItemClick(e, player, category)));
+            slot += 2;
+            if (col >= 7) {
+                slot += 2;
+            }
         }
     }
 
-    private ItemStack buildWikiItem(String entry, Player player){
+    private ItemStack buildWikiItem(String entry){
             ItemStack stack = new ItemStack(Material.BOOK);
-            modifyLore(stack, player, entry);
+            modifyLore(stack, entry);
             return stack;
     }
 
-    private void modifyLore(ItemStack itemStack, Player player, String entry) {
+    private void modifyLore(ItemStack itemStack, String entry) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta == null) {
             itemMeta = Bukkit.getItemFactory().getItemMeta(itemStack.getType());
@@ -97,7 +97,7 @@ public class WikiGuiProvider implements InventoryProvider {
         if (clickedItem != null && clickedItem.getType() != Material.AIR) {
              if (event.isLeftClick() || event.isRightClick()) {
                 // Left-click handling logic for autocooking the recipe
-                wikiManager.openBook(player, entry);
+                wikiManager.openCategory(player, entry);
             }
         }
         event.setCancelled(true);

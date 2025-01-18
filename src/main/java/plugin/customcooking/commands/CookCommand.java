@@ -66,6 +66,8 @@ public class CookCommand implements CommandExecutor {
             handleCompetitionCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("give")){
             handleGiveItemCommand(sender, subargs);
+        } else if (subcommand.equalsIgnoreCase("clear")){
+            handleClearCommand(sender, subargs);
         }
         else {
             // Unknown subcommand
@@ -283,6 +285,26 @@ public class CookCommand implements CommandExecutor {
         InventoryUtil.giveItem(player, itemName, amount, true);
 
         AdventureUtil.sendMessage(sender, "Gave " + amount + " " + itemName + " to " + player.getName());
+    }
+
+    private void handleClearCommand(CommandSender sender, String[] args) {
+        if (args.length < 2) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking clear <player> <item> <amount>");
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+
+        String itemName = args[1];
+        int amount = (args[2] == null) ? 1 : Integer.parseInt(args[2]) ;
+
+        InventoryUtil.removeItem(player.getInventory(), itemName, amount);
+
+        AdventureUtil.sendMessage(sender, "Cleared " + amount + " of " + itemName + " from " + player.getName());
     }
 
 }

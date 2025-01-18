@@ -21,7 +21,6 @@ import plugin.customcooking.util.RecipeDataUtil;
 import java.io.File;
 import java.io.IOException;
 
-import static plugin.customcooking.manager.JadeManager.giveJade;
 import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 import static plugin.customcooking.util.ConfigUtil.getConfig;
 
@@ -76,7 +75,7 @@ public class DataManager extends Function {
 
     private static void giveReward(Player player, String recipeFormatted) {
         // Give the player a reward (e.g., points)
-        JadeManager.giveJade(player, ConfigManager.masteryJadeReward, "mastery");
+        JadeManager.give(player, ConfigManager.masteryJadeReward, "mastery");
 
         AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + player.getName() + "</green> has been given" + ConfigManager.masteryJadeReward + " ₪ for gaining " + recipeFormatted + " mastery");
         AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryReward.replace("{recipe}", recipeFormatted));

@@ -26,6 +26,11 @@ public class SQLite extends JadeDatabase {
             "PRIMARY KEY (`player`, `timestamp`)" +  // This is creating 4 columns: player, amount, source, timestamp. Primary key is a combination of player and timestamp.
             ");"; // we can search by player and timestamp to get the amount and source.
 
+    public String SQLiteCreateUsersTable = "CREATE TABLE IF NOT EXISTS jade_totals (" +
+            "    `player` varchar(32) NOT NULL PRIMARY KEY," +
+            "    `jade` int(11) NOT NULL" +
+            ");"; // we can search by player and timestamp to get the amount and source.
+
     // SQL creation stuff, You can leave the blow stuff untouched.
     public Connection getSQLConnection() {
         Connection result = null;
@@ -58,6 +63,7 @@ public class SQLite extends JadeDatabase {
         try {
             Statement s = connection.createStatement();
             s.executeUpdate(SQLiteCreateTokensTable);
+            s.executeUpdate(SQLiteCreateUsersTable);
             s.close();
         } catch (SQLException e) {
             e.printStackTrace();

@@ -1,5 +1,6 @@
 package plugin.customcooking.gui;
 
+import de.tr7zw.nbtapi.NBT;
 import dev.lone.itemsadder.api.CustomFurniture;
 import dev.lone.itemsadder.api.CustomStack;
 import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
@@ -8,12 +9,18 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.util.GUIUtil;
 import plugin.customcooking.wiki.WikiGuiProvider;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 import static dev.lone.itemsadder.api.ItemsAdder.getAllItems;
@@ -26,7 +33,7 @@ public class GuiManager extends Function {
     public static SmartInventory INGREDIENTS_MENU;
     public static SmartInventory PROGRESSION_MENU;
     public static SmartInventory WIKI_MENU;
-    public static List<ItemStack> collectionItems;
+    public static HashMap<String, ItemStack> collectionItems;
 
     @Override
     public void load() {
@@ -36,6 +43,7 @@ public class GuiManager extends Function {
         PROGRESSION_MENU = getProgressionTracker();
         WIKI_MENU = getWikiMenu();
         loadItems();
+       //writeProgressionItemsToNascraft(collectionItems, new File(CustomCooking.getInstance().getDataFolder(), "nascraft.yml"));
         AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (INGREDIENTS.size()) + " <gray>ingredients");
         AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (collectionItems.size()) + " <gray>progression items");
     }
@@ -45,17 +53,15 @@ public class GuiManager extends Function {
         if (INGREDIENTS != null) INGREDIENTS.clear();
     }
 
-    private static List<ItemStack> initCollectionItems() {
+    private static HashMap<String, ItemStack> initCollectionItems() {
         Set<String> list = CustomStack.getNamespacedIdsInRegistry();
-        System.out.println(list.size());
-        List<ItemStack> itemStacks = new ArrayList<>();
+        HashMap<String, ItemStack> itemStacks = new HashMap<>();
         for (String str : list) {
             if ((str.startsWith("customcrops:") || str.startsWith("customcooking:") || str.startsWith("customfishing:")) &&
-                    !(str.endsWith("_t1") || str.endsWith("_t2"))) {
-                itemStacks.add(build(str));
+                    !((str.contains("stage") || str.contains("unknown") || str.contains("particle")))) {
+                itemStacks.put(str, build(str));
             }
         }
-
         return itemStacks;
     }
 
@@ -118,4 +124,43 @@ public class GuiManager extends Function {
                 INGREDIENTS.put(key, ingredient);
             }
         }
+
+    public static void writeProgressionItemsToNascraft(HashMap<String, ItemStack> map, File outputFile) {
+        // Configure YAML options
+        DumperOptions options = new DumperOptions();
+        options.setPrettyFlow(true);
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+
+        Yaml yaml = new Yaml(options);
+
+        Map<String, ItemStack> sortedMap = new TreeMap<>((key1, key2) -> {
+            String[] parts1 = key1.split(":");
+            String[] parts2 = key2.split(":");
+            int namespaceComparison = parts1[0].compareTo(parts2[0]);
+            if (namespaceComparison != 0) {
+                return namespaceComparison;
+            }
+            return parts1[1].compareTo(parts2[1]);
+        });
+        sortedMap.putAll(map);
+
+        Map<String, Object> yamlData = new LinkedHashMap<>();
+
+        for (Map.Entry<String, ItemStack> entry : sortedMap.entrySet()) {
+            String key = entry.getKey().split(":")[1];
+            ItemStack itemStack = entry.getValue();
+            Double price = NBT.get(itemStack, nbt -> nbt.getDouble("Price"));
+            System.out.println("Price: " + price);
+
+            Map<String, Object> entryData = new HashMap<>();
+            entryData.put("initial-price", price);
+            yamlData.put(key, entryData);
+        }
+        try (FileWriter writer = new FileWriter(outputFile)) {
+            yaml.dump(yamlData, writer);
+            System.out.println("Written file: " + outputFile.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     }

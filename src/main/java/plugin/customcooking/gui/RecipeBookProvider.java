@@ -175,8 +175,8 @@ public class RecipeBookProvider implements InventoryProvider {
             }
             if (hasMastery) {
                 if (event.getClick() == ClickType.MIDDLE) {
-                    // Shift click handling for cooking 15 Recipes
-                    cookingManager.handleAutocooking(recipe, player, 15);
+                    // Shift click handling for cooking 16 Recipes
+                    cookingManager.handleAutocooking(recipe, player, 16);
                 } else if (event.isRightClick()) {
                     // Right click handling for cooking the recipe
                     cookingManager.handleCooking(recipe, player, clickedFurniture);

@@ -125,7 +125,7 @@ public class CollectionTrackerProvider implements InventoryProvider {
             if (hasMastery) {
                 if (event.getClick().equals(ClickType.SHIFT_LEFT) || event.getClick().equals(ClickType.SHIFT_RIGHT)) {
                     // Shift click handling for cooking 15 Recipes
-                    cookingManager.handleAutocooking(recipe, player, 15);
+                    cookingManager.handleAutocooking(recipe, player, 16);
                 } else if (event.isRightClick()) {
                     // Right click handling for cooking the recipe
                 } else if (event.isLeftClick()) {

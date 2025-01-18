@@ -13,6 +13,9 @@ import plugin.customcooking.util.AdventureUtil;
 import plugin.customcooking.util.InventoryUtil;
 import plugin.customcooking.wiki.WikiManager;
 
+import java.io.File;
+import java.io.IOException;
+
 
 public class WikiCommand implements CommandExecutor {
 
@@ -26,6 +29,7 @@ public class WikiCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
             GuiManager.getWikiMenu().open((Player) sender);
+            return true;
         }
 
         if (!sender.hasPermission("customcooking.admin")) {
@@ -38,9 +42,12 @@ public class WikiCommand implements CommandExecutor {
 
         if (subcommand.equalsIgnoreCase("open")) {
             handleOpenBookCommand(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("update")) {
-
-        } else if (subcommand.equalsIgnoreCase("getLeaderboardEntry")) {
+        } else if (subcommand.equalsIgnoreCase("updateWiki")) {
+            try {
+                wikiManager.downloadRepo("https://github.com/Snowy2174/BendingMC-Wiki.git", new File(CustomCooking.plugin.getDataFolder() + File.separator + "wiki"), true);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         else {
             return false;

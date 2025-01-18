@@ -37,13 +37,52 @@ public class JadeCommand implements CommandExecutor {
         System.arraycopy(args, 1, subargs, 0, subargs.length);
 
         if (subcommand.equalsIgnoreCase("give")) {
-            jadeManager.handleGiveJadeCommand(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("totalJadeForPlayer")) {
+            handleGiveJadeCommand(sender, subargs);
+        } else if (subcommand.equalsIgnoreCase("remove")) {
+            handleRemoveJadeCommand(sender, subargs);
+        }
+        else if (subcommand.equalsIgnoreCase("totalJadeForPlayer")) {
             handleTotalJadeForPlayerCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("totalJadeForSource")) {
             handleTotalJadeForSourceCommand(sender, subargs);
+        } else if (subcommand.equalsIgnoreCase("getMostRecent")) {
+            handleGetMostRecent(sender, subargs);
+        } else if (subcommand.equalsIgnoreCase("getPlayerData")) {
+            handleGetPlayerData(sender, subargs);
+        } else if (subcommand.equalsIgnoreCase("verifyAndFixTotals")) {
+            handleVerifyAndFixTotals(sender);
+        }
+        else {
+            return false;
         }
         return true;
+    }
+
+    private void handleRemoveJadeCommand(CommandSender sender, String[] args) {
+        if (args.length < 2) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade remove <player> <amount> <source>");
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        String source = "";
+        int amount = 0;
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+
+        if (args.length == 2 && args[1].matches("-?\\d+(\\.\\d+)?")) {
+            amount = Integer.parseInt(args[1]);
+        } else if (args.length == 3 && args[2].matches("-?\\d+(\\.\\d+)?")) {
+            amount = Integer.parseInt(args[1]);
+            source = args[2];
+        } else {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade remove <player> <amount> <source>");
+            return;
+        }
+        jadeManager.remove(player, amount, source);
+        AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Removed" + amount + " from " + source + " from " + player.getName());
     }
 
     private void handleTotalJadeForPlayerCommand(CommandSender sender, String[] args) {
@@ -58,7 +97,7 @@ public class JadeCommand implements CommandExecutor {
             return;
         }
 
-        int totalJade = jadeDatabase.getTotalJadeForPlayer(player);
+        int totalJade = jadeDatabase.getJadeForPlayer(player);
         AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + totalJade);
     }
 
@@ -71,6 +110,70 @@ public class JadeCommand implements CommandExecutor {
         String source = args[0];
         int totalJade = jadeDatabase.getTotalJadeFromSource(source);
         AdventureUtil.sendMessage(sender, "Total jade for source " + source + ": " + totalJade);
+    }
+
+    private void handleGetMostRecent(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade getMostRecent <player>");
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+
+        String source = args.length > 1 ? args[1] : "";
+        AdventureUtil.sendMessage(sender, "Most recent transaction for " + player.getName() + ": " + jadeDatabase.getRecentPositiveTransactionTimestamps(player, source));
+    }
+
+    private void handleGiveJadeCommand(CommandSender sender, String[] args) {
+        if (args.length < 2) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade give <player> <source> <amount>");
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        String source = "";
+        int amount = 0;
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+
+        if (args.length == 2 && args[1].matches("-?\\d+(\\.\\d+)?")) {
+            amount = Integer.parseInt(args[1]);
+        } else if (args.length == 3 && args[2].matches("-?\\d+(\\.\\d+)?")) {
+            source = args[1];
+            amount = Integer.parseInt(args[2]);
+        } else {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade give <player> <source> <amount>");
+            return;
+        }
+        jadeManager.giveJadeCommand(player, source, amount);
+        AdventureUtil.sendMessage(sender, "Gave " + amount + " from " + source + " to " + player.getName());
+    }
+
+    private void handleGetPlayerData(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade getPlayerData <player>");
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+
+        int totalJade = jadeDatabase.getJadeForPlayer(player);
+        AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + totalJade);
+    }
+
+    private void handleVerifyAndFixTotals(CommandSender sender) {
+        jadeDatabase.verifyAndFixTotals();
+        AdventureUtil.sendMessage(sender, "Jade totals verified and fixed");
     }
 
 }

@@ -2,7 +2,11 @@ package plugin.customcooking.wiki;
 
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.util.AdventureUtil;
@@ -13,13 +17,15 @@ import java.util.*;
 public class WikiManager extends Function {
 
     public static HashMap<String, Book> WIKI;
+    public static List<String> CATEGORY;
+    final String WIKI_URL = "https://github.com/Snowy2174/BendingMC-Wiki.git";
 
     @Override
     public void load() {
         WIKI = new HashMap<>();
-        loadWiki("https://github.com/Snowy2174/BendingMC-Wiki.git");
+        CATEGORY = new ArrayList<>();
+        loadWiki(WIKI_URL);
         AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (WIKI.size()) + " <gray>ingame wiki pages");
-        AdventureUtil.consoleMessage(String.valueOf(WIKI.keySet()));
     }
 
     @Override
@@ -34,7 +40,9 @@ public class WikiManager extends Function {
             return;
         }
         try {
-            downloadRepo(repoUrl, wiki_file);
+            if (wiki_file.listFiles() == null || wiki_file.listFiles().length == 0) {
+                downloadRepo(repoUrl, wiki_file, false);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -50,14 +58,23 @@ public class WikiManager extends Function {
             } else {
                 if (file.getName().endsWith(".md")) {
                     String id = path.replace("/",":").replace(".md:", "");
-                    Book wiki = Book.book(Component.text(id), Component.text("Author"), getBookContent(file));
+                    Book wiki = getBookContent(file);
                     WIKI.put(id, wiki);
+                    if (id.contains(":")) {
+                        String category = id.split(":")[0];
+                        if (!CATEGORY.contains(category)) {
+                            CATEGORY.add(category);
+                        }
+                    }
                 }
             }
         }
 
-        private static void downloadRepo(String repoUrl, File wiki_file) throws IOException {
+        public static void downloadRepo(String repoUrl, File wiki_file, Boolean force) throws IOException {
             try {
+                if (force && wiki_file.exists()) {
+                    wiki_file.delete();
+                }
                 ProcessBuilder processBuilder = new ProcessBuilder("git", "clone", repoUrl, wiki_file.getAbsolutePath());
                 processBuilder.inheritIO();
                 Process process = processBuilder.start();
@@ -72,7 +89,7 @@ public class WikiManager extends Function {
             }
         }
 
-        private static Collection<Component> getBookContent(File file) {
+        private static Book getBookContent(File file) {
             List<Component> bookContent = new ArrayList<>();
             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                 String line;
@@ -101,10 +118,11 @@ public class WikiManager extends Function {
                         appendBookContent(bookContent, mainTitle, currentSubsectionTitle, currentSubsectionContent);
                     }
                 }
+                return Book.book(Component.text(mainTitle), Component.text("Author"), bookContent);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return bookContent;
+            return Book.book(Component.text("Title"), Component.text("Author"), bookContent);
         }
 
         private static void appendBookContent(List<Component> bookContent, String mainTitle, String subsectionTitle, StringBuilder subsectionContent) {
@@ -114,7 +132,6 @@ public class WikiManager extends Function {
                 Component page = Component.text("= " + mainTitle).appendNewline().appendNewline()
                         .append(Component.text("= " + subsectionTitle)).appendNewline().appendNewline()
                         .append(AdventureUtil.getComponentFromMiniMessage(chunk));
-                System.out.println(chunk);
                 bookContent.add(page);
             }
             subsectionContent.setLength(0);
@@ -127,6 +144,19 @@ public class WikiManager extends Function {
                 return;
             }
             AdventureUtil.playerBook(player, book);
+        }
+
+        public static void openCategory(Player player, String category) {
+        List<Component> categoryContent = new ArrayList<>();
+        TextComponent.Builder page = Component.text().content("Category: " + category).appendNewline().appendNewline();
+        for (String id : WIKI.keySet()) {
+            if (id.startsWith(category + ":")) {
+                page.append(WIKI.get(id).title().clickEvent(ClickEvent.runCommand("/wiki open " + id))).hoverEvent(HoverEvent.showText(Component.text("Click to open the entry " + id))).appendNewline();
+            }
+        }
+        page.append(Component.text("Back").clickEvent(ClickEvent.runCommand("/wiki")));
+        categoryContent.add(page.build());
+        AdventureUtil.playerBook(player, Book.book(Component.text("Category: " + category), Component.text("Author"), categoryContent));
         }
 
 

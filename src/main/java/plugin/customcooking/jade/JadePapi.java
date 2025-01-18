@@ -29,12 +29,12 @@ public class JadePapi extends PlaceholderExpansion {
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
         if (player == null) {
-            return "";
+            return "No Player";
         }
 
         String[] parts = identifier.split("_");
-        if (parts.length < 2) {
-            return "";
+        if (parts.length < 1) {
+            return "Placeholder Too Short";
         }
 
         switch (parts[0].toLowerCase()) {

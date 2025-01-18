@@ -7,8 +7,8 @@ depend:
   - ProtocolLib
   - PlaceholderAPI
   - NBTAPI
-softdepend:
   - ItemsAdder
+softdepend:
   - HolographicDisplays
   - DecentHolograms
 
