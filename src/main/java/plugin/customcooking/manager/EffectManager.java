@@ -8,13 +8,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import plugin.customcooking.cooking.Recipe;
-import plugin.customcooking.cooking.action.*;
+import plugin.customcooking.functions.cooking.Recipe;
+import plugin.customcooking.functions.cooking.action.*;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.object.Function;
-import plugin.customcooking.util.AdventureUtil;
-import plugin.customcooking.util.ConfigUtil;
-import plugin.customcooking.util.GUIUtil;
+import plugin.customcooking.utility.AdventureUtil;
+import plugin.customcooking.utility.ConfigUtil;
+import plugin.customcooking.utility.GUIUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
-import static plugin.customcooking.util.AdventureUtil.getComponentFromMiniMessage;
+import static plugin.customcooking.utility.AdventureUtil.getComponentFromMiniMessage;
 
 public class EffectManager extends Function {
     public static Map<String, List<PotionEffect>> EFFECTS;

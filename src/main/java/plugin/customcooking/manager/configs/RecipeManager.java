@@ -3,21 +3,17 @@ package plugin.customcooking.manager.configs;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.potion.PotionEffect;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.cooking.Difficulty;
-import plugin.customcooking.cooking.DroppedItem;
-import plugin.customcooking.cooking.Layout;
-import plugin.customcooking.cooking.Recipe;
-import plugin.customcooking.cooking.action.PotionEffectImpl;
+import plugin.customcooking.functions.cooking.Difficulty;
+import plugin.customcooking.functions.cooking.DroppedItem;
+import plugin.customcooking.functions.cooking.Layout;
+import plugin.customcooking.functions.cooking.Recipe;
 import plugin.customcooking.manager.EffectManager;
 import plugin.customcooking.object.Function;
-import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.utility.AdventureUtil;
 
 import java.io.File;
 import java.util.*;
-
-import static plugin.customcooking.manager.EffectManager.EFFECTS;
 
 public class RecipeManager extends Function {
 

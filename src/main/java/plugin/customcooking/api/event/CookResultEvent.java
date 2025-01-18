@@ -7,9 +7,8 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.customcooking.cooking.Recipe;
 
-    public class CookResultEvent extends PlayerEvent implements Cancellable {
+public class CookResultEvent extends PlayerEvent implements Cancellable {
 
         private boolean cancelled;
         private boolean isPerfect;
@@ -50,18 +49,11 @@ import plugin.customcooking.cooking.Recipe;
             return isPerfect;
         }
 
-        /**
-         * Would be null if failed or caught a mob
-         * @return loot id
-         */
         @Nullable
         public ItemStack getItemStack() {
             return itemStack;
         }
 
-        /**
-         * Would be null if failed
-         */
         @Nullable
         public String getDishID() {
             return id;

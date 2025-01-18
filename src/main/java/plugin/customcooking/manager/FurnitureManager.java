@@ -13,19 +13,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.gui.GuiManager;
 import plugin.customcooking.listener.FurnitureListener;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
-import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.utility.AdventureUtil;
 
 import java.util.*;
 
 import static net.kyori.adventure.key.Key.key;
 import static plugin.customcooking.manager.configs.ConfigManager.splashTime;
-import static plugin.customcooking.util.AdventureUtil.playerSound;
-import static plugin.customcooking.util.InventoryUtil.build;
+import static plugin.customcooking.utility.AdventureUtil.playerSound;
+import static plugin.customcooking.utility.InventoryUtil.build;
 
 public class FurnitureManager extends Function {
 

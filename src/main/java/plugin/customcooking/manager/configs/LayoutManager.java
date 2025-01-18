@@ -1,10 +1,10 @@
 package plugin.customcooking.manager.configs;
 
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.customcooking.cooking.Layout;
+import plugin.customcooking.functions.cooking.Layout;
 import plugin.customcooking.object.Function;
-import plugin.customcooking.util.AdventureUtil;
-import plugin.customcooking.util.ConfigUtil;
+import plugin.customcooking.utility.AdventureUtil;
+import plugin.customcooking.utility.ConfigUtil;
 
 import java.util.HashMap;
 import java.util.Objects;

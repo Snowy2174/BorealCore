@@ -3,7 +3,7 @@ package plugin.customcooking.manager.configs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.util.ConfigUtil;
+import plugin.customcooking.utility.ConfigUtil;
 
 import java.io.File;
 import java.io.IOException;

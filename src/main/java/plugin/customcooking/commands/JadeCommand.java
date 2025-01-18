@@ -6,10 +6,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.jade.JadeDatabase;
+import plugin.customcooking.functions.jade.JadeDatabase;
 import plugin.customcooking.manager.JadeManager;
 import plugin.customcooking.manager.configs.MessageManager;
-import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.utility.AdventureUtil;
 
 
 public class JadeCommand implements CommandExecutor {

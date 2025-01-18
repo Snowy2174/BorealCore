@@ -2,16 +2,16 @@ package plugin.customcooking.manager;
 
 import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.customcooking.cooking.action.Action;
-import plugin.customcooking.cooking.action.CommandActionImpl;
-import plugin.customcooking.cooking.action.MessageActionImpl;
-import plugin.customcooking.cooking.competition.CompetitionConfig;
-import plugin.customcooking.cooking.competition.CompetitionGoal;
-import plugin.customcooking.cooking.competition.CompetitionSchedule;
-import plugin.customcooking.cooking.competition.bossbar.BossBarConfig;
+import plugin.customcooking.functions.cooking.action.Action;
+import plugin.customcooking.functions.cooking.action.CommandActionImpl;
+import plugin.customcooking.functions.cooking.action.MessageActionImpl;
+import plugin.customcooking.functions.cooking.competition.CompetitionConfig;
+import plugin.customcooking.functions.cooking.competition.CompetitionGoal;
+import plugin.customcooking.functions.cooking.competition.CompetitionSchedule;
+import plugin.customcooking.functions.cooking.competition.bossbar.BossBarConfig;
 import plugin.customcooking.object.Function;
-import plugin.customcooking.util.AdventureUtil;
-import plugin.customcooking.util.ConfigUtil;
+import plugin.customcooking.utility.AdventureUtil;
+import plugin.customcooking.utility.ConfigUtil;
 
 import java.util.*;
 

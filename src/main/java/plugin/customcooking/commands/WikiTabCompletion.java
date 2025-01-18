@@ -5,12 +5,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import plugin.customcooking.wiki.WikiManager;
+import plugin.customcooking.functions.wiki.WikiManager;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 
 public class WikiTabCompletion implements TabCompleter {
     @Override

@@ -6,18 +6,18 @@ import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.customcooking.commands.*;
-import plugin.customcooking.gui.GuiManager;
-import plugin.customcooking.jade.JadeDatabase;
-import plugin.customcooking.karmicnode.NodeManager;
+import plugin.customcooking.manager.GuiManager;
+import plugin.customcooking.functions.jade.JadeDatabase;
+import plugin.customcooking.functions.karmicnode.NodeManager;
 import plugin.customcooking.manager.JadeManager;
-import plugin.customcooking.jade.SQLite;
+import plugin.customcooking.functions.jade.SQLite;
 import plugin.customcooking.manager.*;
 import plugin.customcooking.manager.configs.LayoutManager;
 import plugin.customcooking.manager.DataManager;
 import plugin.customcooking.manager.configs.RecipeManager;
-import plugin.customcooking.util.AdventureUtil;
-import plugin.customcooking.util.ConfigUtil;
-import plugin.customcooking.wiki.WikiManager;
+import plugin.customcooking.utility.AdventureUtil;
+import plugin.customcooking.utility.ConfigUtil;
+import plugin.customcooking.functions.wiki.WikiManager;
 
 public class CustomCooking extends JavaPlugin {
 

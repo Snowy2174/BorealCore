@@ -14,15 +14,15 @@ import plugin.customcooking.CustomCooking;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
-import plugin.customcooking.util.AdventureUtil;
-import plugin.customcooking.util.ConfigUtil;
-import plugin.customcooking.util.RecipeDataUtil;
+import plugin.customcooking.utility.AdventureUtil;
+import plugin.customcooking.utility.ConfigUtil;
+import plugin.customcooking.utility.RecipeDataUtil;
 
 import java.io.File;
 import java.io.IOException;
 
 import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
-import static plugin.customcooking.util.ConfigUtil.getConfig;
+import static plugin.customcooking.utility.ConfigUtil.getConfig;
 
 public class DataManager extends Function {
 

@@ -6,12 +6,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.gui.GuiManager;
-import plugin.customcooking.karmicnode.NodeManager;
+import plugin.customcooking.manager.GuiManager;
 import plugin.customcooking.manager.configs.MessageManager;
-import plugin.customcooking.util.AdventureUtil;
-import plugin.customcooking.util.InventoryUtil;
-import plugin.customcooking.wiki.WikiManager;
+import plugin.customcooking.utility.AdventureUtil;
+import plugin.customcooking.functions.wiki.WikiManager;
 
 import java.io.File;
 import java.io.IOException;

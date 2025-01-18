@@ -18,28 +18,28 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.api.event.CookResultEvent;
-import plugin.customcooking.cooking.*;
-import plugin.customcooking.cooking.action.Action;
-import plugin.customcooking.cooking.competition.Competition;
-import plugin.customcooking.gui.Ingredient;
+import plugin.customcooking.functions.cooking.*;
+import plugin.customcooking.functions.cooking.action.Action;
+import plugin.customcooking.functions.cooking.competition.Competition;
+import plugin.customcooking.functions.cooking.Ingredient;
 import plugin.customcooking.listener.ConsumeItemListener;
 import plugin.customcooking.listener.InteractListener;
 import plugin.customcooking.manager.configs.*;
 import plugin.customcooking.object.Function;
-import plugin.customcooking.util.AdventureUtil;
-import plugin.customcooking.util.GUIUtil;
+import plugin.customcooking.utility.AdventureUtil;
+import plugin.customcooking.utility.GUIUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.kyori.adventure.key.Key.key;
-import static plugin.customcooking.gui.GuiManager.INGREDIENTS;
+import static plugin.customcooking.manager.GuiManager.INGREDIENTS;
 import static plugin.customcooking.manager.FurnitureManager.playCookingResultSFX;
 import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 import static plugin.customcooking.manager.configs.ConfigManager.perfectChance;
-import static plugin.customcooking.util.RecipeDataUtil.hasMastery;
-import static plugin.customcooking.util.AdventureUtil.playerSound;
-import static plugin.customcooking.util.InventoryUtil.*;
+import static plugin.customcooking.utility.RecipeDataUtil.hasMastery;
+import static plugin.customcooking.utility.AdventureUtil.playerSound;
+import static plugin.customcooking.utility.InventoryUtil.*;
 
 public class CookingManager extends Function {
     private final Random random;

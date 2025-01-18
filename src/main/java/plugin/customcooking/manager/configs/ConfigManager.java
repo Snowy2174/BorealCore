@@ -1,10 +1,7 @@
 package plugin.customcooking.manager.configs;
 
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.intellij.lang.annotations.Subst;
-import plugin.customcooking.util.ConfigUtil;
-import plugin.customcooking.util.GUIUtil;
+import plugin.customcooking.utility.ConfigUtil;
 
 import java.util.List;
 

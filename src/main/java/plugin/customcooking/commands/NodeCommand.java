@@ -3,9 +3,8 @@ package plugin.customcooking.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.karmicnode.NodeManager;
+import plugin.customcooking.functions.karmicnode.NodeManager;
 
 
 public class NodeCommand implements CommandExecutor {

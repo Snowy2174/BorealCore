@@ -6,15 +6,15 @@ import plugin.customcooking.CustomCooking;
 import java.time.LocalDateTime;
 
 import org.bukkit.entity.Player;
-import plugin.customcooking.jade.JadeDatabase;
+import plugin.customcooking.functions.jade.JadeDatabase;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
-import plugin.customcooking.util.AdventureUtil;
+import plugin.customcooking.utility.AdventureUtil;
 
 import static org.bukkit.Bukkit.getServer;
 import static plugin.customcooking.manager.configs.ConfigManager.*;
 import static plugin.customcooking.manager.configs.ConfigManager.spiritLimit;
-import static plugin.customcooking.util.GUIUtil.formatString;
+import static plugin.customcooking.utility.GUIUtil.formatString;
 
 public class JadeManager extends Function {
 

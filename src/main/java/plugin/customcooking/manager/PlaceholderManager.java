@@ -4,10 +4,10 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import plugin.customcooking.cooking.CookingPapi;
-import plugin.customcooking.cooking.competition.placeholder.CompetitionPapi;
-import plugin.customcooking.jade.JadePapi;
-import plugin.customcooking.karmicnode.NodePapi;
+import plugin.customcooking.functions.cooking.CookingPapi;
+import plugin.customcooking.functions.cooking.competition.placeholder.CompetitionPapi;
+import plugin.customcooking.functions.jade.JadePapi;
+import plugin.customcooking.functions.karmicnode.NodePapi;
 import plugin.customcooking.object.Function;
 
 import java.util.ArrayList;
