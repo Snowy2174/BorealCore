@@ -1,4 +1,4 @@
-package plugin.customcooking.functions.cooking;
+package plugin.customcooking.functions.cooking.object;
 
 public class Layout {
 

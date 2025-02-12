@@ -1,4 +1,4 @@
-package plugin.customcooking.functions.cooking;
+package plugin.customcooking.functions.cooking.object;
 
 
 import java.util.List;
@@ -21,6 +21,7 @@ public class Ingredient {
     public String getKey() {
         return key;
     }
+
     public String getNick() {
         return nick;
     }
@@ -28,6 +29,7 @@ public class Ingredient {
     public Integer getSlot() {
         return slot;
     }
+
     public List<String> getIngredients() {
         return ingredients;
     }

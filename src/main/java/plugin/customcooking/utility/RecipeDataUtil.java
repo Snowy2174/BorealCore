@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
+import plugin.customcooking.manager.configs.RecipeManager;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 import static plugin.customcooking.utility.ConfigUtil.getConfig;
 
 public class RecipeDataUtil {
@@ -29,7 +29,7 @@ public class RecipeDataUtil {
     }
 
     public static int getDefaultRequiredMastery(String recipe) {
-        Integer mastery = RECIPES.get(recipe).getMasteryreq();
+        Integer mastery = RecipeManager.RECIPES.get(recipe).getMasteryreq();
         if (mastery == null) {
             return 10;
         }
@@ -54,7 +54,7 @@ public class RecipeDataUtil {
 
         if (lockedRecipes.isEmpty()) {
             // Player has unlocked all recipes
-            AdventureUtil.playerMessage(player,MessageManager.infoPositive + "You have already unlocked all recipes!");
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + "You have already unlocked all recipes!");
             return;
         }
 
@@ -80,6 +80,7 @@ public class RecipeDataUtil {
 
         unlockRecipes(player, recipesToUnlock);
     }
+
     public static List<String> getMasteredRecipes(Player player, List<String> unlockedRecipes) {
         List<String> masteredRecipes = new ArrayList<>();
         for (String recipe : unlockedRecipes) {
@@ -108,7 +109,7 @@ public class RecipeDataUtil {
     }
 
     public static List<String> getLockedRecipes(List<String> unlockedRecipes) {
-        return RECIPES.keySet().stream()
+        return RecipeManager.RECIPES.keySet().stream()
                 .filter(recipe -> !unlockedRecipes.contains(recipe))
                 .collect(Collectors.toList());
     }
@@ -126,7 +127,7 @@ public class RecipeDataUtil {
                 return; // Recipe already unlocked
             }
             setRecipeData(player, recipe, 0);
-            String recipeFormatted = RECIPES.get(recipe).getNick();
+            String recipeFormatted = RecipeManager.RECIPES.get(recipe).getNick();
             ItemsAdder.playTotemAnimation(player, recipe + ConfigManager.particleItemSuffix);
             AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.recipeUnlocked.replace("{recipe}", recipeFormatted));
         } else {
@@ -134,7 +135,7 @@ public class RecipeDataUtil {
                 return; // Recipe already locked
             }
             setRecipeData(player, recipe, null);
-            String recipeFormatted = RECIPES.get(recipe).getNick();
+            String recipeFormatted = RecipeManager.RECIPES.get(recipe).getNick();
             ItemsAdder.playTotemAnimation(player, recipe + ConfigManager.particleItemSuffix);
             AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeLocked.replace("{recipe}", recipeFormatted));
         }
@@ -160,11 +161,11 @@ public class RecipeDataUtil {
             config.set(playerRecipePath, requiredMastery);
             ItemsAdder.playTotemAnimation(player, recipe + ConfigManager.particleItemSuffix);
             AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
-            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", RECIPES.get(recipe).getNick()));
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", RecipeManager.RECIPES.get(recipe).getNick()));
         }
     }
 
-    public static boolean playerDataExists(Player player){
+    public static boolean playerDataExists(Player player) {
         YamlConfiguration config = getConfig("playerdata.yml");
         String playerName = player.getName();
         String playerDataPath = "players." + playerName;

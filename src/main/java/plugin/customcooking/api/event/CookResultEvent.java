@@ -10,52 +10,51 @@ import org.jetbrains.annotations.Nullable;
 
 public class CookResultEvent extends PlayerEvent implements Cancellable {
 
-        private boolean cancelled;
-        private boolean isPerfect;
+    private static final HandlerList handlerList = new HandlerList();
+    private final ItemStack itemStack;
+    private final String id;
+    private boolean cancelled;
+    private final boolean isPerfect;
 
-        private final ItemStack itemStack;
-        private final String id;
-        private static final HandlerList handlerList = new HandlerList();
-
-        public CookResultEvent(@NotNull Player who, boolean isPerfect, @Nullable ItemStack itemStack, @Nullable String id) {
-            super(who);
-            this.cancelled = false;
-            this.isPerfect = isPerfect;
-            this.itemStack = itemStack;
-            this.id = id;
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return cancelled;
-        }
-
-        @Override
-        public void setCancelled(boolean cancel) {
-            cancelled = cancel;
-        }
-
-        public static HandlerList getHandlerList() {
-            return handlerList;
-        }
-
-        @NotNull
-        @Override
-        public HandlerList getHandlers() {
-            return getHandlerList();
-        }
-
-        public boolean isPerfect() {
-            return isPerfect;
-        }
-
-        @Nullable
-        public ItemStack getItemStack() {
-            return itemStack;
-        }
-
-        @Nullable
-        public String getDishID() {
-            return id;
-        }
+    public CookResultEvent(@NotNull Player who, boolean isPerfect, @Nullable ItemStack itemStack, @Nullable String id) {
+        super(who);
+        this.cancelled = false;
+        this.isPerfect = isPerfect;
+        this.itemStack = itemStack;
+        this.id = id;
     }
+
+    public static HandlerList getHandlerList() {
+        return handlerList;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancel) {
+        cancelled = cancel;
+    }
+
+    @NotNull
+    @Override
+    public HandlerList getHandlers() {
+        return getHandlerList();
+    }
+
+    public boolean isPerfect() {
+        return isPerfect;
+    }
+
+    @Nullable
+    public ItemStack getItemStack() {
+        return itemStack;
+    }
+
+    @Nullable
+    public String getDishID() {
+        return id;
+    }
+}

@@ -1,4 +1,4 @@
-package plugin.customcooking.functions.cooking.gui;
+package plugin.customcooking.functions.cooking;
 
 import dev.lone.itemsadder.api.CustomStack;
 import fr.minuskube.inv.ClickableItem;
@@ -13,7 +13,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
@@ -22,14 +21,13 @@ import plugin.customcooking.utility.GUIUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.lone.itemsadder.api.FontImages.TexturedInventoryWrapper.setPlayerInventoryTexture;
 import static plugin.customcooking.manager.GuiManager.INGREDIENTS;
 import static plugin.customcooking.utility.InventoryUtil.build;
 
 public class IngredientBookProvider implements InventoryProvider {
     private final CookingManager cookingManager;
 
-    IngredientBookProvider() {
+    public IngredientBookProvider() {
         this.cookingManager = CustomCooking.getCookingManager();
     }
 

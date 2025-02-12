@@ -1,4 +1,4 @@
-package plugin.customcooking.functions.cooking.gui;
+package plugin.customcooking.functions.cooking;
 
 import dev.lone.itemsadder.api.CustomFurniture;
 import dev.lone.itemsadder.api.CustomStack;
@@ -15,10 +15,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.manager.EffectManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
+import plugin.customcooking.manager.configs.RecipeManager;
 import plugin.customcooking.utility.AdventureUtil;
 import plugin.customcooking.utility.GUIUtil;
 import plugin.customcooking.utility.RecipeDataUtil;
@@ -26,17 +26,17 @@ import plugin.customcooking.utility.RecipeDataUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 import static plugin.customcooking.utility.InventoryUtil.build;
 
 public class RecipeBookProvider implements InventoryProvider {
-    private final CookingManager cookingManager;
     private static CustomFurniture clickedFurniture;
     private static ItemStack unknownRecipeStack;
-    RecipeBookProvider(CustomFurniture clickedFurniture) {
+    private final CookingManager cookingManager;
+
+    public RecipeBookProvider(CustomFurniture clickedFurniture) {
         this.cookingManager = CustomCooking.getCookingManager();
-        this.clickedFurniture = clickedFurniture;
-        this.unknownRecipeStack = build(ConfigManager.unknownItem);
+        RecipeBookProvider.clickedFurniture = clickedFurniture;
+        unknownRecipeStack = build(ConfigManager.unknownItem);
     }
 
     @Override
@@ -47,14 +47,14 @@ public class RecipeBookProvider implements InventoryProvider {
     @Override
     public void init(Player player, InventoryContents contents) {
         player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1, 1);
-        contents.fill( ClickableItem.of(unknownRecipeStack,
+        contents.fill(ClickableItem.of(unknownRecipeStack,
                 e -> AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown)));
         contents.fillBorders(ClickableItem.empty(new ItemStack(Material.AIR)));
         contents.set(5, 4, ClickableItem.of(buildIngredientsItem(), e -> handleIngredientsMenuClick(e, player)));
 
         List<String> unlockedRecipes = RecipeDataUtil.getUnlockedRecipes(player);
 
-        for (String recipe : RECIPES.keySet()) {
+        for (String recipe : RecipeManager.RECIPES.keySet()) {
             boolean hasMastery = RecipeDataUtil.hasMastery(player, recipe);
             boolean hasRecipe = unlockedRecipes.contains(recipe);
             ItemStack itemStack;
@@ -65,7 +65,7 @@ public class RecipeBookProvider implements InventoryProvider {
                 itemStack = buildUnknownRecipeItem(recipe);
             }
 
-            int slot = RECIPES.get(recipe).getSlot(); // Retrieve the slot from the configuration
+            int slot = RecipeManager.RECIPES.get(recipe).getSlot(); // Retrieve the slot from the configuration
             if (slot != -1) {
                 int row = (slot - 1) / 9; // Calculate the row based on the slot
                 int column = (slot - 1) % 9;  // Calculate the column based on the slot
@@ -75,9 +75,11 @@ public class RecipeBookProvider implements InventoryProvider {
         }
     }
 
-    private ItemStack buildRecipeItem(String recipe, Player player, boolean hasMastery){
+    private ItemStack buildRecipeItem(String recipe, Player player, boolean hasMastery) {
         CustomStack customStack = CustomStack.getInstance(recipe);
-        if (hasMastery) {customStack = CustomStack.getInstance(recipe + ConfigManager.perfectItemSuffix);}
+        if (hasMastery) {
+            customStack = CustomStack.getInstance(recipe + ConfigManager.perfectItemSuffix);
+        }
         if (customStack == null) {
             return unknownRecipeStack;
         } else {
@@ -88,7 +90,7 @@ public class RecipeBookProvider implements InventoryProvider {
         }
     }
 
-    private ItemStack buildUnknownRecipeItem(String recipe){
+    private ItemStack buildUnknownRecipeItem(String recipe) {
         CustomStack customStack = CustomStack.getInstance(recipe + ConfigManager.unknownItemSuffix);
         if (customStack == null) {
             return unknownRecipeStack;
@@ -105,9 +107,10 @@ public class RecipeBookProvider implements InventoryProvider {
         }
     }
 
-    private ItemStack buildIngredientsItem(){
+    private ItemStack buildIngredientsItem() {
         return new ItemStack(CustomStack.getInstance(ConfigManager.grinderItem).getItemStack());
     }
+
     private void handleIngredientsMenuClick(InventoryClickEvent event, Player player) {
         ItemStack clickedItem = event.getCurrentItem();
         if (clickedItem != null && clickedItem.getType() != Material.AIR) {
@@ -132,8 +135,8 @@ public class RecipeBookProvider implements InventoryProvider {
 
         GUIUtil.appendMastery(lore, player, recipe, hasMastery);
 
-        if (RECIPES.get(recipe).getIngredients() != null) {
-            GUIUtil.appendIngredients(lore, player, RECIPES.get(recipe).getIngredients());
+        if (RecipeManager.RECIPES.get(recipe).getIngredients() != null) {
+            GUIUtil.appendIngredients(lore, player, RecipeManager.RECIPES.get(recipe).getIngredients());
         }
 
 

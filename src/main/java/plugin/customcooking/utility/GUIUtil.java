@@ -14,11 +14,11 @@ public class GUIUtil {
         String[] masteryInfo;
 
         lore.add(" ");
-        lore.add(ConfigManager.masteryLine.replace("{mastery}",  (masteryCount + "/" + requiredMastery)));
+        lore.add(ConfigManager.masteryLine.replace("{mastery}", (masteryCount + "/" + requiredMastery)));
         if (Boolean.TRUE.equals(hasMastery)) {
             masteryInfo = ConfigManager.masteryInfoTrue.split("/");
         } else {
-            lore.add(ConfigManager.masteryBar.replace("{bar}", GUIUtil.appendProgressBar((double) masteryCount/requiredMastery)));
+            lore.add(ConfigManager.masteryBar.replace("{bar}", GUIUtil.appendProgressBar((double) masteryCount / requiredMastery)));
             masteryInfo = ConfigManager.masteryInfoFalse.split("/");
         }
         lore.add(masteryInfo[0]);

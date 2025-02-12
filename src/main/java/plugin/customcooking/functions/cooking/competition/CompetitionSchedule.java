@@ -3,7 +3,7 @@ package plugin.customcooking.functions.cooking.competition;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.manager.CompetitionManager;
+import plugin.customcooking.functions.cooking.CompetitionManager;
 import plugin.customcooking.object.Function;
 
 import java.time.LocalTime;

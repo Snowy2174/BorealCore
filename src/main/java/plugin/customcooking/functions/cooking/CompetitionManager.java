@@ -1,4 +1,4 @@
-package plugin.customcooking.manager;
+package plugin.customcooking.functions.cooking;
 
 import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.file.YamlConfiguration;

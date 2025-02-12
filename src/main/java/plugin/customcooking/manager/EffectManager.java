@@ -8,9 +8,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import plugin.customcooking.functions.cooking.Recipe;
 import plugin.customcooking.functions.cooking.action.*;
+import plugin.customcooking.functions.cooking.object.Recipe;
 import plugin.customcooking.manager.configs.ConfigManager;
+import plugin.customcooking.manager.configs.RecipeManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.AdventureUtil;
 import plugin.customcooking.utility.ConfigUtil;
@@ -21,60 +22,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 import static plugin.customcooking.utility.AdventureUtil.getComponentFromMiniMessage;
 
 public class EffectManager extends Function {
     public static Map<String, List<PotionEffect>> EFFECTS;
-    @Override
-    public void load() {
-        EFFECTS = new HashMap<>();
-        loadEffects();
-        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + EFFECTS.size() + " <gray>buff categories");
-    }
-
-    @Override
-    public void unload() {
-        if (EFFECTS != null) EFFECTS.clear();
-    }
-
-    private void loadEffects() {
-        YamlConfiguration config = ConfigUtil.getConfig("buffs.yml");
-        for (String sectionName : config.getKeys(false)) {
-            ConfigurationSection section = config.getConfigurationSection(sectionName);
-            List<PotionEffect> effectsList = new ArrayList<>();
-            List<PotionEffect> perfectEffectsList = new ArrayList<>();
-
-            // Iterate over the keys in each section
-            for (String levelKey : section.getKeys(false)) {
-                ConfigurationSection levelSection = section.getConfigurationSection(levelKey);
-
-                String typeString = levelSection.getString("type");
-                PotionEffectType type = PotionEffectType.getByName(typeString.toUpperCase());
-                if (type == null) {
-                    // Handle invalid potion effect type
-                    AdventureUtil.consoleMessage("<red>[CustomCooking] Potion effect " + typeString + " doesn't exist!");
-                    continue;
-                }
-
-                int duration = levelSection.getInt("duration") * 1200;
-                int amplifier = levelSection.getInt("amplifier");
-
-                effectsList.add(new PotionEffect(type, duration, amplifier));
-                perfectEffectsList.add(new PotionEffect(type, duration/2 * 3, amplifier + 1));
-            }
-            EFFECTS.put(sectionName, effectsList);
-            EFFECTS.put(sectionName + ConfigManager.perfectItemSuffix, perfectEffectsList);
-        }
-    }
 
     public static Action[] getActions(ConfigurationSection section, String nick) {
         if (section != null) {
             List<Action> actions = new ArrayList<>();
             for (String action : section.getKeys(false)) {
                 switch (action) {
-                    case "message" -> actions.add(new MessageActionImpl(section.getStringList(action).toArray(new String[0]), nick));
-                    case "command" -> actions.add(new CommandActionImpl(section.getStringList(action).toArray(new String[0]), nick));
+                    case "message" ->
+                            actions.add(new MessageActionImpl(section.getStringList(action).toArray(new String[0]), nick));
+                    case "command" ->
+                            actions.add(new CommandActionImpl(section.getStringList(action).toArray(new String[0]), nick));
                     case "exp" -> actions.add(new VanillaXPImpl(section.getInt(action), false));
                     case "mending" -> actions.add(new VanillaXPImpl(section.getInt(action), true));
                     case "sound" -> actions.add(new SoundActionImpl(
@@ -147,15 +108,15 @@ public class EffectManager extends Function {
         for (PotionEffect potionEffect : EFFECTS.get(effectsList)) {
             standard.add(getComponentFromMiniMessage(ConfigManager.effectLore
                     .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
-                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier()+1))
-                    .replace("{duration}", getDuration(potionEffect.getDuration()/20))));
+                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier() + 1))
+                    .replace("{duration}", getDuration(potionEffect.getDuration() / 20))));
         }
         List<Component> perfect = new ArrayList<>();
-        for (PotionEffect potionEffect : EFFECTS.get(effectsList+ ConfigManager.perfectItemSuffix)) {
+        for (PotionEffect potionEffect : EFFECTS.get(effectsList + ConfigManager.perfectItemSuffix)) {
             perfect.add(getComponentFromMiniMessage(ConfigManager.effectLore
                     .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
-                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier()+1))
-                    .replace("{duration}", getDuration(potionEffect.getDuration()/20))));
+                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier() + 1))
+                    .replace("{duration}", getDuration(potionEffect.getDuration() / 20))));
         }
         List<List<Component>> lore = new ArrayList<>();
         lore.add(perfect);
@@ -182,7 +143,6 @@ public class EffectManager extends Function {
         return durationString.toString();
     }
 
-
     private static String amplifierToRoman(int amplifier) {
         int[] values = {10, 9, 5, 4, 1};
         String[] romanLetters = {"X", "IX", "V", "IV", "I"};
@@ -197,9 +157,8 @@ public class EffectManager extends Function {
         return roman.toString();
     }
 
-
     public static void addPotionEffectLore(ItemStack itemStack, String key, Boolean perfect) {
-        Recipe recipe = RECIPES.get(key.replaceAll("[\\[\\]]", "").replace(ConfigManager.perfectItemSuffix, ""));
+        Recipe recipe = RecipeManager.RECIPES.get(key.replaceAll("[\\[\\]]", "").replace(ConfigManager.perfectItemSuffix, ""));
 
         if (recipe != null && recipe.getDishEffectsLore() != null) {
             ItemMeta itemMeta = itemStack.getItemMeta();
@@ -223,6 +182,48 @@ public class EffectManager extends Function {
         } else {
             // Log or handle the case where the recipe is null or has no effects
             Bukkit.getLogger().warning("No valid recipe found for key: " + key);
+        }
+    }
+
+    @Override
+    public void load() {
+        EFFECTS = new HashMap<>();
+        loadEffects();
+        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + EFFECTS.size() + " <gray>buff categories");
+    }
+
+    @Override
+    public void unload() {
+        if (EFFECTS != null) EFFECTS.clear();
+    }
+
+    private void loadEffects() {
+        YamlConfiguration config = ConfigUtil.getConfig("buffs.yml");
+        for (String sectionName : config.getKeys(false)) {
+            ConfigurationSection section = config.getConfigurationSection(sectionName);
+            List<PotionEffect> effectsList = new ArrayList<>();
+            List<PotionEffect> perfectEffectsList = new ArrayList<>();
+
+            // Iterate over the keys in each section
+            for (String levelKey : section.getKeys(false)) {
+                ConfigurationSection levelSection = section.getConfigurationSection(levelKey);
+
+                String typeString = levelSection.getString("type");
+                PotionEffectType type = PotionEffectType.getByName(typeString.toUpperCase());
+                if (type == null) {
+                    // Handle invalid potion effect type
+                    AdventureUtil.consoleMessage("<red>[CustomCooking] Potion effect " + typeString + " doesn't exist!");
+                    continue;
+                }
+
+                int duration = levelSection.getInt("duration") * 1200;
+                int amplifier = levelSection.getInt("amplifier");
+
+                effectsList.add(new PotionEffect(type, duration, amplifier));
+                perfectEffectsList.add(new PotionEffect(type, duration / 2 * 3, amplifier + 1));
+            }
+            EFFECTS.put(sectionName, effectsList);
+            EFFECTS.put(sectionName + ConfigManager.perfectItemSuffix, perfectEffectsList);
         }
     }
 }

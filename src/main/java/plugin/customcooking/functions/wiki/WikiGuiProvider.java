@@ -18,8 +18,6 @@ import plugin.customcooking.utility.AdventureUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.customcooking.functions.wiki.WikiManager.CATEGORY;
-
 public class WikiGuiProvider implements InventoryProvider {
     private final WikiManager wikiManager;
 
@@ -38,7 +36,7 @@ public class WikiGuiProvider implements InventoryProvider {
         player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1, 1);
 
         int slot = 11;
-        for (String category : CATEGORY) {
+        for (String category : WikiManager.CATEGORY) {
             int row = slot / 9;
             int col = slot % 9;
             contents.set(row, col, ClickableItem.of(buildWikiItem(category), e -> handleItemClick(e, player, category)));
@@ -49,10 +47,10 @@ public class WikiGuiProvider implements InventoryProvider {
         }
     }
 
-    private ItemStack buildWikiItem(String entry){
-            ItemStack stack = new ItemStack(Material.BOOK);
-            modifyLore(stack, entry);
-            return stack;
+    private ItemStack buildWikiItem(String entry) {
+        ItemStack stack = new ItemStack(Material.BOOK);
+        modifyLore(stack, entry);
+        return stack;
     }
 
     private void modifyLore(ItemStack itemStack, String entry) {
@@ -89,9 +87,9 @@ public class WikiGuiProvider implements InventoryProvider {
         ItemStack clickedItem = event.getCurrentItem();
 
         if (clickedItem != null && clickedItem.getType() != Material.AIR) {
-             if (event.isLeftClick() || event.isRightClick()) {
+            if (event.isLeftClick() || event.isRightClick()) {
                 // Left-click handling logic for autocooking the recipe
-                wikiManager.openCategory(player, entry);
+                WikiManager.openCategory(player, entry);
             }
         }
         event.setCancelled(true);

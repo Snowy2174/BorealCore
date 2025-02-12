@@ -30,13 +30,12 @@ public class NodeCommand implements CommandExecutor {
         System.arraycopy(args, 1, subargs, 0, subargs.length);
 
         if (subcommand.equalsIgnoreCase("updateMaxWave")) {
-            nodeManager.handleUpdateMaxWave(subargs[0], Integer.parseInt(subargs[1]));
+            NodeManager.handleUpdateMaxWave(subargs[0], Integer.parseInt(subargs[1]));
         } else if (subcommand.equalsIgnoreCase("getMaxWave")) {
-            sender.sendMessage(String.valueOf(nodeManager.getMaxWave(subargs[0])));
+            sender.sendMessage(String.valueOf(NodeManager.getMaxWave(subargs[0])));
         } else if (subcommand.equalsIgnoreCase("getLeaderboardEntry")) {
-            nodeManager.getLeaderboardEntry(Integer.parseInt(subargs[0]));
-        }
-        else {
+            NodeManager.getLeaderboardEntry(Integer.parseInt(subargs[0]));
+        } else {
             return false;
 
         }

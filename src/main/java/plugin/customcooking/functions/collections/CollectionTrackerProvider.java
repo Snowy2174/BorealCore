@@ -16,7 +16,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.manager.CookingManager;
+import plugin.customcooking.functions.cooking.CookingManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
@@ -25,13 +25,13 @@ import plugin.customcooking.utility.GUIUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.lone.itemsadder.api.ItemsAdder.getAllItems;
-import static plugin.customcooking.manager.GuiManager.*;
+import static plugin.customcooking.manager.GuiManager.PROGRESSION_MENU;
+import static plugin.customcooking.manager.GuiManager.collectionItems;
 import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 
 public class CollectionTrackerProvider implements InventoryProvider {
     private final CookingManager cookingManager;
-    CollectionTrackerProvider() {
+    public CollectionTrackerProvider() {
         this.cookingManager = CustomCooking.getCookingManager();
     }
 

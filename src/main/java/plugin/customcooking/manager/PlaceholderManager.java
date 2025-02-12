@@ -36,6 +36,14 @@ public class PlaceholderManager extends Function {
         load();
     }
 
+    public static String setPlaceholders(Player player, String text) {
+        return PlaceholderAPI.setPlaceholders(player, text);
+    }
+
+    public static String setPlaceholders(OfflinePlayer player, String text) {
+        return PlaceholderAPI.setPlaceholders(player, text);
+    }
+
     public String parse(Player player, String text) {
         if (hasPlaceholderAPI) {
             return setPlaceholders(player, text);
@@ -59,19 +67,11 @@ public class PlaceholderManager extends Function {
         if (this.nodePapi != null) nodePapi.unregister();
     }
 
-    public List<String> detectPlaceholders(String text){
+    public List<String> detectPlaceholders(String text) {
         if (text == null || !text.contains("%")) return Collections.emptyList();
         List<String> placeholders = new ArrayList<>();
         Matcher matcher = placeholderPattern.matcher(text);
         while (matcher.find()) placeholders.add(matcher.group());
         return placeholders;
-    }
-
-    public static String setPlaceholders(Player player, String text) {
-        return PlaceholderAPI.setPlaceholders(player, text);
-    }
-
-    public static String setPlaceholders(OfflinePlayer player, String text) {
-        return PlaceholderAPI.setPlaceholders(player, text);
     }
 }

@@ -88,7 +88,7 @@ public class ConfigManager {
 
         fishingLimit = config.getInt("jade.limits.fishing", 100);
         cookingLimit = config.getInt("jade.limits.cooking", 10);
-        cropsLimit = config.getInt("jade.limits.crops", 15);
+        cropsLimit = config.getInt("jade.limits.farming", 15);
         spiritLimit = config.getInt("jade.limits.spirit", 100);
 
         successTitle = config.getStringList("titles.success.title").toArray(new String[0]);

@@ -13,22 +13,20 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.functions.collections.CollectionTrackerProvider;
-import plugin.customcooking.functions.cooking.Ingredient;
-import plugin.customcooking.functions.cooking.gui.IngredientBookProvider;
-import plugin.customcooking.functions.cooking.gui.RecipeBookProvider;
+import plugin.customcooking.functions.cooking.IngredientBookProvider;
+import plugin.customcooking.functions.cooking.RecipeBookProvider;
+import plugin.customcooking.functions.cooking.object.Ingredient;
+import plugin.customcooking.functions.wiki.WikiGuiProvider;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.AdventureUtil;
-import plugin.customcooking.functions.wiki.WikiGuiProvider;
+import plugin.customcooking.utility.ConfigUtil;
+import plugin.customcooking.utility.InventoryUtil;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-
-import static dev.lone.itemsadder.api.ItemsAdder.getAllItems;
-import static plugin.customcooking.utility.ConfigUtil.getConfig;
-import static plugin.customcooking.utility.InventoryUtil.build;
 
 public class GuiManager extends Function {
 
@@ -38,43 +36,25 @@ public class GuiManager extends Function {
     public static SmartInventory WIKI_MENU;
     public static HashMap<String, ItemStack> collectionItems;
 
-    @Override
-    public void load() {
-        INGREDIENTS = new HashMap<>();
-        collectionItems = initCollectionItems();
-        INGREDIENTS_MENU = getIngredientsBook();
-        PROGRESSION_MENU = getProgressionTracker();
-        WIKI_MENU = getWikiMenu();
-        loadItems();
-       //writeProgressionItemsToNascraft(collectionItems, new File(CustomCooking.getInstance().getDataFolder(), "nascraft.yml"));
-        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (INGREDIENTS.size()) + " <gray>ingredients");
-        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (collectionItems.size()) + " <gray>progression items");
-    }
-
-    @Override
-    public void unload() {
-        if (INGREDIENTS != null) INGREDIENTS.clear();
-    }
-
     private static HashMap<String, ItemStack> initCollectionItems() {
         Set<String> list = CustomStack.getNamespacedIdsInRegistry();
         HashMap<String, ItemStack> itemStacks = new HashMap<>();
         for (String str : list) {
             if ((str.startsWith("customcrops:") || str.startsWith("customcooking:") || str.startsWith("customfishing:")) &&
                     !((str.contains("stage") || str.contains("unknown") || str.contains("particle")))) {
-                itemStacks.put(str, build(str));
+                itemStacks.put(str, InventoryUtil.build(str));
             }
         }
         return itemStacks;
     }
 
     public static SmartInventory getRecipeBook(CustomFurniture clickedFurniture) {
-        return  SmartInventory.builder()
+        return SmartInventory.builder()
                 .manager(CustomCooking.getInventoryManager())
                 .id("recipeBook")
                 .provider(new RecipeBookProvider(clickedFurniture))
                 .size(6, 9)
-                .title(ChatColor.WHITE + new FontImageWrapper(ConfigManager.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString( ChatColor.RESET + "Recipe Book", -190))
+                .title(ChatColor.WHITE + new FontImageWrapper(ConfigManager.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString(ChatColor.RESET + "Recipe Book", -190))
                 .build();
     }
 
@@ -107,26 +87,6 @@ public class GuiManager extends Function {
                 .title(ChatColor.WHITE + "Player Progression")
                 .build();
     }
-
-
-    private void loadItems() {
-            YamlConfiguration config = getConfig("ingredients.yml");
-            Set<String> ingredients = config.getKeys(false);
-
-            for (String key : ingredients) {
-
-                ConfigurationSection ingredientSection = config.getConfigurationSection(key);
-
-                Ingredient ingredient = new Ingredient(
-                        key,
-                        ingredientSection.getString("nick", key),
-                        ingredientSection.getInt("slot", 1),
-                        ingredientSection.getStringList("ingredients")
-                );
-
-                INGREDIENTS.put(key, ingredient);
-            }
-        }
 
     public static void writeProgressionItemsToNascraft(HashMap<String, ItemStack> map, File outputFile) {
         // Configure YAML options
@@ -166,4 +126,41 @@ public class GuiManager extends Function {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void load() {
+        INGREDIENTS = new HashMap<>();
+        collectionItems = initCollectionItems();
+        INGREDIENTS_MENU = getIngredientsBook();
+        PROGRESSION_MENU = getProgressionTracker();
+        WIKI_MENU = getWikiMenu();
+        loadItems();
+        //writeProgressionItemsToNascraft(collectionItems, new File(CustomCooking.getInstance().getDataFolder(), "nascraft.yml"));
+        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (INGREDIENTS.size()) + " <gray>ingredients");
+        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (collectionItems.size()) + " <gray>progression items");
     }
+
+    @Override
+    public void unload() {
+        if (INGREDIENTS != null) INGREDIENTS.clear();
+    }
+
+    private void loadItems() {
+        YamlConfiguration config = ConfigUtil.getConfig("ingredients.yml");
+        Set<String> ingredients = config.getKeys(false);
+
+        for (String key : ingredients) {
+
+            ConfigurationSection ingredientSection = config.getConfigurationSection(key);
+
+            Ingredient ingredient = new Ingredient(
+                    key,
+                    ingredientSection.getString("nick", key),
+                    ingredientSection.getInt("slot", 1),
+                    ingredientSection.getStringList("ingredients")
+            );
+
+            INGREDIENTS.put(key, ingredient);
+        }
+    }
+}

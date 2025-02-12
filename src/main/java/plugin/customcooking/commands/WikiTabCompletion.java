@@ -19,7 +19,7 @@ public class WikiTabCompletion implements TabCompleter {
             completions.add("open");
             completions.add("reload");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("open")) {
-         completions.addAll(getWikiPages());
+            completions.addAll(getWikiPages());
         } else if (args.length == 3) {
             completions.addAll(getOnlinePlayerNames());
         } else if (args.length == 4) {

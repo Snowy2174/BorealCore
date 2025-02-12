@@ -18,25 +18,141 @@ import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.AdventureUtil;
+import plugin.customcooking.utility.InventoryUtil;
 
 import java.util.*;
 
 import static net.kyori.adventure.key.Key.key;
-import static plugin.customcooking.manager.configs.ConfigManager.splashTime;
-import static plugin.customcooking.utility.AdventureUtil.playerSound;
-import static plugin.customcooking.utility.InventoryUtil.build;
 
 public class FurnitureManager extends Function {
 
+    private static final Map<Location, Hologram> holograms = new HashMap<>();
     private final FurnitureListener furnitureListener;
     private final Map<Player, Long> cooldowns;
-    private static final Map<Location, Hologram> holograms = new HashMap<>();
-    private Map<Location, BukkitTask> activeFXTasks = new HashMap<>();
+    private final Map<Location, BukkitTask> activeFXTasks = new HashMap<>();
 
     public FurnitureManager() {
         this.furnitureListener = new FurnitureListener(this);
         this.cooldowns = new HashMap<>();
         load();
+    }
+
+    public static void ingredientsSFX(Player player, List<String> ingredients, Location loc) {
+        spawnNextIngredient(loc, player, ingredients, 0); // Start spawning ingredients from index 0
+    }
+
+    private static void spawnNextIngredient(Location loc, Player player, List<String> ingredients, int currentIndex) {
+        if (currentIndex >= ingredients.size()) {
+            // All ingredients have been spawned
+            return;
+        }
+
+        String ingredient = ingredients.get(currentIndex);
+        String[] parts = ingredient.split(":");
+        Random random = new Random();
+        int i = random.nextInt(3);
+
+        if (parts[0].endsWith("*")) {
+            parts[0] = parts[0].replaceAll("\\*", "");
+        }
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                spawnFakeIngredientItem(loc, parts[0], () -> {
+                    // After the fake ingredient is removed, spawn the next ingredient
+                    spawnNextIngredient(loc, player, ingredients, currentIndex + 1);
+                });
+                spawnSplashItem(loc);
+                AdventureUtil.playerSound(player, net.kyori.adventure.sound.Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "ingredient" + i), 1f, 1f);
+            }
+        }.runTaskLater(CustomCooking.plugin, 20);
+    }
+
+    private static void spawnFakeIngredientItem(Location loc, String ingredient, Runnable onComplete) {
+        Location spawnLocation = loc.clone().add(0, 2, 0);
+
+        // Create a dropped item entity at the specified location
+        Item itemEntity = loc.getWorld().dropItem(spawnLocation, InventoryUtil.build(ingredient));
+        itemEntity.setCanPlayerPickup(false);
+        itemEntity.setVelocity(itemEntity.getVelocity().zero());
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                itemEntity.remove(); // Remove the item entity from the world
+                onComplete.run(); // Invoke the callback when the removal is complete
+            }
+        }.runTaskLater(CustomCooking.plugin, 10);
+    }
+
+    private static void spawnSplashItem(Location loc) {
+        Location spawnLocation = loc.clone().subtract(0, 0.1, 0);
+
+        // Create an ArmorStand entity at the specified location
+        ArmorStand armorStand = (ArmorStand) loc.getWorld().spawnEntity(spawnLocation, EntityType.ARMOR_STAND);
+        armorStand.setVisible(false);
+        armorStand.setGravity(false);
+
+        // Create a fake ingredient ItemStack
+        ItemStack splashItem = InventoryUtil.build(ConfigManager.splashEffect);
+
+        // Set the fake ingredient ItemStack as the ArmorStand's helmet item
+        armorStand.setItem(EquipmentSlot.HEAD, splashItem);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                armorStand.remove(); // Remove the item entity from the world
+            }
+        }.runTaskLater(CustomCooking.plugin, ConfigManager.splashTime);
+    }
+
+    public static void playCookingResultSFX(Location loc, ItemStack item, Boolean success) {
+        Location location = loc.add(0, 1.25, 0);
+
+        if (success) {
+            // Particles: composter
+            loc.getWorld().spawnParticle(Particle.COMPOSTER, location, 15, 0.5, 0.5, 0.5);
+        } else {
+            // Particles: squid_ink
+            loc.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, location, 15, 0.5, 0.5, 0.5);
+        }
+        playCookingPreview(location, item, success);
+    }
+
+    private static void playCookingPreview(Location loc, ItemStack item, Boolean success) {
+        // Particles: crit
+        loc.getWorld().spawnParticle(Particle.CRIT, loc, 15, 0.25, 0.25, 0.25, 0.2);
+        // Spawn recipe item preview
+        createHologram(item, loc, success);
+    }
+
+    public static void createHologram(ItemStack recipe, Location location, Boolean success) {
+
+        String name = recipe.displayName().examinableName() + "_" + success.toString() + "_" + location.getBlockX() + "_" + location.getBlockY();
+        if (DHAPI.getHologram(name) != null)
+            return;
+
+        List<String> contents = new ArrayList<>();
+
+        if (success) {
+            contents.add("&aSuccess!");
+        } else {
+            contents.add("&aFailure!");
+        }
+
+        contents.add(recipe.getItemMeta().getDisplayName());
+        Hologram hologram = DHAPI.createHologram(name, location.clone().add(0, 1.5, 0), contents);
+        DHAPI.addHologramLine(hologram, recipe);
+
+        // Schedule a task to remove the hologram after a set time
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                hologram.delete(); // Remove the hologram
+            }
+        }.runTaskLater(CustomCooking.plugin, 60);
     }
 
     @Override
@@ -82,8 +198,8 @@ public class FurnitureManager extends Function {
                 AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCooldown.replace("{time}", cooldown));
             }
         } else if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
-                playCookingPotFX(clickedFurniture.getEntity().getLocation());
-                GuiManager.getRecipeBook(clickedFurniture).open(player);
+            playCookingPotFX(clickedFurniture.getEntity().getLocation());
+            GuiManager.getRecipeBook(clickedFurniture).open(player);
         }
     }
 
@@ -93,97 +209,6 @@ public class FurnitureManager extends Function {
         if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
             cancelCookingPotFX(clickedFurniture.getArmorstand().getLocation());
         }
-    }
-
-    public static void ingredientsSFX(Player player, List<String> ingredients, Location loc) {
-        spawnNextIngredient(loc, player, ingredients, 0); // Start spawning ingredients from index 0
-    }
-
-    private static void spawnNextIngredient(Location loc, Player player, List<String> ingredients, int currentIndex) {
-        if (currentIndex >= ingredients.size()) {
-            // All ingredients have been spawned
-            return;
-        }
-
-        String ingredient = ingredients.get(currentIndex);
-        String[] parts = ingredient.split(":");
-        Random random = new Random();
-        int i = random.nextInt(3);
-
-        if (parts[0].endsWith("*")) {
-            parts[0] = parts[0].replaceAll("\\*", "");
-        }
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                spawnFakeIngredientItem(loc, parts[0], () -> {
-                    // After the fake ingredient is removed, spawn the next ingredient
-                    spawnNextIngredient(loc, player, ingredients, currentIndex + 1);
-                });
-                spawnSplashItem(loc);
-                playerSound(player, net.kyori.adventure.sound.Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "ingredient"+ i), 1f, 1f);
-            }
-        }.runTaskLater(CustomCooking.plugin, 20);
-    }
-
-    private static void spawnFakeIngredientItem(Location loc, String ingredient, Runnable onComplete) {
-        Location spawnLocation = loc.clone().add(0,2,0);
-
-        // Create a dropped item entity at the specified location
-        Item itemEntity = loc.getWorld().dropItem(spawnLocation, build(ingredient));
-        itemEntity.setCanPlayerPickup(false);
-        itemEntity.setVelocity(itemEntity.getVelocity().zero());
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                itemEntity.remove(); // Remove the item entity from the world
-                onComplete.run(); // Invoke the callback when the removal is complete
-            }
-        }.runTaskLater(CustomCooking.plugin, 10);
-    }
-
-    private static void spawnSplashItem(Location loc) {
-        Location spawnLocation = loc.clone().subtract(0,0.1,0);
-
-        // Create an ArmorStand entity at the specified location
-        ArmorStand armorStand = (ArmorStand) loc.getWorld().spawnEntity(spawnLocation, EntityType.ARMOR_STAND);
-        armorStand.setVisible(false);
-        armorStand.setGravity(false);
-
-        // Create a fake ingredient ItemStack
-        ItemStack splashItem = build(ConfigManager.splashEffect);
-
-        // Set the fake ingredient ItemStack as the ArmorStand's helmet item
-        armorStand.setItem(EquipmentSlot.HEAD, splashItem);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                armorStand.remove(); // Remove the item entity from the world
-            }
-        }.runTaskLater(CustomCooking.plugin, splashTime);
-    }
-
-    public static void playCookingResultSFX(Location loc, ItemStack item, Boolean success) {
-        Location location = loc.add(0, 1.25, 0);
-
-        if (success) {
-            // Particles: composter
-            loc.getWorld().spawnParticle(Particle.COMPOSTER, location, 15, 0.5, 0.5, 0.5);
-        } else {
-            // Particles: squid_ink
-            loc.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, location, 15, 0.5, 0.5, 0.5);
-        }
-        playCookingPreview(location, item, success);
-    }
-
-    private static void playCookingPreview(Location loc, ItemStack item, Boolean success) {
-        // Particles: crit
-        loc.getWorld().spawnParticle(Particle.CRIT, loc, 15, 0.25, 0.25, 0.25, 0.2);
-        // Spawn recipe item preview
-        createHologram(item, loc, success);
     }
 
     public void playCookingPotFX(Location location) {
@@ -243,32 +268,5 @@ public class FurnitureManager extends Function {
             task.cancel();
         }
     }
-
-    public static void createHologram(ItemStack recipe, Location location, Boolean success) {
-
-        String name = recipe.displayName().examinableName() + "_" +  success.toString() + "_" + location.getBlockX() + "_" + location.getBlockY();
-        if(DHAPI.getHologram(name) != null)
-            return;
-
-        List<String> contents = new ArrayList<>();
-
-            if (success) {
-                contents.add("&aSuccess!");
-            } else {
-                contents.add("&aFailure!");
-            }
-
-            contents.add(recipe.getItemMeta().getDisplayName());
-            Hologram hologram = DHAPI.createHologram(name, location.clone().add(0,1.5,0), contents);
-            DHAPI.addHologramLine(hologram, recipe);
-
-            // Schedule a task to remove the hologram after a set time
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    hologram.delete(); // Remove the hologram
-                }
-            }.runTaskLater(CustomCooking.plugin, 60);
-        }
-    }
+}
 

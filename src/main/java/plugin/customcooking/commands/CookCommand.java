@@ -6,11 +6,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.functions.cooking.CookingManager;
 import plugin.customcooking.functions.cooking.competition.Competition;
 import plugin.customcooking.functions.cooking.competition.CompetitionSchedule;
-import plugin.customcooking.manager.GuiManager;
-import plugin.customcooking.manager.CookingManager;
 import plugin.customcooking.manager.DataManager;
+import plugin.customcooking.manager.GuiManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
 import plugin.customcooking.utility.ConfigUtil;
@@ -18,8 +18,6 @@ import plugin.customcooking.utility.InventoryUtil;
 import plugin.customcooking.utility.RecipeDataUtil;
 
 import java.util.List;
-
-import static plugin.customcooking.manager.DataManager.getRecipeCount;
 
 
 public class CookCommand implements CommandExecutor {
@@ -62,16 +60,17 @@ public class CookCommand implements CommandExecutor {
             handleRecipeBookCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("progression")) {
             handleProgressionCommand(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("competition")){
+        } else if (subcommand.equalsIgnoreCase("competition")) {
             handleCompetitionCommand(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("give")){
+        } else if (subcommand.equalsIgnoreCase("give")) {
             handleGiveItemCommand(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("clear")){
+        } else if (subcommand.equalsIgnoreCase("clear")) {
             handleClearCommand(sender, subargs);
-        }
-        else {
+        } else if (subcommand.equalsIgnoreCase("stats")) {
+            showStatsCommand(sender);
+        } else {
             // Unknown subcommand
-            AdventureUtil.sendMessage(sender,  MessageManager.infoNegative + MessageManager.unavailableArgs);
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.unavailableArgs);
         }
 
         return true;
@@ -83,7 +82,7 @@ public class CookCommand implements CommandExecutor {
 
             AdventureUtil.sendMessage(sender, "<gold><bold>CustomCooking</bold><grey> version 1.1.4");
             AdventureUtil.sendMessage(sender, "<grey>Created by <gold>SnowyOwl217");
-            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Cooked: " + getRecipeCount(player.getName()));
+            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Cooked: " + DataManager.getRecipeCount(player.getName()));
             AdventureUtil.sendMessage(sender, "<gold> Total Recipes Unlocked: " + unlockedRecipes.size());
             AdventureUtil.sendMessage(sender, "<gold> Total Recipes Mastered: " + RecipeDataUtil.getMasteredRecipes(player, unlockedRecipes).size());
             AdventureUtil.sendMessage(sender, "<gold> Total Recipes Unknown: " + RecipeDataUtil.getLockedRecipes(unlockedRecipes).size());
@@ -133,7 +132,7 @@ public class CookCommand implements CommandExecutor {
     private void handleMigratePermsCommand(CommandSender sender) {
         long startTime = System.currentTimeMillis();
         int migratedCount = DataManager.migratePermissions();
-        AdventureUtil.sendMessage(sender, MessageManager.prefix + " Migrated and Updated the perms for <green>" + migratedCount + "Recipes and Masteries <gray> in <green>" + (System.currentTimeMillis() - startTime) + "ms" );
+        AdventureUtil.sendMessage(sender, MessageManager.prefix + " Migrated and Updated the perms for <green>" + migratedCount + "Recipes and Masteries <gray> in <green>" + (System.currentTimeMillis() - startTime) + "ms");
     }
 
     private void handleUnlockCommand(CommandSender sender, String[] args) {
@@ -214,16 +213,16 @@ public class CookCommand implements CommandExecutor {
     }
 
     private void handleCompetitionCommand(CommandSender sender, String[] args) {
-        if (args.length < 1){
+        if (args.length < 1) {
             AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.lackArgs);
             return;
         }
-        if (args[0].equals("start")){
-            if (args.length < 2){
+        if (args[0].equals("start")) {
+            if (args.length < 2) {
                 AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.lackArgs);
                 return;
             }
-            if (CompetitionSchedule.startCompetition(args[1])){
+            if (CompetitionSchedule.startCompetition(args[1])) {
                 AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.forceSuccess);
             } else {
                 AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.forceFailure);
@@ -280,7 +279,7 @@ public class CookCommand implements CommandExecutor {
         }
 
         String itemName = args[1];
-        int amount = (args[2] == null) ? 1 : Integer.parseInt(args[2]) ;
+        int amount = (args[2] == null) ? 1 : Integer.parseInt(args[2]);
 
         InventoryUtil.giveItem(player, itemName, amount, true);
 
@@ -300,7 +299,7 @@ public class CookCommand implements CommandExecutor {
         }
 
         String itemName = args[1];
-        int amount = (args[2] == null) ? 1 : Integer.parseInt(args[2]) ;
+        int amount = (args[2] == null) ? 1 : Integer.parseInt(args[2]);
 
         InventoryUtil.removeItem(player.getInventory(), itemName, amount);
 

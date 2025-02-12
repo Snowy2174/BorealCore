@@ -2,7 +2,7 @@ package plugin.customcooking.functions.cooking;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import plugin.customcooking.manager.CookingManager;
+import plugin.customcooking.functions.cooking.object.Layout;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
 

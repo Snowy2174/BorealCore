@@ -51,7 +51,7 @@ public class MessageManager {
     public static String CATCH_AMOUNT;
 
     public static void load() {
-        YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang +".yml");
+        YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang + ".yml");
         prefix = getOrSet(config, "prefix", "<gradient:#FB5A00:#FDF300>[CustomCooking] </gradient>");
         infoNegative = getOrSet(config, "prefix-negative", "<gray>[<red>!<gray>] ");
         infoPositive = getOrSet(config, "prefix-positive", "<gray>[<green>!<gray>] ");
@@ -99,7 +99,7 @@ public class MessageManager {
         TOTAL_SCORE = getOrSet(config, "total_score", "Total score");
         CATCH_AMOUNT = getOrSet(config, "catch_amount", "Catch amount");
         try {
-            config.save(new File(CustomCooking.getInstance().getDataFolder(), "messages_" + ConfigManager.lang +".yml"));
+            config.save(new File(CustomCooking.getInstance().getDataFolder(), "messages_" + ConfigManager.lang + ".yml"));
         } catch (IOException ignore) {
         }
     }

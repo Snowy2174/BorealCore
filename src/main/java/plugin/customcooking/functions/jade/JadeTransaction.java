@@ -3,10 +3,10 @@ package plugin.customcooking.functions.jade;
 import java.time.LocalDateTime;
 
 public class JadeTransaction {
-    private String player;
-    private double amount;
-    private String source;
-    private LocalDateTime timestamp;
+    private final String player;
+    private final double amount;
+    private final String source;
+    private final LocalDateTime timestamp;
 
     public JadeTransaction(String player, double amount, String source, LocalDateTime timestamp) {
         this.player = player;

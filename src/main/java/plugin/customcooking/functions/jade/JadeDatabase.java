@@ -5,22 +5,22 @@
 
 package plugin.customcooking.functions.jade;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import org.bukkit.entity.Player;
+import plugin.customcooking.CustomCooking;
+import plugin.customcooking.database.Error;
+import plugin.customcooking.database.Errors;
+
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
-import org.bukkit.entity.Player;
-import plugin.customcooking.CustomCooking;
 
 public abstract class JadeDatabase {
-    static CustomCooking plugin;
-    Connection connection;
+    public static CustomCooking plugin;
+    public Connection connection;
     public String table = "jade_transactions";
     public int tokens = 0;
 
@@ -95,10 +95,10 @@ public abstract class JadeDatabase {
 
             // Update or insert the player's total in jade_totals
             String totalsQuery = """
-            INSERT INTO jade_totals (player, jade)
-            VALUES (?, ?)
-            ON CONFLICT(player) DO UPDATE SET jade = jade + ?;
-        """;
+                        INSERT INTO jade_totals (player, jade)
+                        VALUES (?, ?)
+                        ON CONFLICT(player) DO UPDATE SET jade = jade + ?;
+                    """;
             psTotals = conn.prepareStatement(totalsQuery);
             psTotals.setString(1, player.getName().toLowerCase());
             psTotals.setDouble(2, amount);
@@ -322,5 +322,44 @@ public abstract class JadeDatabase {
             Error.close(plugin, var4);
         }
 
+    }
+
+    public HashMap<String, Integer> getJadeLeaderboard() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        HashMap<String, Integer> leaderboard = new HashMap<>();
+
+        try {
+            conn = this.getSQLConnection();
+            String query = "SELECT player, jade FROM jade_totals ORDER BY jade DESC LIMIT 10;";
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                leaderboard.put(rs.getString("player"), rs.getInt("jade"));
+            }
+        } catch (SQLException var17) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), var17);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+
+                if (ps != null) {
+                    ps.close();
+                }
+
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException var16) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), var16);
+            }
+
+        }
+
+        return leaderboard;
     }
 }

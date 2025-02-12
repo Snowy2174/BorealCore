@@ -25,24 +25,19 @@ import java.util.UUID;
 public class BossBarSender {
 
     private final Player player;
+    private final int size;
+    private final TextCache[] texts;
+    private final UUID uuid;
+    private final BossBarConfig config;
     private int timer_1;
     private int timer_2;
     private int counter;
-    private final int size;
-    private final TextCache[] texts;
     private TextCache text;
     private BukkitTask bukkitTask;
-    private final UUID uuid;
     private boolean force;
-    private final BossBarConfig config;
     private boolean isShown;
 
-    public void setText(int position) {
-        this.text = texts[position];
-        this.force = true;
-    }
-
-    public BossBarSender(Player player, BossBarConfig config){
+    public BossBarSender(Player player, BossBarConfig config) {
         String[] str = config.getText();
         this.size = str.length;
         texts = new TextCache[str.length];
@@ -54,6 +49,11 @@ public class BossBarSender {
         this.uuid = UUID.randomUUID();
         this.config = config;
         this.isShown = false;
+    }
+
+    public void setText(int position) {
+        this.text = texts[position];
+        this.force = true;
     }
 
     public void show() {
@@ -80,10 +80,9 @@ public class BossBarSender {
                         setText(counter);
                     }
                 }
-                if (timer_1 < config.getRate()){
+                if (timer_1 < config.getRate()) {
                     timer_1++;
-                }
-                else {
+                } else {
                     timer_1 = 0;
                     if (text.update() || force) {
                         force = false;
@@ -97,7 +96,7 @@ public class BossBarSender {
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(CustomCooking.plugin,0,1);
+        }.runTaskTimerAsynchronously(CustomCooking.plugin, 0, 1);
     }
 
     private PacketContainer getUpdatePacket() {
@@ -169,7 +168,7 @@ public class BossBarSender {
             } catch (InvocationTargetException e) {
                 throw new RuntimeException("Cannot send packet " + packet, e);
             }
-        } catch (ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             AdventureUtil.consoleMessage("<red>[CustomCooking] Failed to remove bossbar for " + player.getName());
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);

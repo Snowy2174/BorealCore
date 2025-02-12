@@ -1,6 +1,6 @@
 name: CustomCooking
 version: '${project.version}'
-main: plugin.customcooking.CustomCooking
+main: CustomCooking
 author: [ SnowyOwl217 ]
 api-version: 1.18
 depend:

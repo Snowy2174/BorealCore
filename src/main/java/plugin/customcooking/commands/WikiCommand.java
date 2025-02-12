@@ -6,10 +6,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.functions.wiki.WikiManager;
 import plugin.customcooking.manager.GuiManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
-import plugin.customcooking.functions.wiki.WikiManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,12 +42,11 @@ public class WikiCommand implements CommandExecutor {
             handleOpenBookCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("updateWiki")) {
             try {
-                wikiManager.downloadRepo("https://github.com/Snowy2174/BendingMC-Wiki.git", new File(CustomCooking.plugin.getDataFolder() + File.separator + "wiki"), true);
+                WikiManager.downloadRepo("https://github.com/Snowy2174/BendingMC-Wiki.git", new File(CustomCooking.plugin.getDataFolder() + File.separator + "wiki"), true);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-        else {
+        } else {
             return false;
 
         }
@@ -65,7 +64,7 @@ public class WikiCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-        wikiManager.openBook(player, id);
+        WikiManager.openBook(player, id);
         AdventureUtil.sendMessage(sender, "Opened wiki page " + id + " for " + player.getName());
     }
 }

@@ -34,7 +34,7 @@ public class LocalRankingImpl implements RankingInterface {
     @Override
     public Iterator<String> getIterator() {
         List<String> players = new ArrayList<>();
-        for (CompetitionPlayer competitionPlayer: competitionPlayers){
+        for (CompetitionPlayer competitionPlayer : competitionPlayers) {
             players.add(competitionPlayer.getPlayer());
         }
         return players.iterator();
@@ -51,7 +51,7 @@ public class LocalRankingImpl implements RankingInterface {
         for (CompetitionPlayer competitionPlayer : competitionPlayers) {
             if (competitionPlayer.getPlayer().equals(player)) {
                 return String.valueOf(index);
-            }else {
+            } else {
                 index++;
             }
         }

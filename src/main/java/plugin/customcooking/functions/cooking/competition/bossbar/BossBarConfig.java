@@ -37,6 +37,7 @@ public class BossBarConfig {
     public int getRate() {
         return rate;
     }
+
     public enum BossBarOverlay {
         NOTCHED_6,
         NOTCHED_10,

@@ -28,7 +28,7 @@ public class CookTabCompletion implements TabCompleter {
             completions.add("migrateperms");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("competition")) {
             completions.addAll(List.of("start", "end", "cancel", "join"));
-        } else if (args.length == 2 && args[0].equalsIgnoreCase("cook")){
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("cook")) {
             completions.addAll(getAvailableRecipes());
         } else if (args.length == 2) {
             completions.addAll(getOnlinePlayerNames());

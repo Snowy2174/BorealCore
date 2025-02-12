@@ -16,12 +16,12 @@ public class CompetitionConfig {
     private final List<String> startCommand;
     private final List<String> endCommand;
     private final List<String> joinCommand;
-    private List<Integer> date;
-    private List<Integer> weekday;
     private final CompetitionGoal goal;
     private final BossBarConfig bossBarConfig;
     private final boolean enableBossBar;
     private final HashMap<String, Action[]> rewards;
+    private List<Integer> date;
+    private List<Integer> weekday;
 
     public CompetitionConfig(int duration, int minPlayers, List<String> startMessage, List<String> endMessage, List<String> startCommand, List<String> endCommand, List<String> joinCommand, CompetitionGoal goal, BossBarConfig bossBarConfig, boolean enableBossBar, HashMap<String, Action[]> rewards) {
         this.duration = duration;
@@ -35,6 +35,10 @@ public class CompetitionConfig {
         this.bossBarConfig = bossBarConfig;
         this.enableBossBar = enableBossBar;
         this.rewards = rewards;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
     }
 
     public int getDuration() {
@@ -89,10 +93,6 @@ public class CompetitionConfig {
         this.weekday = weekday;
     }
 
-    public static void main(String[] args) {
-        System.out.println(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
-    }
-
     public boolean canStart() {
         if (date != null && date.size() != 0) {
             Calendar calendar = Calendar.getInstance();
@@ -104,9 +104,7 @@ public class CompetitionConfig {
         if (weekday != null && weekday.size() != 0) {
             Calendar calendar = Calendar.getInstance();
             int dateDay = calendar.get(Calendar.DAY_OF_WEEK);
-            if (!weekday.contains(dateDay)) {
-                return false;
-            }
+            return weekday.contains(dateDay);
         }
         return true;
     }

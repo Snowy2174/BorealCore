@@ -18,7 +18,8 @@ import java.util.List;
 
 public class InventoryUtil {
 
-    public InventoryUtil() {}
+    public InventoryUtil() {
+    }
 
     public static boolean handleIngredientCheck(Inventory playerInventory, List<String> ingredients, Integer instances) {
         if (ingredients == null || ingredients.isEmpty()) {
@@ -204,7 +205,7 @@ public class InventoryUtil {
         return itemStack;
     }
 
-    private static void addIdentifier(ItemStack itemStack, String id){
+    private static void addIdentifier(ItemStack itemStack, String id) {
         NBTItem nbtItem = new NBTItem(itemStack);
         NBTCompound nbtCompound = nbtItem.addCompound("CustomCooking");
         String identifier = id.replaceAll("[\\[\\]]", "");

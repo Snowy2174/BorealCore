@@ -34,6 +34,14 @@ public class Competition {
         this.competitionConfig = competitionConfig;
     }
 
+    public static boolean hasCompetitionOn() {
+        return currentCompetition != null;
+    }
+
+    public static Competition getCurrentCompetition() {
+        return currentCompetition;
+    }
+
     public void begin(boolean forceStart) {
         this.goal = competitionConfig.getGoal();
         if (this.goal == CompetitionGoal.RANDOM) {
@@ -67,8 +75,7 @@ public class Competition {
                 bossBarManager = new BossBarManager();
                 bossBarManager.load();
             }
-        }
-        else {
+        } else {
             for (Player player : playerCollections) {
                 AdventureUtil.playerMessage(player, MessageManager.prefix + MessageManager.notEnoughPlayers);
             }
@@ -80,7 +87,7 @@ public class Competition {
         this.timerTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (decreaseTime()){
+                if (decreaseTime()) {
                     end();
                 }
             }
@@ -104,7 +111,7 @@ public class Competition {
         givePrize();
 
         List<String> newMessage = new ArrayList<>();
-        PlaceholderManager placeholderManager = CustomCooking.plugin.getPlaceholderManager();
+        PlaceholderManager placeholderManager = CustomCooking.getPlaceholderManager();
 
         for (String endMsg : competitionConfig.getEndMessage()) {
             List<String> placeholders = new ArrayList<>(placeholderManager.detectPlaceholders(endMsg));
@@ -112,8 +119,7 @@ public class Competition {
                 if (placeholder.endsWith("_player%")) {
                     int rank = Integer.parseInt(placeholder.substring(1, placeholder.length() - 8));
                     endMsg = endMsg.replace(placeholder, Optional.ofNullable(ranking.getPlayerAt(rank)).orElse(MessageManager.noPlayer));
-                }
-                else if (placeholder.endsWith("_score%")) {
+                } else if (placeholder.endsWith("_score%")) {
                     int rank = Integer.parseInt(placeholder.substring(1, placeholder.length() - 7));
                     float score = ranking.getScoreAt(rank);
                     endMsg = endMsg.replace(placeholder, score == 0 ? MessageManager.noScore : String.format("%.1f", score));
@@ -134,12 +140,12 @@ public class Competition {
 
         currentCompetition = null;
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(CustomCooking.plugin, ()-> {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(CustomCooking.plugin, () -> {
             ranking.clear();
         }, 600);
     }
 
-    public void givePrize(){
+    public void givePrize() {
         HashMap<String, Action[]> rewardsMap = competitionConfig.getRewards();
         if (ranking.getSize() != 0 && rewardsMap != null) {
             Iterator<String> iterator = ranking.getIterator();
@@ -148,26 +154,24 @@ public class Competition {
                 if (i < rewardsMap.size()) {
                     String playerName = iterator.next();
                     Player player = Bukkit.getPlayer(playerName);
-                    if (player != null){
+                    if (player != null) {
                         for (Action action : rewardsMap.get(String.valueOf(i))) {
                             action.doOn(player, null);
                         }
                     }
                     i++;
-                }
-                else {
+                } else {
                     Action[] actions = rewardsMap.get("participation");
                     if (actions != null) {
                         iterator.forEachRemaining(playerName -> {
                             Player player = Bukkit.getPlayer(playerName);
-                            if (player != null){
+                            if (player != null) {
                                 for (Action action : actions) {
                                     action.doOn(player, null);
                                 }
                             }
                         });
-                    }
-                    else {
+                    } else {
                         break;
                     }
                 }
@@ -195,10 +199,6 @@ public class Competition {
 
     private CompetitionGoal getRandomGoal() {
         return CompetitionGoal.values()[new Random().nextInt(CompetitionGoal.values().length - 1)];
-    }
-
-    public static boolean hasCompetitionOn() {
-        return currentCompetition != null;
     }
 
     public float getProgress() {
@@ -248,10 +248,6 @@ public class Competition {
 
     public RankingInterface getRanking() {
         return ranking;
-    }
-
-    public static Competition getCurrentCompetition() {
-        return currentCompetition;
     }
 
     public long getStartTime() {

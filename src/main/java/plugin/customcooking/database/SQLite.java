@@ -1,6 +1,7 @@
-package plugin.customcooking.functions.jade;
+package plugin.customcooking.database;
 
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.functions.jade.JadeDatabase;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,12 +12,6 @@ import java.sql.Statement;
 import java.util.logging.Level;
 
 public class SQLite extends JadeDatabase {
-    String dbname;
-    public SQLite(CustomCooking instance){
-        super(instance);
-        dbname = "jade_transactions"; // Set the table name here e.g player_kills
-    }
-
     public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS jade_transactions (" + // make sure to put your table name in here too.
             "`player` varchar(32) NOT NULL," + // This creates the different columns you will save data to. varchar(32) Is a string, int = integer
             "`amount` int(11) NOT NULL," +
@@ -24,11 +19,16 @@ public class SQLite extends JadeDatabase {
             "`timestamp` datetime NOT NULL," +
             "PRIMARY KEY (`player`, `timestamp`)" +  // This is creating 4 columns: player, amount, source, timestamp. Primary key is a combination of player and timestamp.
             ");"; // we can search by player and timestamp to get the amount and source.
-
     public String SQLiteCreateUsersTable = "CREATE TABLE IF NOT EXISTS jade_totals (" +
             "    `player` varchar(32) NOT NULL PRIMARY KEY," +
             "    `jade` int(11) NOT NULL" +
             ");"; // we can search by player and timestamp to get the amount and source.
+    String dbname;
+
+    public SQLite(CustomCooking instance) {
+        super(instance);
+        dbname = "jade_transactions"; // Set the table name here e.g player_kills
+    }
 
     // SQL creation stuff, You can leave the blow stuff untouched.
     public Connection getSQLConnection() {

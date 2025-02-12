@@ -9,19 +9,22 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
-
 public class JadeTabCompletion implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
 
-        if (args.length == 1) {
+        if (args.length == 1 && sender.hasPermission("customcooking.admin")) {
             completions.add("give");
             completions.add("totalJadeForPlayer");
             completions.add("totalJadeForSource");
             completions.add("getMostRecent");
             completions.add("getPlayerData");
+            completions.add("verifyAndFixTotals");
+        } else if (args.length == 1) {
+            completions.add("top");
+            completions.add("balance");
+            completions.add("limits");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("totalJadeForSource")) {
             completions.addAll(List.of("cooking", "farming", "fishing", "spirit", "mastery"));
         } else if (args.length == 2) {

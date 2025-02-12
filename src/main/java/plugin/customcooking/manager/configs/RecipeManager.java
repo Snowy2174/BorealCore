@@ -5,15 +5,18 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.functions.cooking.Difficulty;
-import plugin.customcooking.functions.cooking.DroppedItem;
-import plugin.customcooking.functions.cooking.Layout;
-import plugin.customcooking.functions.cooking.Recipe;
+import plugin.customcooking.functions.cooking.object.DroppedItem;
+import plugin.customcooking.functions.cooking.object.Layout;
+import plugin.customcooking.functions.cooking.object.Recipe;
 import plugin.customcooking.manager.EffectManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.AdventureUtil;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 public class RecipeManager extends Function {
 
@@ -78,7 +81,7 @@ public class RecipeManager extends Function {
                 // Set layout
                 if (recipeSection.contains("layout")) {
                     List<Layout> layoutList = new ArrayList<>();
-                    for (String layoutName : recipeSection.getStringList( "layout")) {
+                    for (String layoutName : recipeSection.getStringList("layout")) {
                         Layout layout = LayoutManager.LAYOUTS.get(layoutName);
                         if (layout == null) {
                             AdventureUtil.consoleMessage("<red>[CustomCooking] Bar " + layoutName + " doesn't exist");

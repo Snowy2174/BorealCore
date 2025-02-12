@@ -11,6 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
@@ -26,17 +27,6 @@ import static plugin.customcooking.utility.ConfigUtil.getConfig;
 
 public class DataManager extends Function {
 
-
-    @Override
-    public void load() {
-        AdventureUtil.consoleMessage(MessageManager.prefix + "Loaded mastery values");
-    }
-
-    @Override
-    public void unload() {
-        savePlayerStats(getConfig("playerstats.yml"));
-        AdventureUtil.consoleMessage(MessageManager.prefix + "Unloaded mastery values");
-    }
 
     public static void handleMastery(Player player, String recipe) {
         YamlConfiguration config = ConfigUtil.getConfig("playerdata.yml");
@@ -66,7 +56,7 @@ public class DataManager extends Function {
 
             ItemsAdder.playTotemAnimation(player, recipe + "_particle");
             AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
-            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", recipeFormatted ));
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", recipeFormatted));
 
             // Give the player reward
             giveReward(player, recipeFormatted);
@@ -133,6 +123,17 @@ public class DataManager extends Function {
             }
         }
         return migratedCount;
+    }
+
+    @Override
+    public void load() {
+        AdventureUtil.consoleMessage(MessageManager.prefix + "Loaded mastery values");
+    }
+
+    @Override
+    public void unload() {
+        savePlayerStats(getConfig("playerstats.yml"));
+        AdventureUtil.consoleMessage(MessageManager.prefix + "Unloaded mastery values");
     }
 
 }

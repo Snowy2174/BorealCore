@@ -1,4 +1,4 @@
-package plugin.customcooking.manager;
+package plugin.customcooking.functions.cooking;
 
 
 import de.tr7zw.nbtapi.NBTCompound;
@@ -18,28 +18,35 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.api.event.CookResultEvent;
-import plugin.customcooking.functions.cooking.*;
 import plugin.customcooking.functions.cooking.action.Action;
 import plugin.customcooking.functions.cooking.competition.Competition;
-import plugin.customcooking.functions.cooking.Ingredient;
+import plugin.customcooking.functions.cooking.object.DroppedItem;
+import plugin.customcooking.functions.cooking.object.Ingredient;
+import plugin.customcooking.functions.cooking.object.Layout;
+import plugin.customcooking.functions.cooking.object.Recipe;
+import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.listener.ConsumeItemListener;
 import plugin.customcooking.listener.InteractListener;
-import plugin.customcooking.manager.configs.*;
+import plugin.customcooking.manager.DataManager;
+import plugin.customcooking.manager.FurnitureManager;
+import plugin.customcooking.manager.configs.ConfigManager;
+import plugin.customcooking.manager.configs.LayoutManager;
+import plugin.customcooking.manager.configs.MessageManager;
+import plugin.customcooking.manager.configs.RecipeManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.AdventureUtil;
 import plugin.customcooking.utility.GUIUtil;
+import plugin.customcooking.utility.InventoryUtil;
+import plugin.customcooking.utility.RecipeDataUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.kyori.adventure.key.Key.key;
-import static plugin.customcooking.manager.GuiManager.INGREDIENTS;
 import static plugin.customcooking.manager.FurnitureManager.playCookingResultSFX;
-import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
+import static plugin.customcooking.manager.GuiManager.INGREDIENTS;
 import static plugin.customcooking.manager.configs.ConfigManager.perfectChance;
-import static plugin.customcooking.utility.RecipeDataUtil.hasMastery;
 import static plugin.customcooking.utility.AdventureUtil.playerSound;
-import static plugin.customcooking.utility.InventoryUtil.*;
 
 public class CookingManager extends Function {
     private final Random random;
@@ -80,9 +87,9 @@ public class CookingManager extends Function {
             Recipe bar = RecipeManager.RECIPES.get(recipe);
             // checks if player has required ingredients
             List<String> ingredients = bar.getIngredients();
-            if (handleIngredientCheck(player.getInventory(), ingredients, 1)) {
+            if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, 1)) {
                 // Delay removal of items if furniture is not null
-                removeIngredients(player.getInventory(), ingredients, 1);
+                InventoryUtil.removeIngredients(player.getInventory(), ingredients, 1);
                 if (clickedFurniture != null) {
                     Location loc = clickedFurniture.getArmorstand().getLocation();
                     FurnitureManager.ingredientsSFX(player, ingredients, loc);
@@ -98,9 +105,9 @@ public class CookingManager extends Function {
             Ingredient recipe = INGREDIENTS.get(recipeId);
             // checks if player has required ingredients
             List<String> ingredients = recipe.getIngredients();
-            if (handleIngredientCheck(player.getInventory(), ingredients, amount)) {
-                removeIngredients(player.getInventory(), ingredients, amount);
-                giveItem(player, recipe.getKey(), amount, true);
+            if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
+                InventoryUtil.removeIngredients(player.getInventory(), ingredients, amount);
+                InventoryUtil.giveItem(player, recipe.getKey(), amount, true);
                 playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
                 AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
             } else {
@@ -112,13 +119,13 @@ public class CookingManager extends Function {
         if (isPlayerCooking(player)) {
             AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.alreadyCooking);
         } else {
-            Recipe recipe = RECIPES.get(recipeId);
+            Recipe recipe = RecipeManager.RECIPES.get(recipeId);
             // checks if player has required ingredients
             List<String> ingredients = recipe.getIngredients();
-            if (handleIngredientCheck(player.getInventory(), ingredients, amount)) {
+            if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
                 // Delay removal of items if furniture is not null
-                removeIngredients(player.getInventory(), ingredients, amount);
-                giveItem(player, String.valueOf(recipe.getCookedItems()), amount, true);
+                InventoryUtil.removeIngredients(player.getInventory(), ingredients, amount);
+                InventoryUtil.giveItem(player, String.valueOf(recipe.getCookedItems()), amount, true);
                 playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
                 AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
             } else {
@@ -168,7 +175,7 @@ public class CookingManager extends Function {
 
         if (!cookingPlayer.isSuccess()) {
             if (cookingPot != null) {
-                playCookingResultSFX(cookingPot, build(ConfigManager.failureItem), false);
+                playCookingResultSFX(cookingPot, InventoryUtil.build(ConfigManager.failureItem), false);
             }
             handleFailureResult(player);
             return;
@@ -178,11 +185,11 @@ public class CookingManager extends Function {
             return;
         }
 
-        double masteryPerfectionMultiplier = hasMastery(player, droppedItem.getKey()) ? 1.5 : 1;
+        double masteryPerfectionMultiplier = RecipeDataUtil.hasMastery(player, droppedItem.getKey()) ? 1.5 : 1;
         boolean perfect = cookingPlayer.isPerfect() && (Math.random() < perfectChance*masteryPerfectionMultiplier);
         String drop = recipe.getCookedItems();
 
-        CookResultEvent cookResultEvent = new CookResultEvent(player, perfect, build(drop), drop);
+        CookResultEvent cookResultEvent = new CookResultEvent(player, perfect, InventoryUtil.build(drop), drop);
         Bukkit.getPluginManager().callEvent(cookResultEvent);
         if (cookResultEvent.isCancelled()) {
             return;
@@ -191,7 +198,7 @@ public class CookingManager extends Function {
         if (perfect) {
             AdventureUtil.playerMessage(player,MessageManager.infoPositive + MessageManager.cookingPerfect.replace("{recipe}", droppedItem.getNick()));
             drop = drop + ConfigManager.perfectItemSuffix;
-            if (!hasMastery(player, droppedItem.getKey())) {
+            if (!RecipeDataUtil.hasMastery(player, droppedItem.getKey())) {
                 DataManager.handleMastery(player, droppedItem.getKey());
             }
             if (Math.random() < ConfigManager.cookingJadeRewardRate) {
@@ -200,7 +207,7 @@ public class CookingManager extends Function {
         }
 
         if (cookingPot != null) {
-            playCookingResultSFX(cookingPot, build(drop), true);
+            playCookingResultSFX(cookingPot, InventoryUtil.build(drop), true);
         }
 
         if (droppedItem.getSuccessActions() != null) {
@@ -219,7 +226,7 @@ public class CookingManager extends Function {
         }
 
         playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking.done"), 1f, 1f);
-        giveItem(player, drop, 1, true);
+        InventoryUtil.giveItem(player, drop, 1, true);
         sendSuccessTitle(player, droppedItem.getNick());
 
         DataManager.incrementRecipeCount(player);
@@ -230,7 +237,7 @@ public class CookingManager extends Function {
         String ingredient = ingredients.get(random.nextInt(ingredients.size()));
         String[] parts = ingredient.split(":");
         AdventureUtil.playerMessage(player, MessageManager.infoPositive + "You have used one less: " + GUIUtil.formatString(parts[0]));
-        giveItem(player, parts[0], 1, false);
+        InventoryUtil.giveItem(player, parts[0], 1, false);
     }
 
     private void handleFailureResult(Player player) {
@@ -243,7 +250,7 @@ public class CookingManager extends Function {
                 ConfigManager.failureFadeStay,
                 ConfigManager.failureFadeOut
         );
-        giveItem(player, ConfigManager.failureItem, 1, false);
+        InventoryUtil.giveItem(player, ConfigManager.failureItem, 1, false);
     }
 
 
@@ -359,7 +366,7 @@ public class CookingManager extends Function {
             String lootKey = nbtCompound.getString("id");
             boolean perfect = lootKey.contains(ConfigManager.perfectItemSuffix);
             String recipeKey = lootKey.replace(ConfigManager.perfectItemSuffix, "");
-            Recipe recipe = RECIPES.get(recipeKey);
+            Recipe recipe = RecipeManager.RECIPES.get(recipeKey);
             if (!(recipe instanceof DroppedItem)) {
                 return;
             }

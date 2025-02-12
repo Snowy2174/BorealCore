@@ -48,8 +48,8 @@ public class BossBarManager extends Function {
 
     @Override
     public void onJoin(Player player) {
-        if (Competition.currentCompetition != null){
-            if (Competition.currentCompetition.isJoined(player) && cache.get(player) == null){
+        if (Competition.currentCompetition != null) {
+            if (Competition.currentCompetition.isJoined(player) && cache.get(player) == null) {
                 BossBarSender sender = new BossBarSender(player, Competition.currentCompetition.getCompetitionConfig().getBossBarConfig());
                 if (!sender.getStatus()) {
                     sender.show();
@@ -68,7 +68,7 @@ public class BossBarManager extends Function {
                 sender.show();
             }
             cache.put(player, sender);
-            for (String joinCmd : Competition.currentCompetition.getCompetitionConfig().getJoinCommand()){
+            for (String joinCmd : Competition.currentCompetition.getCompetitionConfig().getJoinCommand()) {
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), joinCmd.replace("{player}", player.getName()));
             }
         }

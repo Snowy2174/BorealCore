@@ -1,10 +1,9 @@
 package plugin.customcooking.listener;
 
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import plugin.customcooking.manager.CookingManager;
+import plugin.customcooking.functions.cooking.CookingManager;
 
 public class ConsumeItemListener implements Listener {
 
