@@ -1,4 +1,4 @@
-package plugin.customcooking.functions.cooking.action;
+package plugin.customcooking.action;
 
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;

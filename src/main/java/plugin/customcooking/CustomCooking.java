@@ -9,7 +9,7 @@ import plugin.customcooking.commands.*;
 import plugin.customcooking.database.SQLite;
 import plugin.customcooking.functions.cooking.CompetitionManager;
 import plugin.customcooking.functions.cooking.CookingManager;
-import plugin.customcooking.functions.jade.JadeDatabase;
+import plugin.customcooking.functions.jade.Database;
 import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.functions.karmicnode.NodeManager;
 import plugin.customcooking.functions.wiki.WikiManager;
@@ -32,12 +32,13 @@ public class CustomCooking extends JavaPlugin {
     private static LayoutManager layoutManager;
     private static EffectManager effectManager;
     private static FurnitureManager furnitureManager;
-    private static DataManager dataManager;
+    private static MasteryManager masteryManager;
     private static InventoryManager inventoryManager;
     private static NodeManager nodeManager;
     private static JadeManager jadeManager;
-    private static JadeDatabase db;
+    private static Database db;
     private static WikiManager wikiManager;
+    private static CraftingManager craftingManager;
     @Override
     public void onLoad() {
         plugin = this;
@@ -54,7 +55,7 @@ public class CustomCooking extends JavaPlugin {
         layoutManager = new LayoutManager();
         effectManager = new EffectManager();
         furnitureManager = new FurnitureManager();
-        dataManager = new DataManager();
+        masteryManager = new MasteryManager();
         recipeManager = new RecipeManager();
         guiManager = new GuiManager();
         placeholderManager = new PlaceholderManager();
@@ -62,6 +63,7 @@ public class CustomCooking extends JavaPlugin {
         jadeManager = new JadeManager();
         wikiManager = new WikiManager();
         db = new SQLite(this);
+        craftingManager = new CraftingManager();
 
         db.dbload();
         inventoryManager.init();
@@ -91,6 +93,7 @@ public class CustomCooking extends JavaPlugin {
         jadeManager.unload();
         nodeManager.unload();
         wikiManager.unload();
+        craftingManager.unload();
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Disabled!");
 
@@ -134,8 +137,8 @@ public class CustomCooking extends JavaPlugin {
         return effectManager;
     }
 
-    public static DataManager getMasteryManager() {
-        return dataManager;
+    public static MasteryManager getMasteryManager() {
+        return masteryManager;
     }
     public static JadeManager getJadeManager() {
         return jadeManager;
@@ -143,7 +146,7 @@ public class CustomCooking extends JavaPlugin {
     public static InventoryManager getInventoryManager() {
         return inventoryManager;
     }
-    public static JadeDatabase getDatabase() {
+    public static Database getDatabase() {
         return db;
     }
     public static NodeManager getNodeManager() {
@@ -151,5 +154,8 @@ public class CustomCooking extends JavaPlugin {
     }
     public static WikiManager getWikiManager() {
         return wikiManager;
+    }
+    public static CraftingManager getCraftingManager() {
+        return craftingManager;
     }
 }

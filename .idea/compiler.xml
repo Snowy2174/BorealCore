@@ -9,8 +9,5 @@
         <module name="CustomCooking" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="CustomCooking" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>

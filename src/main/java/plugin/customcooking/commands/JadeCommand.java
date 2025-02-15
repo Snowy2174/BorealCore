@@ -6,7 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.functions.jade.JadeDatabase;
+import plugin.customcooking.functions.jade.Database;
 import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
@@ -18,11 +18,11 @@ import java.util.Map;
 public class JadeCommand implements CommandExecutor {
 
     private final JadeManager jadeManager;
-    private final JadeDatabase jadeDatabase;
+    private final Database database;
 
     public JadeCommand() {
         this.jadeManager = CustomCooking.getJadeManager();
-        this.jadeDatabase = CustomCooking.getDatabase();
+        this.database = CustomCooking.getDatabase();
     }
 
     @Override
@@ -89,7 +89,7 @@ public class JadeCommand implements CommandExecutor {
         }
         for (String source : new String[]{"cooking", "farming", "fishing", "spirit", "mastery"}) {
             int limit = JadeManager.getLimitForSource(source);
-            int total = jadeDatabase.getRecentPositiveTransactionTimestamps(player, source).size();
+            int total = database.getRecentPositiveTransactionTimestamps(player, source).size();
             AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Limit for " + source + ": " + total + "/" + limit);
         }
 
@@ -102,7 +102,7 @@ public class JadeCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-        int totalJade = jadeDatabase.getJadeForPlayer(player);
+        int totalJade = database.getJadeForPlayer(player);
         AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Total jade: " + totalJade);
     }
 
@@ -145,7 +145,7 @@ public class JadeCommand implements CommandExecutor {
             return;
         }
 
-        int totalJade = jadeDatabase.getJadeForPlayer(player);
+        int totalJade = database.getJadeForPlayer(player);
         AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + totalJade);
     }
 
@@ -156,7 +156,7 @@ public class JadeCommand implements CommandExecutor {
         }
 
         String source = args[0];
-        int totalJade = jadeDatabase.getTotalJadeFromSource(source);
+        int totalJade = database.getTotalJadeFromSource(source);
         AdventureUtil.sendMessage(sender, "Total jade for source " + source + ": " + totalJade);
     }
 
@@ -173,7 +173,7 @@ public class JadeCommand implements CommandExecutor {
         }
 
         String source = args.length > 1 ? args[1] : "";
-        AdventureUtil.sendMessage(sender, "Most recent transaction for " + player.getName() + ": " + jadeDatabase.getRecentPositiveTransactionTimestamps(player, source));
+        AdventureUtil.sendMessage(sender, "Most recent transaction for " + player.getName() + ": " + database.getRecentPositiveTransactionTimestamps(player, source));
     }
 
     private void handleGiveJadeCommand(CommandSender sender, String[] args) {
@@ -215,12 +215,12 @@ public class JadeCommand implements CommandExecutor {
             return;
         }
 
-        int totalJade = jadeDatabase.getJadeForPlayer(player);
+        int totalJade = database.getJadeForPlayer(player);
         AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + totalJade);
     }
 
     private void handleVerifyAndFixTotals(CommandSender sender) {
-        jadeDatabase.verifyAndFixTotals();
+        database.verifyAndFixTotals();
         AdventureUtil.sendMessage(sender, "Jade totals verified and fixed");
     }
 

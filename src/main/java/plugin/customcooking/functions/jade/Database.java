@@ -18,13 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
-public abstract class JadeDatabase {
+public abstract class Database {
     public static CustomCooking plugin;
     public Connection connection;
     public String table = "jade_transactions";
     public int tokens = 0;
 
-    public JadeDatabase(CustomCooking instance) {
+    public Database(CustomCooking instance) {
         plugin = CustomCooking.getInstance();
     }
 

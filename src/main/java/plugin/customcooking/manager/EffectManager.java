@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import plugin.customcooking.functions.cooking.action.*;
+import plugin.customcooking.action.*;
 import plugin.customcooking.functions.cooking.object.Recipe;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.RecipeManager;

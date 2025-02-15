@@ -1,6 +1,6 @@
 package plugin.customcooking.functions.cooking.competition;
 
-import plugin.customcooking.functions.cooking.action.Action;
+import plugin.customcooking.action.Action;
 import plugin.customcooking.functions.cooking.competition.bossbar.BossBarConfig;
 
 import java.util.Calendar;

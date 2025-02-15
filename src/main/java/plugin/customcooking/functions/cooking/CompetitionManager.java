@@ -2,9 +2,9 @@ package plugin.customcooking.functions.cooking;
 
 import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.customcooking.functions.cooking.action.Action;
-import plugin.customcooking.functions.cooking.action.CommandActionImpl;
-import plugin.customcooking.functions.cooking.action.MessageActionImpl;
+import plugin.customcooking.action.Action;
+import plugin.customcooking.action.CommandActionImpl;
+import plugin.customcooking.action.MessageActionImpl;
 import plugin.customcooking.functions.cooking.competition.CompetitionConfig;
 import plugin.customcooking.functions.cooking.competition.CompetitionGoal;
 import plugin.customcooking.functions.cooking.competition.CompetitionSchedule;

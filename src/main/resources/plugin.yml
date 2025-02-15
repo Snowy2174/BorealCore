@@ -1,6 +1,6 @@
 name: CustomCooking
 version: '${project.version}'
-main: CustomCooking
+main: plugin.customcooking.CustomCooking
 author: [ SnowyOwl217 ]
 api-version: 1.18
 depend:
@@ -9,7 +9,6 @@ depend:
   - NBTAPI
   - ItemsAdder
 softdepend:
-  - HolographicDisplays
   - DecentHolograms
 
 commands:

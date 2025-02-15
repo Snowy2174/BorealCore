@@ -16,7 +16,7 @@ import static org.bukkit.Bukkit.getServer;
 
 public class JadeManager extends Function {
 
-    protected static JadeDatabase database;
+    protected static Database database;
 
     public static void giveJadeCommand(Player player, String source, Integer amount) {
         if (database.getRecentPositiveTransactionTimestamps(player, source).size() <= getLimitForSource(source)) {

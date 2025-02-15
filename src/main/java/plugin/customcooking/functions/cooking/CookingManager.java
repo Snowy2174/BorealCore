@@ -18,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.api.event.CookResultEvent;
-import plugin.customcooking.functions.cooking.action.Action;
+import plugin.customcooking.action.Action;
 import plugin.customcooking.functions.cooking.competition.Competition;
 import plugin.customcooking.functions.cooking.object.DroppedItem;
 import plugin.customcooking.functions.cooking.object.Ingredient;
@@ -27,7 +27,7 @@ import plugin.customcooking.functions.cooking.object.Recipe;
 import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.listener.ConsumeItemListener;
 import plugin.customcooking.listener.InteractListener;
-import plugin.customcooking.manager.DataManager;
+import plugin.customcooking.manager.MasteryManager;
 import plugin.customcooking.manager.FurnitureManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.LayoutManager;
@@ -199,7 +199,7 @@ public class CookingManager extends Function {
             AdventureUtil.playerMessage(player,MessageManager.infoPositive + MessageManager.cookingPerfect.replace("{recipe}", droppedItem.getNick()));
             drop = drop + ConfigManager.perfectItemSuffix;
             if (!RecipeDataUtil.hasMastery(player, droppedItem.getKey())) {
-                DataManager.handleMastery(player, droppedItem.getKey());
+                MasteryManager.handleMastery(player, droppedItem.getKey());
             }
             if (Math.random() < ConfigManager.cookingJadeRewardRate) {
                 JadeManager.give(player, 1, "cooking");
@@ -229,7 +229,7 @@ public class CookingManager extends Function {
         InventoryUtil.giveItem(player, drop, 1, true);
         sendSuccessTitle(player, droppedItem.getNick());
 
-        DataManager.incrementRecipeCount(player);
+        MasteryManager.incrementRecipeCount(player);
     }
 
     private void refundIngredients(Player player, Recipe loot) {

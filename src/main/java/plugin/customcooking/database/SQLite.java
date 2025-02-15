@@ -1,7 +1,7 @@
 package plugin.customcooking.database;
 
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.functions.jade.JadeDatabase;
+import plugin.customcooking.functions.jade.Database;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-public class SQLite extends JadeDatabase {
+public class SQLite extends Database {
     public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS jade_transactions (" + // make sure to put your table name in here too.
             "`player` varchar(32) NOT NULL," + // This creates the different columns you will save data to. varchar(32) Is a string, int = integer
             "`amount` int(11) NOT NULL," +
@@ -52,7 +52,7 @@ public class SQLite extends JadeDatabase {
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, "SQLite exception on initialize", ex);
         } catch (ClassNotFoundException ex) {
-            plugin.getLogger().log(Level.SEVERE, "You need the SQLite JBDC library. Google it. Put it in /lib folder.");
+            plugin.getLogger().log(Level.SEVERE, "You need the SQLite JBDC library.");
         }
         return result;
     }

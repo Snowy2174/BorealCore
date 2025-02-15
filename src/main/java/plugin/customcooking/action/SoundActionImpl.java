@@ -1,4 +1,4 @@
-package plugin.customcooking.functions.cooking.action;
+package plugin.customcooking.action;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
