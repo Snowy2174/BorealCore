@@ -362,4 +362,34 @@ public abstract class Database {
 
         return leaderboard;
     }
+
+    public List<String> getAllSources() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<String> sources = new ArrayList<>();
+
+        try {
+            conn = this.getSQLConnection();
+            String query = "SELECT DISTINCT source FROM jade_transactions;";
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                sources.add(rs.getString("source"));
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
+            }
+        }
+
+        return sources;
+    }
 }

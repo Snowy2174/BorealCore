@@ -3,7 +3,7 @@ package plugin.customcooking.functions.cooking;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import plugin.customcooking.manager.DataManager;
+import plugin.customcooking.manager.MasteryManager;
 import plugin.customcooking.utility.InventoryUtil;
 import plugin.customcooking.utility.RecipeDataUtil;
 
@@ -49,7 +49,7 @@ public class CookingPapi extends PlaceholderExpansion {
                 return playerHasIngredient ? "&a" : "&c"; // returns green if player has the item, red otherwise
             case "cooking-stats":
                 String playerName = parts[1];
-                return String.valueOf(DataManager.getRecipeCount(playerName));
+                return String.valueOf(MasteryManager.getRecipeCount(playerName));
             case "masterycount":
                 recipe = parts[1];
                 masteryCount = RecipeDataUtil.getMasteryCount(player, recipe);

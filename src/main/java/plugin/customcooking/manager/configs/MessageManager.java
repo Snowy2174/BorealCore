@@ -49,6 +49,10 @@ public class MessageManager {
     public static String pluginError;
     public static String TOTAL_SCORE;
     public static String CATCH_AMOUNT;
+    public static String jadeFirstTime;
+    public static String jadeReceived;
+    public static String jadeLimitReached;
+    public static String jadeBroadcast;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang + ".yml");
@@ -98,6 +102,11 @@ public class MessageManager {
         pluginError = getOrSet(config, "plugin-error", "<red>Please contact @Snow'eh on discord with a full report of this error");
         TOTAL_SCORE = getOrSet(config, "total_score", "Total score");
         CATCH_AMOUNT = getOrSet(config, "catch_amount", "Catch amount");
+
+        jadeFirstTime = getOrSet(config, "jade-first-time", "<gray>[<green>!<gray>] This is the first time you've gotten Jade from {source} today, you have {limit} remaining.");
+        jadeReceived = getOrSet(config, "jade-received", "<gray>[<green>!<gray>] You have received {amount} Jade.");
+        jadeLimitReached = getOrSet(config, "jade-limit-reached", "<gray>[<red>!<gray>] You've reached your limit for Jade from {source} today, try again later.");
+        jadeBroadcast = getOrSet(config, "jade-broadcast", "<gray>[<green>!<gray>] Whilst {source}, {player} has found {amount}₪.");
         try {
             config.save(new File(CustomCooking.getInstance().getDataFolder(), "messages_" + ConfigManager.lang + ".yml"));
         } catch (IOException ignore) {

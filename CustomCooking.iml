@@ -4,12 +4,11 @@
     <facet type="minecraft" name="Minecraft">
       <configuration>
         <autoDetectTypes>
-          <platformType>SPIGOT</platformType>
+          <platformType>PAPER</platformType>
+          <platformType>ADVENTURE</platformType>
         </autoDetectTypes>
+        <projectReimportVersion>1</projectReimportVersion>
       </configuration>
     </facet>
-  </component>
-  <component name="SonarLintModuleSettings">
-    <option name="uniqueId" value="87fa3336-7f22-4af3-a231-ba08369f8ec8" />
   </component>
 </module>

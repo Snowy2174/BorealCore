@@ -25,7 +25,18 @@ import java.io.IOException;
 import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 import static plugin.customcooking.utility.ConfigUtil.getConfig;
 
-public class DataManager extends Function {
+public class MasteryManager extends Function {
+
+    @Override
+    public void load() {
+        AdventureUtil.consoleMessage(MessageManager.prefix + "Loaded mastery values");
+    }
+
+    @Override
+    public void unload() {
+        savePlayerStats(getConfig("playerstats.yml"));
+        AdventureUtil.consoleMessage(MessageManager.prefix + "Unloaded mastery values");
+    }
 
 
     public static void handleMastery(Player player, String recipe) {
@@ -123,17 +134,6 @@ public class DataManager extends Function {
             }
         }
         return migratedCount;
-    }
-
-    @Override
-    public void load() {
-        AdventureUtil.consoleMessage(MessageManager.prefix + "Loaded mastery values");
-    }
-
-    @Override
-    public void unload() {
-        savePlayerStats(getConfig("playerstats.yml"));
-        AdventureUtil.consoleMessage(MessageManager.prefix + "Unloaded mastery values");
     }
 
 }

@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
+import static plugin.customcooking.functions.jade.JadeManager.jadeLimit;
+
 public class JadeTabCompletion implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
@@ -26,7 +28,7 @@ public class JadeTabCompletion implements TabCompleter {
             completions.add("balance");
             completions.add("limits");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("totalJadeForSource")) {
-            completions.addAll(List.of("cooking", "farming", "fishing", "spirit", "mastery"));
+            completions.addAll(jadeLimit.keySet());
         } else if (args.length == 2) {
             completions.addAll(getOnlinePlayerNames());
         }

@@ -9,7 +9,7 @@ import plugin.customcooking.CustomCooking;
 import plugin.customcooking.functions.cooking.CookingManager;
 import plugin.customcooking.functions.cooking.competition.Competition;
 import plugin.customcooking.functions.cooking.competition.CompetitionSchedule;
-import plugin.customcooking.manager.DataManager;
+import plugin.customcooking.manager.MasteryManager;
 import plugin.customcooking.manager.GuiManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
@@ -82,7 +82,7 @@ public class CookCommand implements CommandExecutor {
 
             AdventureUtil.sendMessage(sender, "<gold><bold>CustomCooking</bold><grey> version 1.1.4");
             AdventureUtil.sendMessage(sender, "<grey>Created by <gold>SnowyOwl217");
-            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Cooked: " + DataManager.getRecipeCount(player.getName()));
+            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Cooked: " + MasteryManager.getRecipeCount(player.getName()));
             AdventureUtil.sendMessage(sender, "<gold> Total Recipes Unlocked: " + unlockedRecipes.size());
             AdventureUtil.sendMessage(sender, "<gold> Total Recipes Mastered: " + RecipeDataUtil.getMasteredRecipes(player, unlockedRecipes).size());
             AdventureUtil.sendMessage(sender, "<gold> Total Recipes Unknown: " + RecipeDataUtil.getLockedRecipes(unlockedRecipes).size());
@@ -131,7 +131,7 @@ public class CookCommand implements CommandExecutor {
 
     private void handleMigratePermsCommand(CommandSender sender) {
         long startTime = System.currentTimeMillis();
-        int migratedCount = DataManager.migratePermissions();
+        int migratedCount = MasteryManager.migratePermissions();
         AdventureUtil.sendMessage(sender, MessageManager.prefix + " Migrated and Updated the perms for <green>" + migratedCount + "Recipes and Masteries <gray> in <green>" + (System.currentTimeMillis() - startTime) + "ms");
     }
 

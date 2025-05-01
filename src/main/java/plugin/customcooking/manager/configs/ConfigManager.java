@@ -46,10 +46,6 @@ public class ConfigManager {
     public static int failureFadeIn;
     public static int failureFadeStay;
     public static int failureFadeOut;
-    public static int cropsLimit;
-    public static int cookingLimit;
-    public static int fishingLimit;
-    public static int spiritLimit;
     public static double cookingJadeRewardRate;
 
     public static void load() {
@@ -88,11 +84,6 @@ public class ConfigManager {
         cookLineShift = config.getString("gui.config.info-shift-cook", "<!italic><#ffcc33>[Middle Click] <#ffcc99>to Autocook x16");
         unknownItem = config.getString("gui.items.unknown-item", "unknownrecipe");
         grinderItem = config.getString("gui.items.grinder-item", "grinder");
-
-        fishingLimit = config.getInt("jade.limits.fishing", 100);
-        cookingLimit = config.getInt("jade.limits.cooking", 10);
-        cropsLimit = config.getInt("jade.limits.farming", 15);
-        spiritLimit = config.getInt("jade.limits.spirit", 100);
 
         successTitle = config.getStringList("titles.success.title").toArray(new String[0]);
         successSubTitle = config.getStringList("titles.success.subtitle").toArray(new String[0]);

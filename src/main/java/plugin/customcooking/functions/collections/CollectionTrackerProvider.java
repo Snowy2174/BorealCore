@@ -60,18 +60,6 @@ public class CollectionTrackerProvider implements InventoryProvider {
                 e -> PROGRESSION_MENU.open(player, pagination.next().getPage())));
         // Insert logic to check if the player has collected item
     }
-
-    private ItemStack buildRecipeItem(String recipe, Player player, boolean hasMastery){
-        CustomStack customStack = CustomStack.getInstance(recipe);
-        if (hasMastery) {customStack = CustomStack.getInstance(recipe + ConfigManager.perfectItemSuffix);}
-        if (customStack == null) {
-            return null;
-        } else {
-            ItemStack stack = customStack.getItemStack();
-            modifyLore(stack, player, recipe, hasMastery);
-            return stack;
-        }
-    }
     private void modifyLore(ItemStack itemStack, Player player, String recipe, Boolean hasMastery) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta == null) {
