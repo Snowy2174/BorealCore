@@ -60,9 +60,9 @@ public class CustomCooking extends JavaPlugin {
         guiManager = new GuiManager();
         placeholderManager = new PlaceholderManager();
         nodeManager = new NodeManager();
-        jadeManager = new JadeManager();
         wikiManager = new WikiManager();
         db = new SQLite(this);
+        jadeManager = new JadeManager(db);
         craftingManager = new CraftingManager();
 
         db.dbload();

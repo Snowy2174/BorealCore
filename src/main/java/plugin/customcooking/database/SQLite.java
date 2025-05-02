@@ -27,10 +27,9 @@ public class SQLite extends Database {
 
     public SQLite(CustomCooking instance) {
         super(instance);
-        dbname = "jade_transactions"; // Set the table name here e.g player_kills
+        dbname = "jade_transactions";
     }
 
-    // SQL creation stuff, You can leave the blow stuff untouched.
     public Connection getSQLConnection() {
         Connection result = null;
         File dataFolder = new File(plugin.getDataFolder(), dbname + ".db");

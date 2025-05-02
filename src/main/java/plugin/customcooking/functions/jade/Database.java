@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
+import static plugin.customcooking.functions.jade.JadeManager.jadeSources;
+
 public abstract class Database {
     public static CustomCooking plugin;
     public Connection connection;
@@ -229,6 +231,72 @@ public abstract class Database {
         }
 
         return timestamps;
+    }
+
+    public boolean isOnCooldown(Player player, String source) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = this.getSQLConnection();
+            String query = "SELECT timestamp FROM jade_transactions WHERE player = ? AND source = ? ORDER BY timestamp DESC LIMIT 1;";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, player.getName().toLowerCase());
+            ps.setString(2, source);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                LocalDateTime lastTransactionTime = rs.getTimestamp("timestamp").toLocalDateTime();
+                LocalDateTime cooldownEndTime = lastTransactionTime.plusSeconds((long) jadeSources.get(source).getCooldown());
+                return LocalDateTime.now().isBefore(cooldownEndTime);
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
+            }
+        }
+
+        return false;
+    }
+
+    public long getCooldownTimeLeft(Player player, String source) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = this.getSQLConnection();
+            String query = "SELECT timestamp FROM jade_transactions WHERE player = ? AND source = ? ORDER BY timestamp DESC LIMIT 1;";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, player.getName().toLowerCase());
+            ps.setString(2, source);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                LocalDateTime lastTransactionTime = rs.getTimestamp("timestamp").toLocalDateTime();
+                LocalDateTime cooldownEndTime = lastTransactionTime.plusSeconds((long) jadeSources.get(source).getCooldown());
+                return ChronoUnit.SECONDS.between(LocalDateTime.now(), cooldownEndTime);
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
+            }
+        }
+
+        return 0;
     }
 
     public void verifyAndFixTotals() {

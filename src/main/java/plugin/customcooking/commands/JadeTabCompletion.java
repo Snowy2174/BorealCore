@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.customcooking.functions.jade.JadeManager.jadeLimit;
+import static plugin.customcooking.functions.jade.JadeManager.jadeSources;
 
 public class JadeTabCompletion implements TabCompleter {
     @Override
@@ -28,7 +28,7 @@ public class JadeTabCompletion implements TabCompleter {
             completions.add("balance");
             completions.add("limits");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("totalJadeForSource")) {
-            completions.addAll(jadeLimit.keySet());
+            completions.addAll(jadeSources.keySet());
         } else if (args.length == 2) {
             completions.addAll(getOnlinePlayerNames());
         }

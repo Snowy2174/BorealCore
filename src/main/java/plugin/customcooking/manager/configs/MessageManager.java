@@ -53,6 +53,7 @@ public class MessageManager {
     public static String jadeReceived;
     public static String jadeLimitReached;
     public static String jadeBroadcast;
+    public static String jadeCooldown;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang + ".yml");
@@ -103,10 +104,12 @@ public class MessageManager {
         TOTAL_SCORE = getOrSet(config, "total_score", "Total score");
         CATCH_AMOUNT = getOrSet(config, "catch_amount", "Catch amount");
 
-        jadeFirstTime = getOrSet(config, "jade-first-time", "<gray>[<green>!<gray>] This is the first time you've gotten Jade from {source} today, you have {limit} remaining.");
-        jadeReceived = getOrSet(config, "jade-received", "<gray>[<green>!<gray>] You have received {amount} Jade.");
-        jadeLimitReached = getOrSet(config, "jade-limit-reached", "<gray>[<red>!<gray>] You've reached your limit for Jade from {source} today, try again later.");
-        jadeBroadcast = getOrSet(config, "jade-broadcast", "<gray>[<green>!<gray>] Whilst {source}, {player} has found {amount}₪.");
+        jadeFirstTime = getOrSet(config, "jade-first-time", "This is the first time you've gotten Jade from {source} today, you have {limit} remaining.");
+        jadeReceived = getOrSet(config, "jade-received", "You have received {amount} Jade.");
+        jadeLimitReached = getOrSet(config, "jade-limit-reached", "You've reached your limit for Jade from {source} today, try again later.");
+        jadeBroadcast = getOrSet(config, "jade-broadcast", "Whilst {source}, {player} has found {amount}₪.");
+        jadeCooldown = getOrSet(config, "jade-cooldown", "You need to wait {time} seconds before earning jade from this source.");
+
         try {
             config.save(new File(CustomCooking.getInstance().getDataFolder(), "messages_" + ConfigManager.lang + ".yml"));
         } catch (IOException ignore) {

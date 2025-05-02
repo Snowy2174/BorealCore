@@ -23,38 +23,42 @@ import static org.bukkit.Bukkit.getServer;
 public class JadeManager extends Function {
 
     protected static Database database;
-    public static HashMap<String, Integer> jadeLimit = new HashMap<>();
+    // Modify this to store the jade cooldowns if they exist
+    public static HashMap<String, JadeSource> jadeSources = new HashMap<>();
+
+    public JadeManager(Database database) {
+        this.database = database;
+    }
 
     @Override
     public void load() {
-        AdventureUtil.consoleMessage("[CustomCooking] Initialised Jade limit system");
-        jadeLimit = loadJadeLimits();
-        AdventureUtil.consoleMessage("[JadeManager] Loaded Jade limits: " + jadeLimit.toString());
-        database = CustomCooking.getDatabase();
+        loadJadeLimits();
         database.verifyAndFixTotals();
-
-        // Check for sources in the database not in jadeLimit
-        List<String> sources = database.getAllSources();
-        for (String source : sources) {
-            if (!jadeLimit.containsKey(source)) {
-                AdventureUtil.consoleMessage("[JadeManager] Warning: Source '" + source + "' is not defined in jade limits.");
-            }
-        }
+        checkUndefinedSources();
     }
 
     @Override
     public void unload() {
-        jadeLimit.clear();
+        jadeSources.clear();
     }
 
-    private HashMap<String, Integer> loadJadeLimits() {
+    private void checkUndefinedSources() {
+        for (String source : database.getAllSources()) {
+            if (!jadeSources.containsKey(source)) {
+                System.out.println("[JadeManager] Warning: Undefined source '" + source + "'.");
+            }
+        }
+    }
+
+    private void loadJadeLimits() {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
-        HashMap<String, Integer> jadeLimit = new HashMap<>();
         for (String key : config.getConfigurationSection("jade.limits").getKeys(false)) {
             int limit = config.getInt("jade.limits." + key);
-            jadeLimit.put(key, limit);
+            long cooldown = config.getLong("jade.cooldown." + key, 0);
+            jadeSources.put(key, new JadeSource(key, cooldown, limit));
         }
-        return jadeLimit;
+        AdventureUtil.consoleMessage("[CustomCooking] Initialised Jade limit system");
+        AdventureUtil.consoleMessage("[JadeManager] Loaded Jade limits: " + jadeSources.toString());
     }
 
     public HashMap<String, Integer> getJadeLeaderboard() {
@@ -62,10 +66,17 @@ public class JadeManager extends Function {
     }
 
     public static void giveJadeCommand(Player player, String source, Integer amount) {
+        // Check if player is on cooldown
+        if (database.isOnCooldown(player, source)) {
+            AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeCooldown
+                    .replace("{time}", String.valueOf(database.getCooldownTimeLeft(player, source))));
+            return;
+        }
+        // Check if player has reached Limit
         if (database.getRecentPositiveTransactionTimestamps(player, source).size() <= getLimitForSource(source)) {
             give(player, amount, source);
         } else {
-            AdventureUtil.sendMessage(player, MessageManager.jadeLimitReached
+            AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeLimitReached
                     .replace("{source}", GUIUtil.formatString(source)));
         }
     }
@@ -74,14 +85,15 @@ public class JadeManager extends Function {
         boolean first = source.isBlank() || database.getRecentPositiveTransactionTimestamps(player, source).isEmpty();
 
         if (first && !source.isEmpty()) {
-            AdventureUtil.sendMessage(player, MessageManager.jadeFirstTime
+            AdventureUtil.sendMessage(player, MessageManager.infoPositive + MessageManager.jadeFirstTime
                     .replace("{source}", GUIUtil.formatString(source))
                     .replace("{limit}", String.valueOf(getLimitForSource(source))));
         } else {
-            AdventureUtil.sendMessage(player, MessageManager.jadeReceived
+            AdventureUtil.sendMessage(player, MessageManager.infoPositive + MessageManager.jadeReceived
                     .replace("{amount}", String.valueOf(amount)));
         }
 
+        // Temp until migration is done
         String command = "av User " + player.getName() + " AddPoints " + (int) amount;
         Bukkit.dispatchCommand(getServer().getConsoleSender(), command);
 
@@ -90,7 +102,7 @@ public class JadeManager extends Function {
         JadeEvent jadeEvent = new JadeEvent(player, amount, source);
         Bukkit.getPluginManager().callEvent(jadeEvent);
 
-        String bcast = MessageManager.jadeBroadcast
+        String bcast = MessageManager.infoPositive + MessageManager.jadeBroadcast
                 .replace("{source}", source.isEmpty() ? "playing" : GUIUtil.formatString(source))
                 .replace("{player}", player.getName())
                 .replace("{amount}", String.valueOf((int) amount));
@@ -108,7 +120,7 @@ public class JadeManager extends Function {
         if (source.isEmpty()) {
             return Integer.MAX_VALUE;
         }
-        return jadeLimit.getOrDefault(source, 100);
+        return jadeSources.get(source).getLimit();
     }
 
     public static String checkJadeLimit(Player player, String source) {
