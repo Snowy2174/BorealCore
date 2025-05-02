@@ -50,16 +50,16 @@ public class JadeManager extends Function {
         }
     }
 
-    private void loadJadeLimits() {
-        YamlConfiguration config = ConfigUtil.getConfig("config.yml");
-        for (String key : config.getConfigurationSection("jade.limits").getKeys(false)) {
-            int limit = config.getInt("jade.limits." + key);
-            long cooldown = config.getLong("jade.cooldown." + key, 0);
-            jadeSources.put(key, new JadeSource(key, cooldown, limit));
-        }
-        AdventureUtil.consoleMessage("[CustomCooking] Initialised Jade limit system");
-        AdventureUtil.consoleMessage("[JadeManager] Loaded Jade limits: " + jadeSources.toString());
-    }
+private void loadJadeLimits() {
+                YamlConfiguration config = ConfigUtil.getConfig("config.yml");
+                for (String key : config.getConfigurationSection("jade.sources").getKeys(false)) {
+                    int limit = config.getInt("jade.sources." + key + ".limit");
+                    long cooldown = config.getLong("jade.sources." + key + ".cooldown", 0);
+                    jadeSources.put(key, new JadeSource(key, cooldown, limit));
+                }
+                AdventureUtil.consoleMessage("[CustomCooking] Initialised Jade limit system");
+                AdventureUtil.consoleMessage("[JadeManager] Loaded Jade limits: " + jadeSources.toString());
+            }
 
     public HashMap<String, Integer> getJadeLeaderboard() {
         return database.getJadeLeaderboard();

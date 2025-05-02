@@ -1,5 +1,23 @@
 lang: english
 
+jade:
+  sources:
+    farming:
+      limit: 10
+      cooldown: 0
+    fishing:
+      limit: 10
+      cooldown: 0
+    cooking:
+      limit: 10
+      cooldown: 0
+    fighting:
+      limit: 10
+      cooldown: 0
+    shopping:
+      limit: 10
+      cooldown: 0
+
 mechanics:
   perfect-chance: 0.3
   splash-time: 80
