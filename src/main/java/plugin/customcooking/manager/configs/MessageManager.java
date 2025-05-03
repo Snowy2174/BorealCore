@@ -54,6 +54,7 @@ public class MessageManager {
     public static String jadeLimitReached;
     public static String jadeBroadcast;
     public static String jadeCooldown;
+    public static String jadeSourceNotFound;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang + ".yml");
@@ -109,6 +110,7 @@ public class MessageManager {
         jadeLimitReached = getOrSet(config, "jade-limit-reached", "You've reached your limit for Jade from {source} today, try again later.");
         jadeBroadcast = getOrSet(config, "jade-broadcast", "Whilst {source}, {player} has found {amount}₪.");
         jadeCooldown = getOrSet(config, "jade-cooldown", "You need to wait {time} seconds before earning jade from this source.");
+        jadeSourceNotFound = getOrSet(config, "jade-source-not-found", "That source does not exist.");
 
         try {
             config.save(new File(CustomCooking.getInstance().getDataFolder(), "messages_" + ConfigManager.lang + ".yml"));

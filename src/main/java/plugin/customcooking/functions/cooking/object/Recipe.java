@@ -2,8 +2,8 @@ package plugin.customcooking.functions.cooking.object;
 
 
 import net.kyori.adventure.text.Component;
-import plugin.customcooking.functions.cooking.Difficulty;
 import plugin.customcooking.action.Action;
+import plugin.customcooking.functions.cooking.Difficulty;
 
 import java.util.Collections;
 import java.util.List;

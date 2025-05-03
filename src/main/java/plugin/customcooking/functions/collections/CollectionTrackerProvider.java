@@ -1,6 +1,5 @@
 package plugin.customcooking.functions.collections;
 
-import dev.lone.itemsadder.api.CustomStack;
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;

@@ -65,6 +65,11 @@ private void loadJadeLimits() {
         // Reconsile Jade data
         if (reconsileJadeData(player)) {
             AdventureUtil.consoleMessage( MessageManager.infoPositive + "Jade data has been reconsiled for " + player.getName());
+        }
+        // Check if source exists
+        if (!jadeSources.containsKey(source) && !source.isEmpty()) {
+            AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeSourceNotFound
+                    .replace("{source}", GUIUtil.formatString(source)));
             return;
         }
 
@@ -75,7 +80,7 @@ private void loadJadeLimits() {
             return;
         }
         // Check if player has reached Limit
-        if (database.getRecentPositiveTransactionTimestamps(player, source).size() <= getLimitForSource(source)) {
+        if (database.getRecentPositiveTransactionTimestamps(player, source).size() + 1 <= getLimitForSource(source)) {
             give(player, amount, source);
         } else {
             AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeLimitReached
@@ -137,13 +142,16 @@ private void loadJadeLimits() {
             System.out.println("Jade data is already reconciled for " + player.getName() + " or " + avPoints + " jade");
             return false;
         }
-        System.out.println("Old jade " + avPoints + " new jade " + database.getJadeForPlayer(player));
+        System.out.println("Old jade: " + avPoints + ", new jade: " + database.getJadeForPlayer(player));
 
-        int jadeDiff = avPoints - database.getJadeForPlayer(player);
-        if (jadeDiff > 0) {
-            System.out.println("Positive jade diff: " + jadeDiff);
+        if (avPoints > database.getJadeForPlayer(player)) {
+            int diff = avPoints - database.getJadeForPlayer(player);
+            System.out.println("I would like to add " + diff + " jade to " + player.getName());
+            //give(player, diff, "migration");
         } else {
-            System.out.println("Negative jade diff: " + jadeDiff);
+            int diff = database.getJadeForPlayer(player) - avPoints;
+            System.out.println("I would like to remove " + diff + " jade from " + player.getName());
+            //remove(player, diff, "migration");
         }
         return true;
     }

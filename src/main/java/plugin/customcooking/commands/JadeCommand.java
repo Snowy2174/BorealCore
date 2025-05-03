@@ -71,6 +71,8 @@ public class JadeCommand implements CommandExecutor {
             handleGetPlayerData(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("verifyAndFixTotals")) {
             handleVerifyAndFixTotals(sender);
+        } else if (subcommand.equalsIgnoreCase("reconsile")) {
+            handleReconsileCommand(sender, subargs);
         } else {
             return false;
         }
