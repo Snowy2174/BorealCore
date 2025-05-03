@@ -1,14 +1,7 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
-package plugin.customcooking.functions.jade;
+package plugin.customcooking.database;
 
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.database.Error;
-import plugin.customcooking.database.Errors;
 
 import java.sql.*;
 import java.time.LocalDateTime;

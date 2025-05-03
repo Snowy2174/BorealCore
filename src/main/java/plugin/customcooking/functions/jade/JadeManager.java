@@ -1,29 +1,25 @@
 package plugin.customcooking.functions.jade;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import plugin.customcooking.CustomCooking;
-import plugin.customcooking.api.event.CookResultEvent;
 import plugin.customcooking.api.event.JadeEvent;
-import plugin.customcooking.manager.configs.ConfigManager;
+import plugin.customcooking.database.Database;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.AdventureUtil;
 import plugin.customcooking.utility.ConfigUtil;
 import plugin.customcooking.utility.GUIUtil;
-import plugin.customcooking.utility.InventoryUtil;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 
 import static org.bukkit.Bukkit.getServer;
 
 public class JadeManager extends Function {
 
     protected static Database database;
-    // Modify this to store the jade cooldowns if they exist
     public static HashMap<String, JadeSource> jadeSources = new HashMap<>();
 
     public JadeManager(Database database) {
@@ -66,6 +62,12 @@ private void loadJadeLimits() {
     }
 
     public static void giveJadeCommand(Player player, String source, Integer amount) {
+        // Reconsile Jade data
+        if (reconsileJadeData(player)) {
+            AdventureUtil.consoleMessage( MessageManager.infoPositive + "Jade data has been reconsiled for " + player.getName());
+            return;
+        }
+
         // Check if player is on cooldown
         if (database.isOnCooldown(player, source)) {
             AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeCooldown
@@ -112,14 +114,11 @@ private void loadJadeLimits() {
     public static void remove(Player player, double amount, String source) {
         String command = "av User " + player.getName() + " RemovePoints " + (int) amount;
         Bukkit.dispatchCommand(getServer().getConsoleSender(), command);
-
         database.addTransaction(player, -amount, source, LocalDateTime.now());
     }
 
     public static int getLimitForSource(String source) {
-        if (source.isEmpty()) {
-            return Integer.MAX_VALUE;
-        }
+        if (source.isEmpty()) {return Integer.MAX_VALUE;}
         return jadeSources.get(source).getLimit();
     }
 
@@ -130,6 +129,22 @@ private void loadJadeLimits() {
     public static int getTotalJadeForPlayer(Player player) {
         return database.getJadeForPlayer(player);
     }
-
     // @TODO Implement migrate Legacy jade data
+
+    public static boolean reconsileJadeData(Player player) {
+        int avPoints = Integer.parseInt(PlaceholderAPI.setPlaceholders(player, "%VotingPlugin_Points%"));
+        if (avPoints == database.getJadeForPlayer(player)) {
+            System.out.println("Jade data is already reconciled for " + player.getName() + " or " + avPoints + " jade");
+            return false;
+        }
+        System.out.println("Old jade " + avPoints + " new jade " + database.getJadeForPlayer(player));
+
+        int jadeDiff = avPoints - database.getJadeForPlayer(player);
+        if (jadeDiff > 0) {
+            System.out.println("Positive jade diff: " + jadeDiff);
+        } else {
+            System.out.println("Negative jade diff: " + jadeDiff);
+        }
+        return true;
+    }
 }

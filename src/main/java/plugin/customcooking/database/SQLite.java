@@ -1,7 +1,6 @@
 package plugin.customcooking.database;
 
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.functions.jade.Database;
 
 import java.io.File;
 import java.io.IOException;

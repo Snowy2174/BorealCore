@@ -6,7 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.functions.jade.Database;
+import plugin.customcooking.database.Database;
 import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static plugin.customcooking.functions.jade.JadeManager.jadeSources;
+import static plugin.customcooking.functions.jade.JadeManager.reconsileJadeData;
 
 
 public class JadeCommand implements CommandExecutor {
@@ -224,6 +225,24 @@ public class JadeCommand implements CommandExecutor {
     private void handleVerifyAndFixTotals(CommandSender sender) {
         database.verifyAndFixTotals();
         AdventureUtil.sendMessage(sender, "Jade totals verified and fixed");
+    }
+
+    private void handleReconsileCommand(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade getPlayerData <player>");
+            return;
+        }
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+
+        if (reconsileJadeData(player)) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Jade data has been reconciled");
+        } else {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Failed to reconcile jade data");
+        }
     }
 
 }

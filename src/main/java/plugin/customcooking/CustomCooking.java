@@ -9,7 +9,7 @@ import plugin.customcooking.commands.*;
 import plugin.customcooking.database.SQLite;
 import plugin.customcooking.functions.cooking.CompetitionManager;
 import plugin.customcooking.functions.cooking.CookingManager;
-import plugin.customcooking.functions.jade.Database;
+import plugin.customcooking.database.Database;
 import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.functions.karmicnode.NodeManager;
 import plugin.customcooking.functions.wiki.WikiManager;
