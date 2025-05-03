@@ -7,6 +7,7 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.customcooking.commands.*;
 import plugin.customcooking.database.SQLite;
+import plugin.customcooking.functions.brewery.BreweryManager;
 import plugin.customcooking.functions.cooking.CompetitionManager;
 import plugin.customcooking.functions.cooking.CookingManager;
 import plugin.customcooking.database.Database;
@@ -39,6 +40,8 @@ public class CustomCooking extends JavaPlugin {
     private static Database db;
     private static WikiManager wikiManager;
     private static CraftingManager craftingManager;
+    private static BreweryManager breweryManager;
+
     @Override
     public void onLoad() {
         plugin = this;
@@ -64,6 +67,7 @@ public class CustomCooking extends JavaPlugin {
         db = new SQLite(this);
         jadeManager = new JadeManager(db);
         craftingManager = new CraftingManager();
+        breweryManager = new BreweryManager();
 
         db.dbload();
         inventoryManager.init();
@@ -128,6 +132,9 @@ public class CustomCooking extends JavaPlugin {
     }
     public static FurnitureManager getFurnitureManager() {
         return furnitureManager;
+    }
+    public static BreweryManager getBreweryManager() {
+        return breweryManager;
     }
 
     public static RecipeManager getRecipeManager() {
