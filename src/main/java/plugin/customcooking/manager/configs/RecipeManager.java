@@ -8,7 +8,6 @@ import plugin.customcooking.functions.cooking.Difficulty;
 import plugin.customcooking.functions.cooking.object.DroppedItem;
 import plugin.customcooking.functions.cooking.object.Layout;
 import plugin.customcooking.functions.cooking.object.Recipe;
-import plugin.customcooking.manager.EffectManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.AdventureUtil;
 

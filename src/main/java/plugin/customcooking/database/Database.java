@@ -292,6 +292,65 @@ public abstract class Database {
         return 0;
     }
 
+    public HashMap<String, Double> getJadeFromSources(Player player) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        HashMap<String, Double> sourceJadeMap = new HashMap<>();
+
+        try {
+            conn = this.getSQLConnection();
+            String query = "SELECT source, SUM(amount) AS total FROM jade_transactions WHERE player = ? AND amount > 0 AND timestamp >= ? GROUP BY source";
+
+            // Check for transactions in the last 24 hours
+            ps = conn.prepareStatement(query);
+            ps.setString(1, player.getName().toLowerCase());
+            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minus(24, ChronoUnit.HOURS)));
+            rs = ps.executeQuery();
+
+            boolean playerExists = false;
+            while (rs.next()) {
+                playerExists = true;
+                String source = rs.getString("source");
+                double total = rs.getDouble("total");
+                sourceJadeMap.put(source, total);
+            }
+
+            // If no transactions in the last 24 hours, check for the last month
+            if (!playerExists) {
+                ps = conn.prepareStatement(query);
+                ps.setString(1, player.getName().toLowerCase());
+                ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minus(30, ChronoUnit.DAYS)));
+                rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    String source = rs.getString("source");
+                    double total = rs.getDouble("total");
+                    sourceJadeMap.put(source, total);
+                }
+
+                if (sourceJadeMap.isEmpty()) {
+                    sourceJadeMap.put("not_in_database", 0.0);
+                }
+
+                rs.close();
+                ps.close();
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
+            }
+        }
+
+        return sourceJadeMap;
+    }
+
     public void verifyAndFixTotals() {
         Connection conn = null;
         PreparedStatement psTransactions = null;

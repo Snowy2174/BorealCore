@@ -11,6 +11,7 @@ public class ConfigUtil {
 
     public static YamlConfiguration getConfig(String configName) {
         File file = new File(CustomCooking.plugin.getDataFolder(), configName);
+        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         if (!file.exists()) CustomCooking.plugin.saveResource(configName, false);
         return YamlConfiguration.loadConfiguration(file);
     }

@@ -17,7 +17,7 @@ public class LayoutManager extends Function {
     @Override
     public void load() {
         LAYOUTS = new HashMap<>();
-        YamlConfiguration config = ConfigUtil.getConfig("bars.yml");
+        YamlConfiguration config = ConfigUtil.getConfig("recipes/bars.yml");
         Set<String> keys = config.getKeys(false);
         for (String key : keys) {
             int range = config.getInt(key + ".range");

@@ -14,7 +14,6 @@ import plugin.customcooking.utility.AdventureUtil;
 import java.util.HashMap;
 import java.util.Map;
 
-import static plugin.customcooking.functions.jade.JadeManager.jadeSources;
 import static plugin.customcooking.functions.jade.JadeManager.reconsileJadeData;
 
 
@@ -92,12 +91,7 @@ public class JadeCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-        for (String source : jadeSources.keySet()) {
-            int limit = JadeManager.getLimitForSource(source);
-            int total = database.getRecentPositiveTransactionTimestamps(player, source).size();
-            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Limit for " + source + ": " + total + "/" + limit);
-        }
-
+        JadeManager.sendJadeLimitMessage(player);
     }
 
     private void handleBalanceCommand(CommandSender sender) {

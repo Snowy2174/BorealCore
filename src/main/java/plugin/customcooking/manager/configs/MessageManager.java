@@ -55,12 +55,18 @@ public class MessageManager {
     public static String jadeBroadcast;
     public static String jadeCooldown;
     public static String jadeSourceNotFound;
+    public static String jadeLimitHeader;
+    public static String jadeLimitSource;
+    public static String jadeLimitFooter;
+    public static String jadeGetStarted;
+    public static String jadeSourceReminder;
+    public static String jadeSourceReminder2;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang + ".yml");
         prefix = getOrSet(config, "prefix", "<gradient:#FB5A00:#FDF300>[CustomCooking] </gradient>");
-        infoNegative = getOrSet(config, "prefix-negative", "<gray>[<red>!<gray>] ");
-        infoPositive = getOrSet(config, "prefix-positive", "<gray>[<green>!<gray>] ");
+        infoNegative = getOrSet(config, "prefix-negative", "<gray>[<red><bold>!</bold><gray>]<red> ");
+        infoPositive = getOrSet(config, "prefix-positive", "<gray>[<green><bold>!</bold><gray>]<green> ");
 
         reload = getOrSet(config, "reload", "<white>Reloaded. Took <green>{time}ms.");
         noPerms = getOrSet(config, "no-perms", "<red>You don't have permission to use this command.");
@@ -111,6 +117,12 @@ public class MessageManager {
         jadeBroadcast = getOrSet(config, "jade-broadcast", "Whilst {source}, {player} has found {amount}₪.");
         jadeCooldown = getOrSet(config, "jade-cooldown", "You need to wait {time} seconds before earning jade from this source.");
         jadeSourceNotFound = getOrSet(config, "jade-source-not-found", "That source does not exist.");
+        jadeLimitHeader = getOrSet(config, "jade-limit-header", "<gradient:#00AA00:#88DAA1>\n}======------ Jade Source Limits ------======={</gradient>\n");
+        jadeLimitSource = getOrSet(config, "jade-limit-source", "<gradient:#00AA00:#88DAA1>  --> {source}: {total} / {limit} </gradient>");
+        jadeLimitFooter = getOrSet(config, "jade-limit-footer", "<gradient:#00AA00:#88DAA1>\n[______________________]</gradient>\n");
+        jadeGetStarted = getOrSet(config, "jade-get-started", "<gradient:#00AA00:#88DAA1>Get started with Jade by using /cooking jade</gradient>");
+        jadeSourceReminder = getOrSet(config, "jade-source-reminder", "<gradient:#00AA00:#88DAA1>Click here to view your limits <click:run_command:jade limits>[ ! ]</gradient>");
+        jadeSourceReminder2 = getOrSet(config, "jade-source-reminder-2", "<gradient:#00AA00:#88DAA1>Cwor check out the wiki for more info</gradient>");
 
         try {
             config.save(new File(CustomCooking.getInstance().getDataFolder(), "messages_" + ConfigManager.lang + ".yml"));

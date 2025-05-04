@@ -15,6 +15,7 @@ import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.functions.karmicnode.NodeManager;
 import plugin.customcooking.functions.wiki.WikiManager;
 import plugin.customcooking.manager.*;
+import plugin.customcooking.manager.configs.EffectManager;
 import plugin.customcooking.manager.configs.LayoutManager;
 import plugin.customcooking.manager.configs.RecipeManager;
 import plugin.customcooking.utility.AdventureUtil;

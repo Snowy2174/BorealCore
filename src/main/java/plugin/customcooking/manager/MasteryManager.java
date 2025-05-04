@@ -34,14 +34,14 @@ public class MasteryManager extends Function {
 
     @Override
     public void unload() {
-        savePlayerStats(getConfig("playerstats.yml"));
+        savePlayerStats(getConfig("data/playerstats.yml"));
         AdventureUtil.consoleMessage(MessageManager.prefix + "Unloaded mastery values");
     }
 
 
     public static void handleMastery(Player player, String recipe) {
-        YamlConfiguration config = ConfigUtil.getConfig("playerdata.yml");
-        File file = new File(CustomCooking.plugin.getDataFolder(), "playerdata.yml");
+        YamlConfiguration config = ConfigUtil.getConfig("data/playerdata.yml");
+        File file = new File(CustomCooking.plugin.getDataFolder(), "data/playerdata.yml");
 
         String playerName = player.getName();
         String playerRecipePath = "players." + playerName + "." + recipe;
@@ -83,7 +83,7 @@ public class MasteryManager extends Function {
     }
 
     public static void incrementRecipeCount(Player player) {
-        FileConfiguration config = getConfig("playerstats.yml");
+        FileConfiguration config = getConfig("data/playerstats.yml");
         String playerName = player.getName();
         int currentCount = config.getInt("players." + playerName, 0);
         int newCount = currentCount + 1;
@@ -92,12 +92,12 @@ public class MasteryManager extends Function {
     }
 
     public static int getRecipeCount(String playerName) {
-        FileConfiguration config = getConfig("playerstats.yml");
+        FileConfiguration config = getConfig("data/playerstats.yml");
         return config.getInt("players." + playerName, 0);
     }
 
     private static void savePlayerStats(FileConfiguration config) {
-        File file = new File(CustomCooking.plugin.getDataFolder(), "playerstats.yml");
+        File file = new File(CustomCooking.plugin.getDataFolder(), "data/playerstats.yml");
         try {
             config.save(file);
         } catch (IOException e) {

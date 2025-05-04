@@ -1,4 +1,4 @@
-package plugin.customcooking.manager;
+package plugin.customcooking.manager.configs;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -10,8 +10,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import plugin.customcooking.action.*;
 import plugin.customcooking.functions.cooking.object.Recipe;
-import plugin.customcooking.manager.configs.ConfigManager;
-import plugin.customcooking.manager.configs.RecipeManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.AdventureUtil;
 import plugin.customcooking.utility.ConfigUtil;
@@ -198,7 +196,7 @@ public class EffectManager extends Function {
     }
 
     private void loadEffects() {
-        YamlConfiguration config = ConfigUtil.getConfig("buffs.yml");
+        YamlConfiguration config = ConfigUtil.getConfig("recipes/buffs.yml");
         for (String sectionName : config.getKeys(false)) {
             ConfigurationSection section = config.getConfigurationSection(sectionName);
             List<PotionEffect> effectsList = new ArrayList<>();

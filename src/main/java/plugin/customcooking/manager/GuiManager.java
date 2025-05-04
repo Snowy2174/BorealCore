@@ -146,7 +146,7 @@ public class GuiManager extends Function {
     }
 
     private void loadItems() {
-        YamlConfiguration config = ConfigUtil.getConfig("ingredients.yml");
+        YamlConfiguration config = ConfigUtil.getConfig("recipes/ingredients.yml");
         Set<String> ingredients = config.getKeys(false);
 
         for (String key : ingredients) {

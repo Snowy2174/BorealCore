@@ -28,8 +28,8 @@ public class NodeManager extends Function {
     }
 
     public static void handleUpdateMaxWave(String player, int wave) {
-        YamlConfiguration config = ConfigUtil.getConfig("nodedata.yml");
-        File file = new File(CustomCooking.plugin.getDataFolder(), "nodedata.yml");
+        YamlConfiguration config = ConfigUtil.getConfig("data/nodedata.yml");
+        File file = new File(CustomCooking.plugin.getDataFolder(), "data/nodedata.yml");
 
         if (Bukkit.getPlayer(player) == null) {
             consoleMessage("Player " + player + " is not online, so no score added");
@@ -60,12 +60,12 @@ public class NodeManager extends Function {
     }
 
     public static int getMaxWave(String playerName) {
-        FileConfiguration config = getConfig("nodedata.yml");
+        FileConfiguration config = getConfig("data/nodedata.yml");
         return config.getInt("players." + playerName, 0);
     }
 
     private static void savePlayerStats(FileConfiguration config) {
-        File file = new File(CustomCooking.plugin.getDataFolder(), "nodedata.yml");
+        File file = new File(CustomCooking.plugin.getDataFolder(), "data/nodedata.yml");
         try {
             config.save(file);
         } catch (IOException e) {
@@ -74,8 +74,8 @@ public class NodeManager extends Function {
     }
 
     public static String getLeaderboardEntry(int index) {
-        YamlConfiguration config = ConfigUtil.getConfig("nodedata.yml");
-        File file = new File(CustomCooking.plugin.getDataFolder(), "nodedata.yml");
+        YamlConfiguration config = ConfigUtil.getConfig("ndata/odedata.yml");
+        File file = new File(CustomCooking.plugin.getDataFolder(), "data/nodedata.yml");
 
         Map<String, Integer> playerWaves = new HashMap<>();
         for (String key : config.getConfigurationSection("players").getKeys(false)) {

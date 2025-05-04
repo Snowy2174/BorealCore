@@ -11,7 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.customcooking.manager.EffectManager;
+import plugin.customcooking.manager.configs.EffectManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 
 import java.util.List;

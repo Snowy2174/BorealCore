@@ -39,7 +39,7 @@ public class CompetitionManager extends Function {
     }
 
     public void loadCompetitions() {
-        YamlConfiguration config = ConfigUtil.getConfig("competition.yml");
+        YamlConfiguration config = ConfigUtil.getConfig("data/competition.yml");
         Set<String> keys = config.getKeys(false);
         keys.forEach(key -> {
             boolean enableBsb = config.getBoolean(key + ".bossbar.enable", false);

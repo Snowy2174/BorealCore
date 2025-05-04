@@ -32,6 +32,7 @@ public class JadeManager extends Function {
     @Override
     public void load() {
         scheduler = CustomCooking.getInstance().getServer().getScheduler();
+        scheduler.runTaskTimer(CustomCooking.getInstance(), new AnnoucmentRunnable(CustomCooking.getInstance()), 0L, 20L * 60 * 5);
         loadJadeLimits();
         database.verifyAndFixTotals();
         checkUndefinedSources();
@@ -40,6 +41,7 @@ public class JadeManager extends Function {
     @Override
     public void unload() {
         jadeSources.clear();
+        if (scheduler != null) { scheduler.cancelTasks(CustomCooking.getInstance()); }
     }
 
     private void checkUndefinedSources() {
@@ -78,7 +80,7 @@ public class JadeManager extends Function {
         }
 
         // Check if player is on cooldown
-        if (database.isOnCooldown(player, source)) {
+        if (source.isEmpty() || jadeSources.get(source).getCooldown() == 0 || database.isOnCooldown(player, source)) {
             AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeCooldown
                     .replace("{time}", String.valueOf(database.getCooldownTimeLeft(player, source))));
             return;
@@ -89,6 +91,7 @@ public class JadeManager extends Function {
         } else {
             AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeLimitReached
                     .replace("{source}", GUIUtil.formatString(source)));
+            sendJadeLimitMessage(player);
         }
     }
 
@@ -139,6 +142,31 @@ public class JadeManager extends Function {
         return database.getJadeForPlayer(player);
     }
     // @TODO Implement migrate Legacy jade data
+
+    public static int sendJadeLimitMessage(Player player) {
+        HashMap<String, Double> jadeData = database.getJadeFromSources(player);
+        if (jadeData.size() == 1 && jadeData.containsKey("not_in_database")) {
+            return -1;
+        }
+        StringBuilder message = new StringBuilder();
+        message.append(MessageManager.jadeLimitHeader);
+        for (String source : jadeSources.keySet()) {
+            int limit = JadeManager.getLimitForSource(source);
+            if (limit == -1) {
+                continue;
+            }
+            Double total = jadeData.getOrDefault(source, 0.0);
+            String sourceMessage = MessageManager.jadeLimitSource
+                    .replace("{source}", GUIUtil.formatString(source))
+                    .replace("{total}", String.valueOf(total.intValue()))
+                    .replace("{limit}", String.valueOf(limit));
+            System.out.println(player.getName() + " " + sourceMessage);
+            message.append(sourceMessage);
+        }
+        message.append(MessageManager.jadeLimitFooter);
+        AdventureUtil.sendMessage(player, message.toString());
+        return jadeData.size();
+    }
 
     public static boolean reconsileJadeData(Player player) {
         int avPoints = Integer.parseInt(PlaceholderAPI.setPlaceholders(player, "%VotingPlugin_Points%"));

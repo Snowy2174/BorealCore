@@ -15,7 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.customcooking.CustomCooking;
-import plugin.customcooking.manager.EffectManager;
+import plugin.customcooking.manager.configs.EffectManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.manager.configs.RecipeManager;

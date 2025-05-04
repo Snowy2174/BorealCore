@@ -23,7 +23,7 @@ import static plugin.customcooking.utility.ConfigUtil.getConfig;
 public class RecipeDataUtil {
 
     public static int getMasteryCount(Player player, String recipe) {
-        YamlConfiguration config = getConfig("playerdata.yml");
+        YamlConfiguration config = getConfig("data/playerdata.yml");
         int count = config.getInt("players." + player.getName() + "." + recipe, 0);
         return count;
     }
@@ -94,7 +94,7 @@ public class RecipeDataUtil {
     }
 
     public static List<String> getUnlockedRecipes(Player player) {
-        YamlConfiguration config = getConfig("playerdata.yml");
+        YamlConfiguration config = getConfig("data/playerdata.yml");
         String playerName = player.getName();
 
         if (!config.contains("players." + playerName)) {
@@ -142,8 +142,8 @@ public class RecipeDataUtil {
     }
 
     public static void setRecipeData(Player player, String recipe, @Nullable Integer count) {
-        YamlConfiguration config = getConfig("playerdata.yml");
-        File file = new File(CustomCooking.plugin.getDataFolder(), "playerdata.yml");
+        YamlConfiguration config = getConfig("data/playerdata.yml");
+        File file = new File(CustomCooking.plugin.getDataFolder(), "data/playerdata.yml");
 
         String playerName = player.getName();
         String playerRecipePath = "players." + playerName + "." + recipe;
@@ -166,7 +166,7 @@ public class RecipeDataUtil {
     }
 
     public static boolean playerDataExists(Player player) {
-        YamlConfiguration config = getConfig("playerdata.yml");
+        YamlConfiguration config = getConfig("data/playerdata.yml");
         String playerName = player.getName();
         String playerDataPath = "players." + playerName;
 
