@@ -4,6 +4,8 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitScheduler;
+import plugin.customcooking.CustomCooking;
 import plugin.customcooking.api.event.JadeEvent;
 import plugin.customcooking.database.Database;
 import plugin.customcooking.manager.configs.MessageManager;
@@ -21,6 +23,7 @@ public class JadeManager extends Function {
 
     protected static Database database;
     public static HashMap<String, JadeSource> jadeSources = new HashMap<>();
+    private static BukkitScheduler scheduler;
 
     public JadeManager(Database database) {
         this.database = database;
@@ -28,6 +31,7 @@ public class JadeManager extends Function {
 
     @Override
     public void load() {
+        scheduler = CustomCooking.getInstance().getServer().getScheduler();
         loadJadeLimits();
         database.verifyAndFixTotals();
         checkUndefinedSources();
@@ -46,7 +50,7 @@ public class JadeManager extends Function {
         }
     }
 
-private void loadJadeLimits() {
+    private void loadJadeLimits() {
                 YamlConfiguration config = ConfigUtil.getConfig("config.yml");
                 for (String key : config.getConfigurationSection("jade.sources").getKeys(false)) {
                     int limit = config.getInt("jade.sources." + key + ".limit");
