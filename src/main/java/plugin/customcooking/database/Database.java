@@ -42,6 +42,16 @@ public abstract class Database {
 
     }
 
+    private void closeResources(Connection conn, PreparedStatement ps, ResultSet rs) {
+        try {
+            if (rs != null) rs.close();
+            if (ps != null) ps.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
+        }
+    }
+
     public Integer getPlayerData(String playerName, String column) {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -308,16 +318,16 @@ public abstract class Database {
             ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minus(24, ChronoUnit.HOURS)));
             rs = ps.executeQuery();
 
-            boolean playerExists = false;
             while (rs.next()) {
-                playerExists = true;
                 String source = rs.getString("source");
                 double total = rs.getDouble("total");
                 sourceJadeMap.put(source, total);
             }
 
-            // If no transactions in the last 24 hours, check for the last month
-            if (!playerExists) {
+            if (sourceJadeMap.isEmpty()) {
+                rs.close();
+                ps.close();
+
                 ps = conn.prepareStatement(query);
                 ps.setString(1, player.getName().toLowerCase());
                 ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minus(30, ChronoUnit.DAYS)));
@@ -332,9 +342,6 @@ public abstract class Database {
                 if (sourceJadeMap.isEmpty()) {
                     sourceJadeMap.put("not_in_database", 0.0);
                 }
-
-                rs.close();
-                ps.close();
             }
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);

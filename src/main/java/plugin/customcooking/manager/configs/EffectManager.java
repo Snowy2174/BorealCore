@@ -103,18 +103,26 @@ public class EffectManager extends Function {
 
     public static List<List<Component>> buildEffectLore(String effectsList) {
         List<Component> standard = new ArrayList<>();
-        for (PotionEffect potionEffect : EFFECTS.get(effectsList)) {
-            standard.add(getComponentFromMiniMessage(ConfigManager.effectLore
-                    .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
-                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier() + 1))
-                    .replace("{duration}", getDuration(potionEffect.getDuration() / 20))));
-        }
         List<Component> perfect = new ArrayList<>();
-        for (PotionEffect potionEffect : EFFECTS.get(effectsList + ConfigManager.perfectItemSuffix)) {
-            perfect.add(getComponentFromMiniMessage(ConfigManager.effectLore
-                    .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
-                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier() + 1))
-                    .replace("{duration}", getDuration(potionEffect.getDuration() / 20))));
+        if (EFFECTS.containsKey(effectsList)) {
+            for (PotionEffect potionEffect : EFFECTS.get(effectsList)) {
+                standard.add(getComponentFromMiniMessage(ConfigManager.effectLore
+                        .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
+                        .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier() + 1))
+                        .replace("{duration}", getDuration(potionEffect.getDuration() / 20))));
+            }
+        } else {
+            Bukkit.getLogger().warning("[CustomCooking] No effects found for key: " + effectsList);
+        }
+        if (EFFECTS.containsKey(effectsList + ConfigManager.perfectItemSuffix)) {
+            for (PotionEffect potionEffect : EFFECTS.get(effectsList + ConfigManager.perfectItemSuffix)) {
+                perfect.add(getComponentFromMiniMessage(ConfigManager.effectLore
+                        .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
+                        .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier() + 1))
+                        .replace("{duration}", getDuration(potionEffect.getDuration() / 20))));
+            }
+        } else {
+            Bukkit.getLogger().warning("[CustomCooking] No perfect effects found for key: " + effectsList + ConfigManager.perfectItemSuffix);
         }
         List<List<Component>> lore = new ArrayList<>();
         lore.add(perfect);

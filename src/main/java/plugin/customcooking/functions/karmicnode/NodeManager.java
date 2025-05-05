@@ -74,7 +74,7 @@ public class NodeManager extends Function {
     }
 
     public static String getLeaderboardEntry(int index) {
-        YamlConfiguration config = ConfigUtil.getConfig("ndata/odedata.yml");
+        YamlConfiguration config = ConfigUtil.getConfig("data/nodedata.yml");
         File file = new File(CustomCooking.plugin.getDataFolder(), "data/nodedata.yml");
 
         Map<String, Integer> playerWaves = new HashMap<>();
