@@ -1,8 +1,12 @@
 package plugin.customcooking.database;
 
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Consumer;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.functions.jade.JadeTransaction;
 import plugin.customcooking.object.Function;
+import plugin.customcooking.utility.AdventureUtil;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -10,38 +14,35 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
 import static plugin.customcooking.functions.jade.JadeManager.jadeSources;
 
 public abstract class Database extends Function {
-    public static CustomCooking plugin;
+    public final CustomCooking plugin;
     public Connection connection;
     public String table = "jade_transactions";
-    public int tokens = 0;
+    private final ConcurrentLinkedQueue<JadeTransaction> pendingTransactions = new ConcurrentLinkedQueue<>();
 
     public Database(CustomCooking instance) {
         plugin = instance;
     }
 
-    public Connection getSQLConnection() {
-        return null;
-    }
+    public abstract Connection getSQLConnection();
     public abstract void load();
-
     public abstract void unload();
 
     public void initialize() {
         this.connection = this.getSQLConnection();
-
         try {
             PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM " + this.table + " WHERE player = ?");
             ResultSet rs = ps.executeQuery();
             this.close(ps, rs);
-        } catch (SQLException var3) {
-            plugin.getLogger().log(Level.SEVERE, "Unable to retrieve connection", var3);
+            AdventureUtil.consoleMessage("[CustomCooking] Loaded SQLite database");
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, "Unable to retrieve connection", ex);
         }
-
     }
 
     public void close(PreparedStatement ps, ResultSet rs) {
@@ -59,138 +60,91 @@ public abstract class Database extends Function {
 
     }
 
-    public Integer getPlayerData(String playerName, String column) {
+    private void closeResources(Connection conn, PreparedStatement ps, ResultSet rs) {
+        try {
+            if (rs != null) rs.close();
+            if (ps != null) ps.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
+        }
+    }
+
+
+
+    private int getSingleIntResult(String query, Object... params) {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             conn = this.getSQLConnection();
-            ps = conn.prepareStatement("SELECT jade FROM jade_totals WHERE player = ?;");
-            ps.setString(1, playerName.toLowerCase());
-            rs = ps.executeQuery();
+            ps = conn.prepareStatement(query);
 
+            for (int i = 0; i < params.length; i++) {
+                ps.setObject(i + 1, params[i]);
+            }
+
+            rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getInt("jade");
+                return rs.getInt(1);
             }
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            try {
-                if (rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
-            }
+            closeResources(conn, ps, rs);
         }
 
         return 0;
     }
 
-    public void addTransaction(Player player, double amount, String source, LocalDateTime timestamp) {
-        Connection conn = null;
-        PreparedStatement psTransaction = null;
-        PreparedStatement psTotals = null;
-
-        try {
-            conn = this.getSQLConnection();
-
-            // Add the transaction to jade_transactions
-            String transactionQuery = "INSERT INTO jade_transactions (player, amount, source, timestamp) VALUES (?, ?, ?, ?);";
-            psTransaction = conn.prepareStatement(transactionQuery);
-            psTransaction.setString(1, player.getName().toLowerCase());
-            psTransaction.setDouble(2, amount);
-            psTransaction.setString(3, source);
-            psTransaction.setTimestamp(4, Timestamp.valueOf(timestamp));
-            psTransaction.executeUpdate();
-
-            // Update or insert the player's total in jade_totals
-            String totalsQuery = """
-                        INSERT INTO jade_totals (player, jade)
-                        VALUES (?, ?)
-                        ON CONFLICT(player) DO UPDATE SET jade = jade + ?;
-                    """;
-            psTotals = conn.prepareStatement(totalsQuery);
-            psTotals.setString(1, player.getName().toLowerCase());
-            psTotals.setDouble(2, amount);
-            psTotals.setDouble(3, amount);
-            psTotals.executeUpdate();
-
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-        } finally {
-            try {
-                if (psTransaction != null) psTransaction.close();
-                if (psTotals != null) psTotals.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
+    public void getJadeForPlayerAsync(Player player, Consumer<Integer> callback) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                int jade = getJadeForPlayer(player);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        callback.accept(jade);
+                    }
+                }.runTask(plugin);
             }
-        }
+        }.runTaskAsynchronously(plugin);
     }
-
 
     public int getJadeForPlayer(Player player) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = this.getSQLConnection();
-            String query = "SELECT jade FROM jade_totals WHERE player = ?;";
-            ps = conn.prepareStatement(query);
-            ps.setString(1, player.getName().toLowerCase());
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt("jade");
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
-            }
-        }
-        return 0;
+        String query = "SELECT jade FROM jade_totals WHERE player = ?;";
+        return getSingleIntResult(query, player.getName().toLowerCase());
     }
 
     public int getTotalJadeFromSource(String source) {
+        String query = "SELECT SUM(amount) AS total FROM jade_transactions WHERE source = ?;";
+        return getSingleIntResult(query, source);
+    }
+
+    public LocalDateTime getLastTransactionTimestamp(Player player, String source) {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
-        int var6;
         try {
             conn = this.getSQLConnection();
-            String query = "SELECT SUM(amount) AS total FROM jade_transactions WHERE source = ?;";
+            String query = "SELECT timestamp FROM jade_transactions WHERE player = ? AND source = ? ORDER BY timestamp DESC LIMIT 1;";
             ps = conn.prepareStatement(query);
-            ps.setString(1, source);
+            ps.setString(1, player.getName().toLowerCase());
+            ps.setString(2, source);
             rs = ps.executeQuery();
-            if (!rs.next()) {
-                return 0;
-            }
 
-            var6 = rs.getInt("total");
-        } catch (SQLException var17) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), var17);
-            return 0;
+            if (rs.next()) {
+                return rs.getTimestamp("timestamp").toLocalDateTime();
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            try {
-                if (rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (conn != null) conn.close();
-            } catch (SQLException var16) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), var16);
-            }
-
+            closeResources(conn, ps, rs);
         }
-        return var6;
+        return null;
     }
 
     public List<LocalDateTime> getRecentPositiveTransactionTimestamps(Player player, String source) {
@@ -207,95 +161,32 @@ public abstract class Database extends Function {
             ps.setString(2, source);
             ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now().minus(24, ChronoUnit.HOURS)));
             rs = ps.executeQuery();
+
             while (rs.next()) {
                 timestamps.add(rs.getTimestamp("timestamp").toLocalDateTime());
             }
-        } catch (SQLException var17) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), var17);
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-
-                if (ps != null) {
-                    ps.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException var16) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), var16);
-            }
+            closeResources(conn, ps, rs);
         }
-
         return timestamps;
     }
 
     public boolean isOnCooldown(Player player, String source) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        LocalDateTime lastTransactionTime = getLastTransactionTimestamp(player, source);
+        if (lastTransactionTime == null) return false;
 
-        try {
-            conn = this.getSQLConnection();
-            String query = "SELECT timestamp FROM jade_transactions WHERE player = ? AND source = ? ORDER BY timestamp DESC LIMIT 1;";
-            ps = conn.prepareStatement(query);
-            ps.setString(1, player.getName().toLowerCase());
-            ps.setString(2, source);
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                LocalDateTime lastTransactionTime = rs.getTimestamp("timestamp").toLocalDateTime();
-                LocalDateTime cooldownEndTime = lastTransactionTime.plusSeconds((long) jadeSources.get(source).getCooldown());
-                return LocalDateTime.now().isBefore(cooldownEndTime);
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
-            }
-        }
-
-        return false;
+        LocalDateTime cooldownEndTime = lastTransactionTime.plusSeconds(jadeSources.get(source).getCooldown());
+        return LocalDateTime.now().isBefore(cooldownEndTime);
     }
 
     public long getCooldownTimeLeft(Player player, String source) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        LocalDateTime lastTransactionTime = getLastTransactionTimestamp(player, source);
+        if (lastTransactionTime == null) return 0;
 
-        try {
-            conn = this.getSQLConnection();
-            String query = "SELECT timestamp FROM jade_transactions WHERE player = ? AND source = ? ORDER BY timestamp DESC LIMIT 1;";
-            ps = conn.prepareStatement(query);
-            ps.setString(1, player.getName().toLowerCase());
-            ps.setString(2, source);
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                LocalDateTime lastTransactionTime = rs.getTimestamp("timestamp").toLocalDateTime();
-                LocalDateTime cooldownEndTime = lastTransactionTime.plusSeconds((long) jadeSources.get(source).getCooldown());
-                return ChronoUnit.SECONDS.between(LocalDateTime.now(), cooldownEndTime);
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
-            }
-        }
-
-        return 0;
+        LocalDateTime cooldownEndTime = lastTransactionTime.plusSeconds(jadeSources.get(source).getCooldown());
+        return ChronoUnit.SECONDS.between(LocalDateTime.now(), cooldownEndTime);
     }
 
     public HashMap<String, Double> getJadeFromSources(Player player) {
@@ -342,16 +233,77 @@ public abstract class Database extends Function {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
+            closeResources(conn, ps, rs);
+        }
+
+        return sourceJadeMap;
+    }
+
+    public void addTransaction(JadeTransaction transaction) {
+        Connection conn = null;
+        PreparedStatement psTransaction = null;
+        PreparedStatement psTotals = null;
+
+        try {
+            conn = this.getSQLConnection();
+            conn.setAutoCommit(false);
+
+            String transactionQuery = "INSERT INTO jade_transactions (player, amount, source, timestamp) VALUES (?, ?, ?, ?);";
+            psTransaction = conn.prepareStatement(transactionQuery);
+            psTransaction.setString(1, transaction.getPlayer());
+            psTransaction.setDouble(2, transaction.getAmount());
+            psTransaction.setString(3, transaction.getSource());
+            psTransaction.setTimestamp(4, Timestamp.valueOf(transaction.getTimestamp()));
+            psTransaction.executeUpdate();
+
+            // Update or insert the player's total in jade_totals
+            String totalsQuery = """
+                        INSERT INTO jade_totals (player, jade)
+                        VALUES (?, ?)
+                        ON CONFLICT(player) DO UPDATE SET jade = jade + ?;
+                    """;
+            psTotals = conn.prepareStatement(totalsQuery);
+            psTotals.setString(1, transaction.getPlayer());
+            psTotals.setDouble(2, transaction.getAmount());
+            psTotals.setDouble(3, transaction.getAmount());
+            psTotals.executeUpdate();
+
+            conn.commit();
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Rollback on failure
+                } catch (SQLException rollbackEx) {
+                    plugin.getLogger().log(Level.SEVERE, "Transaction rollback failed", rollbackEx);
+                }
+            }
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+            pendingTransactions.add(transaction);
+        } finally {
             try {
-                if (rs != null) rs.close();
-                if (ps != null) ps.close();
+                if (psTransaction != null) psTransaction.close();
+                if (psTotals != null) psTotals.close();
                 if (conn != null) conn.close();
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
             }
         }
+    }
 
-        return sourceJadeMap;
+    public void startRetryTask() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                while (!pendingTransactions.isEmpty()) {
+                    JadeTransaction transaction = pendingTransactions.poll();
+                    if (transaction != null) {
+                        addTransaction(
+                            transaction
+                        );
+                    }
+                }
+            }
+        }.runTaskTimerAsynchronously(plugin, 0L, 20L * 60);
     }
 
     public void verifyAndFixTotals() {
@@ -449,24 +401,8 @@ public abstract class Database extends Function {
         } catch (SQLException var17) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), var17);
         } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-
-                if (ps != null) {
-                    ps.close();
-                }
-
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException var16) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), var16);
-            }
-
+            closeResources(conn, ps, rs);
         }
-
         return leaderboard;
     }
 

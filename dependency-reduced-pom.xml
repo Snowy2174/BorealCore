@@ -71,6 +71,10 @@
       <id>jsinco-repo</id>
       <url>https://repo.jsinco.dev/releases</url>
     </repository>
+    <repository>
+      <id>BenCodez Repo</id>
+      <url>https://nexus.bencodez.com/repository/maven-public/</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -119,6 +123,12 @@
       <groupId>com.dre.brewery</groupId>
       <artifactId>BreweryX</artifactId>
       <version>3.4.10</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.bencodez</groupId>
+      <artifactId>votingplugin</artifactId>
+      <version>LATEST</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

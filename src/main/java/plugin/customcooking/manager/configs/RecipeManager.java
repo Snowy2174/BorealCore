@@ -42,7 +42,7 @@ public class RecipeManager extends Function {
         File[] files = recipe_file.listFiles();
         if (files == null) return;
         for (File file : files) {
-            if (!file.getName().endsWith(".yml")) continue;
+            if (!file.getName().equals("recipes.yml")) continue;
             YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
             Set<String> recipes = config.getKeys(false);
 

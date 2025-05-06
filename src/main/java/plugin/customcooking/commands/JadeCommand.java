@@ -101,8 +101,9 @@ public class JadeCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-        int totalJade = database.getJadeForPlayer(player);
-        AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Total jade: " + totalJade);
+        database.getJadeForPlayerAsync(player, jade -> {
+            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Total jade: " + jade);
+        });
     }
 
     private void handleRemoveJadeCommand(CommandSender sender, String[] args) {
@@ -144,8 +145,8 @@ public class JadeCommand implements CommandExecutor {
             return;
         }
 
-        int totalJade = database.getJadeForPlayer(player);
-        AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + totalJade);
+        database.getJadeForPlayerAsync(player, jade -> {
+            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);});
     }
 
     private void handleTotalJadeForSourceCommand(CommandSender sender, String[] args) {
@@ -214,8 +215,8 @@ public class JadeCommand implements CommandExecutor {
             return;
         }
 
-        int totalJade = database.getJadeForPlayer(player);
-        AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + totalJade);
+        database.getJadeForPlayerAsync(player, jade -> {
+            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);});
     }
 
     private void handleVerifyAndFixTotals(CommandSender sender) {
@@ -233,12 +234,7 @@ public class JadeCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-
-        if (reconsileJadeData(player)) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Jade data has been reconciled");
-        } else {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Failed to reconcile jade data");
-        }
+        reconsileJadeData(player);
     }
 
 }

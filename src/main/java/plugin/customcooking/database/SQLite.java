@@ -1,6 +1,7 @@
 package plugin.customcooking.database;
 
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.utility.AdventureUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,12 +58,15 @@ public class SQLite extends Database {
 
     @Override
     public void load() {
+        AdventureUtil.consoleMessage("Loading SQLite database...");
         connection = getSQLConnection();
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate(SQLiteCreateTokensTable);
-            statement.executeUpdate(SQLiteCreateUsersTable);
+        try {
+            Statement s = connection.createStatement();
+            s.executeUpdate(SQLiteCreateTokensTable);
+            s.executeUpdate(SQLiteCreateUsersTable);
+            s.close();
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "Error creating tables", e);
+            e.printStackTrace();
         }
         initialize();
     }
