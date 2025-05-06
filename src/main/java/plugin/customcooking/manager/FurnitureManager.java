@@ -43,10 +43,8 @@ public class FurnitureManager extends Function {
 
     private static void spawnNextIngredient(Location loc, Player player, List<String> ingredients, int currentIndex) {
         if (currentIndex >= ingredients.size()) {
-            // All ingredients have been spawned
             return;
         }
-
         String ingredient = ingredients.get(currentIndex);
         String[] parts = ingredient.split(":");
         Random random = new Random();
@@ -89,15 +87,10 @@ public class FurnitureManager extends Function {
     private static void spawnSplashItem(Location loc) {
         Location spawnLocation = loc.clone().subtract(0, 0.1, 0);
 
-        // Create an ArmorStand entity at the specified location
         ArmorStand armorStand = (ArmorStand) loc.getWorld().spawnEntity(spawnLocation, EntityType.ARMOR_STAND);
         armorStand.setVisible(false);
         armorStand.setGravity(false);
-
-        // Create a fake ingredient ItemStack
         ItemStack splashItem = InventoryUtil.build(ConfigManager.splashEffect);
-
-        // Set the fake ingredient ItemStack as the ArmorStand's helmet item
         armorStand.setItem(EquipmentSlot.HEAD, splashItem);
 
         new BukkitRunnable() {
@@ -122,9 +115,7 @@ public class FurnitureManager extends Function {
     }
 
     private static void playCookingPreview(Location loc, ItemStack item, Boolean success) {
-        // Particles: crit
         loc.getWorld().spawnParticle(Particle.CRIT, loc, 15, 0.25, 0.25, 0.25, 0.2);
-        // Spawn recipe item preview
         createHologram(item, loc, success);
     }
 
@@ -172,22 +163,14 @@ public class FurnitureManager extends Function {
         // Check if the clicked block is an unlit cookingpot
         if (clickedFurniture.getId().equals(ConfigManager.unlitCookingPot)) {
             if (!cooldowns.containsKey(player) || (System.currentTimeMillis() - cooldowns.get(player) >= 2000)) {
-                // Set a cooldown of 2 seconds
                 cooldowns.put(player, System.currentTimeMillis());
-                // Check if the player right-clicked with flint and steel
                 if (player.getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
-
-                    // Replace the furniture block with the lit furniture
-                    //clickedFurniture.replaceFurniture(ConfigManager.litCookingPot);
                     ItemFrame unlitpot = (ItemFrame) Objects.requireNonNull(clickedFurniture).getArmorstand();
                     Rotation rot = unlitpot.getRotation();
                     ItemFrame litpot = (ItemFrame) CustomFurniture.spawnPreciseNonSolid(ConfigManager.litCookingPot, unlitpot.getLocation()).getArmorstand();
                     litpot.setRotation(rot);
-
-                    // Replace the furniture block with the lit furniture
                     clickedFurniture.remove(false);
                     unlitpot.getLocation().getBlock().setType(Material.BARRIER);
-
                     AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.potLight);
                     playCookingPotFX(clickedFurniture.getEntity().getLocation());
                 } else {
@@ -231,29 +214,17 @@ public class FurnitureManager extends Function {
             cancelCookingPotFX(loc);
             return;
         }
-
-        // Schedule all world interactions on the main thread
         Bukkit.getScheduler().runTask(CustomCooking.plugin, () -> {
-            // Particles: flame
             loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
-
-            // Particles: campfire_cosy_smoke
             loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);
             loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);
-
-            // Sound: block.fire.ambient
             loc.getWorld().playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 1f);
-
-            // Sound: block.lava.ambient
             loc.getWorld().playSound(loc, Sound.BLOCK_LAVA_AMBIENT, 1f, 1f);
         });
-
-        // Schedule the repeated particle effects asynchronously
         new BukkitRunnable() {
             @Override
             public void run() {
                 Bukkit.getScheduler().runTask(CustomCooking.plugin, () -> {
-                    // Repeated particles
                     loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
                     loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);
                     loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);

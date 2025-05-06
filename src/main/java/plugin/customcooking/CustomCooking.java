@@ -38,7 +38,7 @@ public class CustomCooking extends JavaPlugin {
     private static InventoryManager inventoryManager;
     private static NodeManager nodeManager;
     private static JadeManager jadeManager;
-    private static Database db;
+    private static SQLite db;
     private static WikiManager wikiManager;
     private static CraftingManager craftingManager;
     private static BreweryManager breweryManager;
@@ -69,9 +69,6 @@ public class CustomCooking extends JavaPlugin {
         jadeManager = new JadeManager(db);
         craftingManager = new CraftingManager();
         breweryManager = new BreweryManager();
-
-        db.dbload();
-        inventoryManager.init();
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());

@@ -68,16 +68,12 @@ public class MasteryManager extends Function {
             ItemsAdder.playTotemAnimation(player, recipe + "_particle");
             AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
             AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", recipeFormatted));
-
-            // Give the player reward
             giveReward(player, recipeFormatted);
         }
     }
 
     private static void giveReward(Player player, String recipeFormatted) {
-        // Give the player a reward (e.g., points)
         JadeManager.give(player, ConfigManager.masteryJadeReward, "mastery");
-
         AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + player.getName() + "</green> has been given" + ConfigManager.masteryJadeReward + " ₪ for gaining " + recipeFormatted + " mastery");
         AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryReward.replace("{recipe}", recipeFormatted));
     }
@@ -105,7 +101,6 @@ public class MasteryManager extends Function {
         }
     }
 
-    // Permissions Migrater
     public static int migratePermissions() {
         String permissionPrefix = "customcooking.";
         int migratedCount = 0;

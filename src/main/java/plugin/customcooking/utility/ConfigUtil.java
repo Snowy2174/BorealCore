@@ -39,6 +39,9 @@ public class ConfigUtil {
         CustomCooking.getNodeManager().load();
         CustomCooking.getWikiManager().unload();
         CustomCooking.getWikiManager().load();
+        CustomCooking.getInventoryManager().init();
+        CustomCooking.getDatabase().unload();
+        CustomCooking.getDatabase().load();
     }
 }
 

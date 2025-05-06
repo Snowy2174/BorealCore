@@ -55,16 +55,26 @@ public class SQLite extends Database {
         return result;
     }
 
-    public void dbload() {
+    @Override
+    public void load() {
         connection = getSQLConnection();
-        try {
-            Statement s = connection.createStatement();
-            s.executeUpdate(SQLiteCreateTokensTable);
-            s.executeUpdate(SQLiteCreateUsersTable);
-            s.close();
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate(SQLiteCreateTokensTable);
+            statement.executeUpdate(SQLiteCreateUsersTable);
         } catch (SQLException e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Error creating tables", e);
         }
         initialize();
+    }
+
+    @Override
+    public void unload() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, "Error closing database connection", e);
+            }
+        }
     }
 }

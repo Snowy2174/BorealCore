@@ -2,6 +2,7 @@ package plugin.customcooking.database;
 
 import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
+import plugin.customcooking.object.Function;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -13,21 +14,22 @@ import java.util.logging.Level;
 
 import static plugin.customcooking.functions.jade.JadeManager.jadeSources;
 
-public abstract class Database {
+public abstract class Database extends Function {
     public static CustomCooking plugin;
     public Connection connection;
     public String table = "jade_transactions";
     public int tokens = 0;
 
     public Database(CustomCooking instance) {
-        plugin = CustomCooking.getInstance();
+        plugin = instance;
     }
 
     public Connection getSQLConnection() {
         return null;
     }
+    public abstract void load();
 
-    public abstract void dbload();
+    public abstract void unload();
 
     public void initialize() {
         this.connection = this.getSQLConnection();
@@ -37,19 +39,24 @@ public abstract class Database {
             ResultSet rs = ps.executeQuery();
             this.close(ps, rs);
         } catch (SQLException var3) {
-            plugin.getLogger().log(Level.SEVERE, "Unable to retreive connection", var3);
+            plugin.getLogger().log(Level.SEVERE, "Unable to retrieve connection", var3);
         }
 
     }
 
-    private void closeResources(Connection conn, PreparedStatement ps, ResultSet rs) {
+    public void close(PreparedStatement ps, ResultSet rs) {
         try {
-            if (rs != null) rs.close();
-            if (ps != null) ps.close();
-            if (conn != null) conn.close();
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
+            if (ps != null) {
+                ps.close();
+            }
+
+            if (rs != null) {
+                rs.close();
+            }
+        } catch (SQLException var4) {
+            Error.close(plugin, var4);
         }
+
     }
 
     public Integer getPlayerData(String playerName, String column) {
@@ -150,8 +157,7 @@ public abstract class Database {
                 plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
             }
         }
-
-        return 0; // Return 0 if no record is found.
+        return 0;
     }
 
     public int getTotalJadeFromSource(String source) {
@@ -176,23 +182,14 @@ public abstract class Database {
             return 0;
         } finally {
             try {
-                if (rs != null) {
-                    rs.close();
-                }
-
-                if (ps != null) {
-                    ps.close();
-                }
-
-                if (conn != null) {
-                    conn.close();
-                }
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
             } catch (SQLException var16) {
                 plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), var16);
             }
 
         }
-
         return var6;
     }
 
@@ -224,7 +221,6 @@ public abstract class Database {
                 if (ps != null) {
                     ps.close();
                 }
-
                 if (conn != null) {
                     conn.close();
                 }
@@ -435,22 +431,6 @@ public abstract class Database {
         }
     }
 
-
-    public void close(PreparedStatement ps, ResultSet rs) {
-        try {
-            if (ps != null) {
-                ps.close();
-            }
-
-            if (rs != null) {
-                rs.close();
-            }
-        } catch (SQLException var4) {
-            Error.close(plugin, var4);
-        }
-
-    }
-
     public HashMap<String, Integer> getJadeLeaderboard() {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -516,7 +496,6 @@ public abstract class Database {
                 plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
             }
         }
-
         return sources;
     }
 }

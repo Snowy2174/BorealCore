@@ -160,7 +160,6 @@ public class JadeManager extends Function {
                     .replace("{source}", GUIUtil.formatString(source))
                     .replace("{total}", String.valueOf(total.intValue()))
                     .replace("{limit}", String.valueOf(limit));
-            System.out.println(player.getName() + " " + sourceMessage);
             message.append(sourceMessage);
         }
         message.append(MessageManager.jadeLimitFooter);
