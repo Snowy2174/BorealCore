@@ -91,6 +91,10 @@
             <id>BenCodez Repo</id>
             <url>https://nexus.bencodez.com/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>Scarsz-Nexus</id>
+            <url>https://nexus.scarsz.me/content/groups/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -165,6 +169,12 @@
             <groupId>com.bencodez</groupId>
             <artifactId>votingplugin</artifactId>
             <version>LATEST</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.discordsrv</groupId>
+            <artifactId>discordsrv</artifactId>
+            <version>1.28.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

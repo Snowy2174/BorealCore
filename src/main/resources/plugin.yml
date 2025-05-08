@@ -10,6 +10,7 @@ depend:
   - ItemsAdder
 softdepend:
   - DecentHolograms
+  - DiscordSRV
 
 commands:
   cooking:

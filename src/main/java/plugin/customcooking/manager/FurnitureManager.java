@@ -37,6 +37,16 @@ public class FurnitureManager extends Function {
         load();
     }
 
+    @Override
+    public void load() {
+        Bukkit.getPluginManager().registerEvents(this.furnitureListener, CustomCooking.plugin);
+    }
+
+    @Override
+    public void unload() {
+        HandlerList.unregisterAll(this.furnitureListener);
+    }
+
     public static void ingredientsSFX(Player player, List<String> ingredients, Location loc) {
         spawnNextIngredient(loc, player, ingredients, 0); // Start spawning ingredients from index 0
     }
@@ -144,16 +154,6 @@ public class FurnitureManager extends Function {
                 hologram.delete(); // Remove the hologram
             }
         }.runTaskLater(CustomCooking.plugin, 60);
-    }
-
-    @Override
-    public void load() {
-        Bukkit.getPluginManager().registerEvents(this.furnitureListener, CustomCooking.plugin);
-    }
-
-    @Override
-    public void unload() {
-        HandlerList.unregisterAll(this.furnitureListener);
     }
 
     public void onFurnitureInteract(FurnitureInteractEvent event) {

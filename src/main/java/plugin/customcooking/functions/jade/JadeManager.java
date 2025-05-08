@@ -3,12 +3,14 @@ package plugin.customcooking.functions.jade;
 import com.bencodez.votingplugin.VotingPluginHooks;
 import com.bencodez.votingplugin.user.VotingPluginUser;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.api.event.JadeEvent;
 import plugin.customcooking.database.Database;
+import plugin.customcooking.listener.VoteListener;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.AdventureUtil;
@@ -27,14 +29,17 @@ public class JadeManager extends Function {
     protected static Database database;
     public static HashMap<String, JadeSource> jadeSources = new HashMap<>();
     private static BukkitScheduler scheduler;
+    private VoteListener voteListener;
 
     public JadeManager(Database database) {
         this.database = database;
+        this.voteListener = new VoteListener(this);
     }
 
     @Override
     public void load() {
         loadJadeLimits();
+        Bukkit.getPluginManager().registerEvents(voteListener, CustomCooking.plugin);
         database.verifyAndFixTotals();
         database.startRetryTask();
         scheduler = CustomCooking.getInstance().getServer().getScheduler();
@@ -72,15 +77,12 @@ public class JadeManager extends Function {
     }
 
     public static void giveJadeCommand(Player player, String source, Integer amount) {
-        // Reconsile Jade data
-        reconsileJadeData(player);
         // Check if source exists
         if (!jadeSources.containsKey(source) && !source.isEmpty()) {
             AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeSourceNotFound
                     .replace("{source}", GUIUtil.formatString(source)));
             return;
         }
-
         // Check if player is on cooldown
         if (!source.isEmpty() && jadeSources.get(source).getCooldown() != 0 && database.isOnCooldown(player, source)) {
             AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeCooldown
@@ -99,7 +101,8 @@ public class JadeManager extends Function {
 
     public static void give(Player player, double amount, String source) {
         boolean first = source.isBlank() || database.getRecentPositiveTransactionTimestamps(player, source).isEmpty();
-
+        // Reconsile Jade data
+        reconsileJadeData(player);
         if (first && !source.isEmpty()) {
             AdventureUtil.sendMessage(player, MessageManager.infoPositive + MessageManager.jadeFirstTime
                     .replace("{source}", GUIUtil.formatString(source))
@@ -119,6 +122,10 @@ public class JadeManager extends Function {
                 .replace("{player}", player.getName())
                 .replace("{amount}", String.valueOf((int) amount));
         getServer().broadcast(AdventureUtil.getComponentFromMiniMessage(bcast));
+    }
+
+    public static void giveOffline(OfflinePlayer player, double amount, String source) {
+        database.addTransaction(new JadeTransaction(player.getName().toLowerCase(), amount, source, LocalDateTime.now()));
     }
 
     public static void remove(Player player, double amount, String source) {
