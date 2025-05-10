@@ -10,6 +10,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.api.event.JadeEvent;
 import plugin.customcooking.database.Database;
+import plugin.customcooking.functions.brewery.BreweryListener;
 import plugin.customcooking.listener.VoteListener;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.bukkit.Bukkit.getServer;
+import static plugin.customcooking.functions.cooking.competition.bossbar.BossBarManager.cache;
 
 public class JadeManager extends Function {
 
@@ -30,18 +32,23 @@ public class JadeManager extends Function {
     public static HashMap<String, JadeSource> jadeSources = new HashMap<>();
     private static BukkitScheduler scheduler;
     private VoteListener voteListener;
+    private BreweryListener breweryListener;
+    private static HashMap<LeaderboardType, Leaderboard> leaderboardCache = new HashMap<>();
 
     public JadeManager(Database database) {
         this.database = database;
         this.voteListener = new VoteListener(this);
+        this.breweryListener = new BreweryListener();
     }
 
     @Override
     public void load() {
         loadJadeLimits();
         Bukkit.getPluginManager().registerEvents(voteListener, CustomCooking.plugin);
+        Bukkit.getPluginManager().registerEvents(breweryListener, CustomCooking.plugin);
         database.verifyAndFixTotals();
         database.startRetryTask();
+        reloadLeaderboards();
         scheduler = CustomCooking.getInstance().getServer().getScheduler();
         scheduler.runTaskTimer(CustomCooking.getInstance(), new AnnoucmentRunnable(CustomCooking.getInstance()), 0L, 20L * 60 * 5);
     }
@@ -49,6 +56,7 @@ public class JadeManager extends Function {
     @Override
     public void unload() {
         jadeSources.clear();
+        leaderboardCache.clear();
         if (scheduler != null) {
             scheduler.cancelTasks(CustomCooking.getInstance());
         }
@@ -72,8 +80,15 @@ public class JadeManager extends Function {
         AdventureUtil.consoleMessage("[CustomCooking] Jade sources not in database: " + jadeSourceList);
     }
 
-    public HashMap<String, Integer> getJadeLeaderboard() {
-        return database.getJadeLeaderboard();
+    public void reloadLeaderboards() {
+        leaderboardCache = new HashMap<>();
+        for (LeaderboardType type : LeaderboardType.values()) {
+            leaderboardCache.put(type, database.queryLeaderboard(type));
+        }
+    }
+
+    public Leaderboard getLeaderboard(LeaderboardType type) {
+        return leaderboardCache.get(type);
     }
 
     public static void giveJadeCommand(Player player, String source, Integer amount) {
@@ -101,8 +116,6 @@ public class JadeManager extends Function {
 
     public static void give(Player player, double amount, String source) {
         boolean first = source.isBlank() || database.getRecentPositiveTransactionTimestamps(player, source).isEmpty();
-        // Reconsile Jade data
-        reconsileJadeData(player);
         if (first && !source.isEmpty()) {
             AdventureUtil.sendMessage(player, MessageManager.infoPositive + MessageManager.jadeFirstTime
                     .replace("{source}", GUIUtil.formatString(source))
@@ -112,7 +125,7 @@ public class JadeManager extends Function {
                     .replace("{amount}", String.valueOf(amount)));
         }
 
-        database.addTransaction(new JadeTransaction(player.getName().toLowerCase(), amount, source, LocalDateTime.now()));
+        database.addTransaction(new JadeTransaction(player.getName().toLowerCase(), player.getUniqueId(), amount, source, LocalDateTime.now()));
 
         JadeEvent jadeEvent = new JadeEvent(player, amount, source);
         Bukkit.getPluginManager().callEvent(jadeEvent);
@@ -125,11 +138,11 @@ public class JadeManager extends Function {
     }
 
     public static void giveOffline(OfflinePlayer player, double amount, String source) {
-        database.addTransaction(new JadeTransaction(player.getName().toLowerCase(), amount, source, LocalDateTime.now()));
+        database.addTransaction(new JadeTransaction(player.getName().toLowerCase(), player.getUniqueId(), amount, source, LocalDateTime.now()));
     }
 
     public static void remove(Player player, double amount, String source) {
-        database.addTransaction(new JadeTransaction(player.getName().toLowerCase(), -amount, source, LocalDateTime.now()));
+        database.addTransaction(new JadeTransaction(player.getName().toLowerCase(), player.getUniqueId(), -amount, source, LocalDateTime.now()));
     }
 
     public static int getLimitForSource(String source) {

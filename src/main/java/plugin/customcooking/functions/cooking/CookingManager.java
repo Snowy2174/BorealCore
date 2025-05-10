@@ -88,7 +88,6 @@ public class CookingManager extends Function {
             // checks if player has required ingredients
             List<String> ingredients = bar.getIngredients();
             if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, 1)) {
-                // Delay removal of items if furniture is not null
                 InventoryUtil.removeIngredients(player.getInventory(), ingredients, 1);
                 if (clickedFurniture != null) {
                     Location loc = clickedFurniture.getArmorstand().getLocation();

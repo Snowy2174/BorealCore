@@ -10,14 +10,4 @@ import static plugin.customcooking.manager.configs.ConfigManager.brewingJadeRewa
 import static plugin.customcooking.manager.configs.ConfigManager.brewingRequiredQuality;
 
 public class BreweryManager {
-    public void breweryJade(BrewModifyEvent event) {
-        if (event.getType() != SEAL) {
-            return;
-        }
-        Player player = event.getPlayer();
-        int quality = event.getBrew().getQuality();
-        if (quality >= brewingRequiredQuality && Math.random() <= brewingJadeRewardRate) {
-            JadeManager.give(player, 1, "brewing");
-        }
-    }
 }

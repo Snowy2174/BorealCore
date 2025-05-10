@@ -22,6 +22,8 @@ import plugin.customcooking.manager.configs.RecipeManager;
 import plugin.customcooking.utility.AdventureUtil;
 import plugin.customcooking.utility.ConfigUtil;
 
+import java.util.logging.Level;
+
 public class CustomCooking extends JavaPlugin {
 
     public static CustomCooking plugin;
@@ -163,5 +165,10 @@ public class CustomCooking extends JavaPlugin {
     }
     public static CraftingManager getCraftingManager() {
         return craftingManager;
+    }
+
+    public static void disablePlugin(String errorMessage, Exception e) {
+        plugin.getLogger().log(Level.SEVERE, errorMessage, e);
+        plugin.getServer().getPluginManager().disablePlugin(plugin);
     }
 }

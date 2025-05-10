@@ -1,10 +1,14 @@
 package plugin.customcooking.database;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Consumer;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.functions.jade.JadeTransaction;
+import plugin.customcooking.functions.jade.Leaderboard;
+import plugin.customcooking.functions.jade.LeaderboardEntry;
+import plugin.customcooking.functions.jade.LeaderboardType;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.AdventureUtil;
 
@@ -14,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
@@ -41,7 +46,7 @@ public abstract class Database extends Function {
             this.close(ps, rs);
             AdventureUtil.consoleMessage("[CustomCooking] Loaded SQLite database");
         } catch (SQLException ex) {
-            plugin.getLogger().log(Level.SEVERE, "Unable to retrieve connection", ex);
+            CustomCooking.disablePlugin("Unable to retrieve connection during database initialization", ex);
         }
     }
 
@@ -114,8 +119,8 @@ public abstract class Database extends Function {
     }
 
     public int getJadeForPlayer(Player player) {
-        String query = "SELECT jade FROM jade_totals WHERE player = ?;";
-        return getSingleIntResult(query, player.getName().toLowerCase());
+        String query = "SELECT jade FROM jade_totals WHERE uuid = ?;";
+        return getSingleIntResult(query, player.getUniqueId().toString());
     }
 
     public int getTotalJadeFromSource(String source) {
@@ -130,9 +135,9 @@ public abstract class Database extends Function {
 
         try {
             conn = this.getSQLConnection();
-            String query = "SELECT timestamp FROM jade_transactions WHERE player = ? AND source = ? ORDER BY timestamp DESC LIMIT 1;";
+            String query = "SELECT timestamp FROM jade_transactions WHERE uuid = ? AND source = ? ORDER BY timestamp DESC LIMIT 1;";
             ps = conn.prepareStatement(query);
-            ps.setString(1, player.getName().toLowerCase());
+            ps.setString(1, player.getUniqueId().toString());
             ps.setString(2, source);
             rs = ps.executeQuery();
 
@@ -155,9 +160,9 @@ public abstract class Database extends Function {
 
         try {
             conn = this.getSQLConnection();
-            String query = "SELECT timestamp FROM jade_transactions WHERE player = ? AND source = ? AND amount > 0 AND timestamp >= ? ORDER BY timestamp DESC;";
+            String query = "SELECT timestamp FROM jade_transactions WHERE uuid = ? AND source = ? AND amount > 0 AND timestamp >= ? ORDER BY timestamp DESC;";
             ps = conn.prepareStatement(query);
-            ps.setString(1, player.getName().toLowerCase());
+            ps.setString(1, player.getUniqueId().toString());
             ps.setString(2, source);
             ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now().minus(24, ChronoUnit.HOURS)));
             rs = ps.executeQuery();
@@ -197,11 +202,11 @@ public abstract class Database extends Function {
 
         try {
             conn = this.getSQLConnection();
-            String query = "SELECT source, SUM(amount) AS total FROM jade_transactions WHERE player = ? AND amount > 0 AND timestamp >= ? GROUP BY source";
+            String query = "SELECT source, SUM(amount) AS total FROM jade_transactions WHERE uuid = ? AND amount > 0 AND timestamp >= ? GROUP BY source";
 
             // Check for transactions in the last 24 hours
             ps = conn.prepareStatement(query);
-            ps.setString(1, player.getName().toLowerCase());
+            ps.setString(1, player.getUniqueId().toString());
             ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minus(24, ChronoUnit.HOURS)));
             rs = ps.executeQuery();
 
@@ -216,7 +221,7 @@ public abstract class Database extends Function {
                 ps.close();
 
                 ps = conn.prepareStatement(query);
-                ps.setString(1, player.getName().toLowerCase());
+                ps.setString(1, player.getUniqueId().toString());
                 ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minus(30, ChronoUnit.DAYS)));
                 rs = ps.executeQuery();
 
@@ -248,24 +253,26 @@ public abstract class Database extends Function {
             conn = this.getSQLConnection();
             conn.setAutoCommit(false);
 
-            String transactionQuery = "INSERT INTO jade_transactions (player, amount, source, timestamp) VALUES (?, ?, ?, ?);";
+            String transactionQuery = "INSERT INTO jade_transactions (player, uuid, amount, source, timestamp) VALUES (?, ?, ?, ?, ?);";
             psTransaction = conn.prepareStatement(transactionQuery);
             psTransaction.setString(1, transaction.getPlayer());
-            psTransaction.setDouble(2, transaction.getAmount());
-            psTransaction.setString(3, transaction.getSource());
-            psTransaction.setTimestamp(4, Timestamp.valueOf(transaction.getTimestamp()));
+            psTransaction.setString(2, transaction.getUuid());
+            psTransaction.setDouble(3, transaction.getAmount());
+            psTransaction.setString(4, transaction.getSource());
+            psTransaction.setTimestamp(5, Timestamp.valueOf(transaction.getTimestamp()));
             psTransaction.executeUpdate();
 
             // Update or insert the player's total in jade_totals
             String totalsQuery = """
-                        INSERT INTO jade_totals (player, jade)
-                        VALUES (?, ?)
-                        ON CONFLICT(player) DO UPDATE SET jade = jade + ?;
+                        INSERT INTO jade_totals (player, uuid, jade)
+                        VALUES (?, ?, ?)
+                        ON CONFLICT(uuid) DO UPDATE SET jade = jade + ?;
                     """;
             psTotals = conn.prepareStatement(totalsQuery);
             psTotals.setString(1, transaction.getPlayer());
-            psTotals.setDouble(2, transaction.getAmount());
+            psTotals.setString(2, transaction.getUuid());
             psTotals.setDouble(3, transaction.getAmount());
+            psTotals.setDouble(4, transaction.getAmount());
             psTotals.executeUpdate();
 
             conn.commit();
@@ -315,17 +322,18 @@ public abstract class Database extends Function {
         try {
             conn = this.getSQLConnection();
 
-            String queryPlayers = "SELECT player, jade FROM jade_totals;";
+            String queryPlayers = "SELECT uuid, player, jade FROM jade_totals;";
             psTotals = conn.prepareStatement(queryPlayers);
             rsPlayers = psTotals.executeQuery();
 
             while (rsPlayers.next()) {
+                String uuid = rsPlayers.getString("uuid");
                 String player = rsPlayers.getString("player");
                 int recordedTotal = rsPlayers.getInt("jade");
 
-                String queryTransactions = "SELECT SUM(amount) AS total FROM jade_transactions WHERE player = ?;";
+                String queryTransactions = "SELECT SUM(amount) AS total FROM jade_transactions WHERE uuid = ?;";
                 psTransactions = conn.prepareStatement(queryTransactions);
-                psTransactions.setString(1, player);
+                psTransactions.setString(1, uuid);
                 ResultSet rsTransactions = psTransactions.executeQuery();
 
                 int actualTotal = 0;
@@ -336,35 +344,38 @@ public abstract class Database extends Function {
                 psTransactions.close();
 
                 if (recordedTotal != actualTotal) {
-                    plugin.getLogger().warning("Discrepancy found for player " + player + ": Recorded total = " + recordedTotal + ", Actual total = " + actualTotal);
+                    plugin.getLogger().warning("Discrepancy found for uuid " + uuid + " (player: " + player + "): Recorded total = " + recordedTotal + ", Actual total = " + actualTotal);
 
-                    String fixQuery = "UPDATE jade_totals SET jade = ? WHERE player = ?;";
+                    String fixQuery = "UPDATE jade_totals SET jade = ?, player = ? WHERE uuid = ?;";
                     PreparedStatement psFix = conn.prepareStatement(fixQuery);
                     psFix.setInt(1, actualTotal);
                     psFix.setString(2, player);
+                    psFix.setString(3, uuid);
                     psFix.executeUpdate();
                     psFix.close();
 
-                    plugin.getLogger().info("Fixed total for player " + player + ": Updated total = " + actualTotal);
+                    plugin.getLogger().info("Fixed total for uuid " + uuid + " (player: " + player + "): Updated total = " + actualTotal);
                 }
             }
 
-            String queryMissingPlayers = "SELECT player, SUM(amount) AS total FROM jade_transactions WHERE player NOT IN (SELECT player FROM jade_totals) GROUP BY player;";
+            String queryMissingPlayers = "SELECT uuid, player, SUM(amount) AS total FROM jade_transactions WHERE uuid NOT IN (SELECT uuid FROM jade_totals) GROUP BY uuid, player;";
             psTransactions = conn.prepareStatement(queryMissingPlayers);
             ResultSet rsMissingPlayers = psTransactions.executeQuery();
 
             while (rsMissingPlayers.next()) {
+                String uuid = rsMissingPlayers.getString("uuid");
                 String player = rsMissingPlayers.getString("player");
                 int total = rsMissingPlayers.getInt("total");
 
-                String insertQuery = "INSERT INTO jade_totals (player, jade) VALUES (?, ?);";
+                String insertQuery = "INSERT INTO jade_totals (uuid, player, jade) VALUES (?, ?, ?);";
                 PreparedStatement psInsert = conn.prepareStatement(insertQuery);
-                psInsert.setString(1, player);
-                psInsert.setInt(2, total);
+                psInsert.setString(1, uuid);
+                psInsert.setString(2, player);
+                psInsert.setInt(3, total);
                 psInsert.executeUpdate();
                 psInsert.close();
 
-                plugin.getLogger().info("Inserted new player " + player + " with total jade = " + total);
+                plugin.getLogger().info("Inserted new uuid " + uuid + " (player: " + player + ") with total jade = " + total);
             }
             rsMissingPlayers.close();
             psTransactions.close();
@@ -383,27 +394,104 @@ public abstract class Database extends Function {
         }
     }
 
-    public HashMap<String, Integer> getJadeLeaderboard() {
+    public Leaderboard queryLeaderboard(LeaderboardType type) {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        HashMap<String, Integer> leaderboard = new HashMap<>();
-
+        List<LeaderboardEntry> leaderboard = new ArrayList<>();
         try {
             conn = this.getSQLConnection();
-            String query = "SELECT player, jade FROM jade_totals ORDER BY jade DESC LIMIT 10;";
+
+            // Base query
+            String baseQuery = """
+            SELECT ROW_NUMBER() OVER (ORDER BY SUM(amount) DESC) AS position, uuid, player, SUM(amount) AS jade
+            FROM jade_transactions
+        """;
+            String condition = "";
+            boolean requiresTimestamp = false;
+
+            // Add conditions based on type
+            switch (type) {
+                case ALL_TIME -> condition = " GROUP BY uuid, player";
+                case POSITIVE_ONLY -> condition = " WHERE amount > 0 GROUP BY uuid, player";
+                case FARMING_ALL_TIME -> condition = " WHERE source = 'farming' GROUP BY uuid, player";
+                case FARMING_MONTHLY -> {
+                    condition = " WHERE source = 'farming' AND timestamp >= ? GROUP BY uuid, player";
+                    requiresTimestamp = true;
+                }
+                case FARMING_WEEKLY -> {
+                    condition = " WHERE source = 'farming' AND timestamp >= ? GROUP BY uuid, player";
+                    requiresTimestamp = true;
+                }
+                case COOKING_ALL_TIME -> condition = " WHERE source = 'cooking' GROUP BY uuid, player";
+                case COOKING_MONTHLY -> {
+                    condition = " WHERE source = 'cooking' AND timestamp >= ? GROUP BY uuid, player";
+                    requiresTimestamp = true;
+                }
+                case COOKING_WEEKLY -> {
+                    condition = " WHERE source = 'cooking' AND timestamp >= ? GROUP BY uuid, player";
+                    requiresTimestamp = true;
+                }
+                case BREWING_ALL_TIME -> condition = " WHERE source = 'brewing' GROUP BY uuid, player";
+                case BREWING_MONTHLY -> {
+                    condition = " WHERE source = 'brewing' AND timestamp >= ? GROUP BY uuid, player";
+                    requiresTimestamp = true;
+                }
+                case BREWING_WEEKLY -> {
+                    condition = " WHERE source = 'brewing' AND timestamp >= ? GROUP BY uuid, player";
+                    requiresTimestamp = true;
+                }
+                case FISHING_ALL_TIME -> condition = " WHERE source = 'fishing' GROUP BY uuid, player";
+                case FISHING_MONTHLY -> {
+                    condition = " WHERE source = 'fishing' AND timestamp >= ? GROUP BY uuid, player";
+                    requiresTimestamp = true;
+                }
+                case FISHING_WEEKLY -> {
+                    condition = " WHERE source = 'fishing' AND timestamp >= ? GROUP BY uuid, player";
+                    requiresTimestamp = true;
+                }
+                default -> {
+                    plugin.getLogger().warning("Unknown leaderboard type: " + type);
+                    return null;
+                }
+            }
+
+            // Final query
+            String query = baseQuery + condition + " ORDER BY jade DESC LIMIT 10;";
             ps = conn.prepareStatement(query);
+
+            // Set timestamp if required
+            if (requiresTimestamp) {
+                ps.setTimestamp(1, Timestamp.valueOf(
+                        LocalDateTime.now().minus(type.name().contains("WEEKLY") ? 7 : 30, ChronoUnit.DAYS)
+                ));
+            }
+
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                leaderboard.put(rs.getString("player"), rs.getInt("jade"));
+                int position = rs.getInt("position");
+                UUID uuid = UUID.fromString(rs.getString("uuid"));
+                String playerName = rs.getString("player");
+                int jadeAmount = rs.getInt("jade");
+                leaderboard.add(new LeaderboardEntry(uuid, playerName, jadeAmount, position));
             }
-        } catch (SQLException var17) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), var17);
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
             closeResources(conn, ps, rs);
         }
-        return leaderboard;
+        return new Leaderboard(type, leaderboard);
+    }
+
+    private String resolveUUID(String playerName) {
+        // Attempt to resolve the UUID using the Bukkit API for online players only
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer.getName().equalsIgnoreCase(playerName)) {
+                return onlinePlayer.getUniqueId().toString();
+            }
+        }
+        return null; // Return null if no match is found
     }
 
     public List<String> getAllSources() {

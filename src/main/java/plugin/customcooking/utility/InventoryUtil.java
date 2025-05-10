@@ -23,16 +23,16 @@ public class InventoryUtil {
 
     public static boolean handleIngredientCheck(Inventory playerInventory, List<String> ingredients, Integer instances) {
         if (ingredients == null || ingredients.isEmpty()) {
-            return true; // consider inventory as having all ingredients if list is empty
+            return true;
         }
         for (String ingredientString : ingredients) {
             String[] options = ingredientString.split("/");
             boolean optionFound = handleOptions(playerInventory, options, instances);
             if (!optionFound) {
-                return false; // option not found in player's inventory, return false immediately
+                return false;
             }
         }
-        return true; // all ingredients found in player's inventory for at least one option
+        return true;
     }
 
     private static boolean handleOptions(Inventory playerInventory, String[] options, Integer instances) {
@@ -82,7 +82,7 @@ public class InventoryUtil {
 
     public static void removeIngredients(Inventory playerInventory, List<String> ingredients, Integer instances) {
         if (ingredients == null || ingredients.isEmpty()) {
-            return; // No ingredients to remove
+            return;
         }
 
         for (String ingredient : ingredients) {
@@ -91,18 +91,7 @@ public class InventoryUtil {
                 String[] parts = option.split(":");
                 String ingredientName = parts[0];
                 int amount = Integer.parseInt(parts[1]) * instances;
-
-                if (ingredientName.endsWith("*")) {
-                    if (playerHasIngredient(playerInventory, ingredientName)) {
-                        removeTieredIngredient(playerInventory, ingredientName, amount);
-                        break; // Exit the loop after removing one tiered ingredient
-                    }
-                } else {
-                    if (playerHasIngredient(playerInventory, ingredientName)) {
-                        removeItem(playerInventory, ingredientName, amount);
-                        break; // Exit the loop after removing one non-tiered ingredient
-                    }
-                }
+                removeItem(playerInventory, ingredientName, amount);
             }
         }
     }
@@ -141,21 +130,42 @@ public class InventoryUtil {
         return false;
     }
 
-    private static void removeTieredIngredient(Inventory playerInventory, String ingredient, int amount) {
-        String baseIngredient = ingredient.replace("*", "");
-        for (int tier = 0; tier <= 2; tier++) {
-            String tieredIngredient = baseIngredient + (tier > 0 ? "_t" + tier : "");
-            CustomStack customStackTiered = CustomStack.getInstance(tieredIngredient);
-            if (customStackTiered != null) {
-                ItemStack itemStackTiered = customStackTiered.getItemStack();
-                itemStackTiered.setAmount(amount);
-                playerInventory.removeItem(itemStackTiered);
-                return; // Exit the method after removing one tiered ingredient
-            }
-        }
-    }
+  private static void removeTieredItem(Inventory playerInventory, String ingredient, int amount) {
+      String baseIngredient = ingredient.replace("*", "");
+      for (int tier = 0; tier <= 2; tier++) {
+          if (amount <= 0) {
+              break;
+          }
+          String tieredIngredient = baseIngredient + (tier > 0 ? "_t" + tier : "");
+          CustomStack customStackTiered = CustomStack.getInstance(tieredIngredient);
+          if (customStackTiered != null) {
+              ItemStack itemStackTiered = customStackTiered.getItemStack();
+              int availableAmount = 0;
+              for (ItemStack item : playerInventory.getContents()) {
+                  if (item != null && item.isSimilar(itemStackTiered)) {
+                      availableAmount += item.getAmount();
+                  }
+              }
+              int toRemove = Math.min(amount, availableAmount);
+              if (toRemove > 0) {
+                  itemStackTiered.setAmount(toRemove);
+                  playerInventory.removeItem(itemStackTiered);
+                  amount -= toRemove;
+              }
+          } else {
+              System.out.println("CustomStack for " + tieredIngredient + " is null.");
+          }
+      }
+      System.out.println("Finished removing tiered item: " + ingredient);
+  }
 
     public static void removeItem(Inventory playerInventory, String ingredient, int amount) {
+        if (ingredient.endsWith("*")) {
+            System.out.println(ingredient);
+            removeTieredItem(playerInventory, ingredient, amount);
+            return;
+        }
+
         CustomStack customStack = CustomStack.getInstance(ingredient);
         if (customStack != null) {
             ItemStack itemStack = customStack.getItemStack();

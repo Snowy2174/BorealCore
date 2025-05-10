@@ -15,12 +15,14 @@ public class SQLite extends Database {
     public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS jade_transactions (" + // make sure to put your table name in here too.
             "`player` varchar(32) NOT NULL," + // This creates the different columns you will save data to. varchar(32) Is a string, int = integer
             "`amount` int(11) NOT NULL," +
+            "`uuid` VARCHAR(36)," +
             "`source` varchar(32) NOT NULL," +
             "`timestamp` datetime NOT NULL," +
             "PRIMARY KEY (`player`, `timestamp`)" +  // This is creating 4 columns: player, amount, source, timestamp. Primary key is a combination of player and timestamp.
             ");"; // we can search by player and timestamp to get the amount and source.
     public String SQLiteCreateUsersTable = "CREATE TABLE IF NOT EXISTS jade_totals (" +
             "    `player` varchar(32) NOT NULL PRIMARY KEY," +
+            "    `uuid` VARCHAR(36)," +
             "    `jade` int(11) NOT NULL" +
             ");"; // we can search by player and timestamp to get the amount and source.
     String dbname;

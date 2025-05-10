@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.database.Database;
 import plugin.customcooking.functions.jade.JadeManager;
+import plugin.customcooking.functions.jade.Leaderboard;
+import plugin.customcooking.functions.jade.LeaderboardType;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
 
@@ -46,8 +48,8 @@ public class JadeCommand implements CommandExecutor {
             handleLimitsCommand(sender);
         } else if (subcommand.equalsIgnoreCase("balance")) {
             handleBalanceCommand(sender);
-        } else if (subcommand.equalsIgnoreCase("top")) {
-            handleJadeLeaderboardCommand(sender);
+        } else if (subcommand.equalsIgnoreCase("top") || subcommand.equalsIgnoreCase("leaderboard")) {
+            handleLeaderboardCommand(sender, args);
         }
 
         if (!sender.hasPermission("customcooking.admin")) {
@@ -76,13 +78,6 @@ public class JadeCommand implements CommandExecutor {
             return false;
         }
         return true;
-    }
-
-    private void handleJadeLeaderboardCommand(CommandSender sender) {
-        HashMap<String, Integer> leaderboard = jadeManager.getJadeLeaderboard();
-        for (Map.Entry<String, Integer> entry : leaderboard.entrySet()) {
-            AdventureUtil.sendMessage(sender, "Player: " + entry.getKey() + " | Jade: " + entry.getValue());
-        }
     }
 
     private void handleLimitsCommand(CommandSender sender) {
@@ -235,6 +230,31 @@ public class JadeCommand implements CommandExecutor {
             return;
         }
         reconsileJadeData(player);
+    }
+
+    private void handleLeaderboardCommand(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade leaderboard <type> <page>");
+            return;
+        }
+        LeaderboardType type = LeaderboardType.valueOf(args[1].toUpperCase());
+        if (type == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+        AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Jade leaderboard for " + type + ":");
+        Leaderboard leaderboard = jadeManager.getLeaderboard(type);
+        int page = 1;
+        if (args.length > 2) {
+            try {
+                page = Integer.parseInt(args[2]);
+            } catch (NumberFormatException e) {
+                AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid page number");
+                return;
+            }
+        };
+        leaderboard.getTop(5)
+                .forEach( entry -> AdventureUtil.sendMessage(sender, entry.getPosition() + " " + entry.getPlayerName() + ": " + entry.getTotalAmount()));
     }
 
 }

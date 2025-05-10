@@ -73,7 +73,7 @@ public class ConfigManager {
         splashTime = config.getInt("mechanics.splash-time", 100);
         masteryJadeReward = config.getInt("mechanics.mastery-reward", 5);
         cookingJadeRewardRate = config.getDouble("mechanics.cooking-reward-rate", 0.05);
-        brewingJadeRewardRate = config.getDouble("mechanics.brewing-reward-rate", 0.05);
+        brewingJadeRewardRate = config.getDouble("mechanics.brewing-reward-rate", 0.1);
         brewingRequiredQuality = config.getInt("mechanics.brewing-required-quality", 9);
 
         recipeBookTextureNamespace = config.getString("gui.config.recipe-book", "customcooking:recipe_book");
