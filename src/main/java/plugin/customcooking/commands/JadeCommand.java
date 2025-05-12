@@ -229,7 +229,7 @@ public class JadeCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-        reconsileJadeData(player);
+        reconsileJadeData();
     }
 
     private void handleLeaderboardCommand(CommandSender sender, String[] args) {

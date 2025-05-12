@@ -184,22 +184,23 @@ public class JadeManager extends Function {
         return jadeData.size();
     }
 
-    public static void reconsileJadeData(Player player) {
-        VotingPluginUser user = VotingPluginHooks.getInstance().getUserManager().getVotingPluginUser(player);
-        int avPoints = user.getPoints();
-        if (avPoints == 0) {
-            System.out.println("Jade data is already reconciled for " + player.getName());
-            return;
-        }
-        database.getJadeForPlayerAsync(player, currentJade -> {
-            if (avPoints > currentJade) {
-                int diff = avPoints - currentJade;
-                give(player, diff, "");
-                user.setPoints(0);
-                System.out.println("Reconciled " + diff + " jade for " + player.getName());
-            } else {
-                System.out.println("No reconciliation needed for " + player.getName());
+    public static void reconsileJadeData() {
+        for (VotingPluginUser user : database.getAllTotals()) {
+            String name = user.getPlayerName().toLowerCase();
+            String uuid = user.getUUID().toString();
+            int avPoints = user.getPoints();
+            if (avPoints == 0) {
+                continue;
             }
-        });
+            double jade = database.getTotalJadeByUUID(uuid);
+                if (avPoints > jade) {
+                    int diff = (int) (avPoints - jade);
+                    giveOffline(Bukkit.getOfflinePlayer(uuid), diff, "");
+                    user.setPoints(0);
+                    System.out.println("Reconciled " + diff + " jade for " + name);
+                } else {
+                    System.out.println("No reconciliation needed for " + name);
+                }
+        }
     }
 }

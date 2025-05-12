@@ -1,5 +1,7 @@
 package plugin.customcooking.database;
 
+import com.bencodez.votingplugin.VotingPluginHooks;
+import com.bencodez.votingplugin.user.VotingPluginUser;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -494,6 +496,30 @@ public abstract class Database extends Function {
         return null; // Return null if no match is found
     }
 
+    public List<VotingPluginUser> getAllTotals() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<VotingPluginUser> players = new ArrayList<>();
+
+        try {
+            conn = this.getSQLConnection();
+            String query = "SELECT uuid FROM jade_totals;";
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String uuid = rs.getString("uuid");
+                players.add(VotingPluginHooks.getInstance().getUserManager().getVotingPluginUser(uuid));
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } finally {
+            closeResources(conn, ps, rs);
+        }
+        return players;
+    }
+
     public List<String> getAllSources() {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -521,5 +547,27 @@ public abstract class Database extends Function {
             }
         }
         return sources;
+    }
+
+    public double getTotalJadeByUUID(String uuid) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = this.getSQLConnection();
+            String query = "SELECT jade FROM jade_totals WHERE uuid = ?;";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, uuid);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getDouble("jade");
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } finally {
+            closeResources(conn, ps, rs);
+        }
+        return 0;
     }
 }
