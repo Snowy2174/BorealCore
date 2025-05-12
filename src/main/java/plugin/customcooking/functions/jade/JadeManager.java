@@ -1,6 +1,7 @@
 package plugin.customcooking.functions.jade;
 
 import com.bencodez.votingplugin.VotingPluginHooks;
+import com.bencodez.votingplugin.user.UserManager;
 import com.bencodez.votingplugin.user.VotingPluginUser;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -50,7 +51,7 @@ public class JadeManager extends Function {
         database.startRetryTask();
         reloadLeaderboards();
         scheduler = CustomCooking.getInstance().getServer().getScheduler();
-        scheduler.runTaskTimer(CustomCooking.getInstance(), new AnnoucmentRunnable(CustomCooking.getInstance()), 0L, 20L * 60 * 5);
+        scheduler.runTaskTimer(CustomCooking.getInstance(), new AnnoucmentRunnable(CustomCooking.getInstance()), 0L, 20L * 60 * 10);
     }
 
     @Override
@@ -185,17 +186,18 @@ public class JadeManager extends Function {
     }
 
     public static void reconsileJadeData() {
-        for (VotingPluginUser user : database.getAllTotals()) {
+        UserManager userManager = VotingPluginHooks.getInstance().getUserManager();
+        for (String userID : database.getAllTotals()) {
+            VotingPluginUser user = userManager.getVotingPluginUser(userID);
             String name = user.getPlayerName().toLowerCase();
-            String uuid = user.getUUID().toString();
             int avPoints = user.getPoints();
             if (avPoints == 0) {
                 continue;
             }
-            double jade = database.getTotalJadeByUUID(uuid);
+            double jade = database.getTotalJadeByUUID(userID);
                 if (avPoints > jade) {
                     int diff = (int) (avPoints - jade);
-                    giveOffline(Bukkit.getOfflinePlayer(uuid), diff, "");
+                    give(Bukkit.getPlayer(userID), diff, "");
                     user.setPoints(0);
                     System.out.println("Reconciled " + diff + " jade for " + name);
                 } else {

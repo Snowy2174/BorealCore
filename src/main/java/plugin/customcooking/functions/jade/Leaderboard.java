@@ -12,7 +12,6 @@ public class Leaderboard {
         this.type = type;
         this.entries = entries;
     }
-
     public List<LeaderboardEntry> getTop(int n) {
         return entries.stream().limit(n).collect(Collectors.toList());
     }

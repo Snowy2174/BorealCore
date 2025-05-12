@@ -496,11 +496,11 @@ public abstract class Database extends Function {
         return null; // Return null if no match is found
     }
 
-    public List<VotingPluginUser> getAllTotals() {
+    public List<String> getAllTotals() {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        List<VotingPluginUser> players = new ArrayList<>();
+        List<String> uuids = new ArrayList<>();
 
         try {
             conn = this.getSQLConnection();
@@ -509,15 +509,14 @@ public abstract class Database extends Function {
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                String uuid = rs.getString("uuid");
-                players.add(VotingPluginHooks.getInstance().getUserManager().getVotingPluginUser(uuid));
+                uuids.add(rs.getString("uuid"));
             }
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            closeResources(conn, ps, rs);
+            closeResources(conn, ps, rs); // Ensure resources are closed properly
         }
-        return players;
+        return uuids;
     }
 
     public List<String> getAllSources() {

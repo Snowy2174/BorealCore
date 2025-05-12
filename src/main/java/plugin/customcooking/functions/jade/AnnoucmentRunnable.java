@@ -5,6 +5,9 @@ import plugin.customcooking.CustomCooking;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
 
+import java.util.Collection;
+import java.util.List;
+
 public class AnnoucmentRunnable implements Runnable {
 
     private final CustomCooking plugin;
@@ -15,7 +18,14 @@ public class AnnoucmentRunnable implements Runnable {
 
     @Override
     public void run() {
-        for (Player p : plugin.getServer().getOnlinePlayers()) {
+        Collection<? extends Player> players = plugin.getServer().getOnlinePlayers();
+        if (players.isEmpty()) {
+            return;
+        }
+        List<? extends Player> validPlayers = players.stream()
+                .filter(player -> player.hasPermission("customcooking.jade.announcement"))
+                .toList();
+        for (Player p : validPlayers) {
             int status = JadeManager.sendJadeLimitMessage(p);
             if (status == -1) {
                 AdventureUtil.playerMessage(p,MessageManager.infoPositive + MessageManager.jadeGetStarted);
