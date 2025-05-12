@@ -236,15 +236,14 @@ private void handleLeaderboardCommand(CommandSender sender, String[] args) {
         return;
     }
     LeaderboardType type = LeaderboardType.ALLTIME;
-    try {
-        type = LeaderboardType.valueOf(args[1].toUpperCase());
-    } catch (IllegalArgumentException e) {
-        AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid leaderboard type");
-        return;
-    }
-
     int page = 1;
     if (args.length > 2) {
+        try {
+            type = LeaderboardType.valueOf(args[1].toUpperCase());
+        } catch (IllegalArgumentException e) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid leaderboard type");
+            return;
+        }
         try {
             page = Integer.parseInt(args[2]);
         } catch (NumberFormatException e) {

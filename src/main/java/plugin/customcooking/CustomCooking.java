@@ -99,6 +99,8 @@ public class CustomCooking extends JavaPlugin {
         nodeManager.unload();
         wikiManager.unload();
         craftingManager.unload();
+        db.unload();
+
 
         AdventureUtil.consoleMessage("[CustomCooking] Plugin Disabled!");
 
