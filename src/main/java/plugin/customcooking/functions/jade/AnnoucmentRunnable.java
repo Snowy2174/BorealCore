@@ -23,8 +23,9 @@ public class AnnoucmentRunnable implements Runnable {
             return;
         }
         List<? extends Player> validPlayers = players.stream()
-                .filter(player -> player.hasPermission("customcooking.jade.announcement"))
+                .filter(player -> !player.hasPermission("customcooking.jade.announcement"))
                 .toList();
+        System.out.println("Jade announcement runnable executed for " + validPlayers.size() + " players.");
         for (Player p : validPlayers) {
             int status = JadeManager.sendJadeLimitMessage(p);
             if (status == -1) {
