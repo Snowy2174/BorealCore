@@ -61,6 +61,9 @@ public class MessageManager {
     public static String jadeGetStarted;
     public static String jadeSourceReminder;
     public static String jadeSourceReminder2;
+    public static String leaderboardHeader;
+    public static String leaderboardEntry;
+    public static String leaderboardFooter;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang + ".yml");
@@ -123,6 +126,10 @@ public class MessageManager {
         jadeGetStarted = getOrSet(config, "jade-get-started", "<gradient:#00AA00:#88DAA1>Get started with Jade by using /cooking jade</gradient>");
         jadeSourceReminder = getOrSet(config, "jade-source-reminder", "<gradient:#00AA00:#88DAA1>Click here to view your limits <click:run_command:jade limits>[ ! ]</gradient>");
         jadeSourceReminder2 = getOrSet(config, "jade-source-reminder-2", "<gradient:#00AA00:#88DAA1>Cwor check out the wiki for more info</gradient>");
+
+        leaderboardHeader = getOrSet(config, "leaderboard-header", "<gradient:#00AA00:#88DAA1>\n}======------ {type} Leaderboard || Page {page} / {totalPages} ------======={</gradient>\n");
+        leaderboardEntry = getOrSet(config, "leaderboard-entry", "<gradient:#00AA00:#88DAA1>  --> {position}: {player} - {score} </gradient>");
+        leaderboardFooter = getOrSet(config, "leaderboard-footer", "<gradient:#00AA00:#88DAA1>\n[______________________]</gradient>\n");
 
         try {
             config.save(new File(CustomCooking.getInstance().getDataFolder(), "messages_" + ConfigManager.lang + ".yml"));

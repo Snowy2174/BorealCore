@@ -1,6 +1,7 @@
 package plugin.customcooking.functions.jade;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Leaderboard {
@@ -14,5 +15,17 @@ public class Leaderboard {
 
     public List<LeaderboardEntry> getTop(int n) {
         return entries.stream().limit(n).collect(Collectors.toList());
+    }
+    public LeaderboardEntry getEntry(int index) {
+        if (index < 0 || index >= entries.size()) {
+            return null;
+        }
+        return entries.get(index);
+    }
+    public LeaderboardType getType() {
+        return type;
+    }
+    public List<LeaderboardEntry> getEntries() {
+        return entries;
     }
 }

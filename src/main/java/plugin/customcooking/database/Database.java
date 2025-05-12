@@ -414,41 +414,41 @@ public abstract class Database extends Function {
 
             // Add conditions based on type
             switch (type) {
-                case ALL_TIME -> condition = " GROUP BY uuid, player";
-                case POSITIVE_ONLY -> condition = " WHERE amount > 0 GROUP BY uuid, player";
-                case FARMING_ALL_TIME -> condition = " WHERE source = 'farming' GROUP BY uuid, player";
-                case FARMING_MONTHLY -> {
+                case ALLTIME -> condition = " GROUP BY uuid, player";
+                case POSITIVEONLY -> condition = " WHERE amount > 0 GROUP BY uuid, player";
+                case FARMINGALL -> condition = " WHERE source = 'farming' GROUP BY uuid, player";
+                case FARMINGMONTHLY -> {
                     condition = " WHERE source = 'farming' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
-                case FARMING_WEEKLY -> {
+                case FARMINGWEEKLY -> {
                     condition = " WHERE source = 'farming' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
-                case COOKING_ALL_TIME -> condition = " WHERE source = 'cooking' GROUP BY uuid, player";
-                case COOKING_MONTHLY -> {
+                case COOKINGALL -> condition = " WHERE source = 'cooking' GROUP BY uuid, player";
+                case COOKINGMONTHLY -> {
                     condition = " WHERE source = 'cooking' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
-                case COOKING_WEEKLY -> {
+                case COOKINGWEEKLY -> {
                     condition = " WHERE source = 'cooking' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
-                case BREWING_ALL_TIME -> condition = " WHERE source = 'brewing' GROUP BY uuid, player";
-                case BREWING_MONTHLY -> {
+                case BREWINGALL -> condition = " WHERE source = 'brewing' GROUP BY uuid, player";
+                case BREWINGMONTHLY -> {
                     condition = " WHERE source = 'brewing' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
-                case BREWING_WEEKLY -> {
+                case BREWINGWEEKLY -> {
                     condition = " WHERE source = 'brewing' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
-                case FISHING_ALL_TIME -> condition = " WHERE source = 'fishing' GROUP BY uuid, player";
-                case FISHING_MONTHLY -> {
+                case FISHINGALL -> condition = " WHERE source = 'fishing' GROUP BY uuid, player";
+                case FISHINGMONTHLY -> {
                     condition = " WHERE source = 'fishing' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
-                case FISHING_WEEKLY -> {
+                case FISHINGWEEKLY -> {
                     condition = " WHERE source = 'fishing' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
@@ -459,7 +459,7 @@ public abstract class Database extends Function {
             }
 
             // Final query
-            String query = baseQuery + condition + " ORDER BY jade DESC LIMIT 10;";
+            String query = baseQuery + condition + " ORDER BY jade DESC LIMIT 50;";
             ps = conn.prepareStatement(query);
 
             // Set timestamp if required

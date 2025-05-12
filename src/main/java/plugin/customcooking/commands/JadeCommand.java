@@ -9,12 +9,10 @@ import plugin.customcooking.CustomCooking;
 import plugin.customcooking.database.Database;
 import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.functions.jade.Leaderboard;
+import plugin.customcooking.functions.jade.LeaderboardEntry;
 import plugin.customcooking.functions.jade.LeaderboardType;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static plugin.customcooking.functions.jade.JadeManager.reconsileJadeData;
 
@@ -232,29 +230,57 @@ public class JadeCommand implements CommandExecutor {
         reconsileJadeData();
     }
 
-    private void handleLeaderboardCommand(CommandSender sender, String[] args) {
-        if (args.length < 1) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade leaderboard <type> <page>");
-            return;
-        }
-        LeaderboardType type = LeaderboardType.valueOf(args[1].toUpperCase());
-        if (type == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
-            return;
-        }
-        AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Jade leaderboard for " + type + ":");
-        Leaderboard leaderboard = jadeManager.getLeaderboard(type);
-        int page = 1;
-        if (args.length > 2) {
-            try {
-                page = Integer.parseInt(args[2]);
-            } catch (NumberFormatException e) {
-                AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid page number");
-                return;
-            }
-        };
-        leaderboard.getTop(5)
-                .forEach( entry -> AdventureUtil.sendMessage(sender, entry.getPosition() + " " + entry.getPlayerName() + ": " + entry.getTotalAmount()));
+private void handleLeaderboardCommand(CommandSender sender, String[] args) {
+    if (args.length < 1) {
+        AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade leaderboard <type> <page>");
+        return;
     }
+    LeaderboardType type = LeaderboardType.ALLTIME;
+    try {
+        type = LeaderboardType.valueOf(args[1].toUpperCase());
+    } catch (IllegalArgumentException e) {
+        AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid leaderboard type");
+        return;
+    }
+
+    int page = 1;
+    if (args.length > 2) {
+        try {
+            page = Integer.parseInt(args[2]);
+        } catch (NumberFormatException e) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid page number");
+            return;
+        }
+    }
+
+    Leaderboard leaderboard = jadeManager.getLeaderboard(type);
+    int entriesPerPage = 5;
+    int totalEntries = leaderboard.getEntries().size();
+    int totalPages = (int) Math.ceil((double) totalEntries / entriesPerPage);
+
+    if (page < 1 || page > totalPages) {
+        AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Page out of range. Total pages: " + totalPages);
+        return;
+    }
+
+    AdventureUtil.sendMessage(sender, MessageManager.leaderboardHeader
+    .replace("{type}", type.toString())
+            .replace("{page}", String.valueOf(page))
+            .replace("{totalPages}", String.valueOf(totalPages)));
+    leaderboard.getEntries().stream()
+            .skip((page - 1) * entriesPerPage)
+            .limit(entriesPerPage)
+            .forEach(entry -> AdventureUtil.sendMessage(sender, MessageManager.leaderboardEntry
+                    .replace("{player}", entry.getPlayerName())
+                    .replace("{position}", String.valueOf(entry.getPosition()))
+                    .replace("{score}", String.valueOf(entry.getTotalAmount()))));
+    AdventureUtil.sendMessage(sender, MessageManager.leaderboardFooter);
+    AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Your position: " + leaderboard.getEntries()
+            .stream()
+            .filter(entry -> entry.getPlayerName().equalsIgnoreCase(sender.getName()))
+            .findFirst()
+            .map(LeaderboardEntry::getPosition)
+            .orElse(0));;
+}
 
 }

@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.database.Database;
+import plugin.customcooking.manager.configs.MessageManager;
 
 public class JadePapi extends PlaceholderExpansion {
     @Override
@@ -42,8 +43,22 @@ public class JadePapi extends PlaceholderExpansion {
             case "lim":
                 String source = parts[1];
                 return JadeManager.checkJadeLimit(player, source);
-            case "source":
+            case "leaderboard":
+                if (parts.length < 3) {
+                    return "Invalid Leaderboard Placeholder";
+                }
+                LeaderboardType leaderboardType = LeaderboardType.valueOf(parts[1].toUpperCase());
+                int position = Integer.parseInt(parts[2]);
+                if (leaderboardType != null && position >= 0) {
+                    LeaderboardEntry leaderboard = JadeManager.leaderboardCache.get(leaderboardType).getEntry(position);
 
+                    return MessageManager.leaderboardEntry
+                            .replace("{player}", leaderboard.getPlayerName())
+                            .replace("{position}", String.valueOf(position))
+                            .replace("{score}", String.valueOf(leaderboard.getTotalAmount()));
+                } else {
+                    return "Invalid Leaderboard Type";
+                }
             case "total":
                 return String.valueOf(JadeManager.getTotalJadeForPlayer(player));
             default:

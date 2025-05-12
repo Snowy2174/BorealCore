@@ -33,7 +33,7 @@ public class JadeManager extends Function {
     private static BukkitScheduler scheduler;
     private VoteListener voteListener;
     private BreweryListener breweryListener;
-    private static HashMap<LeaderboardType, Leaderboard> leaderboardCache = new HashMap<>();
+    public static HashMap<LeaderboardType, Leaderboard> leaderboardCache = new HashMap<>();
 
     public JadeManager(Database database) {
         this.database = database;
