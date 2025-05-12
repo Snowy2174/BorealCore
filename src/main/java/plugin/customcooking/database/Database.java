@@ -414,9 +414,9 @@ public abstract class Database extends Function {
 
             // Add conditions based on type
             switch (type) {
-                case ALLTIME -> condition = " GROUP BY uuid, player";
-                case POSITIVEONLY -> condition = " WHERE amount > 0 GROUP BY uuid, player";
-                case FARMINGALL -> condition = " WHERE source = 'farming' GROUP BY uuid, player";
+                case CURRENT -> condition = " GROUP BY uuid, player";
+                case ALLTIME -> condition = " WHERE amount > 0 GROUP BY uuid, player";
+                case FARMING -> condition = " WHERE source = 'farming' GROUP BY uuid, player";
                 case FARMINGMONTHLY -> {
                     condition = " WHERE source = 'farming' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
@@ -425,7 +425,7 @@ public abstract class Database extends Function {
                     condition = " WHERE source = 'farming' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
-                case COOKINGALL -> condition = " WHERE source = 'cooking' GROUP BY uuid, player";
+                case COOKING -> condition = " WHERE source = 'cooking' GROUP BY uuid, player";
                 case COOKINGMONTHLY -> {
                     condition = " WHERE source = 'cooking' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
@@ -434,7 +434,7 @@ public abstract class Database extends Function {
                     condition = " WHERE source = 'cooking' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
-                case BREWINGALL -> condition = " WHERE source = 'brewing' GROUP BY uuid, player";
+                case BREWING -> condition = " WHERE source = 'brewing' GROUP BY uuid, player";
                 case BREWINGMONTHLY -> {
                     condition = " WHERE source = 'brewing' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
@@ -443,7 +443,7 @@ public abstract class Database extends Function {
                     condition = " WHERE source = 'brewing' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
-                case FISHINGALL -> condition = " WHERE source = 'fishing' GROUP BY uuid, player";
+                case FISHING -> condition = " WHERE source = 'fishing' GROUP BY uuid, player";
                 case FISHINGMONTHLY -> {
                     condition = " WHERE source = 'fishing' AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;

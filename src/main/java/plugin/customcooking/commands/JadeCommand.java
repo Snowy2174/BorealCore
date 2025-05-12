@@ -219,7 +219,7 @@ public class JadeCommand implements CommandExecutor {
 
     private void handleReconsileCommand(CommandSender sender, String[] args) {
         if (args.length < 1) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade getPlayerData <player>");
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade reconsile <player>");
             return;
         }
         Player player = Bukkit.getPlayer(args[0]);
@@ -235,7 +235,7 @@ private void handleLeaderboardCommand(CommandSender sender, String[] args) {
         AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade leaderboard <type> <page>");
         return;
     }
-    LeaderboardType type = LeaderboardType.ALLTIME;
+    LeaderboardType type = LeaderboardType.CURRENT;
     int page = 1;
     if (args.length > 2) {
         try {

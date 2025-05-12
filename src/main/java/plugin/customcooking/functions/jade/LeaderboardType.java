@@ -1,18 +1,18 @@
 package plugin.customcooking.functions.jade;
 
 public enum LeaderboardType {
+    CURRENT,
     ALLTIME,
-    POSITIVEONLY,
-    FARMINGALL,
+    FARMING,
     FARMINGMONTHLY,
     FARMINGWEEKLY,
-    COOKINGALL,
+    COOKING,
     COOKINGMONTHLY,
     COOKINGWEEKLY,
-    BREWINGALL,
+    BREWING,
     BREWINGMONTHLY,
     BREWINGWEEKLY,
-    FISHINGALL,
+    FISHING,
     FISHINGMONTHLY,
     FISHINGWEEKLY,
 }
