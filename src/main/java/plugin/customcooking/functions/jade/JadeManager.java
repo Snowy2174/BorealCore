@@ -3,6 +3,9 @@ package plugin.customcooking.functions.jade;
 import com.bencodez.votingplugin.VotingPluginHooks;
 import com.bencodez.votingplugin.user.UserManager;
 import com.bencodez.votingplugin.user.VotingPluginUser;
+import com.dre.brewery.api.events.brew.BrewModifyEvent;
+import net.momirealms.customcrops.api.core.block.BreakReason;
+import net.momirealms.customcrops.api.event.CropBreakEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -11,7 +14,8 @@ import org.bukkit.scheduler.BukkitScheduler;
 import plugin.customcooking.CustomCooking;
 import plugin.customcooking.api.event.JadeEvent;
 import plugin.customcooking.database.Database;
-import plugin.customcooking.functions.brewery.BreweryListener;
+import plugin.customcooking.listener.BreweryListener;
+import plugin.customcooking.listener.CropsListener;
 import plugin.customcooking.listener.VoteListener;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
@@ -24,8 +28,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.dre.brewery.api.events.brew.BrewModifyEvent.Type.SEAL;
 import static org.bukkit.Bukkit.getServer;
-import static plugin.customcooking.functions.cooking.competition.bossbar.BossBarManager.cache;
+import static plugin.customcooking.manager.configs.ConfigManager.brewingJadeRewardRate;
+import static plugin.customcooking.manager.configs.ConfigManager.brewingRequiredQuality;
 
 public class JadeManager extends Function {
 
@@ -34,12 +40,14 @@ public class JadeManager extends Function {
     private static BukkitScheduler scheduler;
     private VoteListener voteListener;
     private BreweryListener breweryListener;
+    private CropsListener cropsListener;
     public static HashMap<LeaderboardType, Leaderboard> leaderboardCache = new HashMap<>();
 
     public JadeManager(Database database) {
         this.database = database;
         this.voteListener = new VoteListener(this);
-        this.breweryListener = new BreweryListener();
+        this.breweryListener = new BreweryListener(this);
+        this.cropsListener = new CropsListener(this);
     }
 
     @Override
@@ -47,6 +55,7 @@ public class JadeManager extends Function {
         loadJadeLimits();
         Bukkit.getPluginManager().registerEvents(voteListener, CustomCooking.plugin);
         Bukkit.getPluginManager().registerEvents(breweryListener, CustomCooking.plugin);
+        Bukkit.getPluginManager().registerEvents(cropsListener, CustomCooking.plugin);
         database.verifyAndFixTotals();
         database.startRetryTask();
         reloadLeaderboards();
@@ -58,6 +67,7 @@ public class JadeManager extends Function {
     public void unload() {
         jadeSources.clear();
         leaderboardCache.clear();
+
         if (scheduler != null) {
             scheduler.cancelTasks(CustomCooking.getInstance());
         }
@@ -69,7 +79,8 @@ public class JadeManager extends Function {
         for (String key : config.getConfigurationSection("jade.sources").getKeys(false)) {
             int limit = config.getInt("jade.sources." + key + ".limit", -1);
             long cooldown = config.getLong("jade.sources." + key + ".cooldown", 0);
-            jadeSources.put(key, new JadeSource(key, cooldown, limit));
+            double rate = config.getDouble("jade.sources." + key + ".rate", 1.0);
+            jadeSources.put(key, new JadeSource(key, cooldown, limit, rate));
         }
         for (String source : database.getAllSources()) {
             if (!jadeSources.containsKey(source)) {
@@ -203,6 +214,32 @@ public class JadeManager extends Function {
                 } else {
                     System.out.println("No reconciliation needed for " + name);
                 }
+        }
+    }
+
+    public void breweryJade(BrewModifyEvent event) {
+        Player player = event.getPlayer();
+        int quality = event.getBrew().getQuality();
+        CustomCooking.getInstance().getLogger().info("Processing breweryJade for player: " + player.getName() + ", quality: " + quality);
+        if (quality >= brewingRequiredQuality && Math.random() <= jadeSources.get("brewing").getRate()) {
+            giveJadeCommand(player,"brewing", 1);
+        }
+    }
+
+    public void farmingJade(CropBreakEvent event) {
+        if (event.entityBreaker() instanceof Player) {
+            Player player = (Player) event.entityBreaker();
+            CustomCooking.getInstance().getLogger().info("Processing farmingJade for player: " + player.getName());
+            if (Math.random() <= jadeSources.get("farming").getRate()) {
+                giveJadeCommand(player, "farming", 1);
+            }
+        }
+    }
+
+    public static void cookingJade(Player player) {
+        CustomCooking.getInstance().getLogger().info("Processing cookingJade for player: " + player.getName());
+        if (Math.random() <= jadeSources.get("cooking").getRate()) {
+            giveJadeCommand(player, "cooking", 1);
         }
     }
 }

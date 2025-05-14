@@ -95,6 +95,10 @@
             <id>Scarsz-Nexus</id>
             <url>https://nexus.scarsz.me/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>MomiRealms</id>
+            <url>https://repo.momirealms.net/releases/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -175,6 +179,12 @@
             <groupId>com.discordsrv</groupId>
             <artifactId>discordsrv</artifactId>
             <version>1.28.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.momirealms</groupId>
+            <artifactId>custom-crops</artifactId>
+            <version>3.6.29</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
