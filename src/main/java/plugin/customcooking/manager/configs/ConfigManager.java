@@ -72,9 +72,7 @@ public class ConfigManager {
         splashEffect = config.getString("mechanics.pot-effect", "pot_effect");
         splashTime = config.getInt("mechanics.splash-time", 100);
         masteryJadeReward = config.getInt("mechanics.mastery-reward", 5);
-        cookingJadeRewardRate = config.getDouble("mechanics.cooking-reward-rate", 0.05);
-        brewingJadeRewardRate = config.getDouble("mechanics.brewing-reward-rate", 0.1);
-        brewingRequiredQuality = config.getInt("mechanics.brewing-required-quality", 9);
+        brewingRequiredQuality = config.getInt("mechanics.brewing-required-quality", 8);
 
         recipeBookTextureNamespace = config.getString("gui.config.recipe-book", "customcooking:recipe_book");
         masteryLine = config.getString("gui.config.mastery-line", "<!italic><#ff9900>Mastery [{mastery}]");
