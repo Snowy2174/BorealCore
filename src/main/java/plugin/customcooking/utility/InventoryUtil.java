@@ -11,10 +11,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import plugin.customcooking.functions.cooking.object.Recipe;
 import plugin.customcooking.manager.configs.EffectManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 
 import java.util.List;
+
+import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 
 public class InventoryUtil {
 
@@ -179,11 +182,28 @@ public class InventoryUtil {
         }
     }
 
+    public static ItemStack buildItemAPI(String key) {
+        ItemStack itemStack = buildia(key);
+        if (itemStack == null) {
+            try {
+                Material material = Material.valueOf(key.toUpperCase());
+                itemStack = new ItemStack(material);
+            } catch (IllegalArgumentException e) {
+                Bukkit.getLogger().warning("Invalid material name: " + key);
+                itemStack = new ItemStack(Material.AIR);
+            }
+        }
+        if (RECIPES.containsKey(key.toLowerCase().replace("_perfect", ""))) {
+            EffectManager.addPotionEffectLore(itemStack, key, key.contains(ConfigManager.perfectItemSuffix));
+            addIdentifier(itemStack, key);
+        }
+        return itemStack;
+    }
+
     public static void giveItem(Player player, String item, Integer amount, boolean customCookingItem) {
         ItemStack drop = build(item);
         drop.setAmount(amount);
         if (customCookingItem) {
-
             EffectManager.addPotionEffectLore(drop, item, item.contains(ConfigManager.perfectItemSuffix));
             addIdentifier(drop, item);
         }
