@@ -53,11 +53,11 @@ public class JadeManager extends Function {
     @Override
     public void load() {
         loadJadeLimits();
+        database.verifyAndFixTotals();
+        database.startRetryTask();
         Bukkit.getPluginManager().registerEvents(voteListener, CustomCooking.plugin);
         Bukkit.getPluginManager().registerEvents(breweryListener, CustomCooking.plugin);
         Bukkit.getPluginManager().registerEvents(cropsListener, CustomCooking.plugin);
-        database.verifyAndFixTotals();
-        database.startRetryTask();
         reloadLeaderboards();
         scheduler = CustomCooking.getInstance().getServer().getScheduler();
         scheduler.runTaskTimer(CustomCooking.getInstance(), new AnnoucmentRunnable(CustomCooking.getInstance()), 0L, 20L * 60 * 10);
