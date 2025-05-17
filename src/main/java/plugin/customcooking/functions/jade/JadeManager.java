@@ -6,6 +6,7 @@ import com.bencodez.votingplugin.user.VotingPluginUser;
 import com.dre.brewery.api.events.brew.BrewModifyEvent;
 import net.momirealms.customcrops.api.core.block.BreakReason;
 import net.momirealms.customcrops.api.event.CropBreakEvent;
+import net.momirealms.customfishing.api.event.FishingResultEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,6 +17,7 @@ import plugin.customcooking.api.event.JadeEvent;
 import plugin.customcooking.database.Database;
 import plugin.customcooking.listener.BreweryListener;
 import plugin.customcooking.listener.CropsListener;
+import plugin.customcooking.listener.FishingListener;
 import plugin.customcooking.listener.VoteListener;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
@@ -41,6 +43,7 @@ public class JadeManager extends Function {
     private VoteListener voteListener;
     private BreweryListener breweryListener;
     private CropsListener cropsListener;
+    private FishingListener fishingListener;
     public static HashMap<LeaderboardType, Leaderboard> leaderboardCache = new HashMap<>();
 
     public JadeManager(Database database) {
@@ -48,16 +51,18 @@ public class JadeManager extends Function {
         this.voteListener = new VoteListener(this);
         this.breweryListener = new BreweryListener(this);
         this.cropsListener = new CropsListener(this);
+        this.fishingListener = new FishingListener(this);
     }
 
     @Override
     public void load() {
         loadJadeLimits();
-        database.verifyAndFixTotals();
-        database.startRetryTask();
         Bukkit.getPluginManager().registerEvents(voteListener, CustomCooking.plugin);
         Bukkit.getPluginManager().registerEvents(breweryListener, CustomCooking.plugin);
         Bukkit.getPluginManager().registerEvents(cropsListener, CustomCooking.plugin);
+        Bukkit.getPluginManager().registerEvents(fishingListener, CustomCooking.plugin);
+        database.verifyAndFixTotals();
+        database.startRetryTask();
         reloadLeaderboards();
         scheduler = CustomCooking.getInstance().getServer().getScheduler();
         scheduler.runTaskTimer(CustomCooking.getInstance(), new AnnoucmentRunnable(CustomCooking.getInstance()), 0L, 20L * 60 * 10);
@@ -223,6 +228,12 @@ public class JadeManager extends Function {
         CustomCooking.getInstance().getLogger().info("Processing breweryJade for player: " + player.getName() + ", quality: " + quality);
         if (quality >= brewingRequiredQuality && Math.random() <= jadeSources.get("brewing").getRate()) {
             giveJadeCommand(player,"brewing", 1);
+        }
+    }
+
+    public static void fishingJade(FishingResultEvent event) {
+        if (event.getResult().equals(FishingResultEvent.Result.SUCCESS) && Math.random() <= jadeSources.get("fishing").getRate()) {
+            giveJadeCommand(event.getPlayer(), "fishing", 1);
         }
     }
 

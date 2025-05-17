@@ -8,6 +8,8 @@ depend:
   - PlaceholderAPI
   - NBTAPI
   - ItemsAdder
+  - CustomCrops
+  - CustomFishing
 softdepend:
   - DecentHolograms
   - DiscordSRV
