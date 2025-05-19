@@ -49,6 +49,7 @@ public class ConfigManager {
     public static double cookingJadeRewardRate;
     public static double brewingJadeRewardRate;
     public static int brewingRequiredQuality;
+    public static boolean processAnalyticsEnabled;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
@@ -73,6 +74,8 @@ public class ConfigManager {
         splashTime = config.getInt("mechanics.splash-time", 100);
         masteryJadeReward = config.getInt("mechanics.mastery-reward", 5);
         brewingRequiredQuality = config.getInt("mechanics.brewing-required-quality", 8);
+
+        processAnalyticsEnabled = config.getBoolean("analytics.process.enabled", true);
 
         recipeBookTextureNamespace = config.getString("gui.config.recipe-book", "customcooking:recipe_book");
         masteryLine = config.getString("gui.config.mastery-line", "<!italic><#ff9900>Mastery [{mastery}]");

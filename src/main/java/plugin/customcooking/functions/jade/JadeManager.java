@@ -115,6 +115,8 @@ public class JadeManager extends Function {
                     .replace("{source}", GUIUtil.formatString(source)));
             return;
         }
+        // Reconsile jade data
+        reconsileJadeData(player);
         // Check if player is on cooldown
         if (!source.isEmpty() && jadeSources.get(source).getCooldown() != 0 && database.isOnCooldown(player, source)) {
             AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeCooldown
@@ -201,25 +203,23 @@ public class JadeManager extends Function {
         return jadeData.size();
     }
 
-    public static void reconsileJadeData() {
-        UserManager userManager = VotingPluginHooks.getInstance().getUserManager();
-        for (String userID : database.getAllTotals()) {
-            VotingPluginUser user = userManager.getVotingPluginUser(userID);
-            String name = user.getPlayerName().toLowerCase();
-            int avPoints = user.getPoints();
-            if (avPoints == 0) {
-                continue;
-            }
-            double jade = database.getTotalJadeByUUID(userID);
-                if (avPoints > jade) {
-                    int diff = (int) (avPoints - jade);
-                    give(Bukkit.getPlayer(userID), diff, "");
-                    user.setPoints(0);
-                    System.out.println("Reconciled " + diff + " jade for " + name);
-                } else {
-                    System.out.println("No reconciliation needed for " + name);
-                }
+    public static void reconsileJadeData(Player player) {
+        VotingPluginUser user = VotingPluginHooks.getInstance().getUserManager().getVotingPluginUser(player);
+        int avPoints = user.getPoints();
+        if (avPoints == 0) {
+            System.out.println("Jade data is already reconciled for " + player.getName());
+            return;
         }
+        database.getJadeForPlayerAsync(player, currentJade -> {
+            if (avPoints > currentJade) {
+                int diff = avPoints - currentJade;
+                give(player, diff, "");
+                user.setPoints(0);
+                System.out.println("Reconciled " + diff + " jade for " + player.getName());
+            } else {
+                System.out.println("No reconciliation needed for " + player.getName());
+            }
+        });
     }
 
     public void breweryJade(BrewModifyEvent event) {

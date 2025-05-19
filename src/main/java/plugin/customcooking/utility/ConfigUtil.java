@@ -42,6 +42,8 @@ public class ConfigUtil {
         CustomCooking.getInventoryManager().init();
         CustomCooking.getDatabase().unload();
         CustomCooking.getDatabase().load();
+        CustomCooking.getAnalyticsManager().unload();
+        CustomCooking.getAnalyticsManager().load();
     }
 }
 

@@ -43,6 +43,7 @@ public class CustomCooking extends JavaPlugin {
     private static Database db;
     private static WikiManager wikiManager;
     private static CraftingManager craftingManager;
+    private static AnalyticsManager analyticsManager;
 
     @Override
     public void onLoad() {
@@ -69,6 +70,7 @@ public class CustomCooking extends JavaPlugin {
         db = new SQLite(this);
         jadeManager = new JadeManager(db);
         craftingManager = new CraftingManager();
+        analyticsManager = new AnalyticsManager(db);
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());
@@ -96,6 +98,9 @@ public class CustomCooking extends JavaPlugin {
         nodeManager.unload();
         wikiManager.unload();
         craftingManager.unload();
+        furnitureManager.unload();
+        masteryManager.unload();
+        analyticsManager.unload();
         db.unload();
 
 
@@ -161,6 +166,9 @@ public class CustomCooking extends JavaPlugin {
     }
     public static CraftingManager getCraftingManager() {
         return craftingManager;
+    }
+    public static AnalyticsManager getAnalyticsManager() {
+        return analyticsManager;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {
