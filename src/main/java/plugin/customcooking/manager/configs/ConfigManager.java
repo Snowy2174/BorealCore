@@ -50,6 +50,7 @@ public class ConfigManager {
     public static double brewingJadeRewardRate;
     public static int brewingRequiredQuality;
     public static boolean processAnalyticsEnabled;
+    public static List<String> refarmableCrops;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
@@ -74,6 +75,7 @@ public class ConfigManager {
         splashTime = config.getInt("mechanics.splash-time", 100);
         masteryJadeReward = config.getInt("mechanics.mastery-reward", 5);
         brewingRequiredQuality = config.getInt("mechanics.brewing-required-quality", 8);
+        refarmableCrops = config.getStringList("mechanics.refarmable-crops");
 
         processAnalyticsEnabled = config.getBoolean("analytics.process.enabled", true);
 

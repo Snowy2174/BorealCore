@@ -1,10 +1,10 @@
 package plugin.customcooking.functions.jade;
 
 import com.bencodez.votingplugin.VotingPluginHooks;
-import com.bencodez.votingplugin.user.UserManager;
 import com.bencodez.votingplugin.user.VotingPluginUser;
 import com.dre.brewery.api.events.brew.BrewModifyEvent;
 import net.momirealms.customcrops.api.core.block.BreakReason;
+import net.momirealms.customcrops.api.core.mechanic.crop.CropConfig;
 import net.momirealms.customcrops.api.event.CropBreakEvent;
 import net.momirealms.customfishing.api.event.FishingResultEvent;
 import org.bukkit.Bukkit;
@@ -30,10 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.dre.brewery.api.events.brew.BrewModifyEvent.Type.SEAL;
 import static org.bukkit.Bukkit.getServer;
-import static plugin.customcooking.manager.configs.ConfigManager.brewingJadeRewardRate;
-import static plugin.customcooking.manager.configs.ConfigManager.brewingRequiredQuality;
+import static plugin.customcooking.manager.configs.ConfigManager.*;
 
 public class JadeManager extends Function {
 
@@ -115,8 +113,6 @@ public class JadeManager extends Function {
                     .replace("{source}", GUIUtil.formatString(source)));
             return;
         }
-        // Reconsile jade data
-        reconsileJadeData(player);
         // Check if player is on cooldown
         if (!source.isEmpty() && jadeSources.get(source).getCooldown() != 0 && database.isOnCooldown(player, source)) {
             AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeCooldown
@@ -205,6 +201,10 @@ public class JadeManager extends Function {
 
     public static void reconsileJadeData(Player player) {
         VotingPluginUser user = VotingPluginHooks.getInstance().getUserManager().getVotingPluginUser(player);
+        if (user == null) {
+            System.out.println("User not found for " + player.getName());
+            return;
+        }
         int avPoints = user.getPoints();
         if (avPoints == 0) {
             System.out.println("Jade data is already reconciled for " + player.getName());
@@ -225,13 +225,14 @@ public class JadeManager extends Function {
     public void breweryJade(BrewModifyEvent event) {
         Player player = event.getPlayer();
         int quality = event.getBrew().getQuality();
-        CustomCooking.getInstance().getLogger().info("Processing breweryJade for player: " + player.getName() + ", quality: " + quality);
-        if (quality >= brewingRequiredQuality && Math.random() <= jadeSources.get("brewing").getRate()) {
+        CustomCooking.getInstance().getLogger().info("Processing breweryJade for player: " + player.getName() + ", quality: " + quality + ", brew: " + event.getBrew().getCurrentRecipe().getName() + ", age: " + event.getBrew().getAgeTime());
+        if (quality >= brewingRequiredQuality && event.getBrew().getAgeTime() >= 1 && Math.random() <= jadeSources.get("brewing").getRate()) {
             giveJadeCommand(player,"brewing", 1);
         }
     }
 
     public static void fishingJade(FishingResultEvent event) {
+        System.out.println("Fishing result: " + event.getResult() + ", player: " + event.getPlayer().getName() + ", loot: " + event.getLoot() + " group: " + event.getLoot().lootGroup().toString());
         if (event.getResult().equals(FishingResultEvent.Result.SUCCESS) && Math.random() <= jadeSources.get("fishing").getRate()) {
             giveJadeCommand(event.getPlayer(), "fishing", 1);
         }
@@ -240,8 +241,10 @@ public class JadeManager extends Function {
     public void farmingJade(CropBreakEvent event) {
         if (event.entityBreaker() instanceof Player) {
             Player player = (Player) event.entityBreaker();
-            CustomCooking.getInstance().getLogger().info("Processing farmingJade for player: " + player.getName());
-            if (Math.random() <= jadeSources.get("farming").getRate()) {
+            CropConfig cropConfig = event.cropConfig();
+            CustomCooking.getInstance().getLogger().info("Processing farmingJade for player: " + player.getName() +
+                    ", crop: " + event.cropStageItemID() + ", reason: " + event.reason());
+            if (refarmableCrops.contains(cropConfig.id()) ? Math.random() <= jadeSources.get("farming").getRate() * 0.5 : Math.random() <= jadeSources.get("farming").getRate()) {
                 giveJadeCommand(player, "farming", 1);
             }
         }

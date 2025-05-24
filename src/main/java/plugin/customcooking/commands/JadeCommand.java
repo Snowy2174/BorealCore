@@ -218,16 +218,15 @@ public class JadeCommand implements CommandExecutor {
     }
 
     private void handleReconsileCommand(CommandSender sender, String[] args) {
-        if (args.length < 1) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade reconsile <player>");
+        if (args.length < 0) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade reconsile>");
             return;
         }
-        Player player = Bukkit.getPlayer(args[0]);
-        if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
-            return;
+        for (Player p : Bukkit.getOnlinePlayers()) {
+                reconsileJadeData(p);
+                AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Reconciled jade data for " + p.getName());
+                return;
         }
-        reconsileJadeData(player);
     }
 
 private void handleLeaderboardCommand(CommandSender sender, String[] args) {
@@ -267,7 +266,7 @@ private void handleLeaderboardCommand(CommandSender sender, String[] args) {
             .replace("{page}", String.valueOf(page))
             .replace("{totalPages}", String.valueOf(totalPages)));
     leaderboard.getEntries().stream()
-            .skip((page - 1) * entriesPerPage)
+            .skip((long) (page - 1) * entriesPerPage)
             .limit(entriesPerPage)
             .forEach(entry -> AdventureUtil.sendMessage(sender, MessageManager.leaderboardEntry
                     .replace("{player}", entry.getPlayerName())
@@ -279,7 +278,7 @@ private void handleLeaderboardCommand(CommandSender sender, String[] args) {
             .filter(entry -> entry.getPlayerName().equalsIgnoreCase(sender.getName()))
             .findFirst()
             .map(LeaderboardEntry::getPosition)
-            .orElse(0));;
+            .orElse(0));
 }
 
 }

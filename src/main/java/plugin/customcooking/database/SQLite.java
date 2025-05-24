@@ -77,7 +77,11 @@ public class SQLite extends Database {
     public void unload() {
         if (connection != null) {
             try {
-                connection.close();
+                if (!connection.isClosed()) {
+                    connection.commit();
+                    connection.close();
+                    plugin.getLogger().info("Database connection closed successfully.");
+                }
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error closing database connection", e);
             }
