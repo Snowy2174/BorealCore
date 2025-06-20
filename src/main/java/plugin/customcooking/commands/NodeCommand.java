@@ -3,7 +3,7 @@ package plugin.customcooking.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.karmicnode.NodeManager;
 
 
@@ -12,7 +12,7 @@ public class NodeCommand implements CommandExecutor {
     private final NodeManager nodeManager;
 
     public NodeCommand() {
-        this.nodeManager = CustomCooking.getNodeManager();
+        this.nodeManager = BorealCore.getNodeManager();
     }
 
     @Override

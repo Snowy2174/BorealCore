@@ -3,12 +3,10 @@ package plugin.customcooking.manager;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
-import plugin.customcooking.CustomCooking;
 import plugin.customcooking.database.Database;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.object.Function;
 
-import java.sql.ResultSet;
 import java.time.Duration;
 import java.util.Map;
 import java.util.stream.Collectors;

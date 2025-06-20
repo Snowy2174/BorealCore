@@ -10,7 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
@@ -41,7 +41,7 @@ public class MasteryManager extends Function {
 
     public static void handleMastery(Player player, String recipe) {
         YamlConfiguration config = ConfigUtil.getConfig("data/playerdata.yml");
-        File file = new File(CustomCooking.plugin.getDataFolder(), "data/playerdata.yml");
+        File file = new File(BorealCore.plugin.getDataFolder(), "data/playerdata.yml");
 
         String playerName = player.getName();
         String playerRecipePath = "players." + playerName + "." + recipe;
@@ -93,7 +93,7 @@ public class MasteryManager extends Function {
     }
 
     private static void savePlayerStats(FileConfiguration config) {
-        File file = new File(CustomCooking.plugin.getDataFolder(), "data/playerstats.yml");
+        File file = new File(BorealCore.plugin.getDataFolder(), "data/playerstats.yml");
         try {
             config.save(file);
         } catch (IOException e) {

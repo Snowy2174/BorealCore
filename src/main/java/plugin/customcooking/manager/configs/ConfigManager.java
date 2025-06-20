@@ -3,7 +3,7 @@ package plugin.customcooking.manager.configs;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.utility.ConfigUtil;
 
 import java.util.List;
@@ -113,6 +113,6 @@ public class ConfigManager {
     }
 
     public static @NotNull NamespacedKey getNamespacedKey(String key) {
-        return new NamespacedKey(CustomCooking.plugin, key);
+        return new NamespacedKey(BorealCore.plugin, key);
     }
 }

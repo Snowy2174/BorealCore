@@ -3,7 +3,7 @@ package plugin.customcooking.manager.configs;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.cooking.Difficulty;
 import plugin.customcooking.functions.cooking.object.DroppedItem;
 import plugin.customcooking.functions.cooking.object.Layout;
@@ -25,7 +25,7 @@ public class RecipeManager extends Function {
     public void load() {
         RECIPES = new HashMap<>();
         loadItems();
-        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (RECIPES.size()) + " <gray>recipes");
+        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (RECIPES.size()) + " <gray>recipes");
     }
 
     @Override
@@ -34,10 +34,10 @@ public class RecipeManager extends Function {
     }
 
     private void loadItems() {
-        File recipe_file = new File(CustomCooking.plugin.getDataFolder() + File.separator + "recipes");
+        File recipe_file = new File(BorealCore.plugin.getDataFolder() + File.separator + "recipes");
         if (!recipe_file.exists()) {
             if (!recipe_file.mkdir()) return;
-            CustomCooking.plugin.saveResource(CustomCooking.plugin.getDataFolder() + File.separator + "recipes.yml", false);
+            BorealCore.plugin.saveResource(BorealCore.plugin.getDataFolder() + File.separator + "recipes.yml", false);
         }
         File[] files = recipe_file.listFiles();
         if (files == null) return;
@@ -83,7 +83,7 @@ public class RecipeManager extends Function {
                     for (String layoutName : recipeSection.getStringList("layout")) {
                         Layout layout = LayoutManager.LAYOUTS.get(layoutName);
                         if (layout == null) {
-                            AdventureUtil.consoleMessage("<red>[CustomCooking] Bar " + layoutName + " doesn't exist");
+                            AdventureUtil.consoleMessage("<red>[BorealCore] Bar " + layoutName + " doesn't exist");
                             continue;
                         }
                         layoutList.add(layout);

@@ -2,8 +2,8 @@ package plugin.customcooking.functions.jade;
 
 import com.bencodez.votingplugin.VotingPluginHooks;
 import com.bencodez.votingplugin.user.VotingPluginUser;
+import com.dre.brewery.Brew;
 import com.dre.brewery.api.events.brew.BrewModifyEvent;
-import net.momirealms.customcrops.api.core.block.BreakReason;
 import net.momirealms.customcrops.api.core.mechanic.crop.CropConfig;
 import net.momirealms.customcrops.api.event.CropBreakEvent;
 import net.momirealms.customfishing.api.event.FishingResultEvent;
@@ -12,7 +12,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.api.event.JadeEvent;
 import plugin.customcooking.database.Database;
 import plugin.customcooking.listener.BreweryListener;
@@ -27,6 +27,7 @@ import plugin.customcooking.utility.GUIUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,15 +56,15 @@ public class JadeManager extends Function {
     @Override
     public void load() {
         loadJadeLimits();
-        Bukkit.getPluginManager().registerEvents(voteListener, CustomCooking.plugin);
-        Bukkit.getPluginManager().registerEvents(breweryListener, CustomCooking.plugin);
-        Bukkit.getPluginManager().registerEvents(cropsListener, CustomCooking.plugin);
-        Bukkit.getPluginManager().registerEvents(fishingListener, CustomCooking.plugin);
+        Bukkit.getPluginManager().registerEvents(voteListener, BorealCore.plugin);
+        Bukkit.getPluginManager().registerEvents(breweryListener, BorealCore.plugin);
+        Bukkit.getPluginManager().registerEvents(cropsListener, BorealCore.plugin);
+        Bukkit.getPluginManager().registerEvents(fishingListener, BorealCore.plugin);
         database.verifyAndFixTotals();
         database.startRetryTask();
         reloadLeaderboards();
-        scheduler = CustomCooking.getInstance().getServer().getScheduler();
-        scheduler.runTaskTimer(CustomCooking.getInstance(), new AnnoucmentRunnable(CustomCooking.getInstance()), 0L, 20L * 60 * 10);
+        scheduler = BorealCore.getInstance().getServer().getScheduler();
+        scheduler.runTaskTimer(BorealCore.getInstance(), new AnnoucmentRunnable(BorealCore.getInstance()), 0L, 20L * 60 * 10);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class JadeManager extends Function {
         leaderboardCache.clear();
 
         if (scheduler != null) {
-            scheduler.cancelTasks(CustomCooking.getInstance());
+            scheduler.cancelTasks(BorealCore.getInstance());
         }
     }
 
@@ -90,9 +91,9 @@ public class JadeManager extends Function {
                 jadeSourceList.add(source);
             }
         }
-        AdventureUtil.consoleMessage("[CustomCooking] Initialised Jade limit system");
-        AdventureUtil.consoleMessage("[CustomCooking] Loaded Jade limits: " + jadeSources.keySet());
-        AdventureUtil.consoleMessage("[CustomCooking] Jade sources not in database: " + jadeSourceList);
+        AdventureUtil.consoleMessage("[BorealCore] Initialised Jade limit system");
+        AdventureUtil.consoleMessage("[BorealCore] Loaded Jade limits: " + jadeSources.keySet());
+        AdventureUtil.consoleMessage("[BorealCore] Jade sources not in database: " + jadeSourceList);
     }
 
     public void reloadLeaderboards() {
@@ -224,10 +225,21 @@ public class JadeManager extends Function {
 
     public void breweryJade(BrewModifyEvent event) {
         Player player = event.getPlayer();
-        int quality = event.getBrew().getQuality();
-        CustomCooking.getInstance().getLogger().info("Processing breweryJade for player: " + player.getName() + ", quality: " + quality + ", brew: " + event.getBrew().getCurrentRecipe().getName() + ", age: " + event.getBrew().getAgeTime());
-        if (quality >= brewingRequiredQuality && event.getBrew().getAgeTime() >= 1 && Math.random() <= jadeSources.get("brewing").getRate()) {
-            giveJadeCommand(player,"brewing", 1);
+        Brew brew = event.getBrew();
+        int quality = brew.getQuality();
+        int age = brew.getCurrentRecipe().getAge();
+        boolean distilled = brew.getCurrentRecipe().getDistillTime() > 1;
+        double brewingRate = jadeSources.get("brewing").getRate();
+        BorealCore.getInstance().getLogger().info(String.format(
+                "Processing breweryJade for player: %s, quality: %d, brew: %s, age: %d, distilled: %b",
+                player.getName(), quality, Arrays.toString(brew.getCurrentRecipe().getName()), age, distilled
+        ));
+        if (quality >= brewingRequiredQuality) {
+            boolean agedCondition = age > 1 && Math.random() <= brewingRate;
+            boolean distilledCondition = distilled && Math.random() <= (brewingRate * 0.5);
+            if (agedCondition || distilledCondition) {
+                giveJadeCommand(player, "brewing", 1);
+            }
         }
     }
 
@@ -242,7 +254,7 @@ public class JadeManager extends Function {
         if (event.entityBreaker() instanceof Player) {
             Player player = (Player) event.entityBreaker();
             CropConfig cropConfig = event.cropConfig();
-            CustomCooking.getInstance().getLogger().info("Processing farmingJade for player: " + player.getName() +
+            BorealCore.getInstance().getLogger().info("Processing farmingJade for player: " + player.getName() +
                     ", crop: " + event.cropStageItemID() + ", reason: " + event.reason());
             if (refarmableCrops.contains(cropConfig.id()) ? Math.random() <= jadeSources.get("farming").getRate() * 0.5 : Math.random() <= jadeSources.get("farming").getRate()) {
                 giveJadeCommand(player, "farming", 1);
@@ -251,7 +263,7 @@ public class JadeManager extends Function {
     }
 
     public static void cookingJade(Player player) {
-        CustomCooking.getInstance().getLogger().info("Processing cookingJade for player: " + player.getName());
+        BorealCore.getInstance().getLogger().info("Processing cookingJade for player: " + player.getName());
         if (Math.random() <= jadeSources.get("cooking").getRate()) {
             giveJadeCommand(player, "cooking", 1);
         }

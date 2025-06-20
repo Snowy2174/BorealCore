@@ -1,19 +1,22 @@
 package plugin.customcooking;
 
-import com.bencodez.votingplugin.events.PlayerPostVoteEvent;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.customcooking.commands.*;
 import plugin.customcooking.database.SQLite;
 import plugin.customcooking.functions.cooking.CompetitionManager;
 import plugin.customcooking.functions.cooking.CookingManager;
 import plugin.customcooking.database.Database;
+import plugin.customcooking.functions.duels.DuelsManager;
 import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.functions.karmicnode.NodeManager;
+import plugin.customcooking.functions.plushies.PlushieManager;
 import plugin.customcooking.functions.wiki.WikiManager;
+import plugin.customcooking.listener.BendingListener;
 import plugin.customcooking.manager.*;
 import plugin.customcooking.manager.configs.EffectManager;
 import plugin.customcooking.manager.configs.LayoutManager;
@@ -23,9 +26,9 @@ import plugin.customcooking.utility.ConfigUtil;
 
 import java.util.logging.Level;
 
-public class CustomCooking extends JavaPlugin {
+public class BorealCore extends JavaPlugin {
 
-    public static CustomCooking plugin;
+    public static BorealCore plugin;
     public static BukkitAudiences adventure;
     public static ProtocolManager protocolManager;
     private static CookingManager cookingManager;
@@ -44,6 +47,8 @@ public class CustomCooking extends JavaPlugin {
     private static WikiManager wikiManager;
     private static CraftingManager craftingManager;
     private static AnalyticsManager analyticsManager;
+    private static PlushieManager plushieManager;
+    private static DuelsManager duelsManager;
 
     @Override
     public void onLoad() {
@@ -71,6 +76,8 @@ public class CustomCooking extends JavaPlugin {
         jadeManager = new JadeManager(db);
         craftingManager = new CraftingManager();
         analyticsManager = new AnalyticsManager(db);
+        plushieManager = new PlushieManager();
+        duelsManager = new DuelsManager();
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());
@@ -80,8 +87,11 @@ public class CustomCooking extends JavaPlugin {
         getCommand("kn").setExecutor(new NodeCommand());
         getCommand("wiki").setExecutor(new WikiCommand());
         getCommand("wiki").setTabCompleter(new WikiTabCompletion());
+        getCommand("plushies").setExecutor(new GambleCommand());
 
-        AdventureUtil.consoleMessage("[CustomCooking] Plugin Enabled!");
+        Bukkit.getPluginManager().registerEvents(new BendingListener(), this);
+
+        AdventureUtil.consoleMessage("[BorealCore] Plugin Enabled!");
     }
 
     @Override
@@ -101,10 +111,12 @@ public class CustomCooking extends JavaPlugin {
         furnitureManager.unload();
         masteryManager.unload();
         analyticsManager.unload();
+        plushieManager.unload();
+        duelsManager.unload();
         db.unload();
 
 
-        AdventureUtil.consoleMessage("[CustomCooking] Plugin Disabled!");
+        AdventureUtil.consoleMessage("[BorealCore] Plugin Disabled!");
 
         if (adventure != null) {
             adventure.close();
@@ -117,7 +129,7 @@ public class CustomCooking extends JavaPlugin {
         ConfigUtil.reload();
     }
 
-    public static CustomCooking getInstance() {
+    public static BorealCore getInstance() {
         return plugin;
     }
     public static CookingManager getCookingManager() {
@@ -169,6 +181,12 @@ public class CustomCooking extends JavaPlugin {
     }
     public static AnalyticsManager getAnalyticsManager() {
         return analyticsManager;
+    }
+    public static PlushieManager getPlushieManager() {
+        return plushieManager;
+    }
+    public static DuelsManager getDuelsManager() {
+        return duelsManager;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {

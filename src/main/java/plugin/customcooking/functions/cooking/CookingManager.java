@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.action.Action;
 import plugin.customcooking.api.event.CookResultEvent;
 import plugin.customcooking.functions.cooking.competition.Competition;
@@ -69,8 +69,8 @@ public class CookingManager extends Function {
 
     @Override
     public void load() {
-        Bukkit.getPluginManager().registerEvents(this.interactListener, CustomCooking.plugin);
-        Bukkit.getPluginManager().registerEvents(this.consumeItemListener, CustomCooking.plugin);
+        Bukkit.getPluginManager().registerEvents(this.interactListener, BorealCore.plugin);
+        Bukkit.getPluginManager().registerEvents(this.consumeItemListener, BorealCore.plugin);
     }
 
     @Override
@@ -296,7 +296,7 @@ public class CookingManager extends Function {
         }
 
         CookingPlayer cookingPlayer = new CookingPlayer(System.currentTimeMillis() + time, player, layout, difficult, this);
-        cookingPlayer.runTaskTimer(CustomCooking.plugin, 0, 1);
+        cookingPlayer.runTaskTimer(BorealCore.plugin, 0, 1);
         cookingPlayerCache.put(player, cookingPlayer);
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, time / 50, 3));
         playSoundLoop(player);
@@ -330,14 +330,14 @@ public class CookingManager extends Function {
                 playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking"), 1f, 1f);
             }
         };
-        soundTask.runTaskTimerAsynchronously(CustomCooking.plugin, 0L, 60L);
+        soundTask.runTaskTimerAsynchronously(BorealCore.plugin, 0L, 60L);
         playerSoundTasks.put(player.getUniqueId(), soundTask);
         new BukkitRunnable() {
             @Override
             public void run() {
                 stopSoundLoop(player);
             }
-        }.runTaskLater(CustomCooking.plugin, 600L);
+        }.runTaskLater(BorealCore.plugin, 600L);
     }
 
     public void stopSoundLoop(Player player) {
@@ -355,7 +355,7 @@ public class CookingManager extends Function {
 
             ItemStack itemStack = event.getItem();
 
-            NBTCompound nbtCompound = new NBTItem(itemStack).getCompound("CustomCooking");
+            NBTCompound nbtCompound = new NBTItem(itemStack).getCompound("BorealCore");
             if (nbtCompound == null) {
                 return;
             }

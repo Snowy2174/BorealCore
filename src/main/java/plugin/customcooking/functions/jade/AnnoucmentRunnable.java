@@ -1,18 +1,19 @@
 package plugin.customcooking.functions.jade;
 
 import org.bukkit.entity.Player;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 
 public class AnnoucmentRunnable implements Runnable {
 
-    private final CustomCooking plugin;
+    private final BorealCore plugin;
 
-    public AnnoucmentRunnable(CustomCooking plugin) {
+    public AnnoucmentRunnable(BorealCore plugin) {
         this.plugin = plugin;
     }
 
@@ -23,9 +24,9 @@ public class AnnoucmentRunnable implements Runnable {
             return;
         }
         List<? extends Player> validPlayers = players.stream()
-                .filter(player -> !player.hasPermission("customcooking.jade.announcement"))
+                .filter(player -> !player.hasPermission("jade.announcement"))
                 .toList();
-        System.out.println("Jade announcement runnable executed for " + validPlayers.size() + " players.");
+        plugin.getLogger().log(Level.INFO, "Found " + validPlayers.size() + " valid players");
         for (Player p : validPlayers) {
             int status = JadeManager.sendJadeLimitMessage(p);
             if (status == -1) {

@@ -5,7 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.wiki.WikiManager;
 import plugin.customcooking.manager.GuiManager;
 import plugin.customcooking.manager.configs.MessageManager;
@@ -20,7 +20,7 @@ public class WikiCommand implements CommandExecutor {
     private final WikiManager wikiManager;
 
     public WikiCommand() {
-        this.wikiManager = CustomCooking.getWikiManager();
+        this.wikiManager = BorealCore.getWikiManager();
     }
 
     @Override
@@ -42,7 +42,7 @@ public class WikiCommand implements CommandExecutor {
             handleOpenBookCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("updateWiki")) {
             try {
-                WikiManager.downloadRepo("https://github.com/Snowy2174/BendingMC-Wiki.git", new File(CustomCooking.plugin.getDataFolder() + File.separator + "wiki"), true);
+                WikiManager.downloadRepo("https://github.com/Snowy2174/BendingMC-Wiki.git", new File(BorealCore.plugin.getDataFolder() + File.separator + "wiki"), true);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

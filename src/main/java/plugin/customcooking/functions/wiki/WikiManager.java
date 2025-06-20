@@ -6,7 +6,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.entity.Player;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.AdventureUtil;
 
@@ -138,7 +138,7 @@ public class WikiManager extends Function {
         WIKI = new HashMap<>();
         CATEGORY = new ArrayList<>();
         loadWiki(WIKI_URL);
-        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (WIKI.size()) + " <gray>ingame wiki pages");
+        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (WIKI.size()) + " <gray>ingame wiki pages");
     }
 
     @Override
@@ -147,7 +147,7 @@ public class WikiManager extends Function {
     }
 
     private void loadWiki(String repoUrl) {
-        File wiki_file = new File(CustomCooking.plugin.getDataFolder() + File.separator + "wiki");
+        File wiki_file = new File(BorealCore.plugin.getDataFolder() + File.separator + "wiki");
         if (!wiki_file.exists() && !wiki_file.mkdir()) {
             System.out.println("Failed to create wiki folder");
             return;

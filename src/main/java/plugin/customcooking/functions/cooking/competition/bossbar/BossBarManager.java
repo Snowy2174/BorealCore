@@ -3,7 +3,7 @@ package plugin.customcooking.functions.cooking.competition.bossbar;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.cooking.competition.Competition;
 import plugin.customcooking.listener.SimpleListener;
 import plugin.customcooking.manager.configs.MessageManager;
@@ -23,7 +23,7 @@ public class BossBarManager extends Function {
 
     @Override
     public void load() {
-        Bukkit.getPluginManager().registerEvents(this.simpleListener, CustomCooking.plugin);
+        Bukkit.getPluginManager().registerEvents(this.simpleListener, BorealCore.plugin);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package plugin.customcooking.functions.cooking.competition.bossbar;
 
 import org.bukkit.entity.Player;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.cooking.competition.Competition;
 import plugin.customcooking.functions.cooking.competition.ranking.RankingInterface;
 import plugin.customcooking.manager.PlaceholderManager;
@@ -24,7 +24,7 @@ public class TextCache {
     }
 
     private void analyze(String value) {
-        List<String> placeholdersOwner = new ArrayList<>(CustomCooking.getPlaceholderManager().detectPlaceholders(value));
+        List<String> placeholdersOwner = new ArrayList<>(BorealCore.getPlaceholderManager().detectPlaceholders(value));
         String origin = value;
         for (String placeholder : placeholdersOwner) {
             origin = origin.replace(placeholder, "%s");
@@ -42,7 +42,7 @@ public class TextCache {
     public boolean update() {
         String string = originalValue;
         if (ownerPlaceholders.length != 0) {
-            PlaceholderManager placeholderManager = CustomCooking.getPlaceholderManager();
+            PlaceholderManager placeholderManager = BorealCore.getPlaceholderManager();
             if ("%s".equals(originalValue)) {
                 string = placeholderManager.parse(owner, ownerPlaceholders[0]);
             } else {

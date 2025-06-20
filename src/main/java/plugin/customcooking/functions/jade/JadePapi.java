@@ -3,8 +3,6 @@ package plugin.customcooking.functions.jade;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import plugin.customcooking.CustomCooking;
-import plugin.customcooking.database.Database;
 import plugin.customcooking.manager.configs.MessageManager;
 
 public class JadePapi extends PlaceholderExpansion {

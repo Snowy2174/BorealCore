@@ -12,7 +12,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.listener.FurnitureListener;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
@@ -39,7 +39,7 @@ public class FurnitureManager extends Function {
 
     @Override
     public void load() {
-        Bukkit.getPluginManager().registerEvents(this.furnitureListener, CustomCooking.plugin);
+        Bukkit.getPluginManager().registerEvents(this.furnitureListener, BorealCore.plugin);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class FurnitureManager extends Function {
                 spawnSplashItem(loc);
                 AdventureUtil.playerSound(player, net.kyori.adventure.sound.Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "ingredient" + i), 1f, 1f);
             }
-        }.runTaskLater(CustomCooking.plugin, 20);
+        }.runTaskLater(BorealCore.plugin, 20);
     }
 
     private static void spawnFakeIngredientItem(Location loc, String ingredient, Runnable onComplete) {
@@ -91,7 +91,7 @@ public class FurnitureManager extends Function {
                 itemEntity.remove(); // Remove the item entity from the world
                 onComplete.run(); // Invoke the callback when the removal is complete
             }
-        }.runTaskLater(CustomCooking.plugin, 10);
+        }.runTaskLater(BorealCore.plugin, 10);
     }
 
     private static void spawnSplashItem(Location loc) {
@@ -108,7 +108,7 @@ public class FurnitureManager extends Function {
             public void run() {
                 armorStand.remove(); // Remove the item entity from the world
             }
-        }.runTaskLater(CustomCooking.plugin, ConfigManager.splashTime);
+        }.runTaskLater(BorealCore.plugin, ConfigManager.splashTime);
     }
 
     public static void playCookingResultSFX(Location loc, ItemStack item, Boolean success) {
@@ -153,7 +153,7 @@ public class FurnitureManager extends Function {
             public void run() {
                 hologram.delete(); // Remove the hologram
             }
-        }.runTaskLater(CustomCooking.plugin, 60);
+        }.runTaskLater(BorealCore.plugin, 60);
     }
 
     public void onFurnitureInteract(FurnitureInteractEvent event) {
@@ -204,7 +204,7 @@ public class FurnitureManager extends Function {
             public void run() {
                 playAmbientEffects(location);
             }
-        }.runTaskTimerAsynchronously(CustomCooking.plugin, 0L, 80L);
+        }.runTaskTimerAsynchronously(BorealCore.plugin, 0L, 80L);
 
         activeFXTasks.put(location, task);
     }
@@ -214,7 +214,7 @@ public class FurnitureManager extends Function {
             cancelCookingPotFX(loc);
             return;
         }
-        Bukkit.getScheduler().runTask(CustomCooking.plugin, () -> {
+        Bukkit.getScheduler().runTask(BorealCore.plugin, () -> {
             loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
             loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);
             loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);
@@ -224,13 +224,13 @@ public class FurnitureManager extends Function {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Bukkit.getScheduler().runTask(CustomCooking.plugin, () -> {
+                Bukkit.getScheduler().runTask(BorealCore.plugin, () -> {
                     loc.getWorld().spawnParticle(Particle.FLAME, loc, 3, 0.25, 0.25, 0.25, 0.01);
                     loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);
                     loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.clone().add(0, 1, 0), 0, 0, 1, 0, 0.03, null, true);
                 });
             }
-        }.runTaskLaterAsynchronously(CustomCooking.plugin, 40L);
+        }.runTaskLaterAsynchronously(BorealCore.plugin, 40L);
     }
 
     public void cancelCookingPotFX(Location location) {

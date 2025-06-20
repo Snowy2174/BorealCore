@@ -5,7 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.cooking.CookingManager;
 import plugin.customcooking.functions.cooking.competition.Competition;
 import plugin.customcooking.functions.cooking.competition.CompetitionSchedule;
@@ -25,7 +25,7 @@ public class CookCommand implements CommandExecutor {
     private final CookingManager cookingManager;
 
     public CookCommand() {
-        this.cookingManager = CustomCooking.getCookingManager();
+        this.cookingManager = BorealCore.getCookingManager();
     }
 
     @Override
@@ -80,7 +80,7 @@ public class CookCommand implements CommandExecutor {
         if (sender instanceof Player player) {
             List<String> unlockedRecipes = RecipeDataUtil.getUnlockedRecipes(player);
 
-            AdventureUtil.sendMessage(sender, "<gold><bold>CustomCooking</bold><grey> version 1.1.4");
+            AdventureUtil.sendMessage(sender, "<gold><bold>BorealCore</bold><grey> version 1.1.4");
             AdventureUtil.sendMessage(sender, "<grey>Created by <gold>SnowyOwl217");
             AdventureUtil.sendMessage(sender, "<gold> Total Recipes Cooked: " + MasteryManager.getRecipeCount(player.getName()));
             AdventureUtil.sendMessage(sender, "<gold> Total Recipes Unlocked: " + unlockedRecipes.size());
@@ -90,7 +90,7 @@ public class CookCommand implements CommandExecutor {
     }
 
     private void showCommandHelp(CommandSender sender) {
-        AdventureUtil.sendMessage(sender, "<gold><bold>CustomCooking</bold><grey> version 1.0.0");
+        AdventureUtil.sendMessage(sender, "<gold><bold>BorealCore</bold><grey> version 1.0.0");
         AdventureUtil.sendMessage(sender, "<grey>Created by <gold>SnowyOwl217");
         AdventureUtil.sendMessage(sender, "<gold>/cooking cook <recipe> <player> [auto]");
         AdventureUtil.sendMessage(sender, "<gold>/cooking unlock <player> <recipe>");

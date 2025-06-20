@@ -1,5 +1,5 @@
 messages:
-  prefix: "<gradient:#FB5A00:#FDF300>[CustomCooking] </gradient>"
+  prefix: "<gradient:#FB5A00:#FDF300>[BorealCore] </gradient>"
   prefix-negative: "<gray>[<red>!<gray>] "
   prefix-positive: "<gray>[<green>!<gray>] "
 

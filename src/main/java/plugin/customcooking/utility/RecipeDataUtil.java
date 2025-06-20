@@ -4,7 +4,7 @@ import dev.lone.itemsadder.api.ItemsAdder;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.manager.configs.RecipeManager;
@@ -143,7 +143,7 @@ public class RecipeDataUtil {
 
     public static void setRecipeData(Player player, String recipe, @Nullable Integer count) {
         YamlConfiguration config = getConfig("data/playerdata.yml");
-        File file = new File(CustomCooking.plugin.getDataFolder(), "data/playerdata.yml");
+        File file = new File(BorealCore.plugin.getDataFolder(), "data/playerdata.yml");
 
         String playerName = player.getName();
         String playerRecipePath = "players." + playerName + "." + recipe;

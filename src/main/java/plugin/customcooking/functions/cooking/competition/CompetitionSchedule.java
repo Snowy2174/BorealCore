@@ -2,7 +2,7 @@ package plugin.customcooking.functions.cooking.competition;
 
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.cooking.CompetitionManager;
 import plugin.customcooking.object.Function;
 
@@ -65,7 +65,7 @@ public class CompetitionSchedule extends Function {
                     }
                 }
             }
-        }.runTaskTimer(CustomCooking.plugin, 60 - LocalTime.now().getSecond(), 100);
+        }.runTaskTimer(BorealCore.plugin, 60 - LocalTime.now().getSecond(), 100);
     }
 
     public void stopCheck() {

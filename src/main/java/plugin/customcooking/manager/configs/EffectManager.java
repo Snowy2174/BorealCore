@@ -49,7 +49,7 @@ public class EffectManager extends Function {
                         for (String key : section.getConfigurationSection(action).getKeys(false)) {
                             PotionEffectType type = PotionEffectType.getByName(section.getString(action + "." + key + ".type", "BLINDNESS").toUpperCase());
                             if (type == null)
-                                AdventureUtil.consoleMessage("<red>[CustomCooking] Potion effect " + section.getString(action + "." + key + ".type", "BLINDNESS") + " doesn't exists");
+                                AdventureUtil.consoleMessage("<red>[BorealCore] Potion effect " + section.getString(action + "." + key + ".type", "BLINDNESS") + " doesn't exists");
                             potionEffectList.add(new PotionEffect(
                                     type == null ? PotionEffectType.LUCK : type,
                                     section.getInt(action + "." + key + ".duration"),
@@ -77,7 +77,7 @@ public class EffectManager extends Function {
                         for (String key : section.getConfigurationSection(action).getKeys(false)) {
                             PotionEffectType type = PotionEffectType.getByName(section.getString(action + "." + key + ".type", "BLINDNESS").toUpperCase());
                             if (type == null)
-                                AdventureUtil.consoleMessage("<red>[CustomCooking] Potion effect " + section.getString(action + "." + key + ".type", "BLINDNESS") + " doesn't exists");
+                                AdventureUtil.consoleMessage("<red>[BorealCore] Potion effect " + section.getString(action + "." + key + ".type", "BLINDNESS") + " doesn't exists");
                             potionEffectList.add(new PotionEffect(
                                     type == null ? PotionEffectType.LUCK : type,
                                     section.getInt(action + "." + key + ".duration"),
@@ -112,7 +112,7 @@ public class EffectManager extends Function {
                         .replace("{duration}", getDuration(potionEffect.getDuration() / 20))));
             }
         } else {
-            Bukkit.getLogger().warning("[CustomCooking] No effects found for key: " + effectsList);
+            Bukkit.getLogger().warning("[BorealCore] No effects found for key: " + effectsList);
         }
         if (EFFECTS.containsKey(effectsList + ConfigManager.perfectItemSuffix)) {
             for (PotionEffect potionEffect : EFFECTS.get(effectsList + ConfigManager.perfectItemSuffix)) {
@@ -122,7 +122,7 @@ public class EffectManager extends Function {
                         .replace("{duration}", getDuration(potionEffect.getDuration() / 20))));
             }
         } else {
-            Bukkit.getLogger().warning("[CustomCooking] No perfect effects found for key: " + effectsList + ConfigManager.perfectItemSuffix);
+            Bukkit.getLogger().warning("[BorealCore] No perfect effects found for key: " + effectsList + ConfigManager.perfectItemSuffix);
         }
         List<List<Component>> lore = new ArrayList<>();
         lore.add(perfect);
@@ -195,7 +195,7 @@ public class EffectManager extends Function {
     public void load() {
         EFFECTS = new HashMap<>();
         loadEffects();
-        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + EFFECTS.size() + " <gray>buff categories");
+        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + EFFECTS.size() + " <gray>buff categories");
     }
 
     @Override
@@ -218,7 +218,7 @@ public class EffectManager extends Function {
                 PotionEffectType type = PotionEffectType.getByName(typeString.toUpperCase());
                 if (type == null) {
                     // Handle invalid potion effect type
-                    AdventureUtil.consoleMessage("<red>[CustomCooking] Potion effect " + typeString + " doesn't exist!");
+                    AdventureUtil.consoleMessage("<red>[BorealCore] Potion effect " + typeString + " doesn't exist!");
                     continue;
                 }
 

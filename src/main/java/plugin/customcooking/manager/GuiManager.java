@@ -11,7 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.collections.CollectionTrackerProvider;
 import plugin.customcooking.functions.cooking.IngredientBookProvider;
 import plugin.customcooking.functions.cooking.RecipeBookProvider;
@@ -50,7 +50,7 @@ public class GuiManager extends Function {
 
     public static SmartInventory getRecipeBook(CustomFurniture clickedFurniture) {
         return SmartInventory.builder()
-                .manager(CustomCooking.getInventoryManager())
+                .manager(BorealCore.getInventoryManager())
                 .id("recipeBook")
                 .provider(new RecipeBookProvider(clickedFurniture))
                 .size(6, 9)
@@ -60,7 +60,7 @@ public class GuiManager extends Function {
 
     public static SmartInventory getWikiMenu() {
         return SmartInventory.builder()
-                .manager(CustomCooking.getInventoryManager())
+                .manager(BorealCore.getInventoryManager())
                 .id("wikiMenu")
                 .provider(new WikiGuiProvider())
                 .size(6, 9)
@@ -70,7 +70,7 @@ public class GuiManager extends Function {
 
     public static SmartInventory getIngredientsBook() {
         return SmartInventory.builder()
-                .manager(CustomCooking.getInventoryManager())
+                .manager(BorealCore.getInventoryManager())
                 .id("ingredientsMenu")
                 .provider(new IngredientBookProvider())
                 .size(6, 9)
@@ -80,7 +80,7 @@ public class GuiManager extends Function {
 
     public static SmartInventory getProgressionTracker() {
         return SmartInventory.builder()
-                .manager(CustomCooking.getInventoryManager())
+                .manager(BorealCore.getInventoryManager())
                 .id("progressionTracker")
                 .provider(new CollectionTrackerProvider())
                 .size(6, 9)
@@ -135,9 +135,9 @@ public class GuiManager extends Function {
         PROGRESSION_MENU = getProgressionTracker();
         WIKI_MENU = getWikiMenu();
         loadItems();
-        //writeProgressionItemsToNascraft(collectionItems, new File(CustomCooking.getInstance().getDataFolder(), "nascraft.yml"));
-        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (INGREDIENTS.size()) + " <gray>ingredients");
-        AdventureUtil.consoleMessage("[CustomCooking] Loaded <green>" + (collectionItems.size()) + " <gray>progression items");
+        //writeProgressionItemsToNascraft(collectionItems, new File(BorealCore.getInstance().getDataFolder(), "nascraft.yml"));
+        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (INGREDIENTS.size()) + " <gray>ingredients");
+        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (collectionItems.size()) + " <gray>progression items");
     }
 
     @Override

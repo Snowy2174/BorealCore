@@ -237,7 +237,7 @@ public class InventoryUtil {
 
     private static void addIdentifier(ItemStack itemStack, String id) {
         NBTItem nbtItem = new NBTItem(itemStack);
-        NBTCompound nbtCompound = nbtItem.addCompound("CustomCooking");
+        NBTCompound nbtCompound = nbtItem.addCompound("BorealCore");
         String identifier = id.replaceAll("[\\[\\]]", "");
         nbtCompound.setString("id", identifier);
         itemStack.setItemMeta(nbtItem.getItem().getItemMeta());

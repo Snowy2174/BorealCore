@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.action.Action;
 import plugin.customcooking.functions.cooking.competition.bossbar.BossBarManager;
 import plugin.customcooking.functions.cooking.competition.ranking.LocalRankingImpl;
@@ -91,7 +91,7 @@ public class Competition {
                     end();
                 }
             }
-        }.runTaskTimer(CustomCooking.plugin, 0, 20);
+        }.runTaskTimer(BorealCore.plugin, 0, 20);
     }
 
     public void cancel() {
@@ -111,7 +111,7 @@ public class Competition {
         givePrize();
 
         List<String> newMessage = new ArrayList<>();
-        PlaceholderManager placeholderManager = CustomCooking.getPlaceholderManager();
+        PlaceholderManager placeholderManager = BorealCore.getPlaceholderManager();
 
         for (String endMsg : competitionConfig.getEndMessage()) {
             List<String> placeholders = new ArrayList<>(placeholderManager.detectPlaceholders(endMsg));
@@ -140,7 +140,7 @@ public class Competition {
 
         currentCompetition = null;
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(CustomCooking.plugin, () -> {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(BorealCore.plugin, () -> {
             ranking.clear();
         }, 600);
     }

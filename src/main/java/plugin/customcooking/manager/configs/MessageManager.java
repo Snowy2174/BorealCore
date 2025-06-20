@@ -2,7 +2,7 @@ package plugin.customcooking.manager.configs;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.utility.ConfigUtil;
 
 import java.io.File;
@@ -67,7 +67,7 @@ public class MessageManager {
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang + ".yml");
-        prefix = getOrSet(config, "prefix", "<gradient:#FB5A00:#FDF300>[CustomCooking] </gradient>");
+        prefix = getOrSet(config, "prefix", "<gradient:#FB5A00:#FDF300>[BorealCore] </gradient>");
         infoNegative = getOrSet(config, "prefix-negative", "<gray>[<red><bold>!</bold><gray>]<red> ");
         infoPositive = getOrSet(config, "prefix-positive", "<gray>[<green><bold>!</bold><gray>]<green> ");
 
@@ -132,7 +132,7 @@ public class MessageManager {
         leaderboardFooter = getOrSet(config, "leaderboard-footer", "<gradient:#00AA00:#88DAA1>\n[______________________]</gradient>\n");
 
         try {
-            config.save(new File(CustomCooking.getInstance().getDataFolder(), "messages_" + ConfigManager.lang + ".yml"));
+            config.save(new File(BorealCore.getInstance().getDataFolder(), "messages_" + ConfigManager.lang + ".yml"));
         } catch (IOException ignore) {
         }
     }

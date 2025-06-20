@@ -1,11 +1,15 @@
 package plugin.customcooking.commands;
 
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.database.Database;
 import plugin.customcooking.functions.jade.JadeManager;
 import plugin.customcooking.functions.jade.Leaderboard;
@@ -23,8 +27,8 @@ public class JadeCommand implements CommandExecutor {
     private final Database database;
 
     public JadeCommand() {
-        this.jadeManager = CustomCooking.getJadeManager();
-        this.database = CustomCooking.getDatabase();
+        this.jadeManager = BorealCore.getJadeManager();
+        this.database = BorealCore.getDatabase();
     }
 
     @Override
@@ -48,6 +52,8 @@ public class JadeCommand implements CommandExecutor {
             handleBalanceCommand(sender);
         } else if (subcommand.equalsIgnoreCase("top") || subcommand.equalsIgnoreCase("leaderboard")) {
             handleLeaderboardCommand(sender, args);
+        } else if (subcommand.equalsIgnoreCase("toggleAnnouncements")) {
+            handleToggleAnnouncementsCommand(sender);
         }
 
         if (!sender.hasPermission("customcooking.admin")) {
@@ -76,6 +82,24 @@ public class JadeCommand implements CommandExecutor {
             return false;
         }
         return true;
+    }
+
+    private void handleToggleAnnouncementsCommand(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+        LuckPerms api = LuckPermsProvider.get();
+        User user = api.getUserManager().getUser(player.getUniqueId());
+        Node node = Node.builder("jade.announcement").build();
+        boolean currentStatus = user.getCachedData().getPermissionData().checkPermission("jade.announcement").asBoolean();
+        if (currentStatus) {
+            user.data().remove(node);
+            AdventureUtil.sendMessage(player, MessageManager.infoPositive + "Jade announcements disabled.");
+        } else {
+            user.data().add(node);
+            AdventureUtil.sendMessage(player, MessageManager.infoPositive + "Jade announcements enabled.");
+        }
     }
 
     private void handleLimitsCommand(CommandSender sender) {

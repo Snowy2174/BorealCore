@@ -12,7 +12,7 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.cooking.competition.Competition;
 import plugin.customcooking.utility.AdventureUtil;
 
@@ -60,7 +60,7 @@ public class BossBarSender {
         this.isShown = true;
 
         try {
-            CustomCooking.protocolManager.sendServerPacket(player, getPacket());
+            BorealCore.protocolManager.sendServerPacket(player, getPacket());
         } catch (InvocationTargetException e) {
             throw new RuntimeException(
                     "Cannot send packet " + getPacket(), e);
@@ -87,8 +87,8 @@ public class BossBarSender {
                     if (text.update() || force) {
                         force = false;
                         try {
-                            CustomCooking.protocolManager.sendServerPacket(player, getUpdatePacket());
-                            CustomCooking.protocolManager.sendServerPacket(player, getProgressPacket());
+                            BorealCore.protocolManager.sendServerPacket(player, getUpdatePacket());
+                            BorealCore.protocolManager.sendServerPacket(player, getProgressPacket());
                         } catch (InvocationTargetException e) {
                             throw new RuntimeException(
                                     "Cannot send packet " + getUpdatePacket() + getProgressPacket(), e);
@@ -96,7 +96,7 @@ public class BossBarSender {
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(CustomCooking.plugin, 0, 1);
+        }.runTaskTimerAsynchronously(BorealCore.plugin, 0, 1);
     }
 
     private PacketContainer getUpdatePacket() {
@@ -164,12 +164,12 @@ public class BossBarSender {
             remove.setAccessible(true);
             packet.getModifier().write(1, remove.get(null));
             try {
-                CustomCooking.protocolManager.sendServerPacket(player, packet);
+                BorealCore.protocolManager.sendServerPacket(player, packet);
             } catch (InvocationTargetException e) {
                 throw new RuntimeException("Cannot send packet " + packet, e);
             }
         } catch (ClassNotFoundException e) {
-            AdventureUtil.consoleMessage("<red>[CustomCooking] Failed to remove bossbar for " + player.getName());
+            AdventureUtil.consoleMessage("<red>[BorealCore] Failed to remove bossbar for " + player.getName());
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

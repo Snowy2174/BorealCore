@@ -14,7 +14,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.cooking.CookingManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
@@ -31,7 +31,7 @@ import static plugin.customcooking.manager.configs.RecipeManager.RECIPES;
 public class CollectionTrackerProvider implements InventoryProvider {
     private final CookingManager cookingManager;
     public CollectionTrackerProvider() {
-        this.cookingManager = CustomCooking.getCookingManager();
+        this.cookingManager = BorealCore.getCookingManager();
     }
 
     @Override

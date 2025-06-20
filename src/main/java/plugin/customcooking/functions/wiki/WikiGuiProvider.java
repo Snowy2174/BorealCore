@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.utility.AdventureUtil;
 
@@ -22,7 +22,7 @@ public class WikiGuiProvider implements InventoryProvider {
     private final WikiManager wikiManager;
 
     public WikiGuiProvider() {
-        this.wikiManager = CustomCooking.getWikiManager();
+        this.wikiManager = BorealCore.getWikiManager();
     }
 
     @Override

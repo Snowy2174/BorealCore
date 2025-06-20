@@ -1,6 +1,6 @@
 package plugin.customcooking.database;
 
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.utility.AdventureUtil;
 
 import java.io.File;
@@ -27,7 +27,7 @@ public class SQLite extends Database {
             ");"; // we can search by player and timestamp to get the amount and source.
     String dbname;
 
-    public SQLite(CustomCooking instance) {
+    public SQLite(BorealCore instance) {
         super(instance);
         dbname = "jade_transactions";
     }

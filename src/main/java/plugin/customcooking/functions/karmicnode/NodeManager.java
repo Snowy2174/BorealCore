@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.object.Function;
 import plugin.customcooking.utility.ConfigUtil;
@@ -29,7 +29,7 @@ public class NodeManager extends Function {
 
     public static void handleUpdateMaxWave(String player, int wave) {
         YamlConfiguration config = ConfigUtil.getConfig("data/nodedata.yml");
-        File file = new File(CustomCooking.plugin.getDataFolder(), "data/nodedata.yml");
+        File file = new File(BorealCore.plugin.getDataFolder(), "data/nodedata.yml");
 
         if (Bukkit.getPlayer(player) == null) {
             consoleMessage("Player " + player + " is not online, so no score added");
@@ -65,7 +65,7 @@ public class NodeManager extends Function {
     }
 
     private static void savePlayerStats(FileConfiguration config) {
-        File file = new File(CustomCooking.plugin.getDataFolder(), "data/nodedata.yml");
+        File file = new File(BorealCore.plugin.getDataFolder(), "data/nodedata.yml");
         try {
             config.save(file);
         } catch (IOException e) {
@@ -75,7 +75,7 @@ public class NodeManager extends Function {
 
     public static String getLeaderboardEntry(int index) {
         YamlConfiguration config = ConfigUtil.getConfig("data/nodedata.yml");
-        File file = new File(CustomCooking.plugin.getDataFolder(), "data/nodedata.yml");
+        File file = new File(BorealCore.plugin.getDataFolder(), "data/nodedata.yml");
 
         Map<String, Integer> playerWaves = new HashMap<>();
         for (String key : config.getConfigurationSection("players").getKeys(false)) {

@@ -1,12 +1,10 @@
 package plugin.customcooking.database;
 
-import com.bencodez.votingplugin.VotingPluginHooks;
-import com.bencodez.votingplugin.user.VotingPluginUser;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Consumer;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.functions.jade.JadeTransaction;
 import plugin.customcooking.functions.jade.Leaderboard;
 import plugin.customcooking.functions.jade.LeaderboardEntry;
@@ -26,12 +24,12 @@ import java.util.stream.Collectors;
 import static plugin.customcooking.functions.jade.JadeManager.jadeSources;
 
 public abstract class Database extends Function {
-    public final CustomCooking plugin;
+    public final BorealCore plugin;
     public Connection connection;
     public String table = "jade_transactions";
     private final ConcurrentLinkedQueue<JadeTransaction> pendingTransactions = new ConcurrentLinkedQueue<>();
 
-    public Database(CustomCooking instance) {
+    public Database(BorealCore instance) {
         plugin = instance;
     }
 
@@ -45,9 +43,9 @@ public abstract class Database extends Function {
             PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM " + this.table + " WHERE player = ?");
             ResultSet rs = ps.executeQuery();
             this.close(ps, rs);
-            AdventureUtil.consoleMessage("[CustomCooking] Loaded SQLite database");
+            AdventureUtil.consoleMessage("[BorealCore] Loaded SQLite database");
         } catch (SQLException ex) {
-            CustomCooking.disablePlugin("Unable to retrieve connection during database initialization", ex);
+            BorealCore.disablePlugin("Unable to retrieve connection during database initialization", ex);
         }
     }
 

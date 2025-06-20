@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
 import plugin.customcooking.utility.AdventureUtil;
@@ -28,7 +28,7 @@ public class IngredientBookProvider implements InventoryProvider {
     private final CookingManager cookingManager;
 
     public IngredientBookProvider() {
-        this.cookingManager = CustomCooking.getCookingManager();
+        this.cookingManager = BorealCore.getCookingManager();
     }
 
     @Override

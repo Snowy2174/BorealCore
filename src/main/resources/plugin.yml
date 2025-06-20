@@ -1,6 +1,6 @@
-name: CustomCooking
+name: BorealCore
 version: '${project.version}'
-main: plugin.customcooking.CustomCooking
+main: plugin.customcooking.BorealCore
 author: [ SnowyOwl217 ]
 api-version: 1.18
 depend:
@@ -13,16 +13,19 @@ depend:
 softdepend:
   - DecentHolograms
   - DiscordSRV
+  - Duels
 
 commands:
   cooking:
-    description: The main plugin command
+    description: The command to manage CustomCooking
   jade:
     description: The command to manage Jade
   kn:
     description: The command to manage Nodes
   wiki:
     description: The command to manage the Wiki
+  plushies:
+    description: The command to manage the Gamble feature
 
 permissions:
   customcooking.*:

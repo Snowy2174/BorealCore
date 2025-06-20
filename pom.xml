@@ -4,11 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>CustomCooking</groupId>
-    <artifactId>CustomCooking</artifactId>
+    <groupId>BorealCore</groupId>
+    <artifactId>BorealCore</artifactId>
     <version>1.1.8</version>
     <packaging>jar</packaging>
-    <name>CustomCooking</name>
+    <name>BorealCore</name>
 
     <properties>
         <java.version>1.8</java.version>
@@ -191,6 +191,24 @@
             <groupId>net.momirealms</groupId>
             <artifactId>custom-fishing</artifactId>
             <version>2.3.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ProjectKorra</groupId>
+            <artifactId>ProjectKorra</artifactId>
+            <version>v1.12.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Realizedd.Duels</groupId>
+            <artifactId>duels-api</artifactId>
+            <version>3.5.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

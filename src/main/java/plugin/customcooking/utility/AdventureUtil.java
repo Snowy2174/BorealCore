@@ -10,7 +10,7 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 
 import java.time.Duration;
 
@@ -26,21 +26,21 @@ public class AdventureUtil {
     }
 
     public static void consoleMessage(String s) {
-        Audience au = CustomCooking.adventure.sender(Bukkit.getConsoleSender());
+        Audience au = BorealCore.adventure.sender(Bukkit.getConsoleSender());
         MiniMessage mm = MiniMessage.miniMessage();
         Component parsed = mm.deserialize(replaceLegacy(s));
         au.sendMessage(parsed);
     }
 
     public static void playerMessage(Player player, String s) {
-        Audience au = CustomCooking.adventure.player(player);
+        Audience au = BorealCore.adventure.player(player);
         MiniMessage mm = MiniMessage.miniMessage();
         Component parsed = mm.deserialize(replaceLegacy(s));
         au.sendMessage(parsed);
     }
 
     public static void playerTitle(Player player, String s1, String s2, int in, int duration, int out) {
-        Audience au = CustomCooking.adventure.player(player);
+        Audience au = BorealCore.adventure.player(player);
         MiniMessage mm = MiniMessage.miniMessage();
         Title.Times times = Title.Times.times(Duration.ofMillis(in), Duration.ofMillis(duration), Duration.ofMillis(out));
         Title title = Title.title(mm.deserialize(replaceLegacy(s1)), mm.deserialize(replaceLegacy(s2)), times);
@@ -48,26 +48,26 @@ public class AdventureUtil {
     }
 
     public static void playerBook(Player player, Book book) {
-        Audience au = CustomCooking.adventure.player(player);
+        Audience au = BorealCore.adventure.player(player);
         au.openBook(book);
     }
 
     public static void playerTitle(Player player, Component s1, Component s2, int in, int duration, int out) {
-        Audience au = CustomCooking.adventure.player(player);
+        Audience au = BorealCore.adventure.player(player);
         Title.Times times = Title.Times.times(Duration.ofMillis(in), Duration.ofMillis(duration), Duration.ofMillis(out));
         Title title = Title.title(s1, s2, times);
         au.showTitle(title);
     }
 
     public static void playerActionbar(Player player, String s) {
-        Audience au = CustomCooking.adventure.player(player);
+        Audience au = BorealCore.adventure.player(player);
         MiniMessage mm = MiniMessage.miniMessage();
         au.sendActionBar(mm.deserialize(replaceLegacy(s)));
     }
 
     public static void playerSound(Player player, Sound.Source source, Key key, float volume, float pitch) {
         Sound sound = Sound.sound(key, source, volume, pitch);
-        Audience au = CustomCooking.adventure.player(player);
+        Audience au = BorealCore.adventure.player(player);
         au.playSound(sound);
     }
 

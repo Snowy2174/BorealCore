@@ -14,7 +14,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import plugin.customcooking.CustomCooking;
+import plugin.customcooking.BorealCore;
 import plugin.customcooking.manager.configs.EffectManager;
 import plugin.customcooking.manager.configs.ConfigManager;
 import plugin.customcooking.manager.configs.MessageManager;
@@ -34,7 +34,7 @@ public class RecipeBookProvider implements InventoryProvider {
     private final CookingManager cookingManager;
 
     public RecipeBookProvider(CustomFurniture clickedFurniture) {
-        this.cookingManager = CustomCooking.getCookingManager();
+        this.cookingManager = BorealCore.getCookingManager();
         RecipeBookProvider.clickedFurniture = clickedFurniture;
         unknownRecipeStack = build(ConfigManager.unknownItem);
     }
