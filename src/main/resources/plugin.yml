@@ -1,6 +1,6 @@
 name: BorealCore
 version: '${project.version}'
-main: plugin.customcooking.BorealCore
+main: plugin.borealcore.BorealCore
 author: [ SnowyOwl217 ]
 api-version: 1.18
 depend:

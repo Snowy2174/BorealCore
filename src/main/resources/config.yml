@@ -29,7 +29,7 @@ mechanics:
     - pumpkinsoup
     - cactussoup
     - potatosoup
-  namespace: 'customcooking'
+  namespace: 'borealcore'
   failure-item: 'failureitem'
   unlit-cooking-pot: 'cooking_pot_unlit'
   lit-cooking-pot: 'cooking_pot_lit'
@@ -37,7 +37,7 @@ mechanics:
 
 gui:
   config:
-    recipe-book: 'customcooking:recipe_book'
+    recipe-book: 'borealcore:recipe_book'
     mastery-line: "<!italic><#ff9900>Mastery [{mastery}]"
     mastery-bar: "<!italic><#ffcc33>[{bar}<#ffcc33>]"
     mastery-true: "<!italic><#ffcc99>This item has been mastered /<!italic><#ffcc99>and will be cooked automatically."

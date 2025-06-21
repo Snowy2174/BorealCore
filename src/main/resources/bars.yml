@@ -2,7 +2,7 @@ bar_1:
   range: 16
   title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customcooking:default>'
+    start: '<font:borealcore:default>'
     bar: '뀂'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -24,7 +24,7 @@ bar_2:
   range: 16
   title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customcooking:default>'
+    start: '<font:borealcore:default>'
     bar: '뀃'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -46,7 +46,7 @@ bar_3:
   range: 16
   title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customcooking:default>'
+    start: '<font:borealcore:default>'
     bar: '뀄'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -68,7 +68,7 @@ bar_4:
   range: 8
   title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customcooking:default>'
+    start: '<font:borealcore:default>'
     bar: '뀅'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -101,7 +101,7 @@ bar_5:
   range: 8
   title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customcooking:default>'
+    start: '<font:borealcore:default>'
     bar: '뀆'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -134,7 +134,7 @@ bar_6:
   range: 8
   title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customcooking:default>'
+    start: '<font:borealcore:default>'
     bar: '뀇'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -167,7 +167,7 @@ bar_7:
   range: 4
   title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customcooking:default>'
+    start: '<font:borealcore:default>'
     bar: '뀈'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -222,7 +222,7 @@ bar_8:
   range: 4
   title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customcooking:default>'
+    start: '<font:borealcore:default>'
     bar: '뀉'
     pointer_offset: '넁'
     pointer: '뀁'
@@ -277,7 +277,7 @@ bar_9:
   range: 4
   title: 'Cooking your dish, focus!'
   subtitle:
-    start: '<font:customcooking:default>'
+    start: '<font:borealcore:default>'
     bar: '뀊'
     pointer_offset: '넁'
     pointer: '뀁'
