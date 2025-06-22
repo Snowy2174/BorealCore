@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class MatchRunable extends BukkitRunnable {
+public class MatchRunnable extends BukkitRunnable {
     private Set<Player> players;
     private Player player1;
     private Player player2;
@@ -23,7 +23,7 @@ public class MatchRunable extends BukkitRunnable {
     private Arena arena;
 
 
-    public MatchRunable(Set<Player> players) {
+    public MatchRunnable(Set<Player> players) {
         Duels api = (Duels) Bukkit.getServer().getPluginManager().getPlugin("Duels");
         setPlayers(players);
 
