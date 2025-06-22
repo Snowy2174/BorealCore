@@ -1,4 +1,4 @@
-package plugin.borealcore.manager.configs;
+package plugin.borealcore.functions.cooking.configs;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;

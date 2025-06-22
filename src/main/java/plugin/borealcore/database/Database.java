@@ -5,9 +5,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Consumer;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.jade.JadeTransaction;
-import plugin.borealcore.functions.jade.Leaderboard;
-import plugin.borealcore.functions.jade.LeaderboardEntry;
+import plugin.borealcore.functions.jade.object.JadeTransaction;
+import plugin.borealcore.functions.jade.object.Leaderboard;
+import plugin.borealcore.functions.jade.object.LeaderboardEntry;
 import plugin.borealcore.functions.jade.LeaderboardType;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
@@ -484,13 +484,12 @@ public abstract class Database extends Function {
     }
 
     private String resolveUUID(String playerName) {
-        // Attempt to resolve the UUID using the Bukkit API for online players only
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if (onlinePlayer.getName().equalsIgnoreCase(playerName)) {
                 return onlinePlayer.getUniqueId().toString();
             }
         }
-        return null; // Return null if no match is found
+        return null;
     }
 
     public List<String> getAllTotals() {

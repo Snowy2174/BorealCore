@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
-import plugin.borealcore.manager.configs.RecipeManager;
+import plugin.borealcore.functions.cooking.configs.RecipeManager;
 
 import javax.annotation.Nullable;
 import java.io.File;

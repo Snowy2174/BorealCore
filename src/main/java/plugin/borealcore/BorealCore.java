@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.borealcore.commands.*;
 import plugin.borealcore.database.SQLite;
+import plugin.borealcore.functions.bending.BendingManager;
 import plugin.borealcore.functions.cooking.CompetitionManager;
 import plugin.borealcore.functions.cooking.CookingManager;
 import plugin.borealcore.database.Database;
@@ -19,13 +20,12 @@ import plugin.borealcore.functions.plushies.PlushieManager;
 import plugin.borealcore.functions.wiki.WikiManager;
 import plugin.borealcore.listener.BendingListener;
 import plugin.borealcore.manager.*;
-import plugin.borealcore.manager.configs.EffectManager;
-import plugin.borealcore.manager.configs.LayoutManager;
-import plugin.borealcore.manager.configs.RecipeManager;
+import plugin.borealcore.functions.cooking.configs.EffectManager;
+import plugin.borealcore.functions.cooking.configs.LayoutManager;
+import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ConfigUtil;
 
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class BorealCore extends JavaPlugin {
@@ -51,6 +51,7 @@ public class BorealCore extends JavaPlugin {
     private static AnalyticsManager analyticsManager;
     private static PlushieManager plushieManager;
     private static DuelsManager duelsManager;
+    private static BendingManager bendingManager;
 
     @Override
     public void onLoad() {
@@ -80,6 +81,7 @@ public class BorealCore extends JavaPlugin {
         analyticsManager = new AnalyticsManager(db);
         plushieManager = new PlushieManager();
         duelsManager = new DuelsManager();
+        bendingManager = new BendingManager();
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());
@@ -91,7 +93,6 @@ public class BorealCore extends JavaPlugin {
         getCommand("wiki").setTabCompleter(new WikiTabCompletion());
         getCommand("plushies").setExecutor(new GambleCommand());
 
-        Bukkit.getPluginManager().registerEvents(new BendingListener(), this);
 
         // @TODO
         // Debug what this does and if it is still needed
@@ -124,8 +125,8 @@ public class BorealCore extends JavaPlugin {
         analyticsManager.unload();
         plushieManager.unload();
         duelsManager.unload();
+        bendingManager.unload();
         db.unload();
-
 
         AdventureUtil.consoleMessage("[BorealCore] Plugin Disabled!");
 
@@ -198,6 +199,9 @@ public class BorealCore extends JavaPlugin {
     }
     public static DuelsManager getDuelsManager() {
         return duelsManager;
+    }
+    public static BendingManager getBendingManager() {
+        return bendingManager;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {

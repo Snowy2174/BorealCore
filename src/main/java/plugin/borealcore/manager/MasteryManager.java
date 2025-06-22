@@ -22,7 +22,7 @@ import plugin.borealcore.utility.RecipeDataUtil;
 import java.io.File;
 import java.io.IOException;
 
-import static plugin.borealcore.manager.configs.RecipeManager.RECIPES;
+import static plugin.borealcore.functions.cooking.configs.RecipeManager.RECIPES;
 import static plugin.borealcore.utility.ConfigUtil.getConfig;
 
 public class MasteryManager extends Function {

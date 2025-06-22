@@ -25,8 +25,6 @@ public class DuelsManager extends Function {
     public DuelsManager() {
         this.plugin = BorealCore.plugin;
         this.arenaManager = ((Duels) getServer().getPluginManager().getPlugin("Duels")).getArenaManager();
-
-
     }
 
     @Override

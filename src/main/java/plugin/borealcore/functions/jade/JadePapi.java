@@ -3,6 +3,7 @@ package plugin.borealcore.functions.jade;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import plugin.borealcore.functions.jade.object.LeaderboardEntry;
 import plugin.borealcore.manager.configs.MessageManager;
 
 public class JadePapi extends PlaceholderExpansion {

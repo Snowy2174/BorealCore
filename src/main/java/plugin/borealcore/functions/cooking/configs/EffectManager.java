@@ -1,4 +1,4 @@
-package plugin.borealcore.manager.configs;
+package plugin.borealcore.functions.cooking.configs;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -10,6 +10,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import plugin.borealcore.action.*;
 import plugin.borealcore.functions.cooking.object.Recipe;
+import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ConfigUtil;

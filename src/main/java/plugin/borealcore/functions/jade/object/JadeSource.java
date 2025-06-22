@@ -1,4 +1,4 @@
-package plugin.borealcore.functions.jade;
+package plugin.borealcore.functions.jade.object;
 
 public class JadeSource {
     private final String name;

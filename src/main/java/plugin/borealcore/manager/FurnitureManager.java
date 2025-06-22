@@ -48,7 +48,7 @@ public class FurnitureManager extends Function {
     }
 
     public static void ingredientsSFX(Player player, List<String> ingredients, Location loc) {
-        spawnNextIngredient(loc, player, ingredients, 0); // Start spawning ingredients from index 0
+        spawnNextIngredient(loc, player, ingredients, 0);
     }
 
     private static void spawnNextIngredient(Location loc, Player player, List<String> ingredients, int currentIndex) {
@@ -68,7 +68,6 @@ public class FurnitureManager extends Function {
             @Override
             public void run() {
                 spawnFakeIngredientItem(loc, parts[0], () -> {
-                    // After the fake ingredient is removed, spawn the next ingredient
                     spawnNextIngredient(loc, player, ingredients, currentIndex + 1);
                 });
                 spawnSplashItem(loc);
@@ -80,7 +79,6 @@ public class FurnitureManager extends Function {
     private static void spawnFakeIngredientItem(Location loc, String ingredient, Runnable onComplete) {
         Location spawnLocation = loc.clone().add(0, 2, 0);
 
-        // Create a dropped item entity at the specified location
         Item itemEntity = loc.getWorld().dropItem(spawnLocation, InventoryUtil.build(ingredient));
         itemEntity.setCanPlayerPickup(false);
         itemEntity.setVelocity(itemEntity.getVelocity().zero());
@@ -88,8 +86,8 @@ public class FurnitureManager extends Function {
         new BukkitRunnable() {
             @Override
             public void run() {
-                itemEntity.remove(); // Remove the item entity from the world
-                onComplete.run(); // Invoke the callback when the removal is complete
+                itemEntity.remove();
+                onComplete.run();
             }
         }.runTaskLater(BorealCore.plugin, 10);
     }
@@ -106,7 +104,7 @@ public class FurnitureManager extends Function {
         new BukkitRunnable() {
             @Override
             public void run() {
-                armorStand.remove(); // Remove the item entity from the world
+                armorStand.remove();
             }
         }.runTaskLater(BorealCore.plugin, ConfigManager.splashTime);
     }
@@ -147,11 +145,10 @@ public class FurnitureManager extends Function {
         Hologram hologram = DHAPI.createHologram(name, location.clone().add(0, 1.5, 0), contents);
         DHAPI.addHologramLine(hologram, recipe);
 
-        // Schedule a task to remove the hologram after a set time
         new BukkitRunnable() {
             @Override
             public void run() {
-                hologram.delete(); // Remove the hologram
+                hologram.delete();
             }
         }.runTaskLater(BorealCore.plugin, 60);
     }
@@ -160,7 +157,6 @@ public class FurnitureManager extends Function {
         Player player = event.getPlayer();
         CustomFurniture clickedFurniture = event.getFurniture();
 
-        // Check if the clicked block is an unlit cookingpot
         if (clickedFurniture.getId().equals(ConfigManager.unlitCookingPot)) {
             if (!cooldowns.containsKey(player) || (System.currentTimeMillis() - cooldowns.get(player) >= 2000)) {
                 cooldowns.put(player, System.currentTimeMillis());

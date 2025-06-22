@@ -15,10 +15,10 @@ import org.bukkit.scheduler.BukkitScheduler;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.event.JadeEvent;
 import plugin.borealcore.database.Database;
-import plugin.borealcore.listener.BreweryListener;
-import plugin.borealcore.listener.CropsListener;
-import plugin.borealcore.listener.FishingListener;
-import plugin.borealcore.listener.VoteListener;
+import plugin.borealcore.functions.jade.object.JadeSource;
+import plugin.borealcore.functions.jade.object.JadeTransaction;
+import plugin.borealcore.functions.jade.object.Leaderboard;
+import plugin.borealcore.listener.JadeSourceListener;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
@@ -39,27 +39,18 @@ public class JadeManager extends Function {
     protected static Database database;
     public static HashMap<String, JadeSource> jadeSources = new HashMap<>();
     private static BukkitScheduler scheduler;
-    private VoteListener voteListener;
-    private BreweryListener breweryListener;
-    private CropsListener cropsListener;
-    private FishingListener fishingListener;
+    private JadeSourceListener jadeSourceListener;
     public static HashMap<LeaderboardType, Leaderboard> leaderboardCache = new HashMap<>();
 
     public JadeManager(Database database) {
         this.database = database;
-        this.voteListener = new VoteListener(this);
-        this.breweryListener = new BreweryListener(this);
-        this.cropsListener = new CropsListener(this);
-        this.fishingListener = new FishingListener(this);
+        this.jadeSourceListener = new JadeSourceListener(this);
     }
 
     @Override
     public void load() {
         loadJadeLimits();
-        Bukkit.getPluginManager().registerEvents(voteListener, BorealCore.plugin);
-        Bukkit.getPluginManager().registerEvents(breweryListener, BorealCore.plugin);
-        Bukkit.getPluginManager().registerEvents(cropsListener, BorealCore.plugin);
-        Bukkit.getPluginManager().registerEvents(fishingListener, BorealCore.plugin);
+        Bukkit.getPluginManager().registerEvents(jadeSourceListener, BorealCore.plugin);
         database.verifyAndFixTotals();
         database.startRetryTask();
         reloadLeaderboards();

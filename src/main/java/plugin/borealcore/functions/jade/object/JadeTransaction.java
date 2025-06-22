@@ -1,4 +1,4 @@
-package plugin.borealcore.functions.jade;
+package plugin.borealcore.functions.jade.object;
 
 import org.jetbrains.annotations.NotNull;
 

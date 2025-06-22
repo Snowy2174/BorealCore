@@ -1,4 +1,4 @@
-package plugin.borealcore.manager.configs;
+package plugin.borealcore.functions.cooking.configs;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.borealcore.functions.cooking.object.Layout;

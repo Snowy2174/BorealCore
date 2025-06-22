@@ -26,7 +26,7 @@ import java.util.List;
 
 import static plugin.borealcore.manager.GuiManager.PROGRESSION_MENU;
 import static plugin.borealcore.manager.GuiManager.collectionItems;
-import static plugin.borealcore.manager.configs.RecipeManager.RECIPES;
+import static plugin.borealcore.functions.cooking.configs.RecipeManager.RECIPES;
 
 public class CollectionTrackerProvider implements InventoryProvider {
     private final CookingManager cookingManager;

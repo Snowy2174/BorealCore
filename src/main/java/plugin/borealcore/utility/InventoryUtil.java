@@ -11,12 +11,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.borealcore.manager.configs.EffectManager;
+import plugin.borealcore.functions.cooking.configs.EffectManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 
 import java.util.List;
 
-import static plugin.borealcore.manager.configs.RecipeManager.RECIPES;
+import static plugin.borealcore.functions.cooking.configs.RecipeManager.RECIPES;
 
 public class InventoryUtil {
 

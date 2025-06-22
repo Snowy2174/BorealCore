@@ -1,4 +1,6 @@
-package plugin.borealcore.functions.jade;
+package plugin.borealcore.functions.jade.object;
+
+import plugin.borealcore.functions.jade.LeaderboardType;
 
 import java.util.List;
 import java.util.stream.Collectors;
