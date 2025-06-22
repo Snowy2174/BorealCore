@@ -17,13 +17,16 @@ import static org.bukkit.Bukkit.getServer;
 
 public class DuelsManager extends Function {
 
-    private static HashMap<Arena, MatchRunable> ongoingRunnables = new HashMap<>();
     private static BorealCore plugin;
     private static ArenaManager arenaManager;
+    private static HashMap<Arena, MatchRunnable> ongoingRunnables = new HashMap<>();
+
 
     public DuelsManager() {
         this.plugin = BorealCore.plugin;
         this.arenaManager = ((Duels) getServer().getPluginManager().getPlugin("Duels")).getArenaManager();
+
+
     }
 
     @Override
@@ -38,7 +41,7 @@ public class DuelsManager extends Function {
 
     public static void startMatch(MatchStartEvent event) {
         Set<Player> players = event.getMatch().getPlayers();
-        MatchRunable task = new MatchRunable(players);
+        MatchRunnable task = new MatchRunnable(players);
         Player player1 = task.getPlayer1();
         Arena arena = arenaManager.get(player1);
 
@@ -49,13 +52,10 @@ public class DuelsManager extends Function {
 
     public static void endMatch(MatchEndEvent event) {
         Set<Player> players = event.getMatch().getPlayers();
-        Player player1 = players.iterator().next();
-        Arena arena = arenaManager.get(player1);
+        Arena arena = event.getMatch().getArena();
 
-        MatchRunable task = ongoingRunnables.remove(arena);
-        if (task != null) {
-            task.cancel();
-        }
+        MatchRunnable task = ongoingRunnables.remove(arena);
+        task.cancel();
         plugin.getLogger().info("Match ended: " + players);
     }
 
