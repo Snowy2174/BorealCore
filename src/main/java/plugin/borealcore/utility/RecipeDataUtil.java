@@ -124,7 +124,7 @@ public class RecipeDataUtil {
         List<String> unlockedRecipes = getUnlockedRecipes(player);
         if (unlock) {
             if (unlockedRecipes.contains(recipe)) {
-                return; // Recipe already unlocked
+                return;
             }
             setRecipeData(player, recipe, 0);
             String recipeFormatted = RecipeManager.RECIPES.get(recipe).getNick();
@@ -132,7 +132,7 @@ public class RecipeDataUtil {
             AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.recipeUnlocked.replace("{recipe}", recipeFormatted));
         } else {
             if (!unlockedRecipes.contains(recipe)) {
-                return; // Recipe already locked
+                return;
             }
             setRecipeData(player, recipe, null);
             String recipeFormatted = RecipeManager.RECIPES.get(recipe).getNick();

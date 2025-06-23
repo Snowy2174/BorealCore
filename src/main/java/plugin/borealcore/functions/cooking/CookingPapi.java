@@ -10,7 +10,7 @@ import plugin.borealcore.utility.RecipeDataUtil;
 public class CookingPapi extends PlaceholderExpansion {
     @Override
     public @NotNull String getIdentifier() {
-        return "borealcore";
+        return "customcooking";
     }
 
     @Override
@@ -20,12 +20,12 @@ public class CookingPapi extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return "1.0";
+        return "1.8";
     }
 
     @Override
     public boolean persist() {
-        return true; // This is required or else PlaceholderAPI will unregister the Expansion on reload
+        return true;
     }
 
     @Override
@@ -65,7 +65,6 @@ public class CookingPapi extends PlaceholderExpansion {
                 float masteryProgress = ((float) masteryCount / requiredMastery) * 100;
                 return String.valueOf(masteryProgress);
             default:
-                // Invalid or unrecognized placeholder identifier
                 return "Invalid Placeholder";
         }
     }

@@ -83,9 +83,7 @@ public class CookingManager extends Function {
         if (isPlayerCooking(player)) {
             AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.alreadyCooking);
         } else {
-            // get the bar config
             Recipe bar = RecipeManager.RECIPES.get(recipe);
-            // checks if player has required ingredients
             List<String> ingredients = bar.getIngredients();
             if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, 1)) {
                 InventoryUtil.removeIngredients(player.getInventory(), ingredients, 1);
@@ -102,7 +100,6 @@ public class CookingManager extends Function {
 
     public void handleMaterialAutocooking(String recipeId, Player player, Integer amount) {
             Ingredient recipe = INGREDIENTS.get(recipeId);
-            // checks if player has required ingredients
             List<String> ingredients = recipe.getIngredients();
             if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
                 InventoryUtil.removeIngredients(player.getInventory(), ingredients, amount);
@@ -119,7 +116,6 @@ public class CookingManager extends Function {
             AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.alreadyCooking);
         } else {
             Recipe recipe = RecipeManager.RECIPES.get(recipeId);
-            // checks if player has required ingredients
             List<String> ingredients = recipe.getIngredients();
             if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
                 // Delay removal of items if furniture is not null
@@ -145,7 +141,6 @@ public class CookingManager extends Function {
 
         CookingPlayer cookingPlayer = cookingPlayerCache.remove(player);
         if (cookingPlayer == null && (recipe != Recipe.EMPTY)) {
-                // No custom recipe
                 if (recipe == null) {
                     AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>There ain't no custom recipe");
                 } else {
@@ -323,7 +318,6 @@ public class CookingManager extends Function {
 
 
     public void playSoundLoop(Player player) {
-        // Create a new sound task for the player
         BukkitRunnable soundTask = new BukkitRunnable() {
             @Override
             public void run() {
@@ -357,6 +351,9 @@ public class CookingManager extends Function {
 
             NBTCompound nbtCompound = new NBTItem(itemStack).getCompound("BorealCore");
             if (nbtCompound == null) {
+                nbtCompound = new NBTItem(itemStack).getCompound("CustomCooking");
+            }
+            if (nbtCompound == null || !nbtCompound.hasKey("id")) {
                 return;
             }
 

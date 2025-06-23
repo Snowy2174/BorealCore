@@ -109,6 +109,7 @@ public class RecipeBookProvider implements InventoryProvider {
 
     private ItemStack buildIngredientsItem() {
         return new ItemStack(CustomStack.getInstance(ConfigManager.grinderItem).getItemStack());
+        // @TODO: Modify grinder item to have a custom name and lore
     }
 
     private void handleIngredientsMenuClick(InventoryClickEvent event, Player player) {
@@ -151,10 +152,8 @@ public class RecipeBookProvider implements InventoryProvider {
             }
         }
 
-        // Create a new list to store parsed lore
         List<Component> parsedLore = new ArrayList<>();
 
-        // Parse each lore line and add it to the parsedLore list
         for (String line : lore) {
             parsedLore.add(AdventureUtil.getComponentFromMiniMessage(line));
         }
@@ -178,13 +177,10 @@ public class RecipeBookProvider implements InventoryProvider {
             }
             if (hasMastery) {
                 if (event.getClick() == ClickType.MIDDLE) {
-                    // Shift click handling for cooking 16 Recipes
                     cookingManager.handleAutocooking(recipe, player, 16);
                 } else if (event.isRightClick()) {
-                    // Right click handling for cooking the recipe
                     cookingManager.handleCooking(recipe, player, clickedFurniture);
                 } else if (event.isLeftClick()) {
-                    // Left-click handling logic for autocooking the recipe
                     cookingManager.handleAutocooking(recipe, player, 1);
                 }
             } else {
