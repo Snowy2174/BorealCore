@@ -242,7 +242,7 @@ public class CookCommand implements CommandExecutor {
 
     private void handleRecipeBookCommand(CommandSender sender, String[] args) {
         if (sender instanceof Player player) {
-            GuiManager.getRecipeBook(null).open(player);
+            GuiManager.getCookingRecipeBook(null).open(player);
         }
 
         Player player = Bukkit.getPlayer(args[0]);
@@ -250,7 +250,7 @@ public class CookCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-        GuiManager.getRecipeBook(null).open(player);
+        GuiManager.getCookingRecipeBook(null).open(player);
     }
 
     private void handleProgressionCommand(CommandSender sender, String[] args) {

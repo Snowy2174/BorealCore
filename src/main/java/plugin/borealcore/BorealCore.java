@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import plugin.borealcore.commands.*;
 import plugin.borealcore.database.SQLite;
 import plugin.borealcore.functions.bending.BendingManager;
+import plugin.borealcore.functions.brewery.BreweryManager;
 import plugin.borealcore.functions.cooking.CompetitionManager;
 import plugin.borealcore.functions.cooking.CookingManager;
 import plugin.borealcore.database.Database;
@@ -52,6 +53,7 @@ public class BorealCore extends JavaPlugin {
     private static PlushieManager plushieManager;
     private static DuelsManager duelsManager;
     private static BendingManager bendingManager;
+    private static BreweryManager breweryManager;
 
     @Override
     public void onLoad() {
@@ -82,6 +84,7 @@ public class BorealCore extends JavaPlugin {
         plushieManager = new PlushieManager();
         duelsManager = new DuelsManager();
         bendingManager = new BendingManager();
+        breweryManager = new BreweryManager();
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());
@@ -92,6 +95,8 @@ public class BorealCore extends JavaPlugin {
         getCommand("wiki").setExecutor(new WikiCommand());
         getCommand("wiki").setTabCompleter(new WikiTabCompletion());
         getCommand("plushies").setExecutor(new GambleCommand());
+        getCommand("recipes").setExecutor(new RecipeBookCommand());
+        getCommand("recipes").setTabCompleter(new RecipeBookTabCompletion());
 
 
         // @TODO
@@ -126,6 +131,7 @@ public class BorealCore extends JavaPlugin {
         plushieManager.unload();
         duelsManager.unload();
         bendingManager.unload();
+        breweryManager.unload();
         db.unload();
 
         AdventureUtil.consoleMessage("[BorealCore] Plugin Disabled!");
@@ -202,6 +208,9 @@ public class BorealCore extends JavaPlugin {
     }
     public static BendingManager getBendingManager() {
         return bendingManager;
+    }
+    public static BreweryManager getBreweryManager() {
+        return breweryManager;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {

@@ -48,6 +48,10 @@ public class ConfigUtil {
         BorealCore.getPlushieManager().load();
         BorealCore.getDuelsManager().unload();
         BorealCore.getDuelsManager().load();
+        BorealCore.getBendingManager().unload();
+        BorealCore.getBendingManager().load();
+        BorealCore.getBreweryManager().unload();
+        BorealCore.getBreweryManager().load();
     }
 }
 

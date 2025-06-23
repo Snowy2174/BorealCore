@@ -28,14 +28,14 @@ import java.util.List;
 
 import static plugin.borealcore.utility.InventoryUtil.build;
 
-public class RecipeBookProvider implements InventoryProvider {
+public class CookingRecipeBookProvider implements InventoryProvider {
     private static CustomFurniture clickedFurniture;
     private static ItemStack unknownRecipeStack;
     private final CookingManager cookingManager;
 
-    public RecipeBookProvider(CustomFurniture clickedFurniture) {
+    public CookingRecipeBookProvider(CustomFurniture clickedFurniture) {
         this.cookingManager = BorealCore.getCookingManager();
-        RecipeBookProvider.clickedFurniture = clickedFurniture;
+        CookingRecipeBookProvider.clickedFurniture = clickedFurniture;
         unknownRecipeStack = build(ConfigManager.unknownItem);
     }
 

@@ -12,9 +12,10 @@ import org.bukkit.inventory.ItemStack;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.functions.brewery.BreweryRecipeBookProvider;
 import plugin.borealcore.functions.collections.CollectionTrackerProvider;
 import plugin.borealcore.functions.cooking.IngredientBookProvider;
-import plugin.borealcore.functions.cooking.RecipeBookProvider;
+import plugin.borealcore.functions.cooking.CookingRecipeBookProvider;
 import plugin.borealcore.functions.cooking.object.Ingredient;
 import plugin.borealcore.functions.wiki.WikiGuiProvider;
 import plugin.borealcore.manager.configs.ConfigManager;
@@ -36,11 +37,24 @@ public class GuiManager extends Function {
     public static SmartInventory WIKI_MENU;
     public static HashMap<String, ItemStack> collectionItems;
 
+    @Override
+    public void load() {
+        INGREDIENTS = new HashMap<>();
+        collectionItems = initCollectionItems();
+        INGREDIENTS_MENU = getIngredientsBook();
+        PROGRESSION_MENU = getProgressionTracker();
+        WIKI_MENU = getWikiMenu();
+        loadItems();
+        //writeProgressionItemsToNascraft(collectionItems, new File(BorealCore.getInstance().getDataFolder(), "nascraft.yml"));
+        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (INGREDIENTS.size()) + " <gray>ingredients");
+        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (collectionItems.size()) + " <gray>progression items");
+    }
+
     private static HashMap<String, ItemStack> initCollectionItems() {
         Set<String> list = CustomStack.getNamespacedIdsInRegistry();
         HashMap<String, ItemStack> itemStacks = new HashMap<>();
         for (String str : list) {
-            if ((str.startsWith("customcrops:") || str.startsWith("borealcore:") || str.startsWith("customfishing:")) &&
+            if ((str.startsWith("customcrops:") || str.startsWith("customcooking:") || str.startsWith("customfishing:")) &&
                     !((str.contains("stage") || str.contains("unknown") || str.contains("particle")))) {
                 itemStacks.put(str, InventoryUtil.build(str));
             }
@@ -48,13 +62,23 @@ public class GuiManager extends Function {
         return itemStacks;
     }
 
-    public static SmartInventory getRecipeBook(CustomFurniture clickedFurniture) {
+    public static SmartInventory getCookingRecipeBook(CustomFurniture clickedFurniture) {
         return SmartInventory.builder()
                 .manager(BorealCore.getInventoryManager())
                 .id("recipeBook")
-                .provider(new RecipeBookProvider(clickedFurniture))
+                .provider(new CookingRecipeBookProvider(clickedFurniture))
                 .size(6, 9)
                 .title(ChatColor.WHITE + new FontImageWrapper(ConfigManager.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString(ChatColor.RESET + "Recipe Book", -190))
+                .build();
+    }
+
+    public static SmartInventory getBrewingRecipeBook() {
+        return SmartInventory.builder()
+                .manager(BorealCore.getInventoryManager())
+                .id("brewBook")
+                .provider(new BreweryRecipeBookProvider())
+                .size(6, 9)
+                .title(ChatColor.WHITE + new FontImageWrapper(ConfigManager.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString(ChatColor.RESET + "Brewing Book", -190))
                 .build();
     }
 
@@ -125,19 +149,6 @@ public class GuiManager extends Function {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void load() {
-        INGREDIENTS = new HashMap<>();
-        collectionItems = initCollectionItems();
-        INGREDIENTS_MENU = getIngredientsBook();
-        PROGRESSION_MENU = getProgressionTracker();
-        WIKI_MENU = getWikiMenu();
-        loadItems();
-        //writeProgressionItemsToNascraft(collectionItems, new File(BorealCore.getInstance().getDataFolder(), "nascraft.yml"));
-        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (INGREDIENTS.size()) + " <gray>ingredients");
-        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (collectionItems.size()) + " <gray>progression items");
     }
 
     @Override

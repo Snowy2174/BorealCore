@@ -178,7 +178,7 @@ public class FurnitureManager extends Function {
             }
         } else if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
             playCookingPotFX(clickedFurniture.getEntity().getLocation());
-            GuiManager.getRecipeBook(clickedFurniture).open(player);
+            GuiManager.getCookingRecipeBook(clickedFurniture).open(player);
         }
     }
 
