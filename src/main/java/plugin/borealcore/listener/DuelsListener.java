@@ -1,8 +1,10 @@
 package plugin.borealcore.listener;
 
-import me.realized.duels.api.Duels;
-import me.realized.duels.api.event.match.MatchEndEvent;
-import me.realized.duels.api.event.match.MatchStartEvent;
+
+
+import com.meteordevelopments.duels.api.Duels;
+import com.meteordevelopments.duels.api.event.match.MatchEndEvent;
+import com.meteordevelopments.duels.api.event.match.MatchStartEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
