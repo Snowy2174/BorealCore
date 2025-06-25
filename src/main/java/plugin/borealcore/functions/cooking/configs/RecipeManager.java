@@ -19,18 +19,18 @@ import java.util.Set;
 
 public class RecipeManager extends Function {
 
-    public static HashMap<String, Recipe> RECIPES;
+    public static HashMap<String, Recipe> COOKING_RECIPES;
 
     @Override
     public void load() {
-        RECIPES = new HashMap<>();
+        COOKING_RECIPES = new HashMap<>();
         loadItems();
-        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (RECIPES.size()) + " <gray>recipes");
+        AdventureUtil.consoleMessage("Loaded <green>" + (COOKING_RECIPES.size()) + " <gray>dish recipes");
     }
 
     @Override
     public void unload() {
-        if (RECIPES != null) RECIPES.clear();
+        if (COOKING_RECIPES != null) COOKING_RECIPES.clear();
     }
 
     private void loadItems() {
@@ -93,7 +93,7 @@ public class RecipeManager extends Function {
 
                 setActions(recipeSection, recipe);
 
-                RECIPES.put(key, recipe);
+                COOKING_RECIPES.put(key, recipe);
             }
         }
     }

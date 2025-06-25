@@ -50,7 +50,7 @@ public class EffectManager extends Function {
                         for (String key : section.getConfigurationSection(action).getKeys(false)) {
                             PotionEffectType type = PotionEffectType.getByName(section.getString(action + "." + key + ".type", "BLINDNESS").toUpperCase());
                             if (type == null)
-                                AdventureUtil.consoleMessage("<red>[BorealCore] Potion effect " + section.getString(action + "." + key + ".type", "BLINDNESS") + " doesn't exists");
+                                AdventureUtil.consoleMessage("<red>Potion effect " + section.getString(action + "." + key + ".type", "BLINDNESS") + " doesn't exists");
                             potionEffectList.add(new PotionEffect(
                                     type == null ? PotionEffectType.LUCK : type,
                                     section.getInt(action + "." + key + ".duration"),
@@ -78,7 +78,7 @@ public class EffectManager extends Function {
                         for (String key : section.getConfigurationSection(action).getKeys(false)) {
                             PotionEffectType type = PotionEffectType.getByName(section.getString(action + "." + key + ".type", "BLINDNESS").toUpperCase());
                             if (type == null)
-                                AdventureUtil.consoleMessage("<red>[BorealCore] Potion effect " + section.getString(action + "." + key + ".type", "BLINDNESS") + " doesn't exists");
+                                AdventureUtil.consoleMessage("<red>Potion effect " + section.getString(action + "." + key + ".type", "BLINDNESS") + " doesn't exists");
                             potionEffectList.add(new PotionEffect(
                                     type == null ? PotionEffectType.LUCK : type,
                                     section.getInt(action + "." + key + ".duration"),
@@ -165,7 +165,7 @@ public class EffectManager extends Function {
     }
 
     public static void addPotionEffectLore(ItemStack itemStack, String key, Boolean perfect) {
-        Recipe recipe = RecipeManager.RECIPES.get(key.replaceAll("[\\[\\]]", "").replace(ConfigManager.perfectItemSuffix, ""));
+        Recipe recipe = RecipeManager.COOKING_RECIPES.get(key.replaceAll("[\\[\\]]", "").replace(ConfigManager.perfectItemSuffix, ""));
 
         if (recipe != null && recipe.getDishEffectsLore() != null) {
             ItemMeta itemMeta = itemStack.getItemMeta();
@@ -196,7 +196,7 @@ public class EffectManager extends Function {
     public void load() {
         EFFECTS = new HashMap<>();
         loadEffects();
-        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + EFFECTS.size() + " <gray>buff categories");
+        AdventureUtil.consoleMessage("Loaded <green>" + EFFECTS.size() + " <gray>buff categories");
     }
 
     @Override

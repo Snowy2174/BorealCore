@@ -16,9 +16,10 @@ public class BreweryManager extends Function {
     public void load() {
         RECIPES = new HashMap<>();
         // @TODO: loadItems();
-        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (RECIPES.size()) + " <gray> brewing recipes");
+        AdventureUtil.consoleMessage("Loaded <green>" + (RECIPES.size()) + " <gray> brewing recipes");
     }
 
+    @Override
     public void unload() {
         // clear map
     }

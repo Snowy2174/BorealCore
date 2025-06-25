@@ -82,9 +82,9 @@ public class JadeManager extends Function {
                 jadeSourceList.add(source);
             }
         }
-        AdventureUtil.consoleMessage("[BorealCore] Initialised Jade limit system");
-        AdventureUtil.consoleMessage("[BorealCore] Loaded Jade limits: " + jadeSources.keySet());
-        AdventureUtil.consoleMessage("[BorealCore] Jade sources not in database: " + jadeSourceList);
+        AdventureUtil.consoleMessage("Initialised Jade limit system");
+        AdventureUtil.consoleMessage("Loaded Jade limits: " + jadeSources.keySet());
+        AdventureUtil.consoleMessage("Jade sources not in database: " + jadeSourceList);
     }
 
     public void reloadLeaderboards() {

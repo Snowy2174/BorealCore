@@ -138,7 +138,7 @@ public class WikiManager extends Function {
         WIKI = new HashMap<>();
         CATEGORY = new ArrayList<>();
         loadWiki(WIKI_URL);
-        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (WIKI.size()) + " <gray>ingame wiki pages");
+        AdventureUtil.consoleMessage("Loaded <green>" + (WIKI.size()) + " <gray>ingame wiki pages");
     }
 
     @Override

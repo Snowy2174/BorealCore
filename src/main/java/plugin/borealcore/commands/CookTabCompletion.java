@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.borealcore.functions.cooking.configs.RecipeManager.RECIPES;
+import static plugin.borealcore.functions.cooking.configs.RecipeManager.COOKING_RECIPES;
 
 public class CookTabCompletion implements TabCompleter {
     @Override
@@ -54,6 +54,6 @@ public class CookTabCompletion implements TabCompleter {
     }
 
     private List<String> getAvailableRecipes() {
-        return new ArrayList<>(RECIPES.keySet());
+        return new ArrayList<>(COOKING_RECIPES.keySet());
     }
 }

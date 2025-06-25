@@ -26,7 +26,7 @@ import java.util.List;
 
 import static plugin.borealcore.manager.GuiManager.PROGRESSION_MENU;
 import static plugin.borealcore.manager.GuiManager.collectionItems;
-import static plugin.borealcore.functions.cooking.configs.RecipeManager.RECIPES;
+import static plugin.borealcore.functions.cooking.configs.RecipeManager.COOKING_RECIPES;
 
 public class CollectionTrackerProvider implements InventoryProvider {
     private final CookingManager cookingManager;
@@ -74,8 +74,8 @@ public class CollectionTrackerProvider implements InventoryProvider {
 
         GUIUtil.appendMastery(lore, player, recipe, hasMastery);
 
-        if (RECIPES.get(recipe).getIngredients() != null) {
-            GUIUtil.appendIngredients(lore, player, RECIPES.get(recipe).getIngredients());
+        if (COOKING_RECIPES.get(recipe).getIngredients() != null) {
+            GUIUtil.appendIngredients(lore, player, COOKING_RECIPES.get(recipe).getIngredients());
         }
 
             lore.add(" ");

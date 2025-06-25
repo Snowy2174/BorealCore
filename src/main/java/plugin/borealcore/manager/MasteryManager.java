@@ -22,7 +22,7 @@ import plugin.borealcore.utility.RecipeDataUtil;
 import java.io.File;
 import java.io.IOException;
 
-import static plugin.borealcore.functions.cooking.configs.RecipeManager.RECIPES;
+import static plugin.borealcore.functions.cooking.configs.RecipeManager.COOKING_RECIPES;
 import static plugin.borealcore.utility.ConfigUtil.getConfig;
 
 public class MasteryManager extends Function {
@@ -35,7 +35,7 @@ public class MasteryManager extends Function {
     @Override
     public void unload() {
         savePlayerStats(getConfig("data/playerstats.yml"));
-        AdventureUtil.consoleMessage(MessageManager.prefix + "Unloaded mastery values");
+        AdventureUtil.consoleMessage("Unloaded mastery values");
     }
 
 
@@ -63,10 +63,10 @@ public class MasteryManager extends Function {
 
         int requiredMastery = RecipeDataUtil.getDefaultRequiredMastery(recipe);
         if (count >= requiredMastery) {
-            String recipeFormatted = RECIPES.get(recipe).getNick();
+            String recipeFormatted = COOKING_RECIPES.get(recipe).getNick();
 
             ItemsAdder.playTotemAnimation(player, recipe + "_particle");
-            AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
+            AdventureUtil.consoleMessage("Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
             AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", recipeFormatted));
             giveReward(player, recipeFormatted);
         }
@@ -74,7 +74,7 @@ public class MasteryManager extends Function {
 
     private static void giveReward(Player player, String recipeFormatted) {
         JadeManager.give(player, ConfigManager.masteryJadeReward, "mastery");
-        AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + player.getName() + "</green> has been given" + ConfigManager.masteryJadeReward + " ₪ for gaining " + recipeFormatted + " mastery");
+        AdventureUtil.consoleMessage("Player <green>" + player.getName() + "</green> has been given" + ConfigManager.masteryJadeReward + " ₪ for gaining " + recipeFormatted + " mastery");
         AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryReward.replace("{recipe}", recipeFormatted));
     }
 

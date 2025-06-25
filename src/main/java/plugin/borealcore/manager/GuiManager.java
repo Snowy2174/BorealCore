@@ -40,14 +40,14 @@ public class GuiManager extends Function {
     @Override
     public void load() {
         INGREDIENTS = new HashMap<>();
-        collectionItems = initCollectionItems();
+        //collectionItems = initCollectionItems();
         INGREDIENTS_MENU = getIngredientsBook();
-        PROGRESSION_MENU = getProgressionTracker();
+        //PROGRESSION_MENU = getProgressionTracker();
         WIKI_MENU = getWikiMenu();
         loadItems();
         //writeProgressionItemsToNascraft(collectionItems, new File(BorealCore.getInstance().getDataFolder(), "nascraft.yml"));
-        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (INGREDIENTS.size()) + " <gray>ingredients");
-        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + (collectionItems.size()) + " <gray>progression items");
+        AdventureUtil.consoleMessage("Loaded <green>" + (INGREDIENTS.size()) + " <gray>ingredients");
+        //AdventureUtil.consoleMessage("Loaded <green>" + (collectionItems.size()) + " <gray>progression items");
     }
 
     private static HashMap<String, ItemStack> initCollectionItems() {

@@ -15,11 +15,12 @@ import plugin.borealcore.functions.cooking.CompetitionManager;
 import plugin.borealcore.functions.cooking.CookingManager;
 import plugin.borealcore.database.Database;
 import plugin.borealcore.functions.duels.DuelsManager;
+import plugin.borealcore.functions.herbalism.HerbalismManager;
+import plugin.borealcore.functions.herbalism.configs.HerbManager;
 import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.functions.karmicnode.NodeManager;
 import plugin.borealcore.functions.plushies.PlushieManager;
 import plugin.borealcore.functions.wiki.WikiManager;
-import plugin.borealcore.listener.BendingListener;
 import plugin.borealcore.manager.*;
 import plugin.borealcore.functions.cooking.configs.EffectManager;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
@@ -35,9 +36,11 @@ public class BorealCore extends JavaPlugin {
     public static BukkitAudiences adventure;
     public static ProtocolManager protocolManager;
     private static CookingManager cookingManager;
+    private static HerbalismManager herbalismManager;
     private static CompetitionManager competitionManager;
     private static GuiManager guiManager;
     private static RecipeManager recipeManager;
+    private static HerbManager herbManager;
     private static PlaceholderManager placeholderManager;
     private static LayoutManager layoutManager;
     private static EffectManager effectManager;
@@ -67,12 +70,14 @@ public class BorealCore extends JavaPlugin {
         inventoryManager = new InventoryManager(this);
 
         cookingManager = new CookingManager();
+        herbalismManager = new HerbalismManager();
         competitionManager = new CompetitionManager();
         layoutManager = new LayoutManager();
         effectManager = new EffectManager();
         furnitureManager = new FurnitureManager();
         masteryManager = new MasteryManager();
         recipeManager = new RecipeManager();
+        herbManager = new HerbManager();
         guiManager = new GuiManager();
         placeholderManager = new PlaceholderManager();
         nodeManager = new NodeManager();
@@ -108,16 +113,18 @@ public class BorealCore extends JavaPlugin {
             }
         }, 100L);
 
-        AdventureUtil.consoleMessage("[BorealCore] Plugin Enabled!");
+        AdventureUtil.consoleMessage("Plugin Enabled!");
     }
 
     @Override
     public void onDisable() {
 
         cookingManager.unload();
+        herbalismManager.unload();
         competitionManager.unload();
         placeholderManager.unload();
         recipeManager.unload();
+        herbManager.unload();
         layoutManager.unload();
         effectManager.unload();
         guiManager.unload();
@@ -211,6 +218,12 @@ public class BorealCore extends JavaPlugin {
     }
     public static BreweryManager getBreweryManager() {
         return breweryManager;
+    }
+    public static HerbManager getHerbManager() {
+        return herbManager;
+    }
+    public static HerbalismManager getHerbalismManager() {
+        return herbalismManager;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {

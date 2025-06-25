@@ -40,7 +40,7 @@ public class LayoutManager extends Function {
             );
             LAYOUTS.put(key, layout);
         }
-        AdventureUtil.consoleMessage("[BorealCore] Loaded <green>" + LAYOUTS.size() + " <gray>bars");
+        AdventureUtil.consoleMessage("Loaded <green>" + LAYOUTS.size() + " <gray>bars");
     }
 
     @Override

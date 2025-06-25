@@ -169,7 +169,7 @@ public class BossBarSender {
                 throw new RuntimeException("Cannot send packet " + packet, e);
             }
         } catch (ClassNotFoundException e) {
-            AdventureUtil.consoleMessage("<red>[BorealCore] Failed to remove bossbar for " + player.getName());
+            AdventureUtil.consoleMessage("<red>Failed to remove bossbar for " + player.getName());
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

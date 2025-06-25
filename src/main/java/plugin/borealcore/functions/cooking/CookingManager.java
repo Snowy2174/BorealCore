@@ -64,7 +64,6 @@ public class CookingManager extends Function {
         this.cookedRecipe = new HashMap<>();
         this.cookingPotLocations = new HashMap<>();
         this.cookingPlayerCache = new ConcurrentHashMap<>();
-        load();
     }
 
     @Override
@@ -83,7 +82,7 @@ public class CookingManager extends Function {
         if (isPlayerCooking(player)) {
             AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.alreadyCooking);
         } else {
-            Recipe bar = RecipeManager.RECIPES.get(recipe);
+            Recipe bar = RecipeManager.COOKING_RECIPES.get(recipe);
             List<String> ingredients = bar.getIngredients();
             if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, 1)) {
                 InventoryUtil.removeIngredients(player.getInventory(), ingredients, 1);
@@ -115,7 +114,7 @@ public class CookingManager extends Function {
         if (isPlayerCooking(player)) {
             AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.alreadyCooking);
         } else {
-            Recipe recipe = RecipeManager.RECIPES.get(recipeId);
+            Recipe recipe = RecipeManager.COOKING_RECIPES.get(recipeId);
             List<String> ingredients = recipe.getIngredients();
             if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
                 // Delay removal of items if furniture is not null
@@ -360,7 +359,7 @@ public class CookingManager extends Function {
             String lootKey = nbtCompound.getString("id");
             boolean perfect = lootKey.contains(ConfigManager.perfectItemSuffix);
             String recipeKey = lootKey.replace(ConfigManager.perfectItemSuffix, "");
-            Recipe recipe = RecipeManager.RECIPES.get(recipeKey);
+            Recipe recipe = RecipeManager.COOKING_RECIPES.get(recipeKey);
             if (!(recipe instanceof DroppedItem)) {
                 return;
             }

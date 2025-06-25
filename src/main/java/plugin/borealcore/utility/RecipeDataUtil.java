@@ -29,7 +29,7 @@ public class RecipeDataUtil {
     }
 
     public static int getDefaultRequiredMastery(String recipe) {
-        Integer mastery = RecipeManager.RECIPES.get(recipe).getMasteryreq();
+        Integer mastery = RecipeManager.COOKING_RECIPES.get(recipe).getMasteryreq();
         if (mastery == null) {
             return 10;
         }
@@ -109,7 +109,7 @@ public class RecipeDataUtil {
     }
 
     public static List<String> getLockedRecipes(List<String> unlockedRecipes) {
-        return RecipeManager.RECIPES.keySet().stream()
+        return RecipeManager.COOKING_RECIPES.keySet().stream()
                 .filter(recipe -> !unlockedRecipes.contains(recipe))
                 .collect(Collectors.toList());
     }
@@ -127,7 +127,7 @@ public class RecipeDataUtil {
                 return;
             }
             setRecipeData(player, recipe, 0);
-            String recipeFormatted = RecipeManager.RECIPES.get(recipe).getNick();
+            String recipeFormatted = RecipeManager.COOKING_RECIPES.get(recipe).getNick();
             ItemsAdder.playTotemAnimation(player, recipe + ConfigManager.particleItemSuffix);
             AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.recipeUnlocked.replace("{recipe}", recipeFormatted));
         } else {
@@ -135,7 +135,7 @@ public class RecipeDataUtil {
                 return;
             }
             setRecipeData(player, recipe, null);
-            String recipeFormatted = RecipeManager.RECIPES.get(recipe).getNick();
+            String recipeFormatted = RecipeManager.COOKING_RECIPES.get(recipe).getNick();
             ItemsAdder.playTotemAnimation(player, recipe + ConfigManager.particleItemSuffix);
             AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeLocked.replace("{recipe}", recipeFormatted));
         }
@@ -161,7 +161,7 @@ public class RecipeDataUtil {
             config.set(playerRecipePath, requiredMastery);
             ItemsAdder.playTotemAnimation(player, recipe + ConfigManager.particleItemSuffix);
             AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
-            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", RecipeManager.RECIPES.get(recipe).getNick()));
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", RecipeManager.COOKING_RECIPES.get(recipe).getNick()));
         }
     }
 

@@ -21,7 +21,7 @@ public class CraftingManager extends Function {
     @Override
     public void load() {
         registerRecipes();
-        AdventureUtil.consoleMessage(MessageManager.prefix + "Loaded " + RECIPES.size() + " recipes");
+        AdventureUtil.consoleMessage("Loaded " + RECIPES.size() + " recipes");
         for (String key : RECIPES.keySet()) {
             Bukkit.getServer().addRecipe(RECIPES.get(key));
         }

@@ -16,7 +16,7 @@ import plugin.borealcore.manager.configs.ConfigManager;
 
 import java.util.List;
 
-import static plugin.borealcore.functions.cooking.configs.RecipeManager.RECIPES;
+import static plugin.borealcore.functions.cooking.configs.RecipeManager.COOKING_RECIPES;
 
 public class InventoryUtil {
 
@@ -192,7 +192,7 @@ public class InventoryUtil {
                 itemStack = new ItemStack(Material.AIR);
             }
         }
-        if (RECIPES.containsKey(key.toLowerCase().replace("_perfect", ""))) {
+        if (COOKING_RECIPES.containsKey(key.toLowerCase().replace("_perfect", ""))) {
             EffectManager.addPotionEffectLore(itemStack, key, key.contains(ConfigManager.perfectItemSuffix));
             addIdentifier(itemStack, key);
         }

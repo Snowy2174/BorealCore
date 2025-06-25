@@ -54,7 +54,7 @@ public class CookingRecipeBookProvider implements InventoryProvider {
 
         List<String> unlockedRecipes = RecipeDataUtil.getUnlockedRecipes(player);
 
-        for (String recipe : RecipeManager.RECIPES.keySet()) {
+        for (String recipe : RecipeManager.COOKING_RECIPES.keySet()) {
             boolean hasMastery = RecipeDataUtil.hasMastery(player, recipe);
             boolean hasRecipe = unlockedRecipes.contains(recipe);
             ItemStack itemStack;
@@ -65,7 +65,7 @@ public class CookingRecipeBookProvider implements InventoryProvider {
                 itemStack = buildUnknownRecipeItem(recipe);
             }
 
-            int slot = RecipeManager.RECIPES.get(recipe).getSlot(); // Retrieve the slot from the configuration
+            int slot = RecipeManager.COOKING_RECIPES.get(recipe).getSlot(); // Retrieve the slot from the configuration
             if (slot != -1) {
                 int row = (slot - 1) / 9; // Calculate the row based on the slot
                 int column = (slot - 1) % 9;  // Calculate the column based on the slot
@@ -136,8 +136,8 @@ public class CookingRecipeBookProvider implements InventoryProvider {
 
         GUIUtil.appendMastery(lore, player, recipe, hasMastery);
 
-        if (RecipeManager.RECIPES.get(recipe).getIngredients() != null) {
-            GUIUtil.appendIngredients(lore, player, RecipeManager.RECIPES.get(recipe).getIngredients());
+        if (RecipeManager.COOKING_RECIPES.get(recipe).getIngredients() != null) {
+            GUIUtil.appendIngredients(lore, player, RecipeManager.COOKING_RECIPES.get(recipe).getIngredients());
         }
 
 

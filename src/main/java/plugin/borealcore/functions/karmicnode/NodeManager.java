@@ -24,7 +24,7 @@ public class NodeManager extends Function {
 
     @Override
     public void load() {
-        consoleMessage(MessageManager.prefix + "Loaded mastery values");
+        consoleMessage("Loaded Karmic Node Values");
     }
 
     public static void handleUpdateMaxWave(String player, int wave) {
