@@ -1,10 +1,11 @@
 package plugin.borealcore.functions.duels;
 
-import me.realized.duels.api.Duels;
-import me.realized.duels.api.arena.Arena;
-import me.realized.duels.api.arena.ArenaManager;
-import me.realized.duels.api.spectate.SpectateManager;
-import me.realized.duels.api.spectate.Spectator;
+
+import com.meteordevelopments.duels.api.Duels;
+import com.meteordevelopments.duels.api.arena.Arena;
+import com.meteordevelopments.duels.api.arena.ArenaManager;
+import com.meteordevelopments.duels.api.spectate.SpectateManager;
+import com.meteordevelopments.duels.api.spectate.Spectator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
