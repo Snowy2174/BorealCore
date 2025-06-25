@@ -206,9 +206,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.Realizedd.Duels</groupId>
+            <groupId>com.github.dumbo-the-developer.Duels</groupId>
             <artifactId>duels-api</artifactId>
-            <version>3.5.1</version>
+            <version>3.9</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
