@@ -130,10 +130,8 @@ public class CookingManager extends Function {
     }
 
     private void onCookedItem(Player player, Recipe recipe, CustomFurniture clickedFurniture) {
-
         player.closeInventory();
         cookedRecipe.put(player, recipe);
-
         if (clickedFurniture != null) {
             cookingPotLocations.put(player, clickedFurniture.getArmorstand().getLocation());
         }
@@ -145,7 +143,6 @@ public class CookingManager extends Function {
                 } else {
                     showPlayerBar(player, recipe);
                 }
-
         }
     }
 

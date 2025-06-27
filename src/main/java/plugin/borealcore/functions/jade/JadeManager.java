@@ -55,7 +55,7 @@ public class JadeManager extends Function {
         database.startRetryTask();
         reloadLeaderboards();
         scheduler = BorealCore.getInstance().getServer().getScheduler();
-        scheduler.runTaskTimer(BorealCore.getInstance(), new AnnoucmentRunnable(BorealCore.getInstance()), 0L, 20L * 60 * 10);
+        scheduler.runTaskTimer(BorealCore.getInstance(), new AnnoucmentRunnable(BorealCore.getInstance()), 0L, 20L * 60 * 15);
     }
 
     @Override

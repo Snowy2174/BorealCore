@@ -25,8 +25,12 @@ public class ConfigUtil {
         BorealCore.getEffectManager().load();
         BorealCore.getRecipeManager().unload();
         BorealCore.getRecipeManager().load();
+        BorealCore.getHerbManager().unload();
+        BorealCore.getHerbManager().load();
         BorealCore.getCookingManager().unload();
         BorealCore.getCookingManager().load();
+        BorealCore.getHerbalismManager().unload();
+        BorealCore.getHerbalismManager().load();
         BorealCore.getGuiManager().unload();
         BorealCore.getGuiManager().load();
         BorealCore.getCompetitionManager().unload();

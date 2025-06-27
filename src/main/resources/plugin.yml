@@ -26,6 +26,8 @@ commands:
     description: The command to manage the Wiki
   plushies:
     description: The command to manage the Gamble feature
+  recipes:
+    description: The command to manage Recipes
 
 permissions:
   customcooking.*:
