@@ -10,7 +10,5 @@ public record SaturationEffectImpl(int saturation) implements Action {
         float saturationLevel = player.getSaturation();
         float newSaturationLevel = Math.min(20, saturationLevel + saturation);
         player.setSaturation(newSaturationLevel);
-
-
     }
 }

@@ -1,5 +1,6 @@
 package plugin.borealcore.functions.duels;
 
+import com.meteordevelopments.duels.api.Duels;
 import com.meteordevelopments.duels.api.arena.Arena;
 import com.meteordevelopments.duels.api.arena.ArenaManager;
 import com.meteordevelopments.duels.api.event.match.MatchEndEvent;
@@ -8,7 +9,6 @@ import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.listener.DuelsListener;
 import plugin.borealcore.object.Function;
-import com.meteordevelopments.duels.api.Duels;
 
 
 import java.util.HashMap;

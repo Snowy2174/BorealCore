@@ -29,9 +29,9 @@ public class JadeTabCompletion implements TabCompleter {
         } else if (args.length == 1) {
             completions.add("top");
             completions.add("balance");
+            completions.add("toggleAnnouncements");
             completions.add("limits");
             completions.add("leaderboard");
-            completions.add("toggleAnnouncements");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("totalJadeForSource")) {
             completions.addAll(jadeSources.keySet());
         } else if (args.length == 2 && args[0].equalsIgnoreCase("leaderboard")) {

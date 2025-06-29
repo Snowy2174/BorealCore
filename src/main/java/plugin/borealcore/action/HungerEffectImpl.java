@@ -10,7 +10,5 @@ public record HungerEffectImpl(int hunger) implements Action {
         int foodLevel = player.getFoodLevel();
         int newFoodLevel = Math.min(20, foodLevel + hunger / 4);
         player.setFoodLevel(newFoodLevel);
-
-
     }
 }

@@ -1,7 +1,5 @@
 package plugin.borealcore.listener;
 
-
-
 import com.meteordevelopments.duels.api.Duels;
 import com.meteordevelopments.duels.api.event.match.MatchEndEvent;
 import com.meteordevelopments.duels.api.event.match.MatchStartEvent;
