@@ -1,20 +1,23 @@
 package plugin.borealcore.functions.herbalism;
 
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.Difficulty;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.object.Layout;
-import plugin.borealcore.functions.herbalism.objects.Herb;
-import plugin.borealcore.functions.herbalism.objects.Infusion;
-import plugin.borealcore.functions.herbalism.objects.InvertedEffect;
-import plugin.borealcore.functions.herbalism.objects.Modifier;
+import plugin.borealcore.functions.herbalism.objects.*;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
@@ -24,6 +27,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.kyori.adventure.key.Key.key;
+import static plugin.borealcore.functions.herbalism.configs.HerbManager.HERBS;
 import static plugin.borealcore.functions.herbalism.objects.ModifierType.*;
 
 public class HerbalismManager extends Function {
@@ -50,9 +54,80 @@ public class HerbalismManager extends Function {
     public void unload() {
     }
 
-    public void handleInfuse() {
+    public void handleInfuse(Herb[] herbs) {
         // @TODO generate an infusion object
+        Infusion infusion = new Infusion(herbs);
+        // @TODO get the ingredients from the player inventory or clicked furniture
+
         // @TODO modify the infusion object with the final model data
+    }
+
+    public void autoInfuse(Player player, Double quality, String[] args) {
+        if (isPlayerInfusing(player)) {
+            AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>You are already infusing something.");
+            return;
+        }
+
+        Herb[] herbs = new Herb[args.length];
+        for (int i = 0; i < args.length; i++) {
+            herbs[i] = HERBS.get(key(args[i].toLowerCase()));
+            if (herbs[i] == null) {
+                AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>Unknown herb: " + args[i]);
+                return;
+            }
+        }
+
+        buildInfusion(herbs, player, quality);
+    }
+
+    public void buildInfusion(Herb[] herbs, Player player, Double quality) {
+        if (herbs == null || herbs.length == 0) {
+            AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>You need to select at least one herb to infuse.");
+            return;
+        }
+        Infusion infusion = new Infusion(herbs);
+        infusion.setQuality(quality);
+        infusion = formulateEffects(infusion);
+        infusion.buildStack();
+        if (infusion.getItemStack() == null) {
+            AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>Failed to create infusion item stack.");
+            return;
+        }
+        player.getInventory().addItem(infusion.getItemStack());
+    }
+
+    public static ItemStack infusionItemStack(Infusion infusion) {
+        if (infusion == null || infusion.getIngredients() == null || infusion.getIngredients().length == 0) {
+            return null;
+        }
+        ItemStack itemStack = new ItemStack(Material.POTION, 1);
+        // @TODO generate itemstack from infusion object
+        // @TODO set lore, name, colour, etc.
+        itemStack.editMeta(meta -> {
+            meta.displayName(AdventureUtil.getComponentFromMiniMessage("Herbalism Infusion"));
+            List<String> lore = new ArrayList<>();
+            lore.add("Infusion Quality: " + infusion.getQuality());
+            for (Herb herb : infusion.getIngredients()) {
+                lore.add("Ingredient: " + herb.getNick());
+            }
+
+            lore.add("Effects:");
+            // @TODO use logic from EffectManager for cooking? (maybe with modifications from modifications)
+            for (PotionEffect effect : infusion.getEffects()) {
+                lore.add(effect.getType().getName() + " (" + effect.getDuration() / 20 + "s, Level " + (effect.getAmplifier() + 1) + ")");
+            }
+
+            meta.setLore(lore);
+            meta.setCustomModelData(1234);
+        });
+
+        // Set potion type and color based on the infusion effects
+        PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
+        potionMeta.setBasePotionData(new org.bukkit.potion.PotionData(PotionType.UNCRAFTABLE, false, false));
+        potionMeta.setColor(Color.fromRGB(averageColor(infusion.getIngredients())));
+        itemStack.setItemMeta(potionMeta);
+
+        return itemStack;
     }
 
     public void modifyInfusion() {
@@ -141,37 +216,36 @@ public class HerbalismManager extends Function {
         // Apply initial effects from the unprocessed herbs
         for (Herb herb : ingredients) {
             if (herb.getEffects() != null) {
-                for (PotionEffect effect : herb.getEffects()) {
-                    infusion.getEffects().add(effect);
-                }
+                infusion.getEffects().addAll(herb.getEffects());
             }
         }
 
-        // Combine effects first by duplicates, then by quality
+        // Combine effects by type (max duration/amplifier)
         Map<PotionEffectType, PotionEffect> combinedEffects = new HashMap<>();
         for (PotionEffect effect : infusion.getEffects()) {
             PotionEffectType type = effect.getType();
             if (combinedEffects.containsKey(type)) {
-                PotionEffect existingEffect = combinedEffects.get(type);
-                int newDuration = Math.max(existingEffect.getDuration(), effect.getDuration());
-                int newAmplifier = Math.max(existingEffect.getAmplifier(), effect.getAmplifier());
+                PotionEffect existing = combinedEffects.get(type);
+                int newDuration = Math.max(existing.getDuration(), effect.getDuration());
+                int newAmplifier = Math.max(existing.getAmplifier(), effect.getAmplifier());
                 combinedEffects.put(type, new PotionEffect(type, newDuration, newAmplifier));
             } else {
                 combinedEffects.put(type, effect);
             }
         }
+        infusion.getEffects().clear();
+        infusion.getEffects().addAll(combinedEffects.values());
 
-        // Apply modifiers based on the quality of the infusion
-        for (Map.Entry<PotionEffectType, PotionEffect> entry : combinedEffects.entrySet()) {
-            PotionEffectType type = entry.getKey();
-            PotionEffect effect = entry.getValue();
-
-            // Apply quality modifier
+        // Apply quality modifier to all effects
+        List<PotionEffect> qualityEffects = new ArrayList<>();
+        for (PotionEffect effect : infusion.getEffects()) {
+            PotionEffectType type = effect.getType();
             int newDuration = (int) (effect.getDuration() * (1 + quality / 100));
             int newAmplifier = effect.getAmplifier() + (int) (quality / 10);
-
-            infusion.getEffects().add(new PotionEffect(type, newDuration, newAmplifier));
+            qualityEffects.add(new PotionEffect(type, newDuration, newAmplifier));
         }
+        infusion.getEffects().clear();
+        infusion.getEffects().addAll(qualityEffects);
 
         // Collect modifiers from the ingredients
         for (Herb herb : ingredients) {
@@ -183,57 +257,45 @@ public class HerbalismManager extends Function {
         // Apply modifiers from the infusion
         if (!modifiers.isEmpty()) {
             for (Modifier modifier : modifiers) {
-                switch (modifier.getType()) {
-                    case AMPLIFY -> {
-                        for (PotionEffect effect : infusion.getEffects()) {
-                            PotionEffectType type = effect.getType();
-                            int newAmplifier = effect.getAmplifier() + modifier.getValue();
-                            infusion.getEffects().add(new PotionEffect(type, effect.getDuration(), newAmplifier));
-                        }
+                List<PotionEffect> toAdd = new ArrayList<>();
+                ModifierType type = modifier.getType();
+                if (type == AMPLIFY) {
+                    for (PotionEffect effect : infusion.getEffects()) {
+                        PotionEffectType effType = effect.getType();
+                        int newAmplifier = effect.getAmplifier() + modifier.getValue();
+                        toAdd.add(new PotionEffect(effType, effect.getDuration(), newAmplifier));
                     }
-                    case LENGTHEN -> {
-                        for (PotionEffect effect : infusion.getEffects()) {
-                            PotionEffectType type = effect.getType();
-                            int newDuration = (int) (effect.getDuration() * (1 + modifier.getValue() / 100.0));
-                            infusion.getEffects().add(new PotionEffect(type, newDuration, effect.getAmplifier()));
-                        }
+                } else if (type == LENGTHEN) {
+                    for (PotionEffect effect : infusion.getEffects()) {
+                        PotionEffectType effType = effect.getType();
+                        int newDuration = (int) (effect.getDuration() * (1 + modifier.getValue() / 100.0));
+                        toAdd.add(new PotionEffect(effType, newDuration, effect.getAmplifier()));
                     }
-                    case DILUTE -> {
-                        for (PotionEffect effect : infusion.getEffects()) {
-                            PotionEffectType type = effect.getType();
-                            int newDuration = (int) (effect.getDuration() * (1 + quality / 100));
-                            int newAmplifier = effect.getAmplifier() + (int) (quality / 10);
-                            infusion.getEffects().add(new PotionEffect(type, newDuration, newAmplifier));
-                        }
+                } else if (type == DILUTE) {
+                    for (PotionEffect effect : infusion.getEffects()) {
+                        PotionEffectType effType = effect.getType();
+                        int newDuration = (int) (effect.getDuration() * (1 + quality / 100));
+                        int newAmplifier = effect.getAmplifier() + (int) (quality / 10);
+                        toAdd.add(new PotionEffect(effType, newDuration, newAmplifier));
                     }
-                    case CONCENTRATE -> {
-                        for (PotionEffect effect : infusion.getEffects()) {
-                            PotionEffectType type = effect.getType();
-                            int newDuration = (int) (effect.getDuration() * (1 - modifier.getValue() / 100.0));
-                            int newAmplifier = effect.getAmplifier() + modifier.getValue();
-                            infusion.getEffects().add(new PotionEffect(type, newDuration, newAmplifier));
-                        }
+                } else if (type == CONCENTRATE) {
+                    for (PotionEffect effect : infusion.getEffects()) {
+                        PotionEffectType effType = effect.getType();
+                        int newDuration = (int) (effect.getDuration() * (1 - modifier.getValue() / 100.0));
+                        int newAmplifier = effect.getAmplifier() + modifier.getValue();
+                        toAdd.add(new PotionEffect(effType, newDuration, newAmplifier));
                     }
-                    case INVERT -> {
-                        List<PotionEffect> inverted = new ArrayList<>();
-                        for (PotionEffect effect : infusion.getEffects()) {
-                            PotionEffectType invertedType = InvertedEffect.getInverted(effect.getType());
-                            inverted.add(new PotionEffect(invertedType, effect.getDuration(), effect.getAmplifier()));
-                        }
-                        infusion.getEffects().addAll(inverted);
+                } else if (type == INVERT) {
+                    for (PotionEffect effect : infusion.getEffects()) {
+                        PotionEffectType invertedType = InvertedEffect.getInverted(effect.getType());
+                        toAdd.add(new PotionEffect(invertedType, effect.getDuration(), effect.getAmplifier()));
                     }
                 }
-                for (PotionEffect effect : infusion.getEffects()) {
-                    PotionEffectType type = effect.getType();
-                    int newDuration = (int) (effect.getDuration() * (1 + quality / 100));
-                    int newAmplifier = effect.getAmplifier() + (int) (quality / 10);
-                    infusion.getEffects().add(new PotionEffect(type, newDuration, newAmplifier));
-                }
+                infusion.getEffects().addAll(toAdd);
             }
         }
 
-        //@TODO for each potion effect impl, 1.1* time + 1 to level, if effect in defined list (ie not for saturation etc)
-        return null;
+        return infusion;
     }
 
 
@@ -301,6 +363,18 @@ public class HerbalismManager extends Function {
     private boolean isPlayerInfusing(Player player) {
         InfusingPlayer infusingPlayer = getInfusingPlayer(player);
         return infusingPlayer != null;
+    }
+
+    public static int averageColor(Herb[] herbs) {
+        int r = 0, g = 0, b = 0;
+        for (Herb herb : herbs) {
+            int color = herb.getColour();
+            r += (color >> 16) & 0xFF;
+            g += (color >> 8) & 0xFF;
+            b += color & 0xFF;
+        }
+        int n = herbs.length;
+        return ((r / n) << 16) | ((g / n) << 8) | (b / n);
     }
 
 }

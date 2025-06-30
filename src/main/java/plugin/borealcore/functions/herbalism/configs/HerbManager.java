@@ -95,6 +95,21 @@ public class HerbManager extends Function {
                     herb.setLayout(layoutList.toArray(new Layout[0]));
                 }
 
+                // Set colour
+                if (itemSection.contains("colour")) {
+                    String colorStr = itemSection.getString("colour");
+                    int colour;
+                    if (colorStr.startsWith("#")) {
+                        colour = Integer.parseInt(colorStr.substring(1), 16);
+                    } else if (colorStr.contains(",")) {
+                        String[] rgb = colorStr.split(",");
+                        colour = (Integer.parseInt(rgb[0]) << 16) | (Integer.parseInt(rgb[1]) << 8) | Integer.parseInt(rgb[2]);
+                    } else {
+                        colour = 0xFFFFFF;
+                    }
+                    herb.setColour(colour);
+                }
+
                 herb.setActions(plugin.borealcore.functions.cooking.configs.EffectManager.getConsumeActions(itemSection.getConfigurationSection("action.consume"), false));
                 herb.setEffects(getEffects(itemSection.getConfigurationSection("effects")));
 
@@ -113,7 +128,7 @@ public class HerbManager extends Function {
             List<Modifier> modifier = new ArrayList<>();
             for (String type : section.getKeys(false)) {
                 if (ModifierType.valueOf(type) != null) {
-                    modifier.add(new Modifier(HerbalismType.valueOf(type.toUpperCase()), section.getInt(type)));
+                    modifier.add(new Modifier(ModifierType.valueOf(type.toUpperCase()), section.getInt(type)));
                 } else {
                     AdventureUtil.consoleMessage("Modifier type, " + type + " is unrecognised.");
                 }

@@ -136,7 +136,7 @@ public class GuiManager extends Function {
         for (Map.Entry<String, ItemStack> entry : sortedMap.entrySet()) {
             String key = entry.getKey().split(":")[1];
             ItemStack itemStack = entry.getValue();
-            Double price = NBT.get(itemStack, nbt -> nbt.getDouble("Price"));
+            Double price = 0.0;
             System.out.println("Price: " + price);
 
             Map<String, Object> entryData = new HashMap<>();

@@ -61,14 +61,14 @@ public class InventoryUtil {
                 }
             }
         }
-        return false; // none of the options found in player's inventory
+        return false;
     }
 
 
     public static boolean tieredIngredientCheck(Inventory playerInventory, String ingredient, Integer amount) {
         CustomStack customStack = CustomStack.getInstance(ingredient);
         if (customStack == null) {
-            return false; // Invalid ingredient
+            return false;
         }
 
         for (int tier = 0; tier <= 2; tier++) {
@@ -79,14 +79,13 @@ public class InventoryUtil {
                 return true; // Found ingredient in player's inventory
             }
         }
-        return false; // Ingredient not found in player's inventory
+        return false;
     }
 
     public static void removeIngredients(Inventory playerInventory, List<String> ingredients, Integer instances) {
         if (ingredients == null || ingredients.isEmpty()) {
             return;
         }
-
         for (String ingredient : ingredients) {
             String[] options = ingredient.split("/");
             for (String option : options) {

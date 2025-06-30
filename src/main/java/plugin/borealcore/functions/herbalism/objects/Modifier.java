@@ -3,9 +3,9 @@ package plugin.borealcore.functions.herbalism.objects;
 public class Modifier {
     protected String name;
     protected int value;
-    protected HerbalismType type;
+    protected ModifierType type;
 
-    public Modifier(HerbalismType type, int value) {
+    public Modifier(ModifierType type, int value) {
         this.type = type;
         this.value = value;
     }
@@ -22,10 +22,10 @@ public class Modifier {
     public void setValue(int value) {
         this.value = value;
     }
-    public HerbalismType getType() {
+    public ModifierType getType() {
         return type;
     }
-    public void setType(HerbalismType type) {
+    public void setType(ModifierType type) {
         this.type = type;
     }
 }

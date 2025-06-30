@@ -10,7 +10,6 @@ import plugin.borealcore.BorealCore;
 import plugin.borealcore.listener.DuelsListener;
 import plugin.borealcore.object.Function;
 
-
 import java.util.HashMap;
 import java.util.Set;
 
@@ -21,7 +20,6 @@ public class DuelsManager extends Function {
     private static BorealCore plugin;
     private static ArenaManager arenaManager;
     private static HashMap<Arena, MatchRunnable> ongoingRunnables = new HashMap<>();
-
 
     public DuelsManager() {
         this.plugin = BorealCore.plugin;

@@ -17,6 +17,7 @@ public class Herb {
     protected Action[] actions;
     protected List<PotionEffect> effects;
     protected Modifier[] modifiers;
+    protected int colour;
 
     public Herb(String key, String nick, HerbalismType type, Difficulty[] difficulties, int time) {
         this.key = key;
@@ -80,5 +81,13 @@ public class Herb {
 
     public Action[] getActions() {
         return actions;
+    }
+
+    public int getColour() {
+        return colour;
+    }
+
+    public void setColour(int colour) {
+        this.colour = colour;
     }
 }

@@ -18,6 +18,8 @@ softdepend:
 commands:
   cooking:
     description: The command to manage CustomCooking
+  herbalism:
+    description: The command to manage CustomHerbalism
   jade:
     description: The command to manage Jade
   kn:

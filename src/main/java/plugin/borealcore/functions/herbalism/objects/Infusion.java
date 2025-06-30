@@ -1,9 +1,12 @@
 package plugin.borealcore.functions.herbalism.objects;
 
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import plugin.borealcore.action.Action;
 
 import java.util.List;
+
+import static plugin.borealcore.functions.herbalism.HerbalismManager.infusionItemStack;
 
 public class Infusion {
 
@@ -12,8 +15,9 @@ public class Infusion {
     protected Herb[] ingredients;
     protected int ingredientIndex = 0;
     protected Double quality;
+    protected ItemStack itemStack;
 
-    public Infusion() {
+    public Infusion(Herb[] herbs) {
         this.ingredients = ingredients;
         this.quality = 0.0;
     }
@@ -50,4 +54,15 @@ public class Infusion {
         this.quality = quality;
     }
 
+    public void buildStack() {
+        this.itemStack = infusionItemStack(this);
+    }
+
+    public ItemStack getItemStack() {
+        return itemStack;
+    }
+
+    public void setItemStack(ItemStack itemStack) {
+        this.itemStack = itemStack;
+    }
 }
