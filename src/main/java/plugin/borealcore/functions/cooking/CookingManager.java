@@ -20,19 +20,20 @@ import plugin.borealcore.BorealCore;
 import plugin.borealcore.action.Action;
 import plugin.borealcore.api.event.CookResultEvent;
 import plugin.borealcore.functions.cooking.competition.Competition;
+import plugin.borealcore.functions.cooking.configs.LayoutManager;
+import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.functions.cooking.object.DroppedItem;
 import plugin.borealcore.functions.cooking.object.Ingredient;
 import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.functions.cooking.object.Recipe;
+import plugin.borealcore.functions.herbalism.HerbalismManager;
 import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.listener.ConsumeItemListener;
 import plugin.borealcore.listener.InteractListener;
 import plugin.borealcore.manager.FurnitureManager;
 import plugin.borealcore.manager.MasteryManager;
 import plugin.borealcore.manager.configs.ConfigManager;
-import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.manager.configs.MessageManager;
-import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GUIUtil;
@@ -351,6 +352,11 @@ public class CookingManager extends Function {
             }
             if (nbtCompound == null || !nbtCompound.hasKey("id")) {
                 return;
+            }
+
+            List<PotionEffect> effects = HerbalismManager.readInfusionEffectsFromNBT(itemStack);
+            for (PotionEffect effect : effects) {
+                player.addPotionEffect(effect);
             }
 
             String lootKey = nbtCompound.getString("id");

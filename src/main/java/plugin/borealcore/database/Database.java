@@ -5,10 +5,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Consumer;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.functions.jade.LeaderboardType;
 import plugin.borealcore.functions.jade.object.JadeTransaction;
 import plugin.borealcore.functions.jade.object.Leaderboard;
 import plugin.borealcore.functions.jade.object.LeaderboardEntry;
-import plugin.borealcore.functions.jade.LeaderboardType;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 

@@ -12,9 +12,9 @@ import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.database.Database;
 import plugin.borealcore.functions.jade.JadeManager;
+import plugin.borealcore.functions.jade.LeaderboardType;
 import plugin.borealcore.functions.jade.object.Leaderboard;
 import plugin.borealcore.functions.jade.object.LeaderboardEntry;
-import plugin.borealcore.functions.jade.LeaderboardType;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 

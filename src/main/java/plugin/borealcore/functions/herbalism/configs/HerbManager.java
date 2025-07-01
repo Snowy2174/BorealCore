@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.Difficulty;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;

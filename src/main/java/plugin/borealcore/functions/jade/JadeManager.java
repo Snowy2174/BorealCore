@@ -32,7 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.bukkit.Bukkit.getServer;
-import static plugin.borealcore.manager.configs.ConfigManager.*;
+import static plugin.borealcore.manager.configs.ConfigManager.brewingRequiredQuality;
+import static plugin.borealcore.manager.configs.ConfigManager.refarmableCrops;
 
 public class JadeManager extends Function {
 

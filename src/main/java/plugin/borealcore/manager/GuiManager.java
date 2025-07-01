@@ -1,6 +1,5 @@
 package plugin.borealcore.manager;
 
-import de.tr7zw.nbtapi.NBT;
 import dev.lone.itemsadder.api.CustomFurniture;
 import dev.lone.itemsadder.api.CustomStack;
 import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
@@ -14,8 +13,8 @@ import org.yaml.snakeyaml.Yaml;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.brewery.BreweryRecipeBookProvider;
 import plugin.borealcore.functions.collections.CollectionTrackerProvider;
-import plugin.borealcore.functions.cooking.IngredientBookProvider;
 import plugin.borealcore.functions.cooking.CookingRecipeBookProvider;
+import plugin.borealcore.functions.cooking.IngredientBookProvider;
 import plugin.borealcore.functions.cooking.object.Ingredient;
 import plugin.borealcore.functions.wiki.WikiGuiProvider;
 import plugin.borealcore.manager.configs.ConfigManager;

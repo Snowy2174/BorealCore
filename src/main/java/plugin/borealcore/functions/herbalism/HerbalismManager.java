@@ -1,9 +1,10 @@
 package plugin.borealcore.functions.herbalism;
 
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -121,11 +122,25 @@ public class HerbalismManager extends Function {
             meta.setCustomModelData(1234);
         });
 
-        // Set potion type and color based on the infusion effects
+        // Set potion type and color based on the infusion ingredients
         PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
         potionMeta.setBasePotionData(new org.bukkit.potion.PotionData(PotionType.UNCRAFTABLE, false, false));
         potionMeta.setColor(Color.fromRGB(averageColor(infusion.getIngredients())));
         itemStack.setItemMeta(potionMeta);
+
+        // Write effects to NBT
+        NBTItem nbtItem = new NBTItem(itemStack);
+        NBTCompound nbt = nbtItem.addCompound("BorealCore");
+        StringBuilder sb = new StringBuilder();
+        if (infusion.getEffects() != null) {
+            for (PotionEffect effect : infusion.getEffects()) {
+                sb.append(effect.getType().getName()).append(",")
+                        .append(effect.getDuration()).append(",")
+                        .append(effect.getAmplifier()).append(";");
+            }
+        }
+        nbt.setString("infusion_effects", sb.toString());
+        itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
 
         return itemStack;
     }
@@ -377,4 +392,24 @@ public class HerbalismManager extends Function {
         return ((r / n) << 16) | ((g / n) << 8) | (b / n);
     }
 
+    public static List<PotionEffect> readInfusionEffectsFromNBT(ItemStack itemStack) {
+        NBTItem nbtItem = new NBTItem(itemStack);
+        NBTCompound nbt = nbtItem.getCompound("BorealCore");
+        List<PotionEffect> effects = new ArrayList<>();
+        if (nbt != null && nbt.hasKey("infusion_effects")) {
+            String data = nbt.getString("infusion_effects");
+            String[] parts = data.split(";");
+            for (String part : parts) {
+                if (part.isEmpty()) continue;
+                String[] vals = part.split(",");
+                PotionEffectType type = PotionEffectType.getByName(vals[0]);
+                int duration = Integer.parseInt(vals[1]);
+                int amplifier = Integer.parseInt(vals[2]);
+                if (type != null) {
+                    effects.add(new PotionEffect(type, duration, amplifier));
+                }
+            }
+        }
+        return effects;
+    }
 }

@@ -1,0 +1,341 @@
+golden_apple:
+  nick: Golden Apple
+  type: HEARTY
+  difficulty: 2-3
+  time: 8000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  colour: "#FFD700"
+  effects:
+    REGENERATION:
+      duration: 200
+      amplifier: 1
+    ABSORPTION:
+      duration: 120
+      amplifier: 1
+
+ginseng:
+  nick: Ginseng Root
+  type: HEARTY
+  difficulty: 1-2
+  time: 6000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#E0CDA9"
+  effects:
+    REGENERATION:
+      duration: 100
+      amplifier: 0
+
+ginseng_t1:
+  nick: Ginseng Root (Strong)
+  type: HEARTY
+  difficulty: 3-4
+  time: 9000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  colour: "#C2B280"
+  effects:
+    REGENERATION:
+      duration: 200
+      amplifier: 1
+    HEALTH_BOOST:
+      duration: 100
+      amplifier: 1
+
+fortitude_juniper_1:
+  nick: Juniper Berry
+  type: FORTIFICATION
+  difficulty: 1-2
+  time: 7000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#6A5ACD"
+  effects:
+    RESISTANCE:
+      duration: 120
+      amplifier: 0
+
+juniper_t1:
+  nick: Juniper Berry (Strong)
+  type: FORTIFICATION
+  difficulty: 3-4
+  time: 10000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  colour: "#483D8B"
+  effects:
+    RESISTANCE:
+      duration: 240
+      amplifier: 1
+    ABSORPTION:
+      duration: 60
+      amplifier: 1
+
+fortitude_maoto_1:
+  nick: Mao-to Leaf
+  type: FORTIFICATION
+  difficulty: 2-3
+  time: 8000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#228B22"
+  effects:
+    FIRE_RESISTANCE:
+      duration: 100
+      amplifier: 0
+
+fortitude_maoto_2:
+  nick: Mao-to Leaf (Strong)
+  type: FORTIFICATION
+  difficulty: 4-5
+  time: 12000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  colour: "#006400"
+  effects:
+    FIRE_RESISTANCE:
+      duration: 200
+      amplifier: 1
+    RESISTANCE:
+      duration: 100
+      amplifier: 1
+
+agility_fireweed_1:
+  nick: Fireweed
+  type: AGILITY
+  difficulty: 1-2
+  time: 6000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#FF4500"
+  effects:
+    SPEED:
+      duration: 120
+      amplifier: 0
+
+agility_fireweed_2:
+  nick: Fireweed (Strong)
+  type: AGILITY
+  difficulty: 3-4
+  time: 9000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  colour: "#B22222"
+  effects:
+    SPEED:
+      duration: 240
+      amplifier: 1
+    JUMP_BOOST:
+      duration: 120
+      amplifier: 1
+
+strength_ginger:
+  nick: Ginger Root
+  type: COMBAT
+  difficulty: 2-3
+  time: 8000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#DEB887"
+  effects:
+    STRENGTH:
+      duration: 180
+      amplifier: 1
+
+strength_mushrooms:
+  nick: Power Mushroom
+  type: COMBAT
+  difficulty: 3-4
+  time: 10000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  colour: "#A0522D"
+  effects:
+    STRENGTH:
+      duration: 120
+      amplifier: 2
+    HASTE:
+      duration: 120
+      amplifier: 1
+
+special_levitation:
+  nick: Skyblossom
+  type: SPECIAL
+  difficulty: 4-5
+  time: 12000
+  layout:
+    - bar_7
+    - bar_8
+    - bar_9
+  colour: "#87CEEB"
+  effects:
+    LEVITATION:
+      duration: 60
+      amplifier: 1
+
+special_conduit:
+  nick: Conduit Coral
+  type: SPECIAL
+  difficulty: 5-6
+  time: 15000
+  layout:
+    - bar_7
+    - bar_8
+    - bar_9
+  colour: "#00CED1"
+  effects:
+    CONDUIT_POWER:
+      duration: 120
+      amplifier: 1
+
+special_luck:
+  nick: Lucky Clover
+  type: SPECIAL
+  difficulty: 3-4
+  time: 9000
+  layout:
+    - bar_4
+    - bar_5
+    - bar_6
+  colour: "#32CD32"
+  effects:
+    LUCK:
+      duration: 100
+      amplifier: 2
+
+special_slowfall:
+  nick: Feather Fern
+  type: SPECIAL
+  difficulty: 2-3
+  time: 8000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#F5F5DC"
+  effects:
+    SLOW_FALLING:
+      duration: 120
+      amplifier: 0
+
+special_nightvision:
+  nick: Mooncap
+  type: SPECIAL
+  difficulty: 2-3
+  time: 8000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#191970"
+  effects:
+    NIGHT_VISION:
+      duration: 200
+      amplifier: 0
+
+modifier_amplify:
+  nick: Amplify Seed
+  type: MODIFIER
+  difficulty: 1-1
+  time: 5000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#FFEB3B"
+  action:
+    modify:
+      AMPLIFY: 1
+
+modifier_lengthen:
+  nick: Lengthen Root
+  type: MODIFIER
+  difficulty: 1-1
+  time: 5000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#B0E0E6"
+  action:
+    modify:
+      LENGTHEN: 1
+
+modifier_dilute:
+  nick: Dilute Petal
+  type: MODIFIER
+  difficulty: 1-1
+  time: 5000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#E0FFFF"
+  action:
+    modify:
+      DILUTE: 1
+
+modifier_concentrate:
+  nick: Concentrate Nut
+  type: MODIFIER
+  difficulty: 1-1
+  time: 5000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#8B4513"
+  action:
+    modify:
+      CONCENTRATE: 1
+
+modifier_splash:
+  nick: Splash Cap
+  type: MODIFIER
+  difficulty: 1-1
+  time: 5000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#00BFFF"
+  action:
+    modify:
+      SPLASH: 1
+
+modifier_invert:
+  nick: Invert Berry
+  type: MODIFIER
+  difficulty: 1-1 
+  time: 5000
+  layout:
+    - bar_1
+    - bar_2
+    - bar_3
+  colour: "#800080"
+  action:
+    modify:
+      INVERT: 1

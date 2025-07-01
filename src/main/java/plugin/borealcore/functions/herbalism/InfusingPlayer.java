@@ -2,7 +2,6 @@ package plugin.borealcore.functions.herbalism;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import plugin.borealcore.functions.cooking.CookingManager;
 import plugin.borealcore.functions.cooking.Difficulty;
 import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.manager.configs.MessageManager;
