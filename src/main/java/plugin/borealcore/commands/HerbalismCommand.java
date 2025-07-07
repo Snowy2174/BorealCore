@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.herbalism.HerbalismManager;
 
+import java.util.Arrays;
+
 import static plugin.borealcore.utility.AdventureUtil.sendMessage;
 
 public class HerbalismCommand implements CommandExecutor {
@@ -32,7 +34,7 @@ public class HerbalismCommand implements CommandExecutor {
             case "infuse":
                 if (args.length > 1) {
                     if (sender instanceof Player) {
-                        herbalismManager.autoInfuse((Player) sender, Double.valueOf(args[1]), args);
+                        herbalismManager.autoInfuse((Player) sender, Double.valueOf(args[1]), Arrays.copyOfRange(args, 2, args.length));
                     }
                 } else {
                     sendMessage(sender, "Usage: /herbalism infuse <ingredient>");

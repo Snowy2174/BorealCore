@@ -29,7 +29,6 @@ public class AnalyticsManager extends Function {
         }
        if (ConfigManager.processAnalyticsEnabled) {
            getLogger().info("Analytics Manager has been enabled.");
-           // Initialize or load any necessary data for analytics
            queryJadeDatabase();
        }
     }
