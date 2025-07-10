@@ -1,17 +1,20 @@
 package plugin.borealcore.functions.cooking;
 
 
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import dev.lone.itemsadder.api.CustomFurniture;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -346,26 +349,25 @@ public class CookingManager extends Function {
 
             ItemStack itemStack = event.getItem();
 
-            NBTCompound nbtCompound = new NBTItem(itemStack).getCompound("BorealCore");
-            if (nbtCompound == null) {
-                nbtCompound = new NBTItem(itemStack).getCompound("CustomCooking");
-            }
-            if (nbtCompound == null || !nbtCompound.hasKey("id")) {
+            //List<PotionEffect> effects = HerbalismManager.readInfusionEffectsFromNBT(itemStack);
+        // for (PotionEffect effect : effects) {
+        //player.addPotionEffect(effect);
+            //}
+
+            String lootKey = itemStack.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(BorealCore.getInstance(), "id"), PersistentDataType.STRING);
+            if (lootKey == null ) {
                 return;
             }
 
-            List<PotionEffect> effects = HerbalismManager.readInfusionEffectsFromNBT(itemStack);
-            for (PotionEffect effect : effects) {
-                player.addPotionEffect(effect);
-            }
-
-            String lootKey = nbtCompound.getString("id");
             boolean perfect = lootKey.contains(ConfigManager.perfectItemSuffix);
             String recipeKey = lootKey.replace(ConfigManager.perfectItemSuffix, "");
             Recipe recipe = RecipeManager.COOKING_RECIPES.get(recipeKey);
             if (!(recipe instanceof DroppedItem)) {
+                System.out.println("Recipe not found or not a DroppedItem: " + recipeKey);
                 return;
             }
+
+            System.out.println(recipeKey);
 
             DroppedItem droppedItem = (DroppedItem) recipe;
             Action[] actions = perfect ? droppedItem.getPerfectConsumeActions() : droppedItem.getConsumeActions();
@@ -373,6 +375,7 @@ public class CookingManager extends Function {
             if (actions != null) {
                 for (Action action : actions) {
                     action.doOn(player, null);
+                    System.out.println("Action performed: " + action.getClass().getSimpleName() + " for player: " + player.getName());
                 }
             }
     }

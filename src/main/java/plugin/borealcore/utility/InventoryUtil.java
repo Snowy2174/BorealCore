@@ -1,16 +1,20 @@
 package plugin.borealcore.utility;
 
 
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import dev.lone.itemsadder.api.CustomStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.configs.EffectManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 
@@ -234,10 +238,9 @@ public class InventoryUtil {
     }
 
     private static void addIdentifier(ItemStack itemStack, String id) {
-        NBTItem nbtItem = new NBTItem(itemStack);
-        NBTCompound nbtCompound = nbtItem.addCompound("BorealCore");
-        String identifier = id.replaceAll("[\\[\\]]", "");
-        nbtCompound.setString("id", identifier);
-        itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
+        NamespacedKey key = new NamespacedKey(BorealCore.getInstance(), "id");
+        itemStack.editMeta(meta -> {
+            meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, id);
+        });
     }
 }
