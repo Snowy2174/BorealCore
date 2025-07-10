@@ -9,7 +9,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.borealcore.commands.*;
 import plugin.borealcore.database.Database;
-import plugin.borealcore.database.SQLite;
+import plugin.borealcore.database.SQLiteJade;
+import plugin.borealcore.database.SQLiteTraps;
 import plugin.borealcore.functions.bending.BendingManager;
 import plugin.borealcore.functions.brewery.BreweryManager;
 import plugin.borealcore.functions.cooking.CompetitionManager;
@@ -50,6 +51,7 @@ public class BorealCore extends JavaPlugin {
     private static NodeManager nodeManager;
     private static JadeManager jadeManager;
     private static Database db;
+    private static Database traps;
     private static WikiManager wikiManager;
     private static CraftingManager craftingManager;
     private static AnalyticsManager analyticsManager;
@@ -82,7 +84,8 @@ public class BorealCore extends JavaPlugin {
         placeholderManager = new PlaceholderManager();
         nodeManager = new NodeManager();
         wikiManager = new WikiManager();
-        db = new SQLite(this);
+        db = new SQLiteJade(this);
+        traps = new SQLiteTraps(this);
         jadeManager = new JadeManager(db);
         craftingManager = new CraftingManager();
         analyticsManager = new AnalyticsManager(db);
@@ -142,6 +145,7 @@ public class BorealCore extends JavaPlugin {
         bendingManager.unload();
         breweryManager.unload();
         db.unload();
+        traps.unload();
 
         AdventureUtil.consoleMessage("[BorealCore] Plugin Disabled!");
 
@@ -226,6 +230,9 @@ public class BorealCore extends JavaPlugin {
     }
     public static HerbalismManager getHerbalismManager() {
         return herbalismManager;
+    }
+    public static Database getTrapsDatabase() {
+        return traps;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {

@@ -1,17 +1,27 @@
 package plugin.borealcore.database;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Consumer;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.jade.LeaderboardType;
 import plugin.borealcore.functions.jade.object.JadeTransaction;
 import plugin.borealcore.functions.jade.object.Leaderboard;
 import plugin.borealcore.functions.jade.object.LeaderboardEntry;
+import plugin.borealcore.functions.traps.Trap;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -21,6 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import static java.lang.Double.parseDouble;
 import static plugin.borealcore.functions.jade.JadeManager.jadeSources;
 
 public abstract class Database extends Function {
@@ -43,7 +54,7 @@ public abstract class Database extends Function {
             PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM " + this.table + " WHERE player = ?");
             ResultSet rs = ps.executeQuery();
             this.close(ps, rs);
-            AdventureUtil.consoleMessage("[BorealCore] Loaded SQLite database");
+            AdventureUtil.consoleMessage("Loaded SQLiteJade database");
         } catch (SQLException ex) {
             BorealCore.disablePlugin("Unable to retrieve connection during database initialization", ex);
         }
@@ -73,8 +84,6 @@ public abstract class Database extends Function {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
         }
     }
-
-
 
     private int getSingleIntResult(String query, Object... params) {
         Connection conn = null;
@@ -747,4 +756,180 @@ public abstract class Database extends Function {
    // updateRecipeStatus;
 
 
+    public List<Trap> getActiveFishingTraps() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            List<Trap> fishingTraps = new ArrayList<>();
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("SELECT * FROM fishing_traps WHERE active = 1");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                UUID id = UUID.fromString(rs.getString("id"));
+                UUID owner = UUID.fromString(rs.getString("owner"));
+                String key = rs.getString("key");
+                Location location = deserializeLocation(rs.getString("location"));
+                boolean active = rs.getInt("active") == 1;
+                List<ItemStack> items = deserializeItems(rs.getString("items"));
+                int maxItems = rs.getInt("maxItems");
+                ItemStack bait = deserializeItems(rs.getString("bait")).get(0);
+
+                fishingTraps.add(new Trap(key, id, owner, location, active, items, maxItems, bait));
+            }
+            return fishingTraps;
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to deserialize items", e);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+        return null;
+    }
+
+    public Trap getFishingTrapById(String id) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("SELECT * FROM fishing_traps WHERE id = ?");
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                UUID owner = UUID.fromString(rs.getString("owner"));
+                String key = rs.getString("key");
+                Location location = deserializeLocation(rs.getString("location"));
+                boolean active = rs.getInt("active") == 1;
+                List<ItemStack> items = deserializeItems(rs.getString("items"));
+                int maxItems = rs.getInt("maxItems");
+                ItemStack bait = deserializeItems(rs.getString("bait")).get(0);
+
+                return new Trap(key, UUID.fromString(id), owner, location, active, items, maxItems, bait);
+            }
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to deserialize items", e);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+        return null;
+    }
+
+    private Location deserializeLocation(String locationString) {
+        String[] location = locationString.split(":");
+        return new Location(plugin.getServer().getWorld(location[0]), parseDouble(location[1]), parseDouble(location[2]), parseDouble(location[3]));
+    }
+
+    private List<ItemStack> deserializeItems(String itemsString) throws IOException {
+        try {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(itemsString));
+            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+
+            int size = dataInput.readInt();
+            List<ItemStack> itemStacks = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                itemStacks.add((ItemStack) dataInput.readObject());
+            }
+            dataInput.close();
+
+            if (itemStacks.size() == 0) {
+                itemStacks.add(new ItemStack(Material.AIR));
+            }
+
+            return itemStacks;
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to load item stacks.", e);
+        }
+    }
+
+    public void saveFishingTrap(Trap trap) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("REPLACE INTO fishing_traps(id, owner, key, location, active, items, maxItems, bait) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+
+            ps.setString(1, trap.getId().toString());
+            ps.setString(2, trap.getOwner().toString());
+            ps.setString(3, trap.getKey());
+            ps.setString(4, serializeLocation(trap.getLocation()));
+            ps.setInt(5, trap.isActive() ? 1 : 0);
+            ps.setString(6, serializeItems(trap.getItems()));
+            ps.setInt(7, trap.getMaxItems());
+            ps.setString(8, serializeItems(Collections.singletonList(trap.getBait())));
+
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+    }
+
+    private String serializeLocation(Location location) {
+        return "world" + ":" + location.getX() + ":" + location.getY() + ":" + location.getZ();
+    }
+
+    private String serializeItems(List<ItemStack> items) throws IllegalStateException {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+            dataOutput.writeInt(items.size());
+            for (ItemStack item : items) {
+                dataOutput.writeObject(item);
+            }
+            dataOutput.close();
+            return Base64Coder.encodeLines(outputStream.toByteArray());
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to save item stacks.", e);
+        }
+    }
+
+    public void deleteFishingTrapById(String id) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("DELETE FROM fishing_traps WHERE id = ?");
+            ps.setString(1, id);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+    }
 }

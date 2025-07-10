@@ -207,7 +207,7 @@ public class InventoryUtil {
         drop.setAmount(amount);
         if (customCookingItem) {
             EffectManager.addPotionEffectLore(drop, item, item.contains(ConfigManager.perfectItemSuffix));
-            addIdentifier(drop, item);
+            addIdentifier(drop, item.replace("[", "").replace("]", "")); // @TODO diagnose fix later
         }
         player.getLocation().getWorld().dropItem(player.getLocation(), drop);
     }

@@ -11,32 +11,23 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-public class SQLite extends Database {
-    public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS jade_transactions (" + // make sure to put your table name in here too.
-            "`player` varchar(32) NOT NULL," + // This creates the different columns you will save data to. varchar(32) Is a string, int = integer
-            "`amount` int(11) NOT NULL," +
-            "`uuid` VARCHAR(36)," +
-            "`source` varchar(32) NOT NULL," +
-            "`timestamp` datetime NOT NULL," +
-            "PRIMARY KEY (`player`, `timestamp`)" +  // This is creating 4 columns: player, amount, source, timestamp. Primary key is a combination of player and timestamp.
-            ");"; // we can search by player and timestamp to get the amount and source.
-    public String SQLiteCreateUsersTable = "CREATE TABLE IF NOT EXISTS jade_totals (" +
-            "    `player` varchar(32) NOT NULL PRIMARY KEY," +
-            "    `uuid` VARCHAR(36)," +
-            "    `jade` int(11) NOT NULL" +
-            ");"; // we can search by player and timestamp to get the amount and source.
-    public String SQLiteCreateRecipesTable = "CREATE TABLE IF NOT EXISTS recipe_data (" +
-        "uuid VARCHAR(36) NOT NULL," +
-        "recipe_type VARCHAR(32) NOT NULL," +
-        "recipe_name VARCHAR(64) NOT NULL," +
-        "mastery_count INT DEFAULT 0," +
-        "PRIMARY KEY (uuid, recipe_type, recipe_name)" +
-    ");";
+public class SQLiteTraps extends Database {
+    public String SQLiteCreateTrapsTable = "CREATE TABLE IF NOT EXISTS fishing_traps (" +
+            "`id` TEXT NOT NULL," +
+            "`owner` TEXT NOT NULL," +
+            "`key` TEXT NOT NULL," +
+            "`location` TEXT NOT NULL," +
+            "`active` INTEGER NOT NULL," +
+            "`items` TEXT," +
+            "`maxItems` INTEGER NOT NULL," +
+            "`bait` TEXT," +
+            "PRIMARY KEY (`id`)" +
+            ");";
     String dbname;
 
-    public SQLite(BorealCore instance) {
+    public SQLiteTraps(BorealCore instance) {
         super(instance);
-        dbname = "jade_transactions";
+        dbname = "traps";
     }
 
     public Connection getSQLConnection() {
@@ -58,22 +49,20 @@ public class SQLite extends Database {
                 result = connection;
             }
         } catch (SQLException ex) {
-            plugin.getLogger().log(Level.SEVERE, "SQLite exception on initialize", ex);
+            plugin.getLogger().log(Level.SEVERE, "SQLiteJade exception on initialize", ex);
         } catch (ClassNotFoundException ex) {
-            plugin.getLogger().log(Level.SEVERE, "You need the SQLite JBDC library.");
+            plugin.getLogger().log(Level.SEVERE, "You need the SQLiteJade JBDC library.");
         }
         return result;
     }
 
     @Override
     public void load() {
-        AdventureUtil.consoleMessage("Loading SQLite database...");
+        AdventureUtil.consoleMessage("Loading SQLiteJade database...");
         connection = getSQLConnection();
         try {
             Statement s = connection.createStatement();
-            s.executeUpdate(SQLiteCreateTokensTable);
-            s.executeUpdate(SQLiteCreateUsersTable);
-           // s.executeUpdate(SQLiteCreateRecipesTable);
+            s.executeUpdate(SQLiteCreateTrapsTable);
             s.close();
         } catch (SQLException e) {
             e.printStackTrace();

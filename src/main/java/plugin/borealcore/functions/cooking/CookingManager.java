@@ -349,15 +349,15 @@ public class CookingManager extends Function {
 
             ItemStack itemStack = event.getItem();
 
-            //List<PotionEffect> effects = HerbalismManager.readInfusionEffectsFromNBT(itemStack);
-        // for (PotionEffect effect : effects) {
-        //player.addPotionEffect(effect);
-            //}
+            String lootKey = itemStack.getItemMeta().getPersistentDataContainer()
+                    .get(new NamespacedKey(BorealCore.getInstance(), "id"), PersistentDataType.STRING);
 
-            String lootKey = itemStack.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(BorealCore.getInstance(), "id"), PersistentDataType.STRING);
-            if (lootKey == null ) {
+            if (lootKey == null) {
+                Bukkit.getLogger().warning("PersistentDataContainer 'id' is null for item: " + itemStack.getType());
                 return;
             }
+
+            lootKey = lootKey.replaceAll("[\\[\\]]", "");
 
             boolean perfect = lootKey.contains(ConfigManager.perfectItemSuffix);
             String recipeKey = lootKey.replace(ConfigManager.perfectItemSuffix, "");
