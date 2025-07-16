@@ -106,7 +106,8 @@ public class BorealCore extends JavaPlugin {
         getCommand("recipes").setExecutor(new RecipeBookCommand());
         getCommand("recipes").setTabCompleter(new RecipeBookTabCompletion());
         getCommand("herbalism").setExecutor(new HerbalismCommand());
-        //getCommand("herbalism").setTabCompleter(new HerbalismTabCompletion());
+        //getCommand("herbalism").setTabCompleter(new HerbalismTabCompletion());#
+        getCommand("traps").setExecutor(new TrapsCommand());
 
 
         // @TODO

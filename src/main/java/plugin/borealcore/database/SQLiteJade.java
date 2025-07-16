@@ -37,6 +37,7 @@ public class SQLiteJade extends Database {
     public SQLiteJade(BorealCore instance) {
         super(instance);
         dbname = "jade_transactions";
+        table = "jade_transactions";
     }
 
     public Connection getSQLConnection() {

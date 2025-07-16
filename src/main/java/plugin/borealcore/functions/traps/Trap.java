@@ -4,12 +4,6 @@ import com.avaje.ebean.validation.NotNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import plugin.borealcore.action.Action;
-import plugin.borealcore.functions.cooking.Difficulty;
-import plugin.borealcore.functions.cooking.object.Layout;
-import plugin.borealcore.functions.herbalism.objects.HerbalismType;
-import plugin.borealcore.functions.herbalism.objects.Modifier;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +11,7 @@ import java.util.UUID;
 public class Trap {
     public static Trap EMPTY = new Trap("null",null, null, null, false, null, 0, null);
 
-    protected UUID id;
+    protected UUID uuid;
     protected UUID owner;
     protected String key;
     protected @NotNull Location location;
@@ -26,9 +20,9 @@ public class Trap {
     protected int maxItems;
     protected ItemStack bait;
 
-    public Trap(String key, UUID id, UUID owner, Location location, boolean active, List<ItemStack> items, int maxItems, ItemStack bait) {
+    public Trap(String key, UUID uuid, UUID owner, Location location, boolean active, List<ItemStack> items, int maxItems, ItemStack bait) {
         this.key = key;
-        this.id = id;
+        this.uuid = uuid;
         this.owner = owner;
         this.location = location;
         this.active = active;
@@ -37,8 +31,8 @@ public class Trap {
         this.bait = bait;
     }
 
-    public UUID getId() {
-        return id;
+    public UUID getUuid() {
+        return uuid;
     }
 
     public UUID getOwner() {
@@ -69,8 +63,8 @@ public class Trap {
         return bait;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public void setOwner(UUID owner) {

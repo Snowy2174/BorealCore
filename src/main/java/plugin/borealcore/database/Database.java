@@ -33,11 +33,12 @@ import java.util.stream.Collectors;
 
 import static java.lang.Double.parseDouble;
 import static plugin.borealcore.functions.jade.JadeManager.jadeSources;
+import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 
 public abstract class Database extends Function {
     public final BorealCore plugin;
     public Connection connection;
-    public String table = "jade_transactions";
+    public String table;
     private final ConcurrentLinkedQueue<JadeTransaction> pendingTransactions = new ConcurrentLinkedQueue<>();
 
     public Database(BorealCore instance) {
@@ -51,10 +52,10 @@ public abstract class Database extends Function {
     public void initialize() {
         this.connection = this.getSQLConnection();
         try {
-            PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM " + this.table + " WHERE player = ?");
+            PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM " + this.table + " WHERE uuid = ?");
             ResultSet rs = ps.executeQuery();
             this.close(ps, rs);
-            AdventureUtil.consoleMessage("Loaded SQLiteJade database");
+            consoleMessage("Loaded SQLiteJade database");
         } catch (SQLException ex) {
             BorealCore.disablePlugin("Unable to retrieve connection during database initialization", ex);
         }
@@ -65,7 +66,6 @@ public abstract class Database extends Function {
             if (ps != null) {
                 ps.close();
             }
-
             if (rs != null) {
                 rs.close();
             }
@@ -363,6 +363,21 @@ public abstract class Database extends Function {
                     psFix.close();
 
                     plugin.getLogger().info("Fixed total for uuid " + uuid + " (player: " + player + "): Updated total = " + actualTotal);
+                }
+
+                if (actualTotal < 0) {
+                    int offsetAmount = Math.abs(actualTotal);
+                    String insertTransactionQuery = "INSERT INTO jade_transactions (player, uuid, amount, source, timestamp) VALUES (?, ?, ?, ?, ?);";
+                    PreparedStatement psOffsetTransaction = conn.prepareStatement(insertTransactionQuery);
+                    psOffsetTransaction.setString(1, player);
+                    psOffsetTransaction.setString(2, uuid);
+                    psOffsetTransaction.setInt(3, offsetAmount);
+                    psOffsetTransaction.setString(4, "migration");
+                    psOffsetTransaction.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+                    psOffsetTransaction.executeUpdate();
+                    psOffsetTransaction.close();
+
+                    plugin.getLogger().info("Added correction transaction for uuid " + uuid + " (player: " + player + "): Offset amount = " + offsetAmount);
                 }
             }
 
@@ -759,14 +774,15 @@ public abstract class Database extends Function {
     public List<Trap> getActiveFishingTraps() {
         Connection conn = null;
         PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
             List<Trap> fishingTraps = new ArrayList<>();
             conn = getSQLConnection();
             ps = conn.prepareStatement("SELECT * FROM fishing_traps WHERE active = 1");
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
 
             while (rs.next()) {
-                UUID id = UUID.fromString(rs.getString("id"));
+                UUID uuid = UUID.fromString(rs.getString("uuid"));
                 UUID owner = UUID.fromString(rs.getString("owner"));
                 String key = rs.getString("key");
                 Location location = deserializeLocation(rs.getString("location"));
@@ -775,7 +791,7 @@ public abstract class Database extends Function {
                 int maxItems = rs.getInt("maxItems");
                 ItemStack bait = deserializeItems(rs.getString("bait")).get(0);
 
-                fishingTraps.add(new Trap(key, id, owner, location, active, items, maxItems, bait));
+                fishingTraps.add(new Trap(key, uuid, owner, location, active, items, maxItems, bait));
             }
             return fishingTraps;
         } catch (SQLException ex) {
@@ -784,26 +800,20 @@ public abstract class Database extends Function {
             plugin.getLogger().log(Level.SEVERE, "Failed to deserialize items", e);
             e.printStackTrace();
         } finally {
-            try {
-                if (ps != null)
-                    ps.close();
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
-            }
+            closeResources(conn, ps, rs);
         }
         return null;
     }
 
-    public Trap getFishingTrapById(String id) {
+    public Trap getFishingTrapById(String uuid) {
         Connection conn = null;
         PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("SELECT * FROM fishing_traps WHERE id = ?");
-            ps.setString(1, id);
-            ResultSet rs = ps.executeQuery();
+            ps = conn.prepareStatement("SELECT * FROM fishing_traps WHERE uuid = ?");
+            ps.setString(1, uuid);
+            rs = ps.executeQuery();
 
             if (rs.next()) {
                 UUID owner = UUID.fromString(rs.getString("owner"));
@@ -814,7 +824,7 @@ public abstract class Database extends Function {
                 int maxItems = rs.getInt("maxItems");
                 ItemStack bait = deserializeItems(rs.getString("bait")).get(0);
 
-                return new Trap(key, UUID.fromString(id), owner, location, active, items, maxItems, bait);
+                return new Trap(key, UUID.fromString(uuid), owner, location, active, items, maxItems, bait);
             }
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
@@ -822,14 +832,7 @@ public abstract class Database extends Function {
             plugin.getLogger().log(Level.SEVERE, "Failed to deserialize items", e);
             e.printStackTrace();
         } finally {
-            try {
-                if (ps != null)
-                    ps.close();
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
-            }
+            closeResources(conn, ps, rs);
         }
         return null;
     }
@@ -866,9 +869,9 @@ public abstract class Database extends Function {
         PreparedStatement ps = null;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("REPLACE INTO fishing_traps(id, owner, key, location, active, items, maxItems, bait) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+            ps = conn.prepareStatement("REPLACE INTO fishing_traps(uuid, owner, key, location, active, items, maxItems, bait) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
 
-            ps.setString(1, trap.getId().toString());
+            ps.setString(1, trap.getUuid().toString());
             ps.setString(2, trap.getOwner().toString());
             ps.setString(3, trap.getKey());
             ps.setString(4, serializeLocation(trap.getLocation()));
@@ -911,13 +914,13 @@ public abstract class Database extends Function {
         }
     }
 
-    public void deleteFishingTrapById(String id) {
+    public void deleteFishingTrapById(String uuid) {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("DELETE FROM fishing_traps WHERE id = ?");
-            ps.setString(1, id);
+            ps = conn.prepareStatement("DELETE FROM fishing_traps WHERE uuid = ?");
+            ps.setString(1, uuid);
             ps.executeUpdate();
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
@@ -927,6 +930,7 @@ public abstract class Database extends Function {
                     ps.close();
                 if (conn != null)
                     conn.close();
+                consoleMessage("Deleted fishing trap with UUID: " + uuid);
             } catch (SQLException ex) {
                 plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
             }

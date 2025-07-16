@@ -20,23 +20,19 @@ public class TrapInventory implements InventoryHolder {
     private final Trap trap;
     private static List<ItemStack> items;
     private static ItemStack infoItem;
-    private static ItemStack backButton;
     private static ItemStack baitItem;
 
     public TrapInventory(Trap trap, BorealCore plugin) {
-        this.inventory = plugin.getServer().createInventory(this, 36, "Fishing Trap");
+        this.inventory = plugin.getServer().createInventory(this, 27, "Fishing Trap");
         this.trap = trap;
         items = trap.getItems();
-
+        infoItem = getInfoItem();
+        baitItem = getBaitItem();
+        setInfoItems();
         // Add items to the inventory
         for (ItemStack item : items) {
             inventory.addItem(item);
         }
-        infoItem = getInfoItem();
-        backButton = getBackButton();
-        baitItem = getBaitItem();
-
-        setInfoItems();
     }
 
     public ItemStack getInfoItem() {
@@ -45,11 +41,6 @@ public class TrapInventory implements InventoryHolder {
         return item;
     }
 
-    public ItemStack getBackButton() {
-        ItemStack item = new ItemStack(Material.PAPER);
-        modifyLore(item);
-        return item;
-    }
 
     public ItemStack getBaitItem() {
         if (trap.getBait() == null) {
@@ -88,9 +79,16 @@ public class TrapInventory implements InventoryHolder {
     }
 
     public void setInfoItems() {
-        inventory.setItem(27, infoItem);
-        inventory.setItem(31, backButton);
-        inventory.setItem(35, baitItem);
+        inventory.setItem(19, infoItem);
+        inventory.setItem(10, baitItem);
+        inventory.setItem(0, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+        inventory.setItem(1, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+        inventory.setItem(2, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+        inventory.setItem(9, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+        inventory.setItem(11, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+        inventory.setItem(18, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+        inventory.setItem(20, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+
         // @TODO Method to set the info items
     }
 

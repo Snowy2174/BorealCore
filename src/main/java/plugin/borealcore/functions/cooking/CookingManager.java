@@ -348,12 +348,10 @@ public class CookingManager extends Function {
         Player player = event.getPlayer();
 
             ItemStack itemStack = event.getItem();
-
             String lootKey = itemStack.getItemMeta().getPersistentDataContainer()
                     .get(new NamespacedKey(BorealCore.getInstance(), "id"), PersistentDataType.STRING);
 
             if (lootKey == null) {
-                Bukkit.getLogger().warning("PersistentDataContainer 'id' is null for item: " + itemStack.getType());
                 return;
             }
 

@@ -13,7 +13,7 @@ import java.util.logging.Level;
 
 public class SQLiteTraps extends Database {
     public String SQLiteCreateTrapsTable = "CREATE TABLE IF NOT EXISTS fishing_traps (" +
-            "`id` TEXT NOT NULL," +
+            "`uuid` VARCHAR(36) NOT NULL," +
             "`owner` TEXT NOT NULL," +
             "`key` TEXT NOT NULL," +
             "`location` TEXT NOT NULL," +
@@ -21,13 +21,14 @@ public class SQLiteTraps extends Database {
             "`items` TEXT," +
             "`maxItems` INTEGER NOT NULL," +
             "`bait` TEXT," +
-            "PRIMARY KEY (`id`)" +
+            "PRIMARY KEY (`uuid`)" +
             ");";
     String dbname;
 
     public SQLiteTraps(BorealCore instance) {
         super(instance);
         dbname = "traps";
+        table = "fishing_traps";
     }
 
     public Connection getSQLConnection() {
@@ -58,7 +59,7 @@ public class SQLiteTraps extends Database {
 
     @Override
     public void load() {
-        AdventureUtil.consoleMessage("Loading SQLiteJade database...");
+        AdventureUtil.consoleMessage("Loading SQLiteTraps database...");
         connection = getSQLConnection();
         try {
             Statement s = connection.createStatement();
@@ -75,7 +76,6 @@ public class SQLiteTraps extends Database {
         if (connection != null) {
             try {
                 if (!connection.isClosed()) {
-                    connection.commit();
                     connection.close();
                     plugin.getLogger().info("Database connection closed successfully.");
                 }

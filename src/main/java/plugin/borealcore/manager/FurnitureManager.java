@@ -8,6 +8,7 @@ import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -46,6 +47,50 @@ public class FurnitureManager extends Function {
     @Override
     public void unload() {
         HandlerList.unregisterAll(this.furnitureListener);
+    }
+
+    public void onFurnitureInteract(FurnitureInteractEvent event) {
+        Player player = event.getPlayer();
+        CustomFurniture clickedFurniture = event.getFurniture();
+
+        if (clickedFurniture.getId().equals("fishing_trap")) {
+            TrapDataManager.handleFishingTrapInteract(player, clickedFurniture.getEntity());
+        }
+
+        if (clickedFurniture.getId().equals(ConfigManager.unlitCookingPot)) {
+            if (!cooldowns.containsKey(player) || (System.currentTimeMillis() - cooldowns.get(player) >= 2000)) {
+                cooldowns.put(player, System.currentTimeMillis());
+                if (player.getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
+                    ItemFrame unlitpot = (ItemFrame) Objects.requireNonNull(clickedFurniture).getArmorstand();
+                    Rotation rot = unlitpot.getRotation();
+                    ItemFrame litpot = (ItemFrame) CustomFurniture.spawnPreciseNonSolid(ConfigManager.litCookingPot, unlitpot.getLocation()).getArmorstand();
+                    litpot.setRotation(rot);
+                    clickedFurniture.remove(false);
+                    unlitpot.getLocation().getBlock().setType(Material.BARRIER);
+                    AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.potLight);
+                    playCookingPotFX(clickedFurniture.getEntity().getLocation());
+                } else {
+                    AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCold);
+                }
+            } else {
+                String cooldown = String.valueOf((2000 - (System.currentTimeMillis() - cooldowns.get(player)) / 1000));
+                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCooldown.replace("{time}", cooldown));
+            }
+        } else if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
+            playCookingPotFX(clickedFurniture.getEntity().getLocation());
+            GuiManager.getCookingRecipeBook(clickedFurniture).open(player);
+        }
+    }
+
+    public void onFurnitureBreak(FurnitureBreakEvent event) {
+        CustomFurniture clickedFurniture = event.getFurniture();
+
+        if (clickedFurniture.getNamespacedID().equals("fishing_trap")) {
+            BorealCore.getTrapsDatabase().deleteFishingTrapById(clickedFurniture.getEntity().getUniqueId().toString());
+        }
+        if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
+            cancelCookingPotFX(clickedFurniture.getArmorstand().getLocation());
+        }
     }
 
     public static void ingredientsSFX(Player player, List<String> ingredients, Location loc) {
@@ -99,6 +144,8 @@ public class FurnitureManager extends Function {
         ArmorStand armorStand = (ArmorStand) loc.getWorld().spawnEntity(spawnLocation, EntityType.ARMOR_STAND);
         armorStand.setVisible(false);
         armorStand.setGravity(false);
+        armorStand.setCollidable(false);
+        armorStand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
         ItemStack splashItem = InventoryUtil.build(ConfigManager.splashEffect);
         armorStand.setItem(EquipmentSlot.HEAD, splashItem);
 
@@ -152,50 +199,6 @@ public class FurnitureManager extends Function {
                 hologram.delete();
             }
         }.runTaskLater(BorealCore.plugin, 60);
-    }
-
-    public void onFurnitureInteract(FurnitureInteractEvent event) {
-        Player player = event.getPlayer();
-        CustomFurniture clickedFurniture = event.getFurniture();
-
-        if (clickedFurniture.getId().equals("fishing_trap")) {
-            TrapDataManager.handleFishingTrapInteract(player, clickedFurniture.getEntity());
-        }
-
-        if (clickedFurniture.getId().equals(ConfigManager.unlitCookingPot)) {
-            if (!cooldowns.containsKey(player) || (System.currentTimeMillis() - cooldowns.get(player) >= 2000)) {
-                cooldowns.put(player, System.currentTimeMillis());
-                if (player.getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
-                    ItemFrame unlitpot = (ItemFrame) Objects.requireNonNull(clickedFurniture).getArmorstand();
-                    Rotation rot = unlitpot.getRotation();
-                    ItemFrame litpot = (ItemFrame) CustomFurniture.spawnPreciseNonSolid(ConfigManager.litCookingPot, unlitpot.getLocation()).getArmorstand();
-                    litpot.setRotation(rot);
-                    clickedFurniture.remove(false);
-                    unlitpot.getLocation().getBlock().setType(Material.BARRIER);
-                    AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.potLight);
-                    playCookingPotFX(clickedFurniture.getEntity().getLocation());
-                } else {
-                    AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCold);
-                }
-            } else {
-                String cooldown = String.valueOf((2000 - (System.currentTimeMillis() - cooldowns.get(player)) / 1000));
-                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCooldown.replace("{time}", cooldown));
-            }
-        } else if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
-            playCookingPotFX(clickedFurniture.getEntity().getLocation());
-            GuiManager.getCookingRecipeBook(clickedFurniture).open(player);
-        }
-    }
-
-    public void onFurnitureBreak(FurnitureBreakEvent event) {
-        CustomFurniture clickedFurniture = event.getFurniture();
-
-        if (clickedFurniture.getNamespacedID().equals("fishing_trap")) {
-            BorealCore.getTrapsDatabase().deleteFishingTrapById(clickedFurniture.getEntity().getUniqueId().toString());
-        }
-        if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
-            cancelCookingPotFX(clickedFurniture.getArmorstand().getLocation());
-        }
     }
 
     public void playCookingPotFX(Location location) {

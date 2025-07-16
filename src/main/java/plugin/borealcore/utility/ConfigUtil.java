@@ -46,6 +46,8 @@ public class ConfigUtil {
         BorealCore.getInventoryManager().init();
         BorealCore.getDatabase().unload();
         BorealCore.getDatabase().load();
+        BorealCore.getTrapsDatabase().unload();
+        BorealCore.getTrapsDatabase().load();
         BorealCore.getAnalyticsManager().unload();
         BorealCore.getAnalyticsManager().load();
         BorealCore.getPlushieManager().unload();
