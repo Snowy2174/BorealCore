@@ -55,11 +55,23 @@ public class HerbalismManager extends Function {
     public void unload() {
     }
 
-    public void handleInfuse(Herb[] herbs) {
+    public void handleInfuse(Herb[] herbs, Player player) {
         // @TODO generate an infusion object
         Infusion infusion = new Infusion(herbs);
         // @TODO get the ingredients from the player inventory or clicked furniture
-
+        ArrayList<ItemStack> ingredients = new ArrayList<>(); //@TODO replace with actual ingredient retrieval logic
+        for (ItemStack item : ingredients) {
+            if (item == null || item.getType() == Material.AIR) continue;
+            // @TODO check if the item is a valid herb and add it to the infusion
+            Herb herb = HERBS.get(item.getType().name().toLowerCase());
+            if (herb != null) {
+                infusion.getIngredients().add(herb);
+            } else {
+                AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>Invalid herb: " + item.getType().name());
+                return;
+            }
+        }
+        onStartInfusion(player, infusion);
         // @TODO modify the infusion object with the final model data
     }
 
@@ -68,7 +80,6 @@ public class HerbalismManager extends Function {
             AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>You are already infusing something.");
             return;
         }
-
         Herb[] herbs = new Herb[args.length];
         for (int i = 0; i < args.length; i++) {
             herbs[i] = HERBS.get(key(args[i].toLowerCase()));
@@ -77,7 +88,6 @@ public class HerbalismManager extends Function {
                 return;
             }
         }
-
         buildInfusion(herbs, player, quality);
     }
 
@@ -98,7 +108,7 @@ public class HerbalismManager extends Function {
     }
 
     public static ItemStack infusionItemStack(Infusion infusion) {
-        if (infusion == null || infusion.getIngredients() == null || infusion.getIngredients().length == 0) {
+        if (infusion == null || infusion.getIngredients() == null || infusion.getIngredients().size() == 0) {
             return null;
         }
         ItemStack itemStack = new ItemStack(Material.POTION, 1);
@@ -166,12 +176,12 @@ public class HerbalismManager extends Function {
 
         InfusingPlayer infusingPlayer = infusingPlayerCache.remove(player);
         if (infusingPlayer == null) {
-            AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>There ain't no custom recipe");
+            AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>Infusion says no");
         } else {
             if (recipe == null) {
             } else {
                 //@TODO init first step of infusion, by sending bar of first ingredient
-                showPlayerBar(player, recipe.getIngredients()[0]);
+                showPlayerBar(player, recipe.getIngredients().get(0));
             }
         }
     }
@@ -196,7 +206,7 @@ public class HerbalismManager extends Function {
             return;
 
         int idx = infusion.getIngredientIndex();
-        Herb currentIngredient = infusion.getIngredients()[idx];
+        Herb currentIngredient = infusion.getIngredients().get(idx);
 
         double stageModifier = 0;
         if (infusingPlayer.isPerfect()) {
@@ -211,12 +221,22 @@ public class HerbalismManager extends Function {
 
         infusion.incrementIngredientIndex();
 
-        if (infusion.getIngredientIndex() < infusion.getIngredients().length) {
+        if (infusion.getIngredientIndex() < infusion.getIngredients().size()) {
             // Start next minigame for the next ingredient
-            showPlayerBar(player, infusion.getIngredients()[infusion.getIngredientIndex()]);
+            showPlayerBar(player, infusion.getIngredients().get(infusion.getIngredientIndex()));
         } else {
             // All ingredients done, finish infusion
             // @TODO: handle infusion completion
+            infusion = formulateEffects(infusion);
+            infusion.buildStack();
+            if (infusion.getItemStack() != null) {
+                player.getInventory().addItem(infusion.getItemStack());
+                sendIngredientSuccessTitle(player, infusion.getIngredients().get(0).getNick());
+                AdventureUtil.playerMessage(player, MessageManager.prefix + ": <gray>Infusion completed successfully!");
+                currentInfusions.remove(player);
+            } else {
+                AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>Failed to create infusion item stack.");
+            }
         }
     }
 
@@ -225,7 +245,7 @@ public class HerbalismManager extends Function {
 
     private Infusion formulateEffects(Infusion infusion) {
         Double quality = infusion.getQuality();
-        Herb[] ingredients = infusion.getIngredients();
+        List<Herb> ingredients = infusion.getIngredients();
         List<Modifier> modifiers = new ArrayList<>();
 
         // Apply initial effects from the unprocessed herbs
@@ -380,7 +400,7 @@ public class HerbalismManager extends Function {
         return infusingPlayer != null;
     }
 
-    public static int averageColor(Herb[] herbs) {
+    public static int averageColor(List<Herb> herbs) {
         int r = 0, g = 0, b = 0;
         for (Herb herb : herbs) {
             int color = herb.getColour();
@@ -388,7 +408,7 @@ public class HerbalismManager extends Function {
             g += (color >> 8) & 0xFF;
             b += color & 0xFF;
         }
-        int n = herbs.length;
+        int n = herbs.size();
         return ((r / n) << 16) | ((g / n) << 8) | (b / n);
     }
 

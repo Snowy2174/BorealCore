@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 
 import java.time.Duration;
@@ -30,6 +32,14 @@ public class AdventureUtil {
         Audience au = BorealCore.adventure.sender(Bukkit.getConsoleSender());
         MiniMessage mm = MiniMessage.miniMessage();
         Component parsed = mm.deserialize(MessageManager.prefix + replaceLegacy(s));
+        au.sendMessage(parsed);
+    }
+
+    public static void consoleMessage(DebugLevel debug, String s) {
+        if (debug == DebugLevel.DEBUG && ConfigManager.debugLevel != DebugLevel.DEBUG) return;
+        Audience au = BorealCore.adventure.sender(Bukkit.getConsoleSender());
+        MiniMessage mm = MiniMessage.miniMessage();
+        Component parsed = mm.deserialize(MessageManager.prefix + "[ " + debug.toString() + " ]" + replaceLegacy(s));
         au.sendMessage(parsed);
     }
 

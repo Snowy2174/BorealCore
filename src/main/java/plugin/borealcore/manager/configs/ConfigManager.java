@@ -10,6 +10,7 @@ import java.util.List;
 
 public class ConfigManager {
     public static String lang;
+    public static DebugLevel debugLevel;
     public static double perfectChance;
     public static double ingredientRefundChance;
     public static int splashTime;
@@ -56,6 +57,7 @@ public class ConfigManager {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
 
         lang = config.getString("lang", "english");
+        debugLevel = DebugLevel.valueOf(config.getString("debug-level", "INFO").toUpperCase());
 
         perfectChance = config.getDouble("mechanics.perfect-chance", 0.35);
         ingredientRefundChance = config.getDouble("mechanics.ingredients-refund-chance", 0.1);
@@ -114,5 +116,12 @@ public class ConfigManager {
 
     public static @NotNull NamespacedKey getNamespacedKey(String key) {
         return new NamespacedKey(BorealCore.plugin, key);
+    }
+
+    public static void setDebugLevel(@NotNull String debugLevel) {
+        YamlConfiguration config = ConfigUtil.getConfig("config.yml");
+        if (DebugLevel.valueOf(debugLevel.toUpperCase()) != null) {
+            config.set("debug-level", debugLevel.toUpperCase());
+        }
     }
 }

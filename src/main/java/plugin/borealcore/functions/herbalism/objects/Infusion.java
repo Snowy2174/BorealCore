@@ -12,7 +12,7 @@ public class Infusion {
 
     protected Action[] actions;
     protected List<PotionEffect> effects;
-    protected Herb[] ingredients;
+    protected List<Herb> ingredients;
     protected int ingredientIndex = 0;
     protected Double quality;
     protected ItemStack itemStack;
@@ -22,7 +22,7 @@ public class Infusion {
         this.quality = 0.0;
     }
 
-    public Herb[] getIngredients() {
+    public List<Herb> getIngredients() {
         return ingredients;
     }
 
@@ -43,7 +43,7 @@ public class Infusion {
     }
 
     public void recalculateQuality(double stageModifier) {
-        this.quality += stageModifier * 10 / this.ingredients.length;
+        this.quality += stageModifier * 10 / this.ingredients.size();
     }
 
     public Double getQuality() {
