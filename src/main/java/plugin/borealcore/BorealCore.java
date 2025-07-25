@@ -3,8 +3,6 @@ package plugin.borealcore;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import fr.minuskube.inv.InventoryManager;
-import me.casperge.realisticseasons.api.SeasonsAPI;
-import me.casperge.realisticseasons.season.Season;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -61,7 +59,6 @@ public class BorealCore extends JavaPlugin {
     private static DuelsManager duelsManager;
     private static BendingManager bendingManager;
     private static BreweryManager breweryManager;
-    private static SeasonsAPI seasonsAPI;
 
     @Override
     public void onLoad() {
@@ -73,7 +70,6 @@ public class BorealCore extends JavaPlugin {
         adventure = BukkitAudiences.create(this);
         protocolManager = ProtocolLibrary.getProtocolManager();
         inventoryManager = new InventoryManager(this);
-        seasonsAPI = SeasonsAPI.getInstance();
 
         cookingManager = new CookingManager();
         herbalismManager = new HerbalismManager();
@@ -238,9 +234,6 @@ public class BorealCore extends JavaPlugin {
     }
     public static Database getTrapsDatabase() {
         return traps;
-    }
-    public static SeasonsAPI getSeasonsAPI() {
-        return seasonsAPI;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {

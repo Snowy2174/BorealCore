@@ -3,6 +3,7 @@ package plugin.borealcore.functions.jade;
 public enum LeaderboardType {
     CURRENT,
     ALLTIME,
+    SPENT,
     FARMING,
     FARMINGMONTHLY,
     FARMINGWEEKLY,

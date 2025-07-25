@@ -2,6 +2,10 @@ package plugin.borealcore.functions.herbalism;
 
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
+import net.momirealms.customcrops.api.BukkitCustomCropsPlugin;
+import net.momirealms.customcrops.api.core.world.CustomCropsWorld;
+import net.momirealms.customcrops.api.core.world.Pos3;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -80,6 +84,7 @@ public class HerbalismManager extends Function {
             AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>You are already infusing something.");
             return;
         }
+
         Herb[] herbs = new Herb[args.length];
         for (int i = 0; i < args.length; i++) {
             herbs[i] = HERBS.get(key(args[i].toLowerCase()));
@@ -88,6 +93,7 @@ public class HerbalismManager extends Function {
                 return;
             }
         }
+
         buildInfusion(herbs, player, quality);
     }
 

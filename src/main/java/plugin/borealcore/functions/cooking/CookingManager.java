@@ -32,10 +32,12 @@ import plugin.borealcore.functions.cooking.object.Recipe;
 import plugin.borealcore.functions.herbalism.HerbalismManager;
 import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.listener.ConsumeItemListener;
+import plugin.borealcore.listener.CropInteractEventListener;
 import plugin.borealcore.listener.InteractListener;
 import plugin.borealcore.manager.FurnitureManager;
 import plugin.borealcore.manager.MasteryManager;
 import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
@@ -74,6 +76,7 @@ public class CookingManager extends Function {
     public void load() {
         Bukkit.getPluginManager().registerEvents(this.interactListener, BorealCore.plugin);
         Bukkit.getPluginManager().registerEvents(this.consumeItemListener, BorealCore.plugin);
+        Bukkit.getPluginManager().registerEvents(new CropInteractEventListener(), BorealCore.plugin); //@TODO MOVE URGENTLY
     }
 
     @Override
@@ -346,26 +349,23 @@ public class CookingManager extends Function {
     @Override
     public void onConsumeItem(PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
-
             ItemStack itemStack = event.getItem();
-            String lootKey = itemStack.getItemMeta().getPersistentDataContainer()
+            String bcId = itemStack.getItemMeta().getPersistentDataContainer()
                     .get(new NamespacedKey(BorealCore.getInstance(), "id"), PersistentDataType.STRING);
-
-            if (lootKey == null) {
+            if (bcId == null) {
                 return;
             }
 
-            lootKey = lootKey.replaceAll("[\\[\\]]", "");
+            bcId = bcId.replaceAll("[\\[\\]]", "");
 
-            boolean perfect = lootKey.contains(ConfigManager.perfectItemSuffix);
-            String recipeKey = lootKey.replace(ConfigManager.perfectItemSuffix, "");
+            boolean perfect = bcId.contains(ConfigManager.perfectItemSuffix);
+            String recipeKey = bcId.replace(ConfigManager.perfectItemSuffix, "");
             Recipe recipe = RecipeManager.COOKING_RECIPES.get(recipeKey);
             if (!(recipe instanceof DroppedItem)) {
-                System.out.println("Recipe not found or not a DroppedItem: " + recipeKey);
+                AdventureUtil.consoleMessage(DebugLevel.ERROR, "Recipe not found or not a DroppedItem: " + recipeKey);
+                AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>Recipe not found or not a DroppedItem: " + recipeKey);
                 return;
             }
-
-            System.out.println(recipeKey);
 
             DroppedItem droppedItem = (DroppedItem) recipe;
             Action[] actions = perfect ? droppedItem.getPerfectConsumeActions() : droppedItem.getConsumeActions();
@@ -373,7 +373,7 @@ public class CookingManager extends Function {
             if (actions != null) {
                 for (Action action : actions) {
                     action.doOn(player, null);
-                    System.out.println("Action performed: " + action.getClass().getSimpleName() + " for player: " + player.getName());
+                    AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Action performed: " + action.getClass().getSimpleName() + " for player: " + player.getName() + " for dish: " + recipeKey);
                 }
             }
     }

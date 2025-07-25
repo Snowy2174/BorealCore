@@ -16,7 +16,6 @@ public class TrapGUIListener implements Listener {
         // We're getting the clicked inventory to avoid situations where the player
         // already has a stone in their inventory and clicks that one.
         Inventory inventory = event.getClickedInventory();
-        // Add a null check in case the player clicked outside the window.
         if (inventory == null || !(inventory.getHolder(false) instanceof TrapInventory myInventory)) {
             return;
         }

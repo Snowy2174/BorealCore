@@ -432,11 +432,16 @@ public abstract class Database extends Function {
         """;
             String condition = "";
             boolean requiresTimestamp = false;
+            String orderBy = " ORDER BY jade DESC LIMIT 50;";
 
             // Add conditions based on type
             switch (type) {
                 case CURRENT -> condition = " GROUP BY uuid, player";
                 case ALLTIME -> condition = " WHERE amount > 0 GROUP BY uuid, player";
+                case SPENT -> {
+                    condition = " WHERE amount < 0 GROUP BY uuid, player";
+                    orderBy = " ORDER BY jade ASC LIMIT 50;";
+                }
                 case FARMING -> condition = " WHERE source = 'farming' GROUP BY uuid, player";
                 case FARMINGMONTHLY -> {
                     condition = " WHERE source = 'farming' AND timestamp >= ? GROUP BY uuid, player";
@@ -478,20 +483,14 @@ public abstract class Database extends Function {
                     return null;
                 }
             }
-
-            // Final query
-            String query = baseQuery + condition + " ORDER BY jade DESC LIMIT 50;";
+            String query = baseQuery + condition + orderBy;
             ps = conn.prepareStatement(query);
-
-            // Set timestamp if required
             if (requiresTimestamp) {
                 ps.setTimestamp(1, Timestamp.valueOf(
                         LocalDateTime.now().minus(type.name().contains("WEEKLY") ? 7 : 30, ChronoUnit.DAYS)
                 ));
             }
-
             rs = ps.executeQuery();
-
             while (rs.next()) {
                 int position = rs.getInt("position");
                 UUID uuid = UUID.fromString(rs.getString("uuid"));

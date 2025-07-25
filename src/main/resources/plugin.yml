@@ -10,6 +10,7 @@ depend:
   - ItemsAdder
   - CustomCrops
   - CustomFishing
+  - AdvancedEnchantments
 softdepend:
   - DecentHolograms
   - DiscordSRV
@@ -30,6 +31,8 @@ commands:
     description: The command to manage the Gamble feature
   recipes:
     description: The command to manage Recipes
+  traps:
+    description: The command to manage Traps
 
 permissions:
   customcooking.*:
