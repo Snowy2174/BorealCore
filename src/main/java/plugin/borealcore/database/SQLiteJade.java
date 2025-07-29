@@ -26,12 +26,12 @@ public class SQLiteJade extends Database {
             "    `jade` int(11) NOT NULL" +
             ");"; // we can search by player and timestamp to get the amount and source.
     public String SQLiteCreateRecipesTable = "CREATE TABLE IF NOT EXISTS recipe_data (" +
-        "uuid VARCHAR(36) NOT NULL," +
-        "recipe_type VARCHAR(32) NOT NULL," +
-        "recipe_name VARCHAR(64) NOT NULL," +
-        "mastery_count INT DEFAULT 0," +
-        "PRIMARY KEY (uuid, recipe_type, recipe_name)" +
-    ");";
+            "uuid VARCHAR(36) NOT NULL," +
+            "recipe_type VARCHAR(32) NOT NULL," +
+            "recipe_name VARCHAR(64) NOT NULL," +
+            "mastery_count INT DEFAULT 0," +
+            "PRIMARY KEY (uuid, recipe_type, recipe_name)" +
+            ");";
     String dbname;
 
     public SQLiteJade(BorealCore instance) {
@@ -74,7 +74,7 @@ public class SQLiteJade extends Database {
             Statement s = connection.createStatement();
             s.executeUpdate(SQLiteCreateTokensTable);
             s.executeUpdate(SQLiteCreateUsersTable);
-           // s.executeUpdate(SQLiteCreateRecipesTable);
+            // s.executeUpdate(SQLiteCreateRecipesTable);
             s.close();
         } catch (SQLException e) {
             e.printStackTrace();

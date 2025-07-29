@@ -39,7 +39,7 @@ public class IngredientBookProvider implements InventoryProvider {
     @Override
     public void init(Player player, InventoryContents contents) {
         player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1, 1);
-        contents.fill( ClickableItem.of(build(ConfigManager.unknownItem),
+        contents.fill(ClickableItem.of(build(ConfigManager.unknownItem),
                 e -> AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown)));
         contents.fillBorders(ClickableItem.empty(new ItemStack(Material.AIR)));
 
@@ -57,7 +57,7 @@ public class IngredientBookProvider implements InventoryProvider {
         }
     }
 
-    private ItemStack buildRecipeItem(String recipe, Player player){
+    private ItemStack buildRecipeItem(String recipe, Player player) {
         CustomStack customStack = CustomStack.getInstance(recipe);
         if (customStack == null) {
             return build(ConfigManager.unknownItem);

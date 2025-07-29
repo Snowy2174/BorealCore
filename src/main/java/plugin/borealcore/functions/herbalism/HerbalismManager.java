@@ -2,10 +2,6 @@ package plugin.borealcore.functions.herbalism;
 
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
-import net.momirealms.customcrops.api.BukkitCustomCropsPlugin;
-import net.momirealms.customcrops.api.core.world.CustomCropsWorld;
-import net.momirealms.customcrops.api.core.world.Pos3;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -41,7 +37,7 @@ public class HerbalismManager extends Function {
     private final HashMap<Player, Infusion> currentInfusions;
     private final HashMap<Player, Location> teaPotLocations;
     public final ConcurrentHashMap<Player, InfusingPlayer> infusingPlayerCache;
-    private Map<UUID, BukkitRunnable> playerSoundTasks = new HashMap<>();
+    private final Map<UUID, BukkitRunnable> playerSoundTasks = new HashMap<>();
 
     public HerbalismManager() {
         this.random = new Random();
@@ -360,7 +356,7 @@ public class HerbalismManager extends Function {
         if (ingredient != null && ingredient.getLayout() != null) {
             layout = ingredient.getLayout()[random.nextInt(ingredient.getLayout().length)];
         } else {
-            layout = (Layout) LayoutManager.LAYOUTS.values().toArray()[random.nextInt(LayoutManager.LAYOUTS.values().size())];
+            layout = (Layout) LayoutManager.LAYOUTS.values().toArray()[random.nextInt(LayoutManager.LAYOUTS.size())];
         }
         int speed;
         int timer;

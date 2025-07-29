@@ -2,7 +2,6 @@ package plugin.borealcore.functions.template;
 
 import net.kyori.adventure.text.Component;
 import net.momirealms.customcrops.api.BukkitCustomCropsPlugin;
-import net.momirealms.customcrops.api.core.block.CropBlock;
 import net.momirealms.customcrops.api.core.block.CustomCropsBlock;
 import net.momirealms.customcrops.api.core.block.PotBlock;
 import net.momirealms.customcrops.api.core.mechanic.crop.CropConfig;
@@ -11,7 +10,6 @@ import net.momirealms.customcrops.api.core.world.CustomCropsBlockState;
 import net.momirealms.customcrops.api.core.world.Pos3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -28,7 +26,7 @@ import static plugin.borealcore.utility.InventoryUtil.buildia;
 public class PotInventory implements InventoryHolder {
 
     private final CustomCropsBlockState customCropsBlockState;
-    private CropConfig cropConfig;
+    private final CropConfig cropConfig;
     private PotBlock potBlock;
     private final Location location;
     private final Inventory inventory;
@@ -43,18 +41,18 @@ public class PotInventory implements InventoryHolder {
     }
 
     private void updateInventory() {
-    Optional<CustomCropsBlockState> blockState = BukkitCustomCropsPlugin.getInstance().getWorldManager().getWorld(Bukkit.getWorld("world")).get().getBlockState(Pos3.from(this.location.subtract(0, 1, 0)));
-    BorealCore.getInstance().getLogger().info("blockState present: " + blockState.isPresent());
-    if (blockState.isPresent()) {
-        CustomCropsBlock block = blockState.get().type();
-        BorealCore.getInstance().getLogger().info("block type: " + (block != null ? block.getClass().getName() : "null"));
-        if (block instanceof PotBlock potBlock) {
-            this.potBlock = potBlock;
-            BorealCore.getInstance().getLogger().info("block is PotBlock");
-            PotConfig potConfig = potBlock.config(blockState.get());
-            inventory.setItem(9, generateItem());
+        Optional<CustomCropsBlockState> blockState = BukkitCustomCropsPlugin.getInstance().getWorldManager().getWorld(Bukkit.getWorld("world")).get().getBlockState(Pos3.from(this.location.subtract(0, 1, 0)));
+        BorealCore.getInstance().getLogger().info("blockState present: " + blockState.isPresent());
+        if (blockState.isPresent()) {
+            CustomCropsBlock block = blockState.get().type();
+            BorealCore.getInstance().getLogger().info("block type: " + (block != null ? block.getClass().getName() : "null"));
+            if (block instanceof PotBlock potBlock) {
+                this.potBlock = potBlock;
+                BorealCore.getInstance().getLogger().info("block is PotBlock");
+                PotConfig potConfig = potBlock.config(blockState.get());
+                inventory.setItem(9, generateItem());
+            }
         }
-    }
     }
 
     @Override

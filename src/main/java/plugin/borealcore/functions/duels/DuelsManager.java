@@ -19,11 +19,11 @@ public class DuelsManager extends Function {
 
     private static BorealCore plugin;
     private static ArenaManager arenaManager;
-    private static HashMap<Arena, MatchRunnable> ongoingRunnables = new HashMap<>();
+    private static final HashMap<Arena, MatchRunnable> ongoingRunnables = new HashMap<>();
 
     public DuelsManager() {
-        this.plugin = BorealCore.plugin;
-        this.arenaManager = ((Duels) getServer().getPluginManager().getPlugin("Duels")).getArenaManager();
+        plugin = BorealCore.plugin;
+        arenaManager = ((Duels) getServer().getPluginManager().getPlugin("Duels")).getArenaManager();
     }
 
     @Override

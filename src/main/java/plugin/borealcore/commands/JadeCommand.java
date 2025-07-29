@@ -163,7 +163,8 @@ public class JadeCommand implements CommandExecutor {
         }
 
         database.getJadeForPlayerAsync(player, jade -> {
-            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);});
+            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);
+        });
     }
 
     private void handleTotalJadeForSourceCommand(CommandSender sender, String[] args) {
@@ -233,7 +234,8 @@ public class JadeCommand implements CommandExecutor {
         }
 
         database.getJadeForPlayerAsync(player, jade -> {
-            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);});
+            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);
+        });
     }
 
     private void handleVerifyAndFixTotals(CommandSender sender) {
@@ -247,62 +249,62 @@ public class JadeCommand implements CommandExecutor {
             return;
         }
         for (Player p : Bukkit.getOnlinePlayers()) {
-                reconsileJadeData(p);
-                AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Reconciled jade data for " + p.getName());
+            reconsileJadeData(p);
+            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Reconciled jade data for " + p.getName());
+            return;
+        }
+    }
+
+    private void handleLeaderboardCommand(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade leaderboard <type> <page>");
+            return;
+        }
+        LeaderboardType type = LeaderboardType.CURRENT;
+        int page = 1;
+        if (args.length > 2) {
+            try {
+                type = LeaderboardType.valueOf(args[1].toUpperCase());
+            } catch (IllegalArgumentException e) {
+                AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid leaderboard type");
                 return;
+            }
+            try {
+                page = Integer.parseInt(args[2]);
+            } catch (NumberFormatException e) {
+                AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid page number");
+                return;
+            }
         }
-    }
 
-private void handleLeaderboardCommand(CommandSender sender, String[] args) {
-    if (args.length < 1) {
-        AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade leaderboard <type> <page>");
-        return;
-    }
-    LeaderboardType type = LeaderboardType.CURRENT;
-    int page = 1;
-    if (args.length > 2) {
-        try {
-            type = LeaderboardType.valueOf(args[1].toUpperCase());
-        } catch (IllegalArgumentException e) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid leaderboard type");
+        Leaderboard leaderboard = jadeManager.getLeaderboard(type);
+        int entriesPerPage = 5;
+        int totalEntries = leaderboard.getEntries().size();
+        int totalPages = (int) Math.ceil((double) totalEntries / entriesPerPage);
+
+        if (page < 1 || page > totalPages) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Page out of range. Total pages: " + totalPages);
             return;
         }
-        try {
-            page = Integer.parseInt(args[2]);
-        } catch (NumberFormatException e) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid page number");
-            return;
-        }
+
+        AdventureUtil.sendMessage(sender, MessageManager.leaderboardHeader
+                .replace("{type}", type.toString())
+                .replace("{page}", String.valueOf(page))
+                .replace("{totalPages}", String.valueOf(totalPages)));
+        leaderboard.getEntries().stream()
+                .skip((long) (page - 1) * entriesPerPage)
+                .limit(entriesPerPage)
+                .forEach(entry -> AdventureUtil.sendMessage(sender, MessageManager.leaderboardEntry
+                        .replace("{player}", entry.getPlayerName())
+                        .replace("{position}", String.valueOf(entry.getPosition()))
+                        .replace("{score}", String.valueOf(entry.getTotalAmount()))));
+        AdventureUtil.sendMessage(sender, MessageManager.leaderboardFooter);
+        AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Your position: " + leaderboard.getEntries()
+                .stream()
+                .filter(entry -> entry.getPlayerName().equalsIgnoreCase(sender.getName()))
+                .findFirst()
+                .map(LeaderboardEntry::getPosition)
+                .orElse(0));
     }
-
-    Leaderboard leaderboard = jadeManager.getLeaderboard(type);
-    int entriesPerPage = 5;
-    int totalEntries = leaderboard.getEntries().size();
-    int totalPages = (int) Math.ceil((double) totalEntries / entriesPerPage);
-
-    if (page < 1 || page > totalPages) {
-        AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Page out of range. Total pages: " + totalPages);
-        return;
-    }
-
-    AdventureUtil.sendMessage(sender, MessageManager.leaderboardHeader
-    .replace("{type}", type.toString())
-            .replace("{page}", String.valueOf(page))
-            .replace("{totalPages}", String.valueOf(totalPages)));
-    leaderboard.getEntries().stream()
-            .skip((long) (page - 1) * entriesPerPage)
-            .limit(entriesPerPage)
-            .forEach(entry -> AdventureUtil.sendMessage(sender, MessageManager.leaderboardEntry
-                    .replace("{player}", entry.getPlayerName())
-                    .replace("{position}", String.valueOf(entry.getPosition()))
-                    .replace("{score}", String.valueOf(entry.getTotalAmount()))));
-    AdventureUtil.sendMessage(sender, MessageManager.leaderboardFooter);
-    AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Your position: " + leaderboard.getEntries()
-            .stream()
-            .filter(entry -> entry.getPlayerName().equalsIgnoreCase(sender.getName()))
-            .findFirst()
-            .map(LeaderboardEntry::getPosition)
-            .orElse(0));
-}
 
 }

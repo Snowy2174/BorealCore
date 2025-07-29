@@ -30,11 +30,11 @@ public class AnnoucmentRunnable implements Runnable {
         for (Player p : validPlayers) {
             int status = JadeManager.sendJadeLimitMessage(p);
             if (status == -1) {
-                AdventureUtil.playerMessage(p,MessageManager.infoPositive + MessageManager.jadeGetStarted);
+                AdventureUtil.playerMessage(p, MessageManager.infoPositive + MessageManager.jadeGetStarted);
             } else if (status <= 2) {
-                AdventureUtil.playerMessage(p,MessageManager.infoPositive + MessageManager.jadeSourceReminder);
+                AdventureUtil.playerMessage(p, MessageManager.infoPositive + MessageManager.jadeSourceReminder);
             } else {
-                AdventureUtil.playerMessage(p,MessageManager.infoPositive + MessageManager.jadeSourceReminder2);
+                AdventureUtil.playerMessage(p, MessageManager.infoPositive + MessageManager.jadeSourceReminder2);
             }
         }
     }

@@ -16,12 +16,15 @@ public class JadeSource {
     public String getName() {
         return name;
     }
+
     public long getCooldown() {
         return cooldown;
     }
+
     public int getLimit() {
         return limit;
     }
+
     public double getRate() {
         return rate;
     }

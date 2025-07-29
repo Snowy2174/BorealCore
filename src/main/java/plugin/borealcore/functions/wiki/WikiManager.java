@@ -55,11 +55,9 @@ public class WikiManager extends Function {
             int exitCode = process.waitFor();
             if (exitCode != 0) {
                 System.out.println("Git clone failed with exit code: " + exitCode);
-                return;
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            return;
         }
     }
 

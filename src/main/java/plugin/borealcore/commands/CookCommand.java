@@ -11,6 +11,8 @@ import plugin.borealcore.functions.cooking.competition.Competition;
 import plugin.borealcore.functions.cooking.competition.CompetitionSchedule;
 import plugin.borealcore.manager.GuiManager;
 import plugin.borealcore.manager.MasteryManager;
+import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ConfigUtil;
@@ -129,6 +131,9 @@ public class CookCommand implements CommandExecutor {
         long startTime = System.currentTimeMillis();
         ConfigUtil.reload();
         AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.reload.replace("{time}", String.valueOf(System.currentTimeMillis() - startTime)));
+        if (ConfigManager.debugLevel == DebugLevel.DEBUG) {
+            AdventureUtil.sendMessage(sender, MessageManager.prefix + "Debug Level: <green>" + ConfigManager.debugLevel);
+        }
     }
 
     private void handleMigratePermsCommand(CommandSender sender) {
@@ -319,7 +324,6 @@ public class CookCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-
         BorealCore.getDatabase().purgeUser(player.getUniqueId().toString());
         AdventureUtil.sendMessage(sender, "Purged all jade data for player: " + player.getName());
     }

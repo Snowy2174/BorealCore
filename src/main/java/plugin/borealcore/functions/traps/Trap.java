@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class Trap {
-    public static Trap EMPTY = new Trap("null",null, null, null, false, null, 0, null);
+    public static Trap EMPTY = new Trap("null", null, null, null, false, null, 0, null);
 
     protected UUID uuid;
     protected UUID owner;

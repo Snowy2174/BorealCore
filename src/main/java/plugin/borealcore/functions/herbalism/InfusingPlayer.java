@@ -86,6 +86,7 @@ public class InfusingPlayer extends BukkitRunnable {
         int last = progress / range;
         return (Math.random() < successRate[last]);
     }
+
     public boolean isPerfect() {
         int last = progress / range;
         return (successRate[last] == 2);

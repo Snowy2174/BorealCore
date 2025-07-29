@@ -115,7 +115,7 @@ public class BorealCore extends JavaPlugin {
         Bukkit.getScheduler().runTaskLater(this, new Runnable() {
             @Override
             public void run() {
-                Bukkit.dispatchCommand((CommandSender)Bukkit.getConsoleSender(), "mythicmobs reload");
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mythicmobs reload");
             }
         }, 100L);
 
@@ -164,21 +164,27 @@ public class BorealCore extends JavaPlugin {
     public static BorealCore getInstance() {
         return plugin;
     }
+
     public static CookingManager getCookingManager() {
         return cookingManager;
     }
+
     public static CompetitionManager getCompetitionManager() {
         return competitionManager;
     }
+
     public static PlaceholderManager getPlaceholderManager() {
         return placeholderManager;
     }
+
     public static LayoutManager getLayoutManager() {
         return layoutManager;
     }
+
     public static GuiManager getGuiManager() {
         return guiManager;
     }
+
     public static FurnitureManager getFurnitureManager() {
         return furnitureManager;
     }
@@ -186,6 +192,7 @@ public class BorealCore extends JavaPlugin {
     public static RecipeManager getRecipeManager() {
         return recipeManager;
     }
+
     public static EffectManager getEffectManager() {
         return effectManager;
     }
@@ -193,45 +200,59 @@ public class BorealCore extends JavaPlugin {
     public static MasteryManager getMasteryManager() {
         return masteryManager;
     }
+
     public static JadeManager getJadeManager() {
         return jadeManager;
     }
+
     public static InventoryManager getInventoryManager() {
         return inventoryManager;
     }
+
     public static Database getDatabase() {
         return db;
     }
+
     public static NodeManager getNodeManager() {
         return nodeManager;
     }
+
     public static WikiManager getWikiManager() {
         return wikiManager;
     }
+
     public static CraftingManager getCraftingManager() {
         return craftingManager;
     }
+
     public static AnalyticsManager getAnalyticsManager() {
         return analyticsManager;
     }
+
     public static PlushieManager getPlushieManager() {
         return plushieManager;
     }
+
     public static DuelsManager getDuelsManager() {
         return duelsManager;
     }
+
     public static BendingManager getBendingManager() {
         return bendingManager;
     }
+
     public static BreweryManager getBreweryManager() {
         return breweryManager;
     }
+
     public static HerbManager getHerbManager() {
         return herbManager;
     }
+
     public static HerbalismManager getHerbalismManager() {
         return herbalismManager;
     }
+
     public static Database getTrapsDatabase() {
         return traps;
     }

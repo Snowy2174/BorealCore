@@ -30,6 +30,7 @@ import static plugin.borealcore.manager.GuiManager.collectionItems;
 
 public class CollectionTrackerProvider implements InventoryProvider {
     private final CookingManager cookingManager;
+
     public CollectionTrackerProvider() {
         this.cookingManager = BorealCore.getCookingManager();
     }
@@ -46,7 +47,7 @@ public class CollectionTrackerProvider implements InventoryProvider {
 
         ClickableItem[] items = new ClickableItem[collectionItems.size()];
 
-        for(int i = 0; i < items.length; i++)
+        for (int i = 0; i < items.length; i++)
             items[i] = ClickableItem.empty(collectionItems.get(i));
         pagination.setItems(items);
         pagination.setItemsPerPage(7);
@@ -59,6 +60,7 @@ public class CollectionTrackerProvider implements InventoryProvider {
                 e -> PROGRESSION_MENU.open(player, pagination.next().getPage())));
         // Insert logic to check if the player has collected item
     }
+
     private void modifyLore(ItemStack itemStack, Player player, String recipe, Boolean hasMastery) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta == null) {
@@ -78,14 +80,14 @@ public class CollectionTrackerProvider implements InventoryProvider {
             GUIUtil.appendIngredients(lore, player, COOKING_RECIPES.get(recipe).getIngredients());
         }
 
-            lore.add(" ");
-            if (Boolean.TRUE.equals(hasMastery)) {
-                lore.add(ConfigManager.cookLineRight);
-                lore.add(ConfigManager.cookLineLeft);
-                lore.add(ConfigManager.cookLineShift);
-            } else {
-                lore.add(ConfigManager.cookLine);
-            }
+        lore.add(" ");
+        if (Boolean.TRUE.equals(hasMastery)) {
+            lore.add(ConfigManager.cookLineRight);
+            lore.add(ConfigManager.cookLineLeft);
+            lore.add(ConfigManager.cookLineShift);
+        } else {
+            lore.add(ConfigManager.cookLine);
+        }
 
         // Create a new list to store parsed lore
         List<Component> parsedLore = new ArrayList<>();

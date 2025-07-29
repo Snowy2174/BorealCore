@@ -1,11 +1,9 @@
 package plugin.borealcore.functions.traps;
 
-import net.momirealms.customfishing.api.mechanic.MechanicType;
-import net.momirealms.customfishing.api.mechanic.context.Context;
 import net.momirealms.customfishing.api.BukkitCustomFishingPlugin;
+import net.momirealms.customfishing.api.mechanic.context.Context;
 import net.momirealms.customfishing.api.mechanic.context.ContextKeys;
 import net.momirealms.customfishing.api.mechanic.effect.Effect;
-import net.momirealms.customfishing.api.mechanic.effect.EffectModifier;
 import net.momirealms.customfishing.api.mechanic.loot.Loot;
 import net.momirealms.customfishing.api.mechanic.loot.LootType;
 import org.bukkit.Material;
@@ -13,10 +11,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.UUID;
 
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;

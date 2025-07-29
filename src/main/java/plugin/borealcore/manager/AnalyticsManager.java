@@ -15,7 +15,7 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 
 public class AnalyticsManager extends Function {
 
-    private Database database;
+    private final Database database;
 
     public AnalyticsManager(Database database) {
         this.database = database;
@@ -23,14 +23,14 @@ public class AnalyticsManager extends Function {
 
     @Override
     public void load() {
-       if (database == null) {
+        if (database == null) {
             getLogger().error("Database is not initialized. Analytics Manager cannot be loaded.");
             return;
         }
-       if (ConfigManager.processAnalyticsEnabled) {
-           getLogger().info("Analytics Manager has been enabled.");
-           queryJadeDatabase();
-       }
+        if (ConfigManager.processAnalyticsEnabled) {
+            getLogger().info("Analytics Manager has been enabled.");
+            queryJadeDatabase();
+        }
     }
 
     @Override
@@ -69,16 +69,19 @@ public class AnalyticsManager extends Function {
                 .map(entry -> entry.getKey() + ": " + String.format("%.2f", entry.getValue()) + "%")
                 .collect(Collectors.joining("\n"));
     }
+
     private String formatAverageGains(Map<String, Double> averageGains) {
         return averageGains.entrySet().stream()
                 .map(entry -> entry.getKey() + ": " + String.format("%.2f", entry.getValue()))
                 .collect(Collectors.joining("\n"));
     }
+
     private String formatSourceDependencySpread(Map<String, Integer> sourceSpread) {
         return sourceSpread.entrySet().stream()
                 .map(entry -> entry.getKey() + ": " + entry.getValue() + " players")
                 .collect(Collectors.joining("\n"));
     }
+
     private String formatSourceEfficiency(Map<String, Double> sourceEfficiency) {
         return sourceEfficiency.entrySet().stream()
                 .map(entry -> entry.getKey() + ": " + String.format("%.2f", entry.getValue()) + " jade/player")

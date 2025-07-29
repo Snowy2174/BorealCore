@@ -1,5 +1,6 @@
 package plugin.borealcore.utility;
 
+import github.scarsz.discordsrv.DiscordSRV;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.key.Key;
@@ -39,8 +40,11 @@ public class AdventureUtil {
         if (debug == DebugLevel.DEBUG && ConfigManager.debugLevel != DebugLevel.DEBUG) return;
         Audience au = BorealCore.adventure.sender(Bukkit.getConsoleSender());
         MiniMessage mm = MiniMessage.miniMessage();
-        Component parsed = mm.deserialize(MessageManager.prefix + "[ " + debug.toString() + " ]" + replaceLegacy(s));
+        Component parsed = mm.deserialize(MessageManager.prefix + "[ " + debug.toString() + " ] " + replaceLegacy(s));
         au.sendMessage(parsed);
+        if (debug == DebugLevel.ERROR) { // Send error messages to Discord, and ping snowy
+            DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName("developer-logs").sendMessage("<@701490040273895445>" + s);
+        }
     }
 
     public static void playerMessage(Player player, String s) {

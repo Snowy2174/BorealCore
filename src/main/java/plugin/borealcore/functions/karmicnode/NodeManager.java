@@ -54,7 +54,6 @@ public class NodeManager extends Function {
             config.save(file);
         } catch (IOException e) {
             e.printStackTrace();
-            return;
         }
     }
 

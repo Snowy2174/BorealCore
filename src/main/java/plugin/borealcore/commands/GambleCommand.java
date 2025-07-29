@@ -17,49 +17,49 @@ public class GambleCommand implements CommandExecutor {
         this.plushieManager = BorealCore.getPlushieManager();
     }
 
-@Override
-public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-    if (!sender.hasPermission("gamble.use")) {
-        sender.sendMessage("You do not have permission to use this command.");
-        return true;
-    }
-
-    Player player;
-    int amount = 1;
-
-    if (args.length >= 1) {
-        player = Bukkit.getPlayer(args[0]);
-        if (player == null) {
-            sender.sendMessage("Target player not found.");
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!sender.hasPermission("gamble.use")) {
+            sender.sendMessage("You do not have permission to use this command.");
             return true;
         }
-    } else {
-        if (sender instanceof Player) {
-            player = (Player) sender;
+
+        Player player;
+        int amount = 1;
+
+        if (args.length >= 1) {
+            player = Bukkit.getPlayer(args[0]);
+            if (player == null) {
+                sender.sendMessage("Target player not found.");
+                return true;
+            }
         } else {
-            sender.sendMessage("You must specify a player when using this command from console.");
+            if (sender instanceof Player) {
+                player = (Player) sender;
+            } else {
+                sender.sendMessage("You must specify a player when using this command from console.");
+                return true;
+            }
+        }
+
+        if (args.length >= 2) {
+            try {
+                amount = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                sender.sendMessage("Invalid amount. Please provide a number.");
+                return true;
+            }
+        }
+
+        if (amount < 1) {
+            sender.sendMessage("§cInvalid amount.");
             return true;
         }
-    }
 
-    if (args.length >= 2) {
-        try {
-            amount = Integer.parseInt(args[1]);
-        } catch (NumberFormatException e) {
-            sender.sendMessage("Invalid amount. Please provide a number.");
-            return true;
+        for (int i = 0; i < amount; i++) {
+            plushieManager.processGamble(sender instanceof Player ? (Player) sender : null, player, 1);
         }
-    }
 
-    if (amount < 1) {
-        sender.sendMessage("§cInvalid amount.");
         return true;
     }
-
-    for (int i = 0; i < amount; i++) {
-        plushieManager.processGamble(sender instanceof Player ? (Player) sender : null, player, 1);
-    }
-
-    return true;
-}
 }

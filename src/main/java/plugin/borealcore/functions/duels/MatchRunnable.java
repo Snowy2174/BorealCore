@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 public class MatchRunnable extends BukkitRunnable {
-    private Set<Player> players;
+    private final Set<Player> players;
     private Player player1;
     private Player player2;
-    private SpectateManager spectateManager;
-    private ArenaManager arenaManager;
+    private final SpectateManager spectateManager;
+    private final ArenaManager arenaManager;
     private Arena arena;
 
 
@@ -33,7 +33,7 @@ public class MatchRunnable extends BukkitRunnable {
         this.spectateManager = api.getSpectateManager();
         this.arenaManager = api.getArenaManager();
 
-        if(player1 != null) {
+        if (player1 != null) {
             this.arena = arenaManager.get(player1);
         }
     }
@@ -55,10 +55,10 @@ public class MatchRunnable extends BukkitRunnable {
 
     public void setPlayers(Set<Player> players) {
         Iterator<Player> iterator = players.iterator();
-        if(iterator.hasNext()) {
+        if (iterator.hasNext()) {
             player1 = iterator.next();
         }
-        if(iterator.hasNext()) {
+        if (iterator.hasNext()) {
             player2 = iterator.next();
         }
     }
@@ -73,8 +73,19 @@ public class MatchRunnable extends BukkitRunnable {
                 player2.getName(), (int) player2.getHealth(), player2.getMaxHealth());
     }
 
-    public Player getPlayer1() { return player1; }
-    public Player getPlayer2() { return player2; }
-    public double getHealth1() { return player1.getHealth(); }
-    public double getHealth2() { return player2.getHealth(); }
+    public Player getPlayer1() {
+        return player1;
+    }
+
+    public Player getPlayer2() {
+        return player2;
+    }
+
+    public double getHealth1() {
+        return player1.getHealth();
+    }
+
+    public double getHealth2() {
+        return player2.getHealth();
+    }
 }

@@ -42,11 +42,11 @@ public class JadeManager extends Function {
     protected static Database database;
     public static HashMap<String, JadeSource> jadeSources = new HashMap<>();
     private static BukkitScheduler scheduler;
-    private JadeSourceListener jadeSourceListener;
+    private final JadeSourceListener jadeSourceListener;
     public static HashMap<LeaderboardType, Leaderboard> leaderboardCache = new HashMap<>();
 
     public JadeManager(Database database) {
-        this.database = database;
+        JadeManager.database = database;
         this.jadeSourceListener = new JadeSourceListener(this);
     }
 
@@ -238,17 +238,16 @@ public class JadeManager extends Function {
     }
 
     public static void fishingJade(FishingResultEvent event) {
-        consoleMessage(DebugLevel.DEBUG,"Fishing result: " + event.getResult() + ", player: " + event.getPlayer().getName() + ", loot: " + event.getLoot() + " group: " + event.getLoot().lootGroup().toString());
+        consoleMessage(DebugLevel.DEBUG, "Fishing result: " + event.getResult() + ", player: " + event.getPlayer().getName() + ", loot: " + event.getLoot() + " group: " + event.getLoot().lootGroup().toString());
         if (event.getResult().equals(FishingResultEvent.Result.SUCCESS) && Math.random() <= jadeSources.get("fishing").getRate()) {
             giveJadeCommand(event.getPlayer(), "fishing", 1);
         }
     }
 
     public void farmingJade(CropBreakEvent event) {
-        if (event.entityBreaker() instanceof Player) {
-            Player player = (Player) event.entityBreaker();
+        if (event.entityBreaker() instanceof Player player) {
             CropConfig cropConfig = event.cropConfig();
-            consoleMessage(DebugLevel.DEBUG,"Processing farmingJade for player: " + player.getName() +
+            consoleMessage(DebugLevel.DEBUG, "Processing farmingJade for player: " + player.getName() +
                     ", crop: " + event.cropStageItemID() + ", reason: " + event.reason());
             if (refarmableCrops.contains(cropConfig.id()) ? Math.random() <= jadeSources.get("farming").getRate() * 0.5 : Math.random() <= jadeSources.get("farming").getRate()) {
                 giveJadeCommand(player, "farming", 1);
@@ -257,7 +256,7 @@ public class JadeManager extends Function {
     }
 
     public static void cookingJade(Player player) {
-        consoleMessage(DebugLevel.DEBUG,"Processing cookingJade for player: " + player.getName());
+        consoleMessage(DebugLevel.DEBUG, "Processing cookingJade for player: " + player.getName());
         if (Math.random() <= jadeSources.get("cooking").getRate()) {
             giveJadeCommand(player, "cooking", 1);
         }

@@ -18,12 +18,15 @@ public class LeaderboardEntry {
     public UUID getPlayerUUID() {
         return playerUUID;
     }
+
     public String getPlayerName() {
         return playerName;
     }
+
     public double getTotalAmount() {
         return totalAmount;
     }
+
     public int getPosition() {
         return position;
     }

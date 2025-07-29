@@ -47,8 +47,6 @@ public class ConfigManager {
     public static int failureFadeIn;
     public static int failureFadeStay;
     public static int failureFadeOut;
-    public static double cookingJadeRewardRate;
-    public static double brewingJadeRewardRate;
     public static int brewingRequiredQuality;
     public static boolean processAnalyticsEnabled;
     public static List<String> refarmableCrops;

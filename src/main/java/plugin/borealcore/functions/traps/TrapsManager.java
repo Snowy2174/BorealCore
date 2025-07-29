@@ -17,7 +17,8 @@ import java.util.HashMap;
 
 public class TrapsManager extends Function {
 
-    public TrapsManager() {}
+    public TrapsManager() {
+    }
 
     public static HashMap<String, Trap> TRAPS;
     private static BukkitCustomFishingPlugin customFishingApi;
@@ -31,7 +32,7 @@ public class TrapsManager extends Function {
 
         if (DecentHologramsAPI.isRunning()) {
             // Custom Fishing API Loaded
-            this.customFishingApi = BukkitCustomFishingPlugin.getInstance();
+            customFishingApi = BukkitCustomFishingPlugin.getInstance();
         }
         AdventureUtil.consoleMessage("Loaded <green>" + (TRAPS.size()) + " <gray> trap configurations");
         AdventureUtil.consoleMessage("TrapsManager loaded successfully");

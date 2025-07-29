@@ -46,7 +46,7 @@ public class GUIUtil {
         for (String ingredient : ingredients) {
             if (ingredient.contains("/")) {
                 handleOptions(lore, player, ingredient);
-            } else if (ingredient.startsWith("fish"))  {
+            } else if (ingredient.startsWith("fish")) {
                 String[] parts = ingredient.split(":");
                 if (InventoryUtil.playerHasIngredient(player.getInventory(), parts[0])) {
                     lore.add("<green><!italic>- (x" + parts[1] + ") " + "Fish (Any)");

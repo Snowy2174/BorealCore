@@ -35,7 +35,9 @@ public class JadeTabCompletion implements TabCompleter {
         } else if (args.length == 2 && args[0].equalsIgnoreCase("totalJadeForSource")) {
             completions.addAll(jadeSources.keySet());
         } else if (args.length == 2 && args[0].equalsIgnoreCase("leaderboard")) {
-            completions.addAll(Arrays.stream(LeaderboardType.values()).map(Enum::name).collect(Collectors.toList()));completions.addAll(Arrays.stream(LeaderboardType.values()).map(Enum::name).collect(Collectors.toList()));completions.addAll(Arrays.stream(LeaderboardType.values()).map(Enum::name).collect(Collectors.toList()));
+            completions.addAll(Arrays.stream(LeaderboardType.values()).map(Enum::name).collect(Collectors.toList()));
+            completions.addAll(Arrays.stream(LeaderboardType.values()).map(Enum::name).collect(Collectors.toList()));
+            completions.addAll(Arrays.stream(LeaderboardType.values()).map(Enum::name).collect(Collectors.toList()));
         }
         return completions;
     }

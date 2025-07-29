@@ -14,6 +14,7 @@ import static com.dre.brewery.api.events.brew.BrewModifyEvent.Type.SEAL;
 
 public class JadeSourceListener implements Listener {
     private final JadeManager jadeManager;
+
     public JadeSourceListener(JadeManager jadeManager) {
         this.jadeManager = jadeManager;
     }
@@ -23,12 +24,12 @@ public class JadeSourceListener implements Listener {
         if (event.isCancelled()) {
             return;
         }
-        jadeManager.fishingJade(event);
+        JadeManager.fishingJade(event);
     }
 
     @EventHandler
     public void onCropBreakEvent(CropBreakEvent event) {
-        if (event.isCancelled() || event.reason() != BreakReason.ACTION ) {
+        if (event.isCancelled() || event.reason() != BreakReason.ACTION) {
             return;
         }
         System.out.println("Processing farmingJade for player: " + event.entityBreaker());
@@ -46,9 +47,9 @@ public class JadeSourceListener implements Listener {
     @EventHandler
     public void onVote(PlayerVoteEvent event) {
         if (event.isWasOnline()) {
-            jadeManager.give(Bukkit.getPlayer(event.getPlayer()), 1, "voting");
+            JadeManager.give(Bukkit.getPlayer(event.getPlayer()), 1, "voting");
         } else {
-            jadeManager.giveOffline(Bukkit.getOfflinePlayer(event.getPlayer()), 1, "voting");
+            JadeManager.giveOffline(Bukkit.getOfflinePlayer(event.getPlayer()), 1, "voting");
         }
     }
 }

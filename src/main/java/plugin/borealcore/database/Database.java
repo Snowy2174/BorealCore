@@ -17,7 +17,6 @@ import plugin.borealcore.functions.jade.object.Leaderboard;
 import plugin.borealcore.functions.jade.object.LeaderboardEntry;
 import plugin.borealcore.functions.traps.Trap;
 import plugin.borealcore.object.Function;
-import plugin.borealcore.utility.AdventureUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -46,7 +45,9 @@ public abstract class Database extends Function {
     }
 
     public abstract Connection getSQLConnection();
+
     public abstract void load();
+
     public abstract void unload();
 
     public void initialize() {
@@ -172,7 +173,7 @@ public abstract class Database extends Function {
             ps = conn.prepareStatement(query);
             ps.setString(1, player.getUniqueId().toString());
             ps.setString(2, source);
-            ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now().minus(24, ChronoUnit.HOURS)));
+            ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now().minusHours(24)));
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -215,7 +216,7 @@ public abstract class Database extends Function {
             // Check for transactions in the last 24 hours
             ps = conn.prepareStatement(query);
             ps.setString(1, player.getUniqueId().toString());
-            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minus(24, ChronoUnit.HOURS)));
+            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minusHours(24)));
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -230,7 +231,7 @@ public abstract class Database extends Function {
 
                 ps = conn.prepareStatement(query);
                 ps.setString(1, player.getUniqueId().toString());
-                ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minus(30, ChronoUnit.DAYS)));
+                ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minusDays(30)));
                 rs = ps.executeQuery();
 
                 while (rs.next()) {
@@ -313,7 +314,7 @@ public abstract class Database extends Function {
                     JadeTransaction transaction = pendingTransactions.poll();
                     if (transaction != null) {
                         addTransaction(
-                            transaction
+                                transaction
                         );
                     }
                 }
@@ -448,9 +449,9 @@ public abstract class Database extends Function {
 
             // Base query
             String baseQuery = """
-            SELECT ROW_NUMBER() OVER (ORDER BY SUM(amount) DESC) AS position, uuid, player, SUM(amount) AS jade
-            FROM jade_transactions
-        """;
+                        SELECT ROW_NUMBER() OVER (ORDER BY SUM(amount) DESC) AS position, uuid, player, SUM(amount) AS jade
+                        FROM jade_transactions
+                    """;
             String condition = "";
             boolean requiresTimestamp = false;
             String orderBy = " ORDER BY jade DESC LIMIT 50;";
@@ -508,7 +509,7 @@ public abstract class Database extends Function {
             ps = conn.prepareStatement(query);
             if (requiresTimestamp) {
                 ps.setTimestamp(1, Timestamp.valueOf(
-                        LocalDateTime.now().minus(type.name().contains("WEEKLY") ? 7 : 30, ChronoUnit.DAYS)
+                        LocalDateTime.now().minusDays(type.name().contains("WEEKLY") ? 7 : 30)
                 ));
             }
             rs = ps.executeQuery();
@@ -757,11 +758,11 @@ public abstract class Database extends Function {
 
     public Map<String, Double> getSourceEfficiencyAnalysis() {
         String query = """
-            SELECT source, SUM(amount) AS total, COUNT(DISTINCT uuid) AS users
-            FROM jade_transactions
-            WHERE source != '' AND amount > 0
-            GROUP BY source
-        """;
+                    SELECT source, SUM(amount) AS total, COUNT(DISTINCT uuid) AS users
+                    FROM jade_transactions
+                    WHERE source != '' AND amount > 0
+                    GROUP BY source
+                """;
         Map<String, Double> sourceEfficiency = new HashMap<>();
         Connection conn = null;
         PreparedStatement ps = null;
@@ -786,9 +787,9 @@ public abstract class Database extends Function {
         return sourceEfficiency;
     }
 
-   // playerRecipeDataExists;
-   // updatePlayerRecipeData;
-   // updateRecipeStatus;
+    // playerRecipeDataExists;
+    // updatePlayerRecipeData;
+    // updateRecipeStatus;
 
 
     public List<Trap> getActiveFishingTraps() {

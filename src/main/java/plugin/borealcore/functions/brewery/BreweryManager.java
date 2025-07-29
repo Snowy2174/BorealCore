@@ -8,7 +8,8 @@ import java.util.HashMap;
 
 public class BreweryManager extends Function {
 
-    public BreweryManager() {}
+    public BreweryManager() {
+    }
 
     public static HashMap<String, Recipe> RECIPES;
 
