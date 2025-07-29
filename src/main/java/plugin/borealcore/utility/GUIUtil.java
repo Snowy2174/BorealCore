@@ -8,11 +8,9 @@ import java.util.List;
 public class GUIUtil {
 
     public static void appendMastery(List<String> lore, Player player, String recipe, Boolean hasMastery) {
-
         Integer masteryCount = RecipeDataUtil.getMasteryCount(player, recipe);
         Integer requiredMastery = RecipeDataUtil.getDefaultRequiredMastery(recipe);
         String[] masteryInfo;
-
         lore.add(" ");
         lore.add(ConfigManager.masteryLine.replace("{mastery}", (masteryCount + "/" + requiredMastery)));
         if (Boolean.TRUE.equals(hasMastery)) {
@@ -26,7 +24,7 @@ public class GUIUtil {
     }
 
     public static String appendProgressBar(double percentage) {
-        int length = 10; // Length of the progress bar
+        int length = 10;
         int completedLength = (int) (length * percentage);
         StringBuilder progressBar = new StringBuilder();
 
@@ -45,10 +43,16 @@ public class GUIUtil {
     public static void appendIngredients(List<String> lore, Player player, List<String> ingredients) {
         lore.add(" ");
         lore.add(ConfigManager.ingredientsLine);
-
         for (String ingredient : ingredients) {
             if (ingredient.contains("/")) {
                 handleOptions(lore, player, ingredient);
+            } else if (ingredient.startsWith("fish"))  {
+                String[] parts = ingredient.split(":");
+                if (InventoryUtil.playerHasIngredient(player.getInventory(), parts[0])) {
+                    lore.add("<green><!italic>- (x" + parts[1] + ") " + "Fish (Any)");
+                } else {
+                    lore.add("<red><!italic>- (x" + parts[1] + ") " + "Fish (Any)");
+                }
             } else {
                 String[] parts = ingredient.split(":");
                 String ingredientFormatted = formatString(parts[0]);

@@ -63,6 +63,7 @@ public class MessageManager {
     public static String jadeSourceReminder2;
     public static String leaderboardHeader;
     public static String leaderboardEntry;
+    public static String altLeaderboardEntry;
     public static String leaderboardFooter;
 
     public static void load() {
@@ -129,6 +130,7 @@ public class MessageManager {
 
         leaderboardHeader = getOrSet(config, "leaderboard-header", "<gradient:#00AA00:#88DAA1>\n}======------ {type} Leaderboard || Page {page} / {totalPages} ------======={</gradient>\n");
         leaderboardEntry = getOrSet(config, "leaderboard-entry", "<gradient:#00AA00:#88DAA1>  --> {position}: {player} - {score} </gradient>");
+        altLeaderboardEntry = getOrSet(config, "alt-leaderboard-entry", "&e{position}. &b{player} &7- &e{score}");
         leaderboardFooter = getOrSet(config, "leaderboard-footer", "<gradient:#00AA00:#88DAA1>\n[______________________]</gradient>\n");
 
         try {

@@ -68,6 +68,8 @@ public class CookCommand implements CommandExecutor {
             handleClearCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("stats")) {
             showStatsCommand(sender);
+        } else if (subcommand.equalsIgnoreCase("purge")) {
+            handlePurgeCommand(sender, subargs);
         } else {
             // Unknown subcommand
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.unavailableArgs);
@@ -304,6 +306,22 @@ public class CookCommand implements CommandExecutor {
         InventoryUtil.removeItem(player.getInventory(), itemName, amount);
 
         AdventureUtil.sendMessage(sender, "Cleared " + amount + " of " + itemName + " from " + player.getName());
+    }
+
+    private void handlePurgeCommand(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking purge <player>");
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+
+        BorealCore.getDatabase().purgeUser(player.getUniqueId().toString());
+        AdventureUtil.sendMessage(sender, "Purged all jade data for player: " + player.getName());
     }
 
 }

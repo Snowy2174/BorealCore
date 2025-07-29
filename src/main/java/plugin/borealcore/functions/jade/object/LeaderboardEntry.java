@@ -5,10 +5,10 @@ import java.util.UUID;
 public class LeaderboardEntry {
     private final UUID playerUUID;
     private final String playerName;
-    private final double totalAmount;
+    private final int totalAmount;
     private final int position;
 
-    public LeaderboardEntry(UUID playerUUID, String playerName, double totalAmount, int position) {
+    public LeaderboardEntry(UUID playerUUID, String playerName, int totalAmount, int position) {
         this.playerUUID = playerUUID;
         this.playerName = playerName;
         this.totalAmount = totalAmount;

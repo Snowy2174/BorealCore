@@ -18,7 +18,8 @@ softdepend:
 
 commands:
   cooking:
-    description: The command to manage CustomCooking
+    description: The command to manage BorealCore
+    aliases: [cc, bc, borealcore]
   herbalism:
     description: The command to manage CustomHerbalism
   jade:

@@ -1,9 +1,6 @@
 package plugin.borealcore.utility;
 
 
-import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
 import dev.lone.itemsadder.api.CustomStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.configs.EffectManager;
 import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.configs.DebugLevel;
 
 import java.util.List;
 
@@ -44,23 +42,32 @@ public class InventoryUtil {
     private static boolean handleOptions(Inventory playerInventory, String[] options, Integer instances) {
         for (String option : options) {
             String[] parts = option.split(":");
-            int amount = Integer.parseInt(parts[1]) * instances;
+            int amount;
+            try {
+                amount = Integer.parseInt(parts[1]) * instances;
+            } catch (NumberFormatException e) {
+                AdventureUtil.consoleMessage(DebugLevel.WARNING, "Invalid ingredient amount: " + parts[1]);
+                continue;
+            }
 
             if (parts[0].endsWith("*")) {
                 if (tieredIngredientCheck(playerInventory, parts[0].replace("*", ""), amount)) {
-                    return true; // ingredient found in player's inventory for this option
+                    return true;
+                }
+                if (fishingIngredientCheck(playerInventory, parts[0].replace("*", ""), amount)) {
+                    return true;
                 }
             } else {
                 CustomStack customStack = CustomStack.getInstance(parts[0]);
                 if (customStack != null) {
                     ItemStack itemStack = customStack.getItemStack();
                     if (playerInventory.containsAtLeast(itemStack, amount)) {
-                        return true; // ingredient found in player's inventory for this option
+                        return true;
                     }
                 } else {
                     Material material = Material.getMaterial(parts[0]);
                     if (material != null && playerInventory.containsAtLeast(new ItemStack(material), amount)) {
-                        return true; // ingredient found in player's inventory for this option
+                        return true;
                     }
                 }
             }
@@ -68,22 +75,38 @@ public class InventoryUtil {
         return false;
     }
 
-
     public static boolean tieredIngredientCheck(Inventory playerInventory, String ingredient, Integer amount) {
         CustomStack customStack = CustomStack.getInstance(ingredient);
         if (customStack == null) {
             return false;
         }
-
         for (int tier = 0; tier <= 2; tier++) {
             String tieredIngredient = ingredient + (tier > 0 ? "_t" + tier : "");
             CustomStack customStackTiered = CustomStack.getInstance(tieredIngredient);
             ItemStack itemStackTiered = customStackTiered.getItemStack();
             if (playerInventory.containsAtLeast(itemStackTiered, amount)) {
-                return true; // Found ingredient in player's inventory
+                return true;
             }
         }
         return false;
+    }
+
+    public static boolean fishingIngredientCheck(Inventory playerInventory, String ingredient, Integer amount) {
+        if (!ingredient.startsWith("fish")) {
+            return false;
+        }
+        int fishAmount = 0;
+        for (ItemStack item : playerInventory.getContents()) {
+            if (item == null) continue;
+            CustomStack customStack = CustomStack.byItemStack(item);
+            if (customStack != null && customStack.getNamespacedID().startsWith("customfishing:") && item.getType() == Material.COD) {
+                if (item.getAmount() >= amount) {
+                    return true;
+                }
+                fishAmount += item.getAmount();
+            }
+        }
+        return fishAmount >= amount;
     }
 
     public static void removeIngredients(Inventory playerInventory, List<String> ingredients, Integer instances) {
@@ -95,6 +118,10 @@ public class InventoryUtil {
             for (String option : options) {
                 String[] parts = option.split(":");
                 String ingredientName = parts[0];
+                if (parts.length < 2) {
+                    AdventureUtil.consoleMessage(DebugLevel.WARNING, "Malformed ingredient: " + option);
+                    continue;
+                }
                 int amount = Integer.parseInt(parts[1]) * instances;
                 removeItem(playerInventory, ingredientName, amount);
             }
@@ -103,7 +130,12 @@ public class InventoryUtil {
 
     public static boolean playerHasIngredient(Inventory playerInventory, String ingredient) {
         if (ingredient.endsWith("*")) {
-            return hasTieredIngredient(playerInventory, ingredient);
+            String base = ingredient.replace("*", "");
+            if (base.startsWith("fish")) {
+                return fishingIngredientCheck(playerInventory, base, 1);
+            } else {
+                return tieredIngredientCheck(playerInventory, ingredient, 1);
+            }
         } else {
             CustomStack customStack = CustomStack.getInstance(ingredient);
             if (customStack != null) {
@@ -120,27 +152,34 @@ public class InventoryUtil {
         }
     }
 
-    private static boolean hasTieredIngredient(Inventory playerInventory, String ingredient) {
-        String baseIngredient = ingredient.replace("*", "");
-        for (int tier = 0; tier <= 2; tier++) {
-            String tieredIngredient = baseIngredient + (tier > 0 ? "_t" + tier : "");
-            CustomStack customStackTiered = CustomStack.getInstance(tieredIngredient);
-            if (customStackTiered != null) {
-                ItemStack itemStackTiered = customStackTiered.getItemStack();
-                if (playerInventory.containsAtLeast(itemStackTiered, 1)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-  private static void removeTieredItem(Inventory playerInventory, String ingredient, int amount) {
+  private static void removeWildcardItem(Inventory playerInventory, String ingredient, int amount) {
       String baseIngredient = ingredient.replace("*", "");
-      for (int tier = 0; tier <= 2; tier++) {
-          if (amount <= 0) {
-              break;
+      if (baseIngredient.startsWith("fish")) {
+          int remaining = amount;
+          for (int i = 0; i < playerInventory.getSize(); i++) {
+              ItemStack item = playerInventory.getItem(i);
+              if (item == null) continue;
+              CustomStack customStack = CustomStack.byItemStack(item);
+              if (customStack != null &&
+                      customStack.getNamespacedID().startsWith("customfishing:") &&
+                      item.getType() == Material.COD) {
+                  int itemAmount = item.getAmount();
+                  if (itemAmount <= remaining) {
+                      playerInventory.setItem(i, null);
+                      remaining -= itemAmount;
+                  } else {
+                      item.setAmount(itemAmount - remaining);
+                      playerInventory.setItem(i, item);
+                      remaining = 0;
+                  }
+                  if (remaining <= 0) break;
+              }
           }
+          return;
+      }
+
+      for (int tier = 0; tier <= 2; tier++) {
+          if (amount <= 0) break;
           String tieredIngredient = baseIngredient + (tier > 0 ? "_t" + tier : "");
           CustomStack customStackTiered = CustomStack.getInstance(tieredIngredient);
           if (customStackTiered != null) {
@@ -153,29 +192,45 @@ public class InventoryUtil {
               }
               int toRemove = Math.min(amount, availableAmount);
               if (toRemove > 0) {
-                  itemStackTiered.setAmount(toRemove);
-                  playerInventory.removeItem(itemStackTiered);
+                  removeItemsPrecisely(playerInventory, itemStackTiered, toRemove);
                   amount -= toRemove;
               }
           } else {
-              System.out.println("CustomStack for " + tieredIngredient + " is null.");
+             AdventureUtil.consoleMessage(DebugLevel.DEBUG, "CustomStack for " + tieredIngredient + " is null.");
           }
       }
-      System.out.println("Finished removing tiered item: " + ingredient);
+      AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Finished removing tiered or fish item: " + ingredient);
   }
+
+    private static void removeItemsPrecisely(Inventory inv, ItemStack target, int amount) {
+        for (int i = 0; i < inv.getSize() && amount > 0; i++) {
+            ItemStack item = inv.getItem(i);
+            if (item == null || !item.isSimilar(target)) continue;
+            int stackAmount = item.getAmount();
+            if (stackAmount <= amount) {
+                inv.setItem(i, null);
+                amount -= stackAmount;
+            } else {
+                item.setAmount(stackAmount - amount);
+                inv.setItem(i, item);
+                amount = 0;
+            }
+        }
+    }
 
     public static void removeItem(Inventory playerInventory, String ingredient, int amount) {
         if (ingredient.endsWith("*")) {
             System.out.println(ingredient);
-            removeTieredItem(playerInventory, ingredient, amount);
+            removeWildcardItem(playerInventory, ingredient, amount);
             return;
         }
 
         CustomStack customStack = CustomStack.getInstance(ingredient);
         if (customStack != null) {
             ItemStack itemStack = customStack.getItemStack();
-            itemStack.setAmount(amount);
-            playerInventory.removeItem(itemStack);
+            ItemStack clone = itemStack.clone();
+            clone.setAmount(amount);
+            playerInventory.removeItem(clone);
         } else {
             Material material = Material.getMaterial(ingredient);
             if (material != null) {
@@ -191,7 +246,7 @@ public class InventoryUtil {
                 Material material = Material.valueOf(key.toUpperCase());
                 itemStack = new ItemStack(material);
             } catch (IllegalArgumentException e) {
-                Bukkit.getLogger().warning("Invalid material name: " + key);
+                AdventureUtil.consoleMessage(DebugLevel.WARNING, "Invalid material name: " + key);
                 itemStack = new ItemStack(Material.AIR);
             }
         }
@@ -230,7 +285,7 @@ public class InventoryUtil {
                 Material material = Material.valueOf(key.toUpperCase());
                 itemStack = new ItemStack(material);
             } catch (IllegalArgumentException e) {
-                Bukkit.getLogger().warning("Invalid material name: " + key);
+                AdventureUtil.consoleMessage(DebugLevel.WARNING, "Invalid material name: " + key);
                 itemStack = new ItemStack(Material.AIR);
             }
         }

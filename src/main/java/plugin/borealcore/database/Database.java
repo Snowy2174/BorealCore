@@ -417,6 +417,27 @@ public abstract class Database extends Function {
         }
     }
 
+    public void purgeUser(String uuid) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = this.getSQLConnection();
+            String query = "DELETE FROM jade_totals WHERE uuid = ?;";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, uuid);
+            ps.executeUpdate();
+
+            query = "DELETE FROM jade_transactions WHERE uuid = ?;";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, uuid);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } finally {
+            closeResources(conn, ps, null);
+        }
+    }
+
     public Leaderboard queryLeaderboard(LeaderboardType type) {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -495,7 +516,7 @@ public abstract class Database extends Function {
                 int position = rs.getInt("position");
                 UUID uuid = UUID.fromString(rs.getString("uuid"));
                 String playerName = rs.getString("player");
-                int jadeAmount = rs.getInt("jade");
+                int jadeAmount = Math.abs(rs.getInt("jade"));
                 leaderboard.add(new LeaderboardEntry(uuid, playerName, jadeAmount, position));
             }
         } catch (SQLException e) {

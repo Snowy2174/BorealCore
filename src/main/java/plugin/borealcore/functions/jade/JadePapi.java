@@ -50,6 +50,12 @@ public class JadePapi extends PlaceholderExpansion {
                 int position = Integer.parseInt(parts[2]);
                 if (leaderboardType != null && position >= 0) {
                     LeaderboardEntry leaderboard = JadeManager.leaderboardCache.get(leaderboardType).getEntry(position);
+                    if (parts.length > 3 && parts[3].equalsIgnoreCase("alt")) {
+                        return MessageManager.altLeaderboardEntry
+                                .replace("{player}", leaderboard.getPlayerName())
+                                .replace("{position}", String.valueOf(position))
+                                .replace("{score}", String.valueOf(leaderboard.getTotalAmount()));
+                    }
 
                     return MessageManager.leaderboardEntry
                             .replace("{player}", leaderboard.getPlayerName())
