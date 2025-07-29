@@ -1,7 +1,12 @@
 package plugin.borealcore.listener;
 
 import dev.lone.itemsadder.api.CustomStack;
+import net.momirealms.customcrops.api.core.block.PotBlock;
+import net.momirealms.customcrops.api.core.mechanic.fertilizer.Fertilizer;
+import net.momirealms.customcrops.api.core.mechanic.fertilizer.FertilizerConfig;
 import net.momirealms.customcrops.api.event.CropInteractEvent;
+import net.momirealms.customcrops.api.event.FertilizerUseEvent;
+import net.momirealms.customcrops.api.event.PotInteractEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -9,6 +14,7 @@ import org.bukkit.inventory.Inventory;
 import plugin.borealcore.functions.template.PotInventory;
 import plugin.borealcore.manager.configs.DebugLevel;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
@@ -28,6 +34,20 @@ public class CropInteractEventListener implements Listener {
             }
 
         }
+    }
+
+    @EventHandler
+    public void onFertilizerUse(FertilizerUseEvent event) {
+        PotBlock potBlock = (PotBlock) event.blockState().type();
+        Arrays.stream(potBlock.fertilizers(event.blockState())).findFirst()
+                .ifPresent(fertilizer -> {
+                    if (fertilizer.config() == event.fertilizer().config()) {
+                        if (event.fertilizer().times() == fertilizer.times()) {
+                            consoleMessage(DebugLevel.DEBUG, "Fertilizer times match: " + fertilizer.times());
+                            event.setCancelled(true);
+                        }
+                    }
+                });
     }
 
     @EventHandler
