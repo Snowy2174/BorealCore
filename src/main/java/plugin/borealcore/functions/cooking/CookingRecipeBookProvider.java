@@ -18,6 +18,7 @@ import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.configs.EffectManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GUIUtil;
@@ -101,7 +102,7 @@ public class CookingRecipeBookProvider implements InventoryProvider {
                 itemMeta.setLore(unknownRecipeStack.getItemMeta().getLore());
                 stack.setItemMeta(itemMeta);
             } else {
-                System.out.println("ItemMeta is null!");
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG,"ItemMeta is null!");
             }
             return stack;
         }

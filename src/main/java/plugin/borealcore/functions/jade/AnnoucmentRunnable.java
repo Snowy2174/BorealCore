@@ -2,6 +2,7 @@ package plugin.borealcore.functions.jade;
 
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 
@@ -26,7 +27,7 @@ public class AnnoucmentRunnable implements Runnable {
         List<? extends Player> validPlayers = players.stream()
                 .filter(player -> !player.hasPermission("jade.announcement"))
                 .toList();
-        plugin.getLogger().log(Level.INFO, "Found " + validPlayers.size() + " valid players");
+        AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Found " + validPlayers.size() + " valid players");
         for (Player p : validPlayers) {
             int status = JadeManager.sendJadeLimitMessage(p);
             if (status == -1) {

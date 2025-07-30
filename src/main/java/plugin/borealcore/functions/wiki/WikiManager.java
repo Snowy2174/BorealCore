@@ -7,6 +7,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 
@@ -54,7 +55,7 @@ public class WikiManager extends Function {
             Process process = processBuilder.start();
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                System.out.println("Git clone failed with exit code: " + exitCode);
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Git clone failed with exit code: " + exitCode);
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -147,7 +148,7 @@ public class WikiManager extends Function {
     private void loadWiki(String repoUrl) {
         File wiki_file = new File(BorealCore.plugin.getDataFolder() + File.separator + "wiki");
         if (!wiki_file.exists() && !wiki_file.mkdir()) {
-            System.out.println("Failed to create wiki folder");
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Failed to create wiki folder");
             return;
         }
         try {

@@ -2,6 +2,8 @@ package plugin.borealcore.functions.cooking.competition;
 
 import plugin.borealcore.action.Action;
 import plugin.borealcore.functions.cooking.competition.bossbar.BossBarConfig;
+import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.Calendar;
 import java.util.HashMap;

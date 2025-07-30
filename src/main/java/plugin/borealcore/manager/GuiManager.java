@@ -18,6 +18,7 @@ import plugin.borealcore.functions.cooking.IngredientBookProvider;
 import plugin.borealcore.functions.cooking.object.Ingredient;
 import plugin.borealcore.functions.wiki.WikiGuiProvider;
 import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ConfigUtil;
@@ -136,7 +137,7 @@ public class GuiManager extends Function {
             String key = entry.getKey().split(":")[1];
             ItemStack itemStack = entry.getValue();
             Double price = 0.0;
-            System.out.println("Price: " + price);
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Price: " + price);
 
             Map<String, Object> entryData = new HashMap<>();
             entryData.put("initial-price", price);
@@ -144,7 +145,7 @@ public class GuiManager extends Function {
         }
         try (FileWriter writer = new FileWriter(outputFile)) {
             yaml.dump(yamlData, writer);
-            System.out.println("Written file: " + outputFile.getAbsolutePath());
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Written file: " + outputFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }

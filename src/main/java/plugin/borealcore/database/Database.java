@@ -16,7 +16,9 @@ import plugin.borealcore.functions.jade.object.JadeTransaction;
 import plugin.borealcore.functions.jade.object.Leaderboard;
 import plugin.borealcore.functions.jade.object.LeaderboardEntry;
 import plugin.borealcore.functions.traps.Trap;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
+import plugin.borealcore.utility.AdventureUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -501,7 +503,7 @@ public abstract class Database extends Function {
                     requiresTimestamp = true;
                 }
                 default -> {
-                    plugin.getLogger().warning("Unknown leaderboard type: " + type);
+                    AdventureUtil.consoleMessage(DebugLevel.ERROR,"Unknown leaderboard type: " + type);
                     return null;
                 }
             }

@@ -116,10 +116,8 @@ public class ConfigManager {
         return new NamespacedKey(BorealCore.plugin, key);
     }
 
-    public static void setDebugLevel(@NotNull String debugLevel) {
+    public static void setDebugLevel(DebugLevel debugLevel) {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
-        if (DebugLevel.valueOf(debugLevel.toUpperCase()) != null) {
-            config.set("debug-level", debugLevel.toUpperCase());
-        }
+            config.set("debug-level", debugLevel.toString());
     }
 }

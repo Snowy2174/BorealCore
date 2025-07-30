@@ -50,6 +50,8 @@ public class CookCommand implements CommandExecutor {
             handleCookCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("reload")) {
             handleReloadCommand(sender);
+        } else if (subcommand.equalsIgnoreCase("debugLevel")) {
+            handleDebugLevelCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("migrateperms")) {
             handleMigratePermsCommand(sender);
         } else if (subcommand.equalsIgnoreCase("unlock")) {
@@ -133,6 +135,24 @@ public class CookCommand implements CommandExecutor {
         AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.reload.replace("{time}", String.valueOf(System.currentTimeMillis() - startTime)));
         if (ConfigManager.debugLevel == DebugLevel.DEBUG) {
             AdventureUtil.sendMessage(sender, MessageManager.prefix + "Debug Level: <green>" + ConfigManager.debugLevel);
+        }
+    }
+
+    private void handleDebugLevelCommand(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking debugLevel <level>");
+            return;
+        }
+        DebugLevel debugLevel = DebugLevel.valueOf(args[0].toUpperCase());
+        if (debugLevel == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid debug level. Use: INFO, DEBUG");
+            return;
+        }
+        if (ConfigManager.debugLevel != debugLevel) {
+            ConfigManager.setDebugLevel(debugLevel);
+            AdventureUtil.sendMessage(sender, MessageManager.prefix + "Debug level set to <green>" + debugLevel);
+        } else {
+            AdventureUtil.sendMessage(sender, MessageManager.prefix + "Debug level is already set to <green>" + debugLevel);
         }
     }
 

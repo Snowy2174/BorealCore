@@ -8,7 +8,9 @@ import com.meteordevelopments.duels.api.event.match.MatchStartEvent;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.listener.DuelsListener;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
+import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -42,14 +44,24 @@ public class DuelsManager extends Function {
         Player player1 = task.getPlayer1();
         Arena arena = arenaManager.get(player1);
 
+        if (ongoingRunnables.containsKey(arena)) {
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Match already ongoing for arena: " + arena.getName());
+            ongoingRunnables.remove(arena);
+        }
+
         task.runTaskTimer(plugin, 0L, 20L);
         ongoingRunnables.put(arena, task);
-        plugin.getLogger().info("Match started: " + ongoingRunnables.get(arena));
+        AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Match started: " + ongoingRunnables.get(arena));
     }
 
     public static void endMatch(MatchEndEvent event) {
         Set<Player> players = event.getMatch().getPlayers();
         Arena arena = event.getMatch().getArena();
+
+        if (!ongoingRunnables.containsKey(arena)) {
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "No ongoing match found for arena: " + arena.getName());
+            return;
+        }
 
         MatchRunnable task = ongoingRunnables.remove(arena);
         task.cancel();

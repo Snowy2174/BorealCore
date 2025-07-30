@@ -9,6 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import plugin.borealcore.functions.jade.JadeManager;
+import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.utility.AdventureUtil;
 
 import static com.dre.brewery.api.events.brew.BrewModifyEvent.Type.SEAL;
 
@@ -32,7 +34,7 @@ public class JadeSourceListener implements Listener {
         if (event.isCancelled() || event.reason() != BreakReason.ACTION) {
             return;
         }
-        System.out.println("Processing farmingJade for player: " + event.entityBreaker());
+        AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Processing farmingJade for player: " + event.entityBreaker());
         jadeManager.farmingJade(event);
     }
 
