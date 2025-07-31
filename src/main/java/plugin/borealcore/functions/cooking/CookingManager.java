@@ -362,7 +362,7 @@ public class CookingManager extends Function {
             return;
         }
 
-        Action[] actions = perfect ? droppedItem.getPerfectConsumeActions() : droppedItem.getConsumeActions();
+        Action[] actions = perfect ? droppedItem.getConsumeActions().get(1) : droppedItem.getConsumeActions().get(0);
 
         if (actions != null) {
             for (Action action : actions) {

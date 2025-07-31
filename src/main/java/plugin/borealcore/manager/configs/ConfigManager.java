@@ -20,6 +20,8 @@ public class ConfigManager {
     public static String perfectItemSuffix;
     public static String particleItemSuffix;
     public static String effectLore;
+    public static String hungerLore;
+    public static String saturationLore;
     public static String failureItem;
     public static String unlitCookingPot;
     public static String litCookingPot;
@@ -67,6 +69,8 @@ public class ConfigManager {
         particleItemSuffix = config.getString("mechanics.particle-item-suffix", "_particle");
 
         effectLore = config.getString("mechanics.effect-lore", " <!italic><gold>\uD83E\uDDEA <white>{effect} <gold>{amplifier} {duration}");
+        hungerLore = config.getString("mechanics.hunger-lore", " <!italic><gold>\uD83C\uDF56 Restores {hunger} hunger");
+        saturationLore = config.getString("mechanics.saturation-lore", " <!italic><gold>\uD83C\uDF56 Restores {saturation} saturation");
         failureItem = config.getString("mechanics.failure-item", "failureitem");
         unlitCookingPot = config.getString("mechanics.unlit-cooking-pot", "cooking_pot_unlit");
         litCookingPot = config.getString("mechanics.lit-cooking-pot", "cooking_pot_lit");

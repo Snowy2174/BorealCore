@@ -10,11 +10,10 @@ import java.util.List;
 
 public class Recipe {
 
-    public static Recipe EMPTY = new Recipe("null", "null", Collections.singletonList(Collections.singletonList(Component.empty())), new Difficulty[]{new Difficulty(1, 1)}, Collections.singletonList("null"), "null", 5000, 0, 0, 0);
+    public static Recipe EMPTY = new Recipe("null", "null", new Difficulty[]{new Difficulty(1, 1)}, Collections.singletonList("null"), "null", 5000, 0, 0, 0);
     protected final int masteryreq;
     protected final int slot;
     protected final double score;
-    public Action[] perfectConsumeActions;
     protected String key;
     protected String nick;
     protected List<String> ingredients;
@@ -25,12 +24,11 @@ public class Recipe {
     protected int time;
     protected Action[] successActions;
     protected Action[] failureActions;
-    protected Action[] consumeActions;
+    protected List<Action[]> consumeActions;
 
-    public Recipe(String key, String nick, List<List<Component>> dishEffects, Difficulty[] difficulty, List<String> ingredients, String cookedItems, int time, int masteryreq, int slot, double score) {
+    public Recipe(String key, String nick, Difficulty[] difficulty, List<String> ingredients, String cookedItems, int time, int masteryreq, int slot, double score) {
         this.key = key;
         this.nick = nick;
-        this.dishEffects = dishEffects;
         this.difficulty = difficulty;
         this.ingredients = ingredients;
         this.cookedItems = cookedItems;
@@ -66,6 +64,10 @@ public class Recipe {
 
     public List<List<Component>> getDishEffectsLore() {
         return dishEffects;
+    }
+
+    public void setDishEffectsLore(List<List<Component>> dishEffects) {
+        this.dishEffects = dishEffects;
     }
 
     public Layout[] getLayout() {
@@ -112,20 +114,12 @@ public class Recipe {
         this.failureActions = failureActions;
     }
 
-    public Action[] getConsumeActions() {
+    public List<Action[]> getConsumeActions() {
         return consumeActions;
     }
 
-    public void setConsumeActions(Action[] consumeActions) {
+    public void setConsumeActions(List<Action[]> consumeActions) {
         this.consumeActions = consumeActions;
-    }
-
-    public Action[] getPerfectConsumeActions() {
-        return perfectConsumeActions;
-    }
-
-    public void setPerfectConsumeActions(Action[] perfectConsumeActions) {
-        this.perfectConsumeActions = perfectConsumeActions;
     }
 
 }

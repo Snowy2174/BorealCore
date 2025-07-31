@@ -12,6 +12,8 @@ import plugin.borealcore.functions.herbalism.objects.Herb;
 import plugin.borealcore.functions.herbalism.objects.HerbalismType;
 import plugin.borealcore.functions.herbalism.objects.Modifier;
 import plugin.borealcore.functions.herbalism.objects.ModifierType;
+import plugin.borealcore.manager.EffectManager;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 
@@ -109,7 +111,7 @@ public class HerbManager extends Function {
                     herb.setColour(colour);
                 }
 
-                herb.setActions(plugin.borealcore.functions.cooking.configs.EffectManager.getConsumeActions(itemSection.getConfigurationSection("action.consume"), false));
+                herb.setActions(EffectManager.getActions(itemSection.getConfigurationSection("action.consume"), herb.getNick(), false));
                 herb.setEffects(getEffects(itemSection.getConfigurationSection("effects")));
 
                 if (type == HerbalismType.MODIFIER) {
@@ -129,7 +131,7 @@ public class HerbManager extends Function {
                 if (ModifierType.valueOf(type) != null) {
                     modifier.add(new Modifier(ModifierType.valueOf(type.toUpperCase()), section.getInt(type)));
                 } else {
-                    AdventureUtil.consoleMessage("Modifier type, " + type + " is unrecognised.");
+                    AdventureUtil.consoleMessage(DebugLevel.WARNING, "Modifier type, " + type + " is unrecognised.");
                 }
             }
             return modifier.toArray(new Modifier[0]);

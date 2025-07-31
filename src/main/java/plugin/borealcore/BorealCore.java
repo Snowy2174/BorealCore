@@ -5,7 +5,6 @@ import com.comphenix.protocol.ProtocolManager;
 import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.borealcore.commands.*;
 import plugin.borealcore.database.Database;
@@ -15,7 +14,7 @@ import plugin.borealcore.functions.bending.BendingManager;
 import plugin.borealcore.functions.brewery.BreweryManager;
 import plugin.borealcore.functions.cooking.CompetitionManager;
 import plugin.borealcore.functions.cooking.CookingManager;
-import plugin.borealcore.functions.cooking.configs.EffectManager;
+import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.functions.duels.DuelsManager;
@@ -26,13 +25,9 @@ import plugin.borealcore.functions.karmicnode.NodeManager;
 import plugin.borealcore.functions.plushies.PlushieManager;
 import plugin.borealcore.functions.wiki.WikiManager;
 import plugin.borealcore.manager.*;
-import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ConfigUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
 
 public class BorealCore extends JavaPlugin {
@@ -63,8 +58,6 @@ public class BorealCore extends JavaPlugin {
     private static DuelsManager duelsManager;
     private static BendingManager bendingManager;
     private static BreweryManager breweryManager;
-
-    public static final List<Function> functions = new ArrayList<>();
 
     @Override
     public void onLoad() {
@@ -99,13 +92,6 @@ public class BorealCore extends JavaPlugin {
         duelsManager = new DuelsManager();
         bendingManager = new BendingManager();
         breweryManager = new BreweryManager();
-
-        functions.addAll(Arrays.asList(
-                cookingManager, herbalismManager, competitionManager, layoutManager, effectManager,
-                furnitureManager, masteryManager, recipeManager, herbManager, guiManager,
-                placeholderManager, nodeManager, wikiManager, jadeManager, craftingManager,
-                analyticsManager, plushieManager, duelsManager, bendingManager, breweryManager
-        ));
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());

@@ -12,7 +12,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.cooking.configs.EffectManager;
+import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 

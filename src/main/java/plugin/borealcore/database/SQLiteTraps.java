@@ -1,6 +1,7 @@
 package plugin.borealcore.database;
 
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.io.File;
@@ -38,7 +39,7 @@ public class SQLiteTraps extends Database {
             try {
                 dataFolder.createNewFile();
             } catch (IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "File write error: " + dbname + ".db");
+                AdventureUtil.consoleMessage(DebugLevel.ERROR,  "File write error: " + dbname + ".db");
             }
         }
         try {
@@ -52,7 +53,7 @@ public class SQLiteTraps extends Database {
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, "SQLiteJade exception on initialize", ex);
         } catch (ClassNotFoundException ex) {
-            plugin.getLogger().log(Level.SEVERE, "You need the SQLiteJade JBDC library.");
+            AdventureUtil.consoleMessage(DebugLevel.ERROR,  "You need the SQLiteJade JBDC library.");
         }
         return result;
     }

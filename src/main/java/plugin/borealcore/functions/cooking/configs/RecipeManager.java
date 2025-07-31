@@ -8,6 +8,8 @@ import plugin.borealcore.functions.cooking.Difficulty;
 import plugin.borealcore.functions.cooking.object.DroppedItem;
 import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.functions.cooking.object.Recipe;
+import plugin.borealcore.manager.EffectManager;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 
@@ -67,7 +69,6 @@ public class RecipeManager extends Function {
                 DroppedItem recipe = new DroppedItem(
                         key,
                         recipeSection.getString("nick", key),
-                        EffectManager.buildEffectLore(recipeSection.getString("action.consume.dish-buff", key)),
                         difficulties.toArray(new Difficulty[0]),
                         recipeSection.getStringList("ingredients"),
                         recipeSection.getString("cookedItems"),
@@ -83,7 +84,7 @@ public class RecipeManager extends Function {
                     for (String layoutName : recipeSection.getStringList("layout")) {
                         Layout layout = LayoutManager.LAYOUTS.get(layoutName);
                         if (layout == null) {
-                            AdventureUtil.consoleMessage("<red>[BorealCore] Bar " + layoutName + " doesn't exist");
+                            AdventureUtil.consoleMessage(DebugLevel.ERROR, "Bar" + layoutName + " doesn't exist");
                             continue;
                         }
                         layoutList.add(layout);
@@ -93,16 +94,17 @@ public class RecipeManager extends Function {
 
                 setActions(recipeSection, recipe);
 
+                recipe.setDishEffectsLore(EffectManager.buildActionsLore(recipe.getConsumeActions()));
+
                 COOKING_RECIPES.put(key, recipe);
             }
         }
     }
 
     private void setActions(ConfigurationSection section, Recipe recipe) {
-        recipe.setSuccessActions(EffectManager.getActions(section.getConfigurationSection("action.success"), recipe.getNick()));
-        recipe.setFailureActions(EffectManager.getActions(section.getConfigurationSection("action.failure"), recipe.getNick()));
-        recipe.setConsumeActions(EffectManager.getConsumeActions(section.getConfigurationSection("action.consume"), false));
-        recipe.setPerfectConsumeActions(EffectManager.getConsumeActions(section.getConfigurationSection("action.consume"), true));
+        recipe.setSuccessActions(EffectManager.getActions(section.getConfigurationSection("action.success"), recipe.getNick(), false));
+        recipe.setFailureActions(EffectManager.getActions(section.getConfigurationSection("action.failure"), recipe.getNick(), false));
+        recipe.setConsumeActions(List.of(EffectManager.getActions(section.getConfigurationSection("action.consume"), recipe.getNick(), false), EffectManager.getActions(section.getConfigurationSection("action.consume"), recipe.getNick(), true)));
     }
 
 }
