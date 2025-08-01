@@ -238,7 +238,7 @@ public class InventoryUtil {
             if (base.startsWith("fish")) {
                 return fishingIngredientCheck(playerInventory, base, 1);
             } else {
-                return tieredIngredientCheck(playerInventory, ingredient, 1);
+                return tieredIngredientCheck(playerInventory, base, 1);
             }
         } else {
             CustomStack customStack = CustomStack.getInstance(ingredient);
