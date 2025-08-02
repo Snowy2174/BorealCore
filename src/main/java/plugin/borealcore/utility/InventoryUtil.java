@@ -198,7 +198,7 @@ public class InventoryUtil {
             if (item == null) continue;
             AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Checking item: " + item.getType() + " x" + item.getAmount());
             String customFishingItemID = BukkitCustomFishingPlugin.getInstance().getItemManager().getCustomFishingItemID(item);
-            if (customFishingItemID != null) {
+            if (customFishingItemID != null && item.getType() == Material.COD) {
                 AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Custom fishing item found: " + customFishingItemID);
                 if (item.getAmount() >= amount) {
                     AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Enough fish found: " + item.getAmount());
@@ -264,7 +264,7 @@ public class InventoryUtil {
                 ItemStack item = playerInventory.getItem(i);
                 if (item == null) continue;
                 String customFishingItemID = BukkitCustomFishingPlugin.getInstance().getItemManager().getCustomFishingItemID(item);
-                if (customFishingItemID != null) {
+                if (customFishingItemID != null && item.getType() == Material.COD) {
                     int itemAmount = item.getAmount();
                     if (itemAmount <= remaining) {
                         playerInventory.setItem(i, null);
