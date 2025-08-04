@@ -208,6 +208,7 @@ public class CookingManager extends Function {
         }
 
         if (Competition.currentCompetition != null) {
+            Competition.currentCompetition.tryAddBossBarToPlayer(player);
             float score = ((float) droppedItem.getScore());
             Competition.currentCompetition.refreshData(player, score, perfect);
         }
@@ -284,10 +285,6 @@ public class CookingManager extends Function {
             speed = 1;
         }
         Difficulty difficult = new Difficulty(timer, speed);
-
-        if (Competition.currentCompetition != null) {
-            Competition.currentCompetition.tryAddBossBarToPlayer(player);
-        }
 
         CookingPlayer cookingPlayer = new CookingPlayer(System.currentTimeMillis() + time, player, layout, difficult, this);
         cookingPlayer.runTaskTimer(BorealCore.plugin, 0, 1);

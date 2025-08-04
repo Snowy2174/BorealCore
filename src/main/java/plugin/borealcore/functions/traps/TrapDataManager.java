@@ -11,6 +11,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.manager.configs.DebugLevel;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import java.util.UUID;
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 
 public class TrapDataManager {
+
     public static void handleFishingTrapInteract(Player player, Entity entity) {
         if (BorealCore.getTrapsDatabase().getFishingTrapById(entity.getUniqueId().toString()) != null) {
             // Method to handle interacting with a fishing trap
@@ -33,7 +35,7 @@ public class TrapDataManager {
         } else {
             // Method to handle interacting with a fishing trap that does not have stored data
             Trap fishingTrap = handleCreateFishingTrap(player, entity);
-            consoleMessage("Created a new fishing trap! with id:" + fishingTrap.getUuid());
+            consoleMessage(DebugLevel.DEBUG, "Created a new fishing trap! with id:" + fishingTrap.getUuid());
             player.openInventory(new TrapInventory(fishingTrap, BorealCore.getInstance()).getInventory());
         }
     }
