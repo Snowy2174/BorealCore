@@ -14,10 +14,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.traps.TrapDataManager;
-import plugin.borealcore.listener.FurnitureListener;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
+import plugin.borealcore.object.SimpleListener;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.InventoryUtil;
 
@@ -28,26 +28,34 @@ import static net.kyori.adventure.key.Key.key;
 public class FurnitureManager extends Function {
 
     private static final Map<Location, Hologram> holograms = new HashMap<>();
-    private final FurnitureListener furnitureListener;
     private final Map<Player, Long> cooldowns;
     private final Map<Location, BukkitTask> activeFXTasks = new HashMap<>();
+    private final SimpleListener simpleListener;
 
     public FurnitureManager() {
-        this.furnitureListener = new FurnitureListener(this);
         this.cooldowns = new HashMap<>();
+        this.simpleListener = new SimpleListener(this);
         load();
     }
 
     @Override
     public void load() {
-        Bukkit.getPluginManager().registerEvents(this.furnitureListener, BorealCore.plugin);
+        Bukkit.getPluginManager().registerEvents(this.simpleListener, BorealCore.plugin);
     }
 
     @Override
     public void unload() {
-        HandlerList.unregisterAll(this.furnitureListener);
+        if (this.simpleListener != null) HandlerList.unregisterAll(this.simpleListener);
+        cooldowns.clear();
+        for (BukkitTask task : activeFXTasks.values()) {
+            task.cancel();
+        }
+        activeFXTasks.clear();
+        holograms.clear();
+        AdventureUtil.consoleMessage("FurnitureManager unloaded successfully.");
     }
 
+    @Override
     public void onFurnitureInteract(FurnitureInteractEvent event) {
         Player player = event.getPlayer();
         CustomFurniture clickedFurniture = event.getFurniture();
@@ -81,6 +89,7 @@ public class FurnitureManager extends Function {
         }
     }
 
+    @Override
     public void onFurnitureBreak(FurnitureBreakEvent event) {
         CustomFurniture clickedFurniture = event.getFurniture();
 
@@ -179,15 +188,12 @@ public class FurnitureManager extends Function {
         String name = recipe.displayName().examinableName() + "_" + success.toString() + "_" + location.getBlockX() + "_" + location.getBlockY();
         if (DHAPI.getHologram(name) != null)
             return;
-
         List<String> contents = new ArrayList<>();
-
         if (success) {
             contents.add("&aSuccess!");
         } else {
             contents.add("&aFailure!");
         }
-
         contents.add(recipe.getItemMeta().getDisplayName());
         Hologram hologram = DHAPI.createHologram(name, location.clone().add(0, 1.5, 0), contents);
         DHAPI.addHologramLine(hologram, recipe);
@@ -202,16 +208,14 @@ public class FurnitureManager extends Function {
 
     public void playCookingPotFX(Location location) {
         if (activeFXTasks.containsKey(location)) {
-            return; // FX is already running at this location
+            return;
         }
-
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
                 playAmbientEffects(location);
             }
         }.runTaskTimerAsynchronously(BorealCore.plugin, 0L, 80L);
-
         activeFXTasks.put(location, task);
     }
 

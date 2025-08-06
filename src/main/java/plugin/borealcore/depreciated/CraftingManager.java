@@ -1,4 +1,4 @@
-package plugin.borealcore.manager;
+package plugin.borealcore.depreciated;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;

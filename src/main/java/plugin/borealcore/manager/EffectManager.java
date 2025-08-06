@@ -44,7 +44,6 @@ public class EffectManager extends Function {
             List<PotionEffect> effectsList = new ArrayList<>();
             List<PotionEffect> perfectEffectsList = new ArrayList<>();
 
-            // Iterate over the keys in each section
             for (String levelKey : section.getKeys(false)) {
                 ConfigurationSection levelSection = section.getConfigurationSection(levelKey);
 

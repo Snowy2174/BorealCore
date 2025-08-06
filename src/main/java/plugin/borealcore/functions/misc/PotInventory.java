@@ -1,4 +1,4 @@
-package plugin.borealcore.functions.template;
+package plugin.borealcore.functions.misc;
 
 import net.kyori.adventure.text.Component;
 import net.momirealms.customcrops.api.BukkitCustomCropsPlugin;

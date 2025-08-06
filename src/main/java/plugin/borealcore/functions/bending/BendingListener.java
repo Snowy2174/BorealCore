@@ -1,4 +1,4 @@
-package plugin.borealcore.listener;
+package plugin.borealcore.functions.bending;
 
 import com.projectkorra.projectkorra.event.AbilityVelocityAffectEntityEvent;
 import org.bukkit.event.EventHandler;

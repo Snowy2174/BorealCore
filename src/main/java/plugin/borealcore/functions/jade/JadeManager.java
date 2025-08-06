@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitScheduler;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.event.JadeEvent;
@@ -18,7 +19,6 @@ import plugin.borealcore.database.Database;
 import plugin.borealcore.functions.jade.object.JadeSource;
 import plugin.borealcore.functions.jade.object.JadeTransaction;
 import plugin.borealcore.functions.jade.object.Leaderboard;
-import plugin.borealcore.listener.JadeSourceListener;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
@@ -65,6 +65,7 @@ public class JadeManager extends Function {
     public void unload() {
         jadeSources.clear();
         leaderboardCache.clear();
+        if (this.jadeSourceListener != null) HandlerList.unregisterAll(this.jadeSourceListener);
 
         if (scheduler != null) {
             scheduler.cancelTasks(BorealCore.getInstance());

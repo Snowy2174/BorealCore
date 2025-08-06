@@ -2,6 +2,8 @@ package plugin.borealcore.object;
 
 //import com.comphenix.protocol.events.PacketContainer;
 
+import dev.lone.itemsadder.api.Events.FurnitureBreakEvent;
+import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -44,6 +46,14 @@ public abstract class Function {
     }
 
     public void onConsumeItem(PlayerItemConsumeEvent event) {
+        //empty
+    }
+
+    public void onFurnitureInteract(FurnitureInteractEvent event) {
+        //empty
+    }
+
+    public void onFurnitureBreak(FurnitureBreakEvent event) {
         //empty
     }
 }

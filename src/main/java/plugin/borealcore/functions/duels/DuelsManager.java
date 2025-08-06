@@ -7,7 +7,6 @@ import com.meteordevelopments.duels.api.event.match.MatchEndEvent;
 import com.meteordevelopments.duels.api.event.match.MatchStartEvent;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.listener.DuelsListener;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;

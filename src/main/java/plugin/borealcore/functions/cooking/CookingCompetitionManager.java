@@ -1,7 +1,6 @@
 package plugin.borealcore.functions.cooking;
 
 import net.kyori.adventure.bossbar.BossBar;
-import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.borealcore.action.Action;
 import plugin.borealcore.action.CommandActionImpl;
@@ -17,7 +16,7 @@ import plugin.borealcore.utility.ConfigUtil;
 import java.util.*;
 
 
-public class CompetitionManager extends Function {
+public class CookingCompetitionManager extends Function {
 
     public static HashMap<String, CompetitionConfig> competitionsT;
     public static HashMap<String, CompetitionConfig> competitionsC;

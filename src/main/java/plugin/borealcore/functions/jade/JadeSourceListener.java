@@ -1,4 +1,4 @@
-package plugin.borealcore.listener;
+package plugin.borealcore.functions.jade;
 
 import com.bencodez.votingplugin.events.PlayerVoteEvent;
 import com.dre.brewery.api.events.brew.BrewModifyEvent;
@@ -8,7 +8,6 @@ import net.momirealms.customfishing.api.event.FishingResultEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 

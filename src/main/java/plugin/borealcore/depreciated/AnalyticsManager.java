@@ -1,4 +1,4 @@
-package plugin.borealcore.manager;
+package plugin.borealcore.depreciated;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;

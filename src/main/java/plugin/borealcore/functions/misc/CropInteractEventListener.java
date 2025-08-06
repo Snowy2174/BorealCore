@@ -1,17 +1,13 @@
-package plugin.borealcore.listener;
+package plugin.borealcore.functions.misc;
 
 import dev.lone.itemsadder.api.CustomStack;
 import net.momirealms.customcrops.api.core.block.PotBlock;
-import net.momirealms.customcrops.api.core.mechanic.fertilizer.Fertilizer;
-import net.momirealms.customcrops.api.core.mechanic.fertilizer.FertilizerConfig;
 import net.momirealms.customcrops.api.event.CropInteractEvent;
 import net.momirealms.customcrops.api.event.FertilizerUseEvent;
-import net.momirealms.customcrops.api.event.PotInteractEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import plugin.borealcore.functions.template.PotInventory;
 import plugin.borealcore.manager.configs.DebugLevel;
 
 import java.util.Arrays;

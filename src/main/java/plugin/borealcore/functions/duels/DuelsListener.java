@@ -1,4 +1,4 @@
-package plugin.borealcore.listener;
+package plugin.borealcore.functions.duels;
 
 import com.meteordevelopments.duels.api.Duels;
 import com.meteordevelopments.duels.api.event.match.MatchEndEvent;

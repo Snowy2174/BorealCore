@@ -1,9 +1,8 @@
-package plugin.borealcore.listener;
+package plugin.borealcore.functions.traps;
 
 import com.palmergames.bukkit.towny.event.NewDayEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import plugin.borealcore.functions.traps.TrapDataManager;
 
 public class TownyListener implements Listener {
 

@@ -10,10 +10,13 @@ import plugin.borealcore.commands.*;
 import plugin.borealcore.database.Database;
 import plugin.borealcore.database.SQLiteJade;
 import plugin.borealcore.database.SQLiteTraps;
+import plugin.borealcore.depreciated.AnalyticsManager;
+import plugin.borealcore.depreciated.CraftingManager;
 import plugin.borealcore.functions.bending.BendingManager;
 import plugin.borealcore.functions.brewery.BreweryManager;
-import plugin.borealcore.functions.cooking.CompetitionManager;
+import plugin.borealcore.functions.cooking.CookingCompetitionManager;
 import plugin.borealcore.functions.cooking.CookingManager;
+import plugin.borealcore.functions.cooking.MasteryManager;
 import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
@@ -37,7 +40,7 @@ public class BorealCore extends JavaPlugin {
     public static ProtocolManager protocolManager;
     private static CookingManager cookingManager;
     private static HerbalismManager herbalismManager;
-    private static CompetitionManager competitionManager;
+    private static CookingCompetitionManager competitionManager;
     private static GuiManager guiManager;
     private static RecipeManager recipeManager;
     private static HerbManager herbManager;
@@ -72,7 +75,7 @@ public class BorealCore extends JavaPlugin {
 
         cookingManager = new CookingManager();
         herbalismManager = new HerbalismManager();
-        competitionManager = new CompetitionManager();
+        competitionManager = new CookingCompetitionManager();
         layoutManager = new LayoutManager();
         effectManager = new EffectManager();
         furnitureManager = new FurnitureManager();
@@ -107,16 +110,6 @@ public class BorealCore extends JavaPlugin {
         getCommand("herbalism").setExecutor(new HerbalismCommand());
         //getCommand("herbalism").setTabCompleter(new HerbalismTabCompletion());#
         getCommand("traps").setExecutor(new TrapsCommand());
-
-
-        // @TODO
-        // Debug what this does and if it is still needed
-        Bukkit.getScheduler().runTaskLater(this, new Runnable() {
-            @Override
-            public void run() {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mythicmobs reload");
-            }
-        }, 100L);
 
         AdventureUtil.consoleMessage("Plugin Enabled!");
     }
@@ -168,7 +161,7 @@ public class BorealCore extends JavaPlugin {
         return cookingManager;
     }
 
-    public static CompetitionManager getCompetitionManager() {
+    public static CookingCompetitionManager getCompetitionManager() {
         return competitionManager;
     }
 

@@ -2,7 +2,6 @@ package plugin.borealcore.functions.bending;
 
 import org.bukkit.Bukkit;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.listener.BendingListener;
 import plugin.borealcore.object.Function;
 
 public class BendingManager extends Function {

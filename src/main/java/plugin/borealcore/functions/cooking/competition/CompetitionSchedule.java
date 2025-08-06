@@ -3,7 +3,7 @@ package plugin.borealcore.functions.cooking.competition;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.cooking.CompetitionManager;
+import plugin.borealcore.functions.cooking.CookingCompetitionManager;
 import plugin.borealcore.object.Function;
 
 import java.time.LocalTime;
@@ -25,7 +25,7 @@ public class CompetitionSchedule extends Function {
     private int doubleCheckTime;
 
     public static boolean startCompetition(String competitionName) {
-        CompetitionConfig competitionConfig = CompetitionManager.competitionsC.get(competitionName);
+        CompetitionConfig competitionConfig = CookingCompetitionManager.competitionsC.get(competitionName);
         if (competitionConfig == null) return false;
         if (Competition.currentCompetition != null) {
             Competition.currentCompetition.end();
@@ -59,7 +59,7 @@ public class CompetitionSchedule extends Function {
         this.checkTimeTask = new BukkitRunnable() {
             public void run() {
                 if (isANewMinute()) {
-                    CompetitionConfig competitionConfig = CompetitionManager.competitionsT.get(getCurrentTime());
+                    CompetitionConfig competitionConfig = CookingCompetitionManager.competitionsT.get(getCurrentTime());
                     if (competitionConfig != null && competitionConfig.canStart()) {
                         startCompetition(competitionConfig);
                     }

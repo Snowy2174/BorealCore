@@ -10,7 +10,7 @@ import plugin.borealcore.functions.cooking.CookingManager;
 import plugin.borealcore.functions.cooking.competition.Competition;
 import plugin.borealcore.functions.cooking.competition.CompetitionSchedule;
 import plugin.borealcore.manager.GuiManager;
-import plugin.borealcore.manager.MasteryManager;
+import plugin.borealcore.functions.cooking.MasteryManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
