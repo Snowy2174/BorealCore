@@ -17,6 +17,7 @@ import plugin.borealcore.functions.brewery.BreweryManager;
 import plugin.borealcore.functions.cooking.CookingCompetitionManager;
 import plugin.borealcore.functions.cooking.CookingManager;
 import plugin.borealcore.functions.cooking.MasteryManager;
+import plugin.borealcore.functions.traps.TrapsManager;
 import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
@@ -28,6 +29,7 @@ import plugin.borealcore.functions.karmicnode.NodeManager;
 import plugin.borealcore.functions.plushies.PlushieManager;
 import plugin.borealcore.functions.wiki.WikiManager;
 import plugin.borealcore.manager.*;
+import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ConfigUtil;
 
@@ -61,6 +63,7 @@ public class BorealCore extends JavaPlugin {
     private static DuelsManager duelsManager;
     private static BendingManager bendingManager;
     private static BreweryManager breweryManager;
+    private static TrapsManager trapsManager;
 
     @Override
     public void onLoad() {
@@ -95,6 +98,7 @@ public class BorealCore extends JavaPlugin {
         duelsManager = new DuelsManager();
         bendingManager = new BendingManager();
         breweryManager = new BreweryManager();
+        trapsManager = new TrapsManager();
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());
@@ -247,6 +251,10 @@ public class BorealCore extends JavaPlugin {
 
     public static Database getTrapsDatabase() {
         return traps;
+    }
+
+    public static TrapsManager getTrapsManager() {
+        return trapsManager;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {

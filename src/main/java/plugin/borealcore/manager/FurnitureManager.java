@@ -60,10 +60,6 @@ public class FurnitureManager extends Function {
         Player player = event.getPlayer();
         CustomFurniture clickedFurniture = event.getFurniture();
 
-        if (clickedFurniture.getId().equals("fishing_trap")) {
-            TrapDataManager.handleFishingTrapInteract(player, clickedFurniture.getEntity());
-        }
-
         if (clickedFurniture.getId().equals(ConfigManager.unlitCookingPot)) {
             if (!cooldowns.containsKey(player) || (System.currentTimeMillis() - cooldowns.get(player) >= 2000)) {
                 cooldowns.put(player, System.currentTimeMillis());

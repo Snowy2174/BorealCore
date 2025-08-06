@@ -20,26 +20,6 @@ import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 
 public class TrapDataManager {
 
-    public static void handleFishingTrapInteract(Player player, Entity entity) {
-        if (BorealCore.getTrapsDatabase().getFishingTrapById(entity.getUniqueId().toString()) != null) {
-            // Method to handle interacting with a fishing trap
-            UUID playerID = player.getUniqueId();
-            Trap fishingTrap = BorealCore.getTrapsDatabase().getFishingTrapById(entity.getUniqueId().toString());
-            if (fishingTrap.getOwner().equals(playerID)) {
-                // @TODO Method to handle interacting with your own fishing trap
-                consoleMessage("Opened fishing trap with id:" + fishingTrap.getUuid());
-                player.openInventory(new TrapInventory(fishingTrap, BorealCore.getInstance()).getInventory());
-            } else {
-                // @TODO Method to handle interacting with someone else's fishing trap
-            }
-        } else {
-            // Method to handle interacting with a fishing trap that does not have stored data
-            Trap fishingTrap = handleCreateFishingTrap(player, entity);
-            consoleMessage(DebugLevel.DEBUG, "Created a new fishing trap! with id:" + fishingTrap.getUuid());
-            player.openInventory(new TrapInventory(fishingTrap, BorealCore.getInstance()).getInventory());
-        }
-    }
-
     public static Trap handleCreateFishingTrap(Player player, Entity entity) {
         // Method to handle creating a fishing trap
         Trap fishingTrap = new Trap("fishing_trap", // New fishing trap
@@ -50,27 +30,29 @@ public class TrapDataManager {
                 new ArrayList<>(),
                 64, // Get from Config eventually
                 null); // Get from Config eventually
-        fishingTrap.checkActive(); // Check if the trap is active
-        BorealCore.getTrapsDatabase().saveFishingTrap(fishingTrap); // Save the trap to the database!
+        fishingTrap.checkActive();
+        BorealCore.getTrapsDatabase().saveFishingTrap(fishingTrap);
         return fishingTrap;
     }
 
     public static void updateFishingTraps() {
-        BukkitCustomFishingPlugin api = TrapsManager.getCustomFishingApi();
+        BukkitCustomFishingPlugin api = BukkitCustomFishingPlugin.getInstance();
         Context<Player> context = Context.player(null);
         context.arg(ContextKeys.SURROUNDING, "water");
         for (Trap trap : BorealCore.getTrapsDatabase().getActiveFishingTraps()) {
             consoleMessage("Updating fishing trap with id: " + trap.getUuid());
             if (trap.getBait() == null || trap.getBait().getType() == Material.AIR) {
-                continue;
+                //continue;
+                consoleMessage(DebugLevel.DEBUG, "No bait found for trap with id: " + trap.getUuid() + ", skipping loot generation.");
             }
             context.arg(ContextKeys.LOCATION, trap.getLocation());
             context.arg(ContextKeys.OTHER_LOCATION, trap.getLocation());
             Loot loot = api.getLootManager().getNextLoot(Effect.newInstance(), context);
+            consoleMessage(loot.id());
             if (loot.type() == LootType.ITEM) {
                 ItemStack itemStack = api.getItemManager().buildInternal(context, loot.id());
                 trap.addItem(itemStack);
-                consoleMessage("Added item to trap: " + itemStack.getType() + " with id: " + trap.getUuid());
+                consoleMessage(DebugLevel.DEBUG, "Added item to trap: " + itemStack.getType() + " with id: " + trap.getUuid());
                 BorealCore.getTrapsDatabase().saveFishingTrap(trap);
             }
         }

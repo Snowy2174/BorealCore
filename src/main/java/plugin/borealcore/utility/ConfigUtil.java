@@ -58,6 +58,8 @@ public class ConfigUtil {
         BorealCore.getBendingManager().load();
         BorealCore.getBreweryManager().unload();
         BorealCore.getBreweryManager().load();
+        BorealCore.getTrapsManager().unload();
+        BorealCore.getTrapsManager().load();
     }
 }
 

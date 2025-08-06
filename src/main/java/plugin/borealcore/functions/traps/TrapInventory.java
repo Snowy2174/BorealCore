@@ -109,7 +109,7 @@ public class TrapInventory implements InventoryHolder {
 
     public void updateFishingTrap() {
         trap.setItems(items);
-        BorealCore.getDatabase().saveFishingTrap(trap);
+        BorealCore.getTrapsDatabase().saveFishingTrap(trap);
         // @TODO Method to update the fishing trap
     }
 
