@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-public class SQLiteTraps extends Database {
+public class SQLiteData extends Database {
     public String SQLiteCreateTrapsTable = "CREATE TABLE IF NOT EXISTS fishing_traps (" +
             "`uuid` VARCHAR(36) NOT NULL," +
             "`owner` TEXT NOT NULL," +
@@ -24,9 +24,14 @@ public class SQLiteTraps extends Database {
             "`bait` TEXT," +
             "PRIMARY KEY (`uuid`)" +
             ");";
+    public String SQLiteCreateCookingTable = "CREATE TABLE IF NOT EXISTS ingredient_bag (" +
+            "`uuid` VARCHAR(36) NOT NULL," +
+            "`items` TEXT," +
+            "PRIMARY KEY (`uuid`)" +
+            ");";
     String dbname;
 
-    public SQLiteTraps(BorealCore instance) {
+    public SQLiteData(BorealCore instance) {
         super(instance);
         dbname = "traps";
         table = "fishing_traps";
@@ -60,11 +65,12 @@ public class SQLiteTraps extends Database {
 
     @Override
     public void load() {
-        AdventureUtil.consoleMessage("Loading SQLiteTraps database...");
+        AdventureUtil.consoleMessage("Loading SQLiteData database...");
         connection = getSQLConnection();
         try {
             Statement s = connection.createStatement();
             s.executeUpdate(SQLiteCreateTrapsTable);
+            s.executeUpdate(SQLiteCreateCookingTable);
             s.close();
         } catch (SQLException e) {
             e.printStackTrace();

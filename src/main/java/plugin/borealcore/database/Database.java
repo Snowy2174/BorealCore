@@ -19,6 +19,7 @@ import plugin.borealcore.functions.traps.Trap;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
+import plugin.borealcore.utility.SerialisationUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -808,11 +809,11 @@ public abstract class Database extends Function {
                 UUID uuid = UUID.fromString(rs.getString("uuid"));
                 UUID owner = UUID.fromString(rs.getString("owner"));
                 String key = rs.getString("key");
-                Location location = deserializeLocation(rs.getString("location"));
+                Location location = SerialisationUtil.deserializeLocation(rs.getString("location"));
                 boolean active = rs.getInt("active") == 1;
-                List<ItemStack> items = deserializeItems(rs.getString("items"));
+                List<ItemStack> items = SerialisationUtil.deserializeItems(rs.getString("items"));
                 int maxItems = rs.getInt("maxItems");
-                ItemStack bait = deserializeItems(rs.getString("bait")).get(0);
+                ItemStack bait = SerialisationUtil.deserializeItems(rs.getString("bait")).get(0);
 
                 fishingTraps.add(new Trap(key, uuid, owner, location, active, items, maxItems, bait));
             }
@@ -841,11 +842,11 @@ public abstract class Database extends Function {
             if (rs.next()) {
                 UUID owner = UUID.fromString(rs.getString("owner"));
                 String key = rs.getString("key");
-                Location location = deserializeLocation(rs.getString("location"));
+                Location location = SerialisationUtil.deserializeLocation(rs.getString("location"));
                 boolean active = rs.getInt("active") == 1;
-                List<ItemStack> items = deserializeItems(rs.getString("items"));
+                List<ItemStack> items = SerialisationUtil.deserializeItems(rs.getString("items"));
                 int maxItems = rs.getInt("maxItems");
-                ItemStack bait = deserializeItems(rs.getString("bait")).get(0);
+                ItemStack bait = SerialisationUtil.deserializeItems(rs.getString("bait")).get(0);
 
                 return new Trap(key, UUID.fromString(uuid), owner, location, active, items, maxItems, bait);
             }
@@ -860,33 +861,6 @@ public abstract class Database extends Function {
         return null;
     }
 
-    private Location deserializeLocation(String locationString) {
-        String[] location = locationString.split(":");
-        return new Location(plugin.getServer().getWorld(location[0]), parseDouble(location[1]), parseDouble(location[2]), parseDouble(location[3]));
-    }
-
-    private List<ItemStack> deserializeItems(String itemsString) throws IOException {
-        try {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(itemsString));
-            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-
-            int size = dataInput.readInt();
-            List<ItemStack> itemStacks = new ArrayList<>();
-            for (int i = 0; i < size; i++) {
-                itemStacks.add((ItemStack) dataInput.readObject());
-            }
-            dataInput.close();
-
-            if (itemStacks.size() == 0) {
-                itemStacks.add(new ItemStack(Material.AIR));
-            }
-
-            return itemStacks;
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to load item stacks.", e);
-        }
-    }
-
     public void saveFishingTrap(Trap trap) {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -897,11 +871,11 @@ public abstract class Database extends Function {
             ps.setString(1, trap.getUuid().toString());
             ps.setString(2, trap.getOwner().toString());
             ps.setString(3, trap.getKey());
-            ps.setString(4, serializeLocation(trap.getLocation()));
+            ps.setString(4, SerialisationUtil.serializeLocation(trap.getLocation()));
             ps.setInt(5, trap.isActive() ? 1 : 0);
-            ps.setString(6, serializeItems(trap.getItems()));
+            ps.setString(6, SerialisationUtil.serializeItems(trap.getItems()));
             ps.setInt(7, trap.getMaxItems());
-            ps.setString(8, serializeItems(Collections.singletonList(trap.getBait())));
+            ps.setString(8, SerialisationUtil.serializeItems(Collections.singletonList(trap.getBait())));
 
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -915,25 +889,6 @@ public abstract class Database extends Function {
             } catch (SQLException ex) {
                 plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
             }
-        }
-    }
-
-    private String serializeLocation(Location location) {
-        return "world" + ":" + location.getX() + ":" + location.getY() + ":" + location.getZ();
-    }
-
-    private String serializeItems(List<ItemStack> items) throws IllegalStateException {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
-            dataOutput.writeInt(items.size());
-            for (ItemStack item : items) {
-                dataOutput.writeObject(item);
-            }
-            dataOutput.close();
-            return Base64Coder.encodeLines(outputStream.toByteArray());
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to save item stacks.", e);
         }
     }
 
@@ -959,4 +914,51 @@ public abstract class Database extends Function {
             }
         }
     }
+
+    public List<ItemStack> getIngredientBagItems(Player player) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<ItemStack> items = new ArrayList<>();
+        try {
+            conn = this.getSQLConnection();
+            String query = "SELECT items FROM ingredient_bag WHERE uuid = ?;";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, player.getUniqueId().toString());
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String serializedItems = rs.getString("items");
+                if (serializedItems != null && !serializedItems.isEmpty()) {
+                    items = SerialisationUtil.deserializeItems(serializedItems);
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeResources(conn, ps, rs);
+        }
+        return items;
+    }
+
+    public void saveIngredientBagItems(Player player, List<ItemStack> items) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = this.getSQLConnection();
+            String query = "REPLACE INTO ingredient_bag (uuid, items) VALUES (?, ?);";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, player.getUniqueId().toString());
+            ps.setString(2, SerialisationUtil.serializeItems(items));
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } finally {
+            closeResources(conn, ps, null);
+        }
+    }
+
+
 }

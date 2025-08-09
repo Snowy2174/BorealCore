@@ -2,6 +2,7 @@ package plugin.borealcore.functions.traps;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -13,6 +14,8 @@ import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static plugin.borealcore.utility.InventoryUtil.build;
 
 public class TrapInventory implements InventoryHolder {
 
@@ -36,7 +39,7 @@ public class TrapInventory implements InventoryHolder {
     }
 
     public ItemStack getInfoItem() {
-        ItemStack item = new ItemStack(Material.PAPER);
+        ItemStack item = build(trap.key);
         modifyLore(item);
         return item;
     }
@@ -44,7 +47,7 @@ public class TrapInventory implements InventoryHolder {
 
     public ItemStack getBaitItem() {
         if (trap.getBait() == null) {
-            return new ItemStack(Material.BARRIER);
+            return build("nobait");
         }
         ItemStack item = trap.getBait();
         return item;
@@ -65,7 +68,6 @@ public class TrapInventory implements InventoryHolder {
 
         lore.add(" ");
         lore.add("Active: " + trap.isActive());
-        lore.add("Max Items: " + trap.getMaxItems());
         lore.add("");
 
         List<Component> parsedLore = new ArrayList<>();
@@ -111,6 +113,12 @@ public class TrapInventory implements InventoryHolder {
         trap.setItems(items);
         BorealCore.getTrapsDatabase().saveFishingTrap(trap);
         // @TODO Method to update the fishing trap
+    }
+
+    public void setBaitItem(ItemStack baitItem) {
+        TrapInventory.baitItem = baitItem;
+        trap.setBait(baitItem);
+        BorealCore.getTrapsDatabase().saveFishingTrap(trap);
     }
 
     @Override

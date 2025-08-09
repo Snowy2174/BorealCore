@@ -4,6 +4,7 @@ import dev.lone.itemsadder.api.Events.FurnitureBreakEvent;
 import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
 import eu.decentsoftware.holograms.api.DecentHologramsAPI;
 import net.momirealms.customfishing.api.BukkitCustomFishingPlugin;
+import net.momirealms.customfishing.api.mechanic.MechanicType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -31,7 +32,6 @@ public class TrapsManager extends Function {
     }
 
     public static HashMap<String, Trap> TRAPS;
-    private static BukkitCustomFishingPlugin customFishingApi;
     private final SimpleListener simpleListener;
 
     @Override
@@ -49,26 +49,38 @@ public class TrapsManager extends Function {
     @Override
     public void unload() {
         if (this.simpleListener != null) HandlerList.unregisterAll(this.simpleListener);
-        // clear map
     }
 
-    public static BukkitCustomFishingPlugin getCustomFishingApi() {
-        return customFishingApi;
+    public boolean isBait(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return false;
+        BukkitCustomFishingPlugin api = BukkitCustomFishingPlugin.getInstance();
+        return !api.getEffectManager().getEffectModifier(api.getItemManager().getItemID(item), MechanicType.BAIT).isEmpty();
     }
 
     @Override
     public void onClickInventory(InventoryClickEvent event) {
         Inventory inventory = event.getClickedInventory();
         if (!(inventory.getHolder(false) instanceof TrapInventory myInventory)) {
-            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Clicked inventory is not a TrapInventory but: " + inventory.getHolder());
+            //AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Clicked inventory is not a TrapInventory but: " + inventory.getHolder());
             return;
         }
         event.setCancelled(true);
         if (!event.getClick().isLeftClick()) return;
         ItemStack clicked = event.getCurrentItem();
-        if (clicked != null && clicked.getType() == Material.COD) { //@ TODO check if the item is a fish
-            myInventory.takeItem((Player) event.getWhoClicked(), clicked);
-            myInventory.reloadInventory();
+        ItemStack cursor = event.getCursor();
+        if (clicked != null) { //@ TODO check if the item is a fish
+            if (clicked.getType() == Material.COD) {
+                myInventory.takeItem((Player) event.getWhoClicked(), clicked);
+                myInventory.reloadInventory();
+            } else if (clicked.getType() == Material.BARRIER) {
+                if (isBait(cursor)) {
+                    myInventory.setBaitItem(cursor);
+                    cursor.setType(Material.AIR);
+                    myInventory.reloadInventory();
+                } else {
+                    AdventureUtil.playerMessage((Player) event.getWhoClicked(), "You can only use bait items here!");
+                }
+            }
         }
     }
 
