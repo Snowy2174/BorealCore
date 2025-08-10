@@ -176,6 +176,9 @@ public class JadeManager extends Function {
         if (jadeData.size() == 1 && jadeData.containsKey("not_in_database")) {
             return -1;
         }
+        if (jadeData.containsKey("not_in_last_24_hours")) {
+            return 0;
+        }
         StringBuilder message = new StringBuilder();
         message.append(MessageManager.jadeLimitHeader);
         for (String source : jadeSources.keySet()) {

@@ -245,6 +245,8 @@ public abstract class Database extends Function {
 
                 if (sourceJadeMap.isEmpty()) {
                     sourceJadeMap.put("not_in_database", 0.0);
+                } else {
+                    sourceJadeMap.put("not_in_last_24_hours", 0.0);
                 }
             }
         } catch (SQLException e) {
