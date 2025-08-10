@@ -65,6 +65,7 @@ public class MessageManager {
     public static String leaderboardEntry;
     public static String altLeaderboardEntry;
     public static String leaderboardFooter;
+    public static String actionBarHealth;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang + ".yml");
@@ -132,6 +133,8 @@ public class MessageManager {
         leaderboardEntry = getOrSet(config, "leaderboard-entry", "<gradient:#00AA00:#88DAA1>  --> {position}: {player} - {score} </gradient>");
         altLeaderboardEntry = getOrSet(config, "alt-leaderboard-entry", "&e{position}. &b{player} &7- &e{score}");
         leaderboardFooter = getOrSet(config, "leaderboard-footer", "<gradient:#00AA00:#88DAA1>\n[______________________]</gradient>\n");
+
+        actionBarHealth = getOrSet(config, "action-bar-health", "<gray>%s: <red>%d / %.0f <grey>| %s: <red>%d / %.0f");
 
         try {
             config.save(new File(BorealCore.getInstance().getDataFolder(), "messages_" + ConfigManager.lang + ".yml"));

@@ -45,7 +45,7 @@ public class DuelsManager extends Function {
 
         if (ongoingRunnables.containsKey(arena)) {
             AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Match already ongoing for arena: " + arena.getName());
-            ongoingRunnables.remove(arena);
+            ongoingRunnables.remove(arena).cancel();
         }
 
         task.runTaskTimer(plugin, 0L, 20L);

@@ -7,13 +7,17 @@ import com.meteordevelopments.duels.api.arena.ArenaManager;
 import com.meteordevelopments.duels.api.spectate.SpectateManager;
 import com.meteordevelopments.duels.api.spectate.Spectator;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import static plugin.borealcore.manager.configs.MessageManager.actionBarHealth;
 
 public class MatchRunnable extends BukkitRunnable {
     private final Set<Player> players;
@@ -45,7 +49,13 @@ public class MatchRunnable extends BukkitRunnable {
         List<Spectator> spectators = getSpectators(spectateManager);
         for (Spectator spectator : spectators) {
             Player player = spectator.getPlayer();
-            AdventureUtil.playerActionbar(player, getFormat());
+            if (player.getGameMode() != GameMode.SPECTATOR) {
+                player.setGameMode(GameMode.SPECTATOR);
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Player " + player.getName() + "'s game mode changed to spectator whilst spectating " + arena.getName());
+            }
+            AdventureUtil.playerActionbar(player, String.format(actionBarHealth,
+                    player1.getName(), (int) player1.getHealth(), player1.getMaxHealth(),
+                    player2.getName(), (int) player2.getHealth(), player2.getMaxHealth()));
         }
     }
 
@@ -65,12 +75,6 @@ public class MatchRunnable extends BukkitRunnable {
 
     public List<Spectator> getSpectators(SpectateManager spectateManager) {
         return spectateManager.getSpectators(arena);
-    }
-
-    public String getFormat() {
-        return String.format("<gray>%s: <red>%d / %.0f <grey>| %s: <red>%d / %.0f",
-                player1.getName(), (int) player1.getHealth(), player1.getMaxHealth(),
-                player2.getName(), (int) player2.getHealth(), player2.getMaxHealth());
     }
 
     public Player getPlayer1() {
