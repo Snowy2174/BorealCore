@@ -3,6 +3,7 @@ package plugin.borealcore.utility;
 
 import dev.lone.itemsadder.api.CustomStack;
 import net.momirealms.customfishing.api.BukkitCustomFishingPlugin;
+import net.momirealms.customfishing.api.mechanic.context.Context;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -48,6 +49,10 @@ public class InventoryUtil {
             }
         }
         return itemStack;
+    }
+
+    public static Double getItemValue(Player player, ItemStack itemStack) {
+        return BukkitCustomFishingPlugin.getInstance().getMarketManager().getItemPrice(Context.player(player), itemStack);
     }
 
     private static void addIdentifier(ItemStack itemStack, String id) {

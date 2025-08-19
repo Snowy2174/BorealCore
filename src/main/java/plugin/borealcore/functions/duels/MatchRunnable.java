@@ -42,7 +42,6 @@ public class MatchRunnable extends BukkitRunnable {
         }
     }
 
-
     @Override
     public void run() {
         //plugin.getLogger().info("Match: " + arena.toString() + " Players: " + this.players.toString());

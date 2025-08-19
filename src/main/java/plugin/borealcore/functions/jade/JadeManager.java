@@ -198,7 +198,7 @@ public class JadeManager extends Function {
         return jadeData.size();
     }
 
-    public static void reconsileJadeData(Player player) {
+    public static void reconcileJadeData(Player player) {
         VotingPluginUser user = VotingPluginHooks.getInstance().getUserManager().getVotingPluginUser(player);
         if (user == null) {
             AdventureUtil.consoleMessage(DebugLevel.DEBUG,"User not found for " + player.getName());

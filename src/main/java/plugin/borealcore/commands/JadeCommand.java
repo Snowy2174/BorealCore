@@ -18,7 +18,7 @@ import plugin.borealcore.functions.jade.object.LeaderboardEntry;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 
-import static plugin.borealcore.functions.jade.JadeManager.reconsileJadeData;
+import static plugin.borealcore.functions.jade.JadeManager.reconcileJadeData;
 
 
 public class JadeCommand implements CommandExecutor {
@@ -249,7 +249,7 @@ public class JadeCommand implements CommandExecutor {
             return;
         }
         for (Player p : Bukkit.getOnlinePlayers()) {
-            reconsileJadeData(p);
+            reconcileJadeData(p);
             AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Reconciled jade data for " + p.getName());
             return;
         }

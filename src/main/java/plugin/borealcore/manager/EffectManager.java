@@ -46,6 +46,10 @@ public class EffectManager extends Function {
 
             for (String levelKey : section.getKeys(false)) {
                 ConfigurationSection levelSection = section.getConfigurationSection(levelKey);
+                if (levelSection == null) {
+                    AdventureUtil.consoleMessage(DebugLevel.DEBUG, "This is a debug message from AdventureUtil");
+                    continue;
+                }
 
                 String typeString = levelSection.getString("type");
                 PotionEffectType type = PotionEffectType.getByName(typeString.toUpperCase());
@@ -76,6 +80,7 @@ public class EffectManager extends Function {
                 case "command" -> actions.add(new CommandActionImpl(section.getStringList(action).toArray(new String[0]), nick));
                 case "exp" -> actions.add(new VanillaXPImpl(section.getInt(action), false));
                 case "mending" -> actions.add(new VanillaXPImpl(section.getInt(action), true));
+                case "reduce-drunkenness" -> actions.add(new DrunknessEffectImpl(section.getInt(action)));
                 case "sound" -> actions.add(new SoundActionImpl(
                         section.getString(action + ".source"),
                         section.getString(action + ".key"),
