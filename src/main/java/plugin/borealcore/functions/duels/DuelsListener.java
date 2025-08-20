@@ -4,7 +4,6 @@ import com.meteordevelopments.duels.api.Duels;
 import com.meteordevelopments.duels.api.event.match.MatchEndEvent;
 import com.meteordevelopments.duels.api.event.match.MatchStartEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;

@@ -2,8 +2,6 @@ package plugin.borealcore.database;
 
 
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.manager.configs.DebugLevel;
-import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.logging.Level;
 

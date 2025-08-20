@@ -201,12 +201,12 @@ public class JadeManager extends Function {
     public static void reconcileJadeData(Player player) {
         VotingPluginUser user = VotingPluginHooks.getInstance().getUserManager().getVotingPluginUser(player);
         if (user == null) {
-            AdventureUtil.consoleMessage(DebugLevel.DEBUG,"User not found for " + player.getName());
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "User not found for " + player.getName());
             return;
         }
         int avPoints = user.getPoints();
         if (avPoints == 0) {
-            AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Jade data is already reconciled for " + player.getName());
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Jade data is already reconciled for " + player.getName());
             return;
         }
         database.getJadeForPlayerAsync(player, currentJade -> {
@@ -214,7 +214,7 @@ public class JadeManager extends Function {
                 int diff = avPoints - currentJade;
                 give(player, diff, "");
                 user.setPoints(0);
-                AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Reconciled " + diff + " jade for " + player.getName());
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Reconciled " + diff + " jade for " + player.getName());
             } else {
                 consoleMessage(DebugLevel.DEBUG, "No reconciliation needed for " + player.getName());
             }

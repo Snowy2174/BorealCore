@@ -55,7 +55,7 @@ public class WikiManager extends Function {
             Process process = processBuilder.start();
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Git clone failed with exit code: " + exitCode);
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Git clone failed with exit code: " + exitCode);
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -148,7 +148,7 @@ public class WikiManager extends Function {
     private void loadWiki(String repoUrl) {
         File wiki_file = new File(BorealCore.plugin.getDataFolder() + File.separator + "wiki");
         if (!wiki_file.exists() && !wiki_file.mkdir()) {
-            AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Failed to create wiki folder");
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Failed to create wiki folder");
             return;
         }
         try {

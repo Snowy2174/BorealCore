@@ -137,7 +137,7 @@ public class GuiManager extends Function {
             String key = entry.getKey().split(":")[1];
             ItemStack itemStack = entry.getValue();
             Double price = 0.0;
-            AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Price: " + price);
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Price: " + price);
 
             Map<String, Object> entryData = new HashMap<>();
             entryData.put("initial-price", price);
@@ -145,7 +145,7 @@ public class GuiManager extends Function {
         }
         try (FileWriter writer = new FileWriter(outputFile)) {
             yaml.dump(yamlData, writer);
-            AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Written file: " + outputFile.getAbsolutePath());
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Written file: " + outputFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }

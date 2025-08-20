@@ -18,7 +18,10 @@ import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ConfigUtil;
 import plugin.borealcore.utility.GUIUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static plugin.borealcore.utility.AdventureUtil.getComponentFromMiniMessage;
 
@@ -76,8 +79,10 @@ public class EffectManager extends Function {
             switch (action) {
                 case "hunger" -> actions.add(new HungerEffectImpl(section.getInt(action)));
                 case "saturation" -> actions.add(new SaturationEffectImpl(section.getInt(action)));
-                case "message" -> actions.add(new MessageActionImpl(section.getStringList(action).toArray(new String[0]), nick));
-                case "command" -> actions.add(new CommandActionImpl(section.getStringList(action).toArray(new String[0]), nick));
+                case "message" ->
+                        actions.add(new MessageActionImpl(section.getStringList(action).toArray(new String[0]), nick));
+                case "command" ->
+                        actions.add(new CommandActionImpl(section.getStringList(action).toArray(new String[0]), nick));
                 case "exp" -> actions.add(new VanillaXPImpl(section.getInt(action), false));
                 case "mending" -> actions.add(new VanillaXPImpl(section.getInt(action), true));
                 case "reduce-drunkenness" -> actions.add(new DrunknessEffectImpl(section.getInt(action)));
@@ -102,11 +107,11 @@ public class EffectManager extends Function {
                     actions.add(new PotionEffectImpl(potionEffectList.toArray(new PotionEffect[0])));
                 }
                 case "dish-buff" -> {
-                        String actionKey = section.getString(action);
-                        if (perfect) {
-                            actionKey += ConfigManager.perfectItemSuffix;
-                        }
-                        actions.add(new PotionEffectImpl(EFFECTS.get(actionKey).toArray(new PotionEffect[0])));
+                    String actionKey = section.getString(action);
+                    if (perfect) {
+                        actionKey += ConfigManager.perfectItemSuffix;
+                    }
+                    actions.add(new PotionEffectImpl(EFFECTS.get(actionKey).toArray(new PotionEffect[0])));
                 }
             }
         }

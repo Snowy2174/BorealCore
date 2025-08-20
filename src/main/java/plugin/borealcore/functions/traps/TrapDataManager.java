@@ -14,7 +14,6 @@ import plugin.borealcore.BorealCore;
 import plugin.borealcore.manager.configs.DebugLevel;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 

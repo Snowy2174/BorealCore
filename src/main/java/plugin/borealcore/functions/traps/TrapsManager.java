@@ -2,7 +2,6 @@ package plugin.borealcore.functions.traps;
 
 import dev.lone.itemsadder.api.Events.FurnitureBreakEvent;
 import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
-import eu.decentsoftware.holograms.api.DecentHologramsAPI;
 import net.momirealms.customfishing.api.BukkitCustomFishingPlugin;
 import net.momirealms.customfishing.api.mechanic.MechanicType;
 import org.bukkit.Bukkit;
@@ -64,6 +63,7 @@ public class TrapsManager extends Function {
             //AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Clicked inventory is not a TrapInventory but: " + inventory.getHolder());
             return;
         }
+        if (inventory == null) return;
         event.setCancelled(true);
         if (!event.getClick().isLeftClick()) return;
         ItemStack clicked = event.getCurrentItem();

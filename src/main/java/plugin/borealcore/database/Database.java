@@ -2,14 +2,10 @@ package plugin.borealcore.database;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Consumer;
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.jade.LeaderboardType;
 import plugin.borealcore.functions.jade.object.JadeTransaction;
@@ -21,8 +17,6 @@ import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.SerialisationUtil;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.time.Duration;
@@ -33,7 +27,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import static java.lang.Double.parseDouble;
 import static plugin.borealcore.functions.jade.JadeManager.jadeSources;
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 
@@ -506,7 +499,7 @@ public abstract class Database extends Function {
                     requiresTimestamp = true;
                 }
                 default -> {
-                    AdventureUtil.consoleMessage(DebugLevel.ERROR,"Unknown leaderboard type: " + type);
+                    AdventureUtil.consoleMessage(DebugLevel.ERROR, "Unknown leaderboard type: " + type);
                     return null;
                 }
             }

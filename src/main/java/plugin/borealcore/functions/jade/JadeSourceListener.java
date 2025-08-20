@@ -33,7 +33,7 @@ public class JadeSourceListener implements Listener {
         if (event.isCancelled() || event.reason() != BreakReason.ACTION) {
             return;
         }
-        AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Processing farmingJade for player: " + event.entityBreaker());
+        AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Processing farmingJade for player: " + event.entityBreaker());
         jadeManager.farmingJade(event);
     }
 

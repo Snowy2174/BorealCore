@@ -50,7 +50,7 @@ public class DuelsManager extends Function {
 
         task.runTaskTimer(plugin, 0L, 20L);
         ongoingRunnables.put(arena, task);
-        AdventureUtil.consoleMessage(DebugLevel.DEBUG,"Match started: " + ongoingRunnables.get(arena));
+        AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Match started: " + ongoingRunnables.get(arena));
     }
 
     public static void endMatch(MatchEndEvent event) {

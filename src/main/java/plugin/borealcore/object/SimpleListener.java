@@ -10,9 +10,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
-import plugin.borealcore.functions.traps.TrapInventory;
-import plugin.borealcore.functions.traps.TrapsManager;
 
 public record SimpleListener(Function function) implements Listener {
 

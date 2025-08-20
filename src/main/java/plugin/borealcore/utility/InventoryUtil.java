@@ -90,7 +90,7 @@ public class InventoryUtil {
 
     public static void removeItem(Inventory playerInventory, String ingredient, int amount) {
         if (ingredient.endsWith("*")) {
-            AdventureUtil.consoleMessage(DebugLevel.DEBUG,ingredient);
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, ingredient);
             removeWildcardItem(playerInventory, ingredient, amount);
             return;
         }

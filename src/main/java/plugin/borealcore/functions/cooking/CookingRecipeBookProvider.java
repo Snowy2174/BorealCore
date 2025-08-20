@@ -15,8 +15,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
+import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
@@ -102,7 +102,7 @@ public class CookingRecipeBookProvider implements InventoryProvider {
                 itemMeta.setLore(unknownRecipeStack.getItemMeta().getLore());
                 stack.setItemMeta(itemMeta);
             } else {
-                AdventureUtil.consoleMessage(DebugLevel.DEBUG,"ItemMeta is null!");
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "ItemMeta is null!");
             }
             return stack;
         }

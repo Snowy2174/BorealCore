@@ -52,6 +52,7 @@ public class ConfigManager {
     public static int brewingRequiredQuality;
     public static boolean processAnalyticsEnabled;
     public static List<String> refarmableCrops;
+    public static int lavaDamage;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
@@ -96,6 +97,8 @@ public class ConfigManager {
         unknownItem = config.getString("gui.items.unknown-item", "unknownrecipe");
         grinderItem = config.getString("gui.items.grinder-item", "grinder");
 
+        lavaDamage = config.getInt("mechanics.lava-damage", 1);
+
         successTitle = config.getStringList("titles.success.title").toArray(new String[0]);
         successSubTitle = config.getStringList("titles.success.subtitle").toArray(new String[0]);
         successFadeIn = config.getInt("titles.success.fade.in", 10) * 50;
@@ -122,6 +125,6 @@ public class ConfigManager {
 
     public static void setDebugLevel(DebugLevel debugLevel) {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
-            config.set("debug-level", debugLevel.toString());
+        config.set("debug-level", debugLevel.toString());
     }
 }

@@ -8,7 +8,6 @@ import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
 
 public class AnnoucmentRunnable implements Runnable {
 

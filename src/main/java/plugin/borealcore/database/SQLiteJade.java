@@ -48,7 +48,7 @@ public class SQLiteJade extends Database {
             try {
                 dataFolder.createNewFile();
             } catch (IOException e) {
-                AdventureUtil.consoleMessage(DebugLevel.ERROR,  "File write error: " + dbname + ".db");
+                AdventureUtil.consoleMessage(DebugLevel.ERROR, "File write error: " + dbname + ".db");
             }
         }
         try {
@@ -62,7 +62,7 @@ public class SQLiteJade extends Database {
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, "SQLiteJade exception on initialize", ex);
         } catch (ClassNotFoundException ex) {
-            AdventureUtil.consoleMessage(DebugLevel.ERROR,  "You need the SQLiteJade JBDC library.");
+            AdventureUtil.consoleMessage(DebugLevel.ERROR, "You need the SQLiteJade JBDC library.");
         }
         return result;
     }

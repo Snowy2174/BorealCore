@@ -5,9 +5,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.competition.Competition;
-import plugin.borealcore.object.SimpleListener;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
+import plugin.borealcore.object.SimpleListener;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.HashMap;

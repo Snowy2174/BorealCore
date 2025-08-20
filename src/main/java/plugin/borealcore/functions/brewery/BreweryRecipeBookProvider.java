@@ -80,7 +80,7 @@ public class BreweryRecipeBookProvider implements InventoryProvider {
                 itemMeta.setLore(unknownRecipeStack.getItemMeta().getLore());
                 stack.setItemMeta(itemMeta);
             } else {
-                AdventureUtil.consoleMessage(DebugLevel.DEBUG,"ItemMeta is null!");
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "ItemMeta is null!");
             }
             return stack;
         }
