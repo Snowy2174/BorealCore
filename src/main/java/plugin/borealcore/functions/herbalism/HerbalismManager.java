@@ -136,7 +136,6 @@ public class HerbalismManager extends Function {
 
         // Set potion type and color based on the infusion ingredients
         PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
-        potionMeta.setBasePotionData(new org.bukkit.potion.PotionData(PotionType.UNCRAFTABLE, false, false));
         potionMeta.setColor(Color.fromRGB(averageColor(infusion.getIngredients())));
         itemStack.setItemMeta(potionMeta);
 
@@ -202,7 +201,7 @@ public class HerbalismManager extends Function {
         Infusion infusion = currentInfusions.get(player);
 
         //stopSoundLoop(player);
-        player.removePotionEffect(PotionEffectType.SLOW);
+        player.removePotionEffect(PotionEffectType.SLOWNESS);
 
         if (infusion == null)
             return;
@@ -380,7 +379,7 @@ public class HerbalismManager extends Function {
         infusingPlayer.runTaskTimer(BorealCore.plugin, 0, 1);
         //@TODO sort cache
         infusingPlayerCache.put(player, infusingPlayer);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, time / 50, 3));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, time / 50, 3));
     }
 
     @Override

@@ -52,7 +52,8 @@ public class ConfigManager {
     public static int brewingRequiredQuality;
     public static boolean processAnalyticsEnabled;
     public static List<String> refarmableCrops;
-    public static int lavaDamage;
+    public static int lavaContactDamage;
+    public static int fireContactDamage;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
@@ -97,7 +98,8 @@ public class ConfigManager {
         unknownItem = config.getString("gui.items.unknown-item", "unknownrecipe");
         grinderItem = config.getString("gui.items.grinder-item", "grinder");
 
-        lavaDamage = config.getInt("mechanics.lava-damage", 1);
+        lavaContactDamage = config.getInt("bending.lava-contact-damage", 1);
+        fireContactDamage = config.getInt("bending.fire-contact-damage", 1);
 
         successTitle = config.getStringList("titles.success.title").toArray(new String[0]);
         successSubTitle = config.getStringList("titles.success.subtitle").toArray(new String[0]);

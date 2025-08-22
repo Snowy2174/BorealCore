@@ -168,7 +168,7 @@ public class FurnitureManager extends Function {
             loc.getWorld().spawnParticle(Particle.COMPOSTER, location, 15, 0.5, 0.5, 0.5);
         } else {
             // Particles: squid_ink
-            loc.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, location, 15, 0.5, 0.5, 0.5);
+            loc.getWorld().spawnParticle(Particle.ANGRY_VILLAGER, location, 15, 0.5, 0.5, 0.5);
         }
         playCookingPreview(location, item, success);
     }

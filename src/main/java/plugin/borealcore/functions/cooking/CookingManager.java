@@ -159,7 +159,7 @@ public class CookingManager extends Function {
 
         stopSoundLoop(player);
 
-        player.removePotionEffect(PotionEffectType.SLOW);
+        player.removePotionEffect(PotionEffectType.SLOWNESS);
 
         if (!cookingPlayer.isSuccess()) {
             if (cookingPot != null) {
@@ -284,7 +284,7 @@ public class CookingManager extends Function {
         CookingPlayer cookingPlayer = new CookingPlayer(System.currentTimeMillis() + time, player, layout, difficult, this);
         cookingPlayer.runTaskTimer(BorealCore.plugin, 0, 1);
         cookingPlayerCache.put(player, cookingPlayer);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, time / 50, 3));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, time / 50, 3));
         playSoundLoop(player);
     }
 
