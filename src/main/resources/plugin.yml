@@ -37,7 +37,7 @@ commands:
   sit:
     description: Sit
     usage: /<command>
-    permission: OpenSit.Sit
+    permission: borealcore.Sit
 
 permissions:
   customcooking.*:
@@ -47,5 +47,5 @@ permissions:
   borealcore.*:
     default: false
     children:
-      borealcore.Sit: true
+      borealcore.Sit: false
       borealcore.SitClick: true

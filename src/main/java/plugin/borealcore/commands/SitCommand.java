@@ -10,12 +10,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-import plugin.borealcore.functions.misc.SitListener;
 
 public final class SitCommand implements CommandExecutor {
-    public final double offset;
 
-    public SitCommand(final SitListener listener) { offset = listener.offset - .2; }
+    public SitCommand() {}
 
     @Override
     public boolean onCommand(final @NotNull CommandSender sender, final @NotNull Command command, final @NotNull String s, final @NotNull String[] strings) {
@@ -24,7 +22,7 @@ public final class SitCommand implements CommandExecutor {
             return true;
         }
         final Player plr = (Player) sender;
-        if (!plr.hasPermission("OpenSit.Sit")) {
+        if (!plr.hasPermission("borealcore.Sit")) {
             sender.sendMessage("You don't have permission");
             return true;
         }
@@ -42,7 +40,7 @@ public final class SitCommand implements CommandExecutor {
             sender.sendMessage("You do not stand on the ground.");
             return true;
         }
-        final BlockDisplay b = (BlockDisplay) l.getWorld().spawnEntity(new Location(l.getWorld(), l.getX(), r.getHitPosition().getY() + offset, l.getZ()), EntityType.BLOCK_DISPLAY);
+        final BlockDisplay b = (BlockDisplay) l.getWorld().spawnEntity(new Location(l.getWorld(), l.getX(), r.getHitPosition().getY(), l.getZ()), EntityType.BLOCK_DISPLAY);
         b.addScoreboardTag("sit");
         b.addPassenger(plr);
         return true;
