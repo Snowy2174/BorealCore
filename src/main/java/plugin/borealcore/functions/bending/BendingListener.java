@@ -26,7 +26,7 @@ public class BendingListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDamageEvent(EntityDamageEvent event) {
-        if (!TempBlock.isTempBlock(event.getEntity().getLocation().getBlock())) {
+        if (!event.getEntity().getWorld().getName().toLowerCase().equals("arenaworld")) {
             return;
         }
         if (!(event.getEntity() instanceof Player player)) return;
@@ -34,6 +34,9 @@ public class BendingListener implements Listener {
             case CUSTOM -> {
                 if (player.getLocation().getBlock().getType() == Material.LAVA) {
                     event.setDamage(lavaContactDamage);
+                }
+                if (player.getLocation().getBlock().getType() == Material.FIRE) {
+                    event.setDamage(fireContactDamage);
                 }
             }
             case LAVA -> {

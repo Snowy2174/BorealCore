@@ -1,11 +1,13 @@
 package plugin.borealcore.functions.cooking;
 
 
+import com.mojang.brigadier.Command;
 import dev.lone.itemsadder.api.CustomFurniture;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -19,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.action.Action;
 import plugin.borealcore.api.event.CookResultEvent;
+import plugin.borealcore.commands.SitCommand;
 import plugin.borealcore.functions.cooking.competition.Competition;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
@@ -28,6 +31,7 @@ import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.functions.cooking.object.Recipe;
 import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.functions.misc.CropInteractEventListener;
+import plugin.borealcore.functions.misc.SitListener;
 import plugin.borealcore.manager.FurnitureManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
@@ -55,6 +59,7 @@ public class CookingManager extends Function {
     public final ConcurrentHashMap<Player, CookingPlayer> cookingPlayerCache;
     private final Map<UUID, BukkitRunnable> playerSoundTasks = new HashMap<>();
     private final SimpleListener simpleListener;
+    public final SitListener listener;
 
     public CookingManager() {
         this.random = new Random();
@@ -62,17 +67,25 @@ public class CookingManager extends Function {
         this.cookingPotLocations = new HashMap<>();
         this.cookingPlayerCache = new ConcurrentHashMap<>();
         this.simpleListener = new SimpleListener(this);
+        this.listener = new SitListener(BorealCore.getInstance());
     }
 
     @Override
     public void load() {
+        listener.register(BorealCore.getInstance());
         Bukkit.getPluginManager().registerEvents(this.simpleListener, BorealCore.plugin);
         Bukkit.getPluginManager().registerEvents(new CropInteractEventListener(), BorealCore.plugin); //@TODO MOVE URGENTLY
+    }
+
+    // REMOVE/UPDATE
+    public SitListener getSitListener() {
+        return listener;
     }
 
     @Override
     public void unload() {
         if (this.simpleListener != null) HandlerList.unregisterAll(this.simpleListener);
+        if (this.listener != null) HandlerList.unregisterAll(this.listener);
     }
 
     public void handleCooking(String recipe, Player player, CustomFurniture clickedFurniture) {

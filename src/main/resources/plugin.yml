@@ -34,9 +34,18 @@ commands:
     description: The command to manage Recipes
   traps:
     description: The command to manage Traps
+  sit:
+    description: Sit
+    usage: /<command>
+    permission: OpenSit.Sit
 
 permissions:
   customcooking.*:
     default: false
   customcooking.admin:
     default: op
+  borealcore.*:
+    default: false
+    children:
+      borealcore.Sit: true
+      borealcore.SitClick: true
