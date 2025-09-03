@@ -65,6 +65,8 @@ public class ConfigUtil {
         BorealCore.getTrapsManager().load();
         BorealCore.getConfigEditorManager().unload();
         BorealCore.getConfigEditorManager().load();
+        BorealCore.getTitleManager().load();
+        BorealCore.getTitleManager().unload();
     }
 }
 

@@ -25,6 +25,7 @@ import plugin.borealcore.functions.herbalism.configs.HerbManager;
 import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.functions.karmicnode.NodeManager;
 import plugin.borealcore.functions.plushies.PlushieManager;
+import plugin.borealcore.functions.titles.TitleManagerManager;
 import plugin.borealcore.functions.traps.TrapsManager;
 import plugin.borealcore.functions.wiki.WikiManager;
 import plugin.borealcore.manager.EffectManager;
@@ -66,6 +67,7 @@ public class BorealCore extends JavaPlugin {
     private static BreweryManager breweryManager;
     private static TrapsManager trapsManager;
     private static ConfigEditorManager configEditorManager;
+    private static TitleManagerManager titleManager;
 
     @Override
     public void onLoad() {
@@ -102,6 +104,7 @@ public class BorealCore extends JavaPlugin {
         breweryManager = new BreweryManager();
         trapsManager = new TrapsManager();
         configEditorManager = new ConfigEditorManager();
+        titleManager = new TitleManagerManager();
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());
@@ -147,6 +150,9 @@ public class BorealCore extends JavaPlugin {
         breweryManager.unload();
         db.unload();
         traps.unload();
+        trapsManager.unload();
+        configEditorManager.unload();
+        titleManager.unload();
 
         AdventureUtil.consoleMessage("[BorealCore] Plugin Disabled!");
 
@@ -263,6 +269,10 @@ public class BorealCore extends JavaPlugin {
 
     public static ConfigEditorManager getConfigEditorManager() {
         return configEditorManager;
+    }
+
+    public static TitleManagerManager getTitleManager() {
+        return titleManager;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {

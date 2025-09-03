@@ -106,7 +106,7 @@ public class ConfigEditorGUI implements InventoryProvider {
 
         if (saveAction != null) {
             contents.set(rows - 1, 4, ClickableItem.of(
-                    createItem(Material.LIME_CONCRETE, Component.text("Save").color(NamedTextColor.GREEN)
+                    createItem(Material.LIME_STAINED_GLASS_PANE, Component.text("Save").color(NamedTextColor.GREEN)
                             .decoration(TextDecoration.ITALIC, false)),
                     e -> saveAction.run()));
         }

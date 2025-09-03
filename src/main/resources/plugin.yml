@@ -10,8 +10,8 @@ depend:
   - ItemsAdder
   - CustomCrops
   - CustomFishing
-  - AdvancedEnchantments
 softdepend:
+  - AdvancedEnchantments
   - DecentHolograms
   - DiscordSRV
   - Duels
@@ -43,6 +43,10 @@ commands:
     usage: /configeditor <plugin> | /configeditor browse <plugin> | /configeditor reload <plugin>
     aliases: [confedit, editconfig]
     permission: borealcore.configeditor
+  titles:
+    description: Manage your titles, prefixes, and suffixes
+    usage: /titles [prefix|suffix]
+    aliases: [title]
 
 permissions:
   customcooking.*:
