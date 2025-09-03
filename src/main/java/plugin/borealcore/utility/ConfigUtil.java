@@ -1,6 +1,9 @@
 package plugin.borealcore.utility;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
@@ -60,6 +63,8 @@ public class ConfigUtil {
         BorealCore.getBreweryManager().load();
         BorealCore.getTrapsManager().unload();
         BorealCore.getTrapsManager().load();
+        BorealCore.getConfigEditorManager().unload();
+        BorealCore.getConfigEditorManager().load();
     }
 }
 

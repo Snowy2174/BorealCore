@@ -38,6 +38,11 @@ commands:
     description: Sit
     usage: /<command>
     permission: borealcore.Sit
+  configeditor:
+    description: Open the in-game config editor for a specific plugin
+    usage: /configeditor <plugin> | /configeditor browse <plugin> | /configeditor reload <plugin>
+    aliases: [confedit, editconfig]
+    permission: borealcore.configeditor
 
 permissions:
   customcooking.*:

@@ -66,6 +66,22 @@ public class MessageManager {
     public static String altLeaderboardEntry;
     public static String leaderboardFooter;
     public static String actionBarHealth;
+    public static String configEditorOpening;
+    public static String configEditorPluginNotFound;
+    public static String configEditorDataFolderNotFound;
+    public static String configEditorConfigNotFound;
+    public static String configEditorSectionNotFound;
+    public static String configEditorValueUpdated;
+    public static String configEditorInvalidValue;
+    public static String configEditorChangesSaved;
+    public static String configEditorNoChanges;
+    public static String configEditorSavingError;
+    public static String configEditorReloadSuccess;
+    public static String configEditorNoFiles;
+    public static String configEditorReadingError;
+    public static String configEditorNoPermission;
+    public static String configEditorCancelled;
+    public static String configEditorTimedOut;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang + ".yml");
@@ -135,6 +151,23 @@ public class MessageManager {
         leaderboardFooter = getOrSet(config, "leaderboard-footer", "<gradient:#00AA00:#88DAA1>\n[______________________]</gradient>\n");
 
         actionBarHealth = getOrSet(config, "action-bar-health", "<gray>%s: <red>%d / %.0f <grey>| %s: <red>%d / %.0f");
+
+        configEditorOpening = getOrSet(config, "config-editor-opening", "Opening Config Editor for {plugin}...");
+        configEditorPluginNotFound = getOrSet(config, "config-editor-plugin-not-found", "Plugin '{plugin}' not found.");
+        configEditorDataFolderNotFound = getOrSet(config, "config-editor-data-folder-not-found", "Data folder for {plugin} does not exist!");
+        configEditorConfigNotFound = getOrSet(config, "config-editor-config-not-found", "Config file for {plugin} does not exist!");
+        configEditorSectionNotFound = getOrSet(config, "config-editor-section-not-found", "Section {section} does not exist!");
+        configEditorValueUpdated = getOrSet(config, "config-editor-value-updated", "Value updated successfully.");
+        configEditorInvalidValue = getOrSet(config, "config-editor-invalid-value", "Invalid value: {error}");
+        configEditorChangesSaved = getOrSet(config, "config-editor-changes-saved", "Changes saved:");
+        configEditorNoChanges = getOrSet(config, "config-editor-no-changes", "No changes to save.");
+        configEditorSavingError = getOrSet(config, "config-editor-saving-error", "Error saving config: {error}");
+        configEditorReloadSuccess = getOrSet(config, "config-editor-reload-success", "Configuration for {plugin} reloaded successfully!");
+        configEditorNoFiles = getOrSet(config, "config-editor-no-files", "No config files found in this directory.");
+        configEditorReadingError = getOrSet(config, "config-editor-reading-error", "Error reading folder: {error}");
+        configEditorNoPermission = getOrSet(config, "config-editor-no-permission", "You don't have permission to use this command.");
+        configEditorCancelled = getOrSet(config, "config-editor-cancelled", "Cancelled");
+        configEditorTimedOut = getOrSet(config, "config-editor-timed-out", "Timed out.");
 
         try {
             config.save(new File(BorealCore.getInstance().getDataFolder(), "messages_" + ConfigManager.lang + ".yml"));

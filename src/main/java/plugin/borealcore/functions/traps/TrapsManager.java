@@ -59,7 +59,7 @@ public class TrapsManager extends Function {
     @Override
     public void onClickInventory(InventoryClickEvent event) {
         Inventory inventory = event.getClickedInventory();
-        if (!(inventory.getHolder(false) instanceof TrapInventory myInventory)) {
+        if (inventory == null || !(inventory.getHolder(false) instanceof TrapInventory myInventory)) {
             //AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Clicked inventory is not a TrapInventory but: " + inventory.getHolder());
             return;
         }

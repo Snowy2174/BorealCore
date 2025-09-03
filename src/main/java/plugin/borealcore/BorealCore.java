@@ -13,6 +13,7 @@ import plugin.borealcore.depreciated.AnalyticsManager;
 import plugin.borealcore.depreciated.CraftingManager;
 import plugin.borealcore.functions.bending.BendingManager;
 import plugin.borealcore.functions.brewery.BreweryManager;
+import plugin.borealcore.functions.configeditor.ConfigEditorManager;
 import plugin.borealcore.functions.cooking.CookingCompetitionManager;
 import plugin.borealcore.functions.cooking.CookingManager;
 import plugin.borealcore.functions.cooking.MasteryManager;
@@ -64,6 +65,7 @@ public class BorealCore extends JavaPlugin {
     private static BendingManager bendingManager;
     private static BreweryManager breweryManager;
     private static TrapsManager trapsManager;
+    private static ConfigEditorManager configEditorManager;
 
     @Override
     public void onLoad() {
@@ -99,6 +101,7 @@ public class BorealCore extends JavaPlugin {
         bendingManager = new BendingManager();
         breweryManager = new BreweryManager();
         trapsManager = new TrapsManager();
+        configEditorManager = new ConfigEditorManager();
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());
@@ -256,6 +259,10 @@ public class BorealCore extends JavaPlugin {
 
     public static TrapsManager getTrapsManager() {
         return trapsManager;
+    }
+
+    public static ConfigEditorManager getConfigEditorManager() {
+        return configEditorManager;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {
