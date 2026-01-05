@@ -2,7 +2,7 @@ name: BorealCore
 version: '${project.version}'
 main: plugin.borealcore.BorealCore
 author: [ SnowyOwl217 ]
-api-version: 1.18
+api-version: 1.21.1
 depend:
   - ProtocolLib
   - PlaceholderAPI
@@ -34,6 +34,9 @@ commands:
     description: The command to manage Recipes
   traps:
     description: The command to manage Traps
+  market:
+    description: The command to manage the Market
+    aliases: [bazaar, shop]
   sit:
     description: Sit
     usage: /<command>

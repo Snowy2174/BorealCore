@@ -262,19 +262,42 @@ public abstract class Database extends Function {
 
             String transactionQuery = "INSERT INTO jade_transactions (player, uuid, amount, source, timestamp) VALUES (?, ?, ?, ?, ?);";
             psTransaction = conn.prepareStatement(transactionQuery);
-            psTransaction.setString(1, transaction.getPlayer());
-            psTransaction.setString(2, transaction.getUuid());
-            psTransaction.setDouble(3, transaction.getAmount());
-            psTransaction.setString(4, transaction.getSource());
-            psTransaction.setTimestamp(5, Timestamp.valueOf(transaction.getTimestamp()));
-            psTransaction.executeUpdate();
+
+            boolean inserted = false;
+            int attempts = 0;
+            Timestamp ts = Timestamp.valueOf(transaction.getTimestamp());
+
+            while (!inserted && attempts < 5) {
+                try {
+                    psTransaction.setString(1, transaction.getPlayer());
+                    psTransaction.setString(2, transaction.getUuid());
+                    psTransaction.setDouble(3, transaction.getAmount());
+                    psTransaction.setString(4, transaction.getSource());
+                    psTransaction.setTimestamp(5, ts);
+                    psTransaction.executeUpdate();
+                    inserted = true;
+                } catch (SQLException e) {
+                    if (e.getMessage().contains("PRIMARY KEY") || e.getMessage().contains("UNIQUE")) {
+                        // Add 1 millisecond and retry
+                        ts = new Timestamp(ts.getTime() + 1);
+                        attempts++;
+                        AdventureUtil.consoleMessage(DebugLevel.DEBUG, "This is a debug message from AdventureUtil");
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+
+            if (!inserted) {
+                throw new SQLException("Failed to insert transaction after multiple attempts due to primary key constraint.");
+            }
 
             // Update or insert the player's total in jade_totals
             String totalsQuery = """
-                        INSERT INTO jade_totals (player, uuid, jade)
-                        VALUES (?, ?, ?)
-                        ON CONFLICT(uuid) DO UPDATE SET jade = jade + ?;
-                    """;
+                    INSERT INTO jade_totals (player, uuid, jade)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT(uuid) DO UPDATE SET jade = jade + ?;
+                """;
             psTotals = conn.prepareStatement(totalsQuery);
             psTotals.setString(1, transaction.getPlayer());
             psTotals.setString(2, transaction.getUuid());
@@ -286,7 +309,7 @@ public abstract class Database extends Function {
         } catch (SQLException e) {
             if (conn != null) {
                 try {
-                    conn.rollback(); // Rollback on failure
+                    conn.rollback();
                 } catch (SQLException rollbackEx) {
                     plugin.getLogger().log(Level.SEVERE, "Transaction rollback failed", rollbackEx);
                 }

@@ -1,0 +1,258 @@
+pot:
+  buy: 1
+scarecrow:
+  buy: 1
+seed_bag:
+  buy: 5
+shipping_bin:
+  buy: 1
+sprinkler_1_item:
+  buy: 10
+watering_can_1:
+  buy: 5
+artichoke:
+  buy: 1.66
+artichoke_t1:
+  buy: 4.8
+artichoke_t2:
+  buy: 8.4
+artichoke_seeds:
+  buy: 1
+barley:
+  buy: 1.66
+barley_t1:
+  buy: 4.8
+barley_t2:
+  buy: 8.4
+barley_seeds:
+  buy: 1
+bean:
+  buy: 1.38
+bean_t1:
+  buy: 4
+bean_t2:
+  buy: 7
+bean_seeds:
+  buy: 1
+blueberry:
+  buy: 0.52
+blueberry_t1:
+  buy: 1.5
+blueberry_t2:
+  buy: 2.62
+blueberry_seeds:
+  buy: 1
+broccoli:
+  buy: 2.06
+broccoli_t1:
+  buy: 6
+broccoli_t2:
+  buy: 10.5
+broccoli_seeds:
+  buy: 1
+cabbage:
+  buy: 1.66
+cabbage_t1:
+  buy: 4.8
+cabbage_t2:
+  buy: 8.4
+cabbage_seeds:
+  buy: 1
+cactusfruit:
+  buy: 2.06
+cactusfruit_t1:
+  buy: 6
+cactusfruit_t2:
+  buy: 10.5
+cactusfruit_seeds:
+  buy: 1
+cantaloupe:
+  buy: 2.76
+cantaloupe_t1:
+  buy: 8
+cantaloupe_t2:
+  buy: 14
+cantaloupe_seeds:
+  buy: 1
+cauliflower:
+  buy: 2.06
+cauliflower_t1:
+  buy: 6
+cauliflower_t2:
+  buy: 10.5
+cauliflower_seeds:
+  buy: 1
+corn:
+  buy: 2.06
+corn_t1:
+  buy: 6
+corn_t2:
+  buy: 10.5
+corn_seeds:
+  buy: 1
+cotton:
+  buy: 1.18
+cotton_t1:
+  buy: 3.42
+cotton_t2:
+  buy: 6
+cotton_seeds:
+  buy: 1
+cranberry:
+  buy: 0.56
+cranberry_t1:
+  buy: 1.6
+cranberry_t2:
+  buy: 2.8
+cranberry_seeds:
+  buy: 1
+eggplant:
+  buy: 2.06
+eggplant_t1:
+  buy: 6
+eggplant_t2:
+  buy: 10.5
+eggplant_seeds:
+  buy: 1
+garlic:
+  buy: 1.66
+garlic_t1:
+  buy: 4.8
+garlic_t2:
+  buy: 8.4
+garlic_seeds:
+  buy: 1
+ginger:
+  buy: 2.06
+ginger_t1:
+  buy: 1.26
+ginger_t2:
+  buy: 2.8
+ginger_seeds:
+  buy: 1
+grape:
+  buy: 0.48
+grape_t1:
+  buy: 1.42
+grape_t2:
+  buy: 2.48
+grape_seeds:
+  buy: 1
+kiwi:
+  buy: 2.06
+kiwi_t1:
+  buy: 6
+kiwi_t2:
+  buy: 10.5
+kiwi_seeds:
+  buy: 1
+lettuce:
+  buy: 2.06
+lettuce_t1:
+  buy: 6
+lettuce_t2:
+  buy: 10.5
+lettuce_seeds:
+  buy: 1
+oats:
+  buy: 1.38
+oats_t1:
+  buy: 4
+oats_t2:
+  buy: 7
+oats_seeds:
+  buy: 1
+onion:
+  buy: 1.18
+onion_t1:
+  buy: 3.42
+onion_t2:
+  buy: 6
+onion_seeds:
+  buy: 1
+pepper:
+  buy: 0.68
+pepper_t1:
+  buy: 1.56
+pepper_t2:
+  buy: 2.56
+pepper_seeds:
+  buy: 1
+pineapple:
+  buy: 2.06
+pineapple_t1:
+  buy: 6
+pineapple_t2:
+  buy: 10.5
+pineapple_seeds:
+  buy: 1
+raspberry:
+  buy: 0.52
+raspberry_t1:
+  buy: 1.5
+raspberry_t2:
+  buy: 2.62
+raspberry_seeds:
+  buy: 1
+rhubarb:
+  buy: 1.66
+rhubarb_t1:
+  buy: 4.8
+rhubarb_t2:
+  buy: 8.4
+rhubarb_seeds:
+  buy: 1
+rice:
+  buy: 1.04
+rice_t1:
+  buy: 3
+rice_t2:
+  buy: 5.25
+rice_seeds:
+  buy: 1
+shroom:
+  buy: 1.04
+shroom_t1:
+  buy: 3
+shroom_t2:
+  buy: 5
+soybean:
+  buy: 1.66
+soybean_t1:
+  buy: 4.8
+soybean_t2:
+  buy: 8.4
+soybean_seeds:
+  buy: 1
+spinach:
+  buy: 2.06
+spinach_t1:
+  buy: 6
+spinach_t2:
+  buy: 10.5
+spinach_seeds:
+  buy: 1
+squash:
+  buy: 2.06
+squash_t1:
+  buy: 6
+squash_t2:
+  buy: 3.35
+squash_seeds:
+  buy: 1
+strawberry:
+  buy: 0.52
+strawberry_t1:
+  buy: 1.5
+strawberry_t2:
+  buy: 2.62
+strawberry_seeds:
+  buy: 1
+tomato:
+  buy: 0.52
+tomato_t1:
+  buy: 1.5
+tomato_t2:
+  buy: 2.62
+tomato_seeds:
+  buy: 1

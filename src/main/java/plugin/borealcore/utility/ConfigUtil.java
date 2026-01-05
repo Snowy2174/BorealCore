@@ -15,7 +15,7 @@ public class ConfigUtil {
     public static YamlConfiguration getConfig(String configName) {
         File file = new File(BorealCore.plugin.getDataFolder(), configName);
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
-        if (!file.exists()) BorealCore.plugin.saveResource(configName, false);
+        if (!file.exists()) BorealCore.plugin.saveResource(configName.substring(configName.lastIndexOf("/") + 1), false);
         return YamlConfiguration.loadConfiguration(file);
     }
 
@@ -55,8 +55,8 @@ public class ConfigUtil {
         BorealCore.getAnalyticsManager().load();
         BorealCore.getPlushieManager().unload();
         BorealCore.getPlushieManager().load();
-        BorealCore.getDuelsManager().unload();
-        BorealCore.getDuelsManager().load();
+        //BorealCore.getDuelsManager().unload(); @TODO REVERT!!!
+        //BorealCore.getDuelsManager().load();
         BorealCore.getBendingManager().unload();
         BorealCore.getBendingManager().load();
         BorealCore.getBreweryManager().unload();
@@ -65,8 +65,10 @@ public class ConfigUtil {
         BorealCore.getTrapsManager().load();
         BorealCore.getConfigEditorManager().unload();
         BorealCore.getConfigEditorManager().load();
-        BorealCore.getTitleManager().load();
         BorealCore.getTitleManager().unload();
+        BorealCore.getTitleManager().load();
+        BorealCore.getMarketManager().unload();
+        BorealCore.getMarketManager().load();
     }
 }
 

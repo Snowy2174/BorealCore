@@ -24,6 +24,7 @@ import plugin.borealcore.functions.herbalism.HerbalismManager;
 import plugin.borealcore.functions.herbalism.configs.HerbManager;
 import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.functions.karmicnode.NodeManager;
+import plugin.borealcore.functions.market.MarketManager;
 import plugin.borealcore.functions.plushies.PlushieManager;
 import plugin.borealcore.functions.titles.TitleManagerManager;
 import plugin.borealcore.functions.traps.TrapsManager;
@@ -68,6 +69,7 @@ public class BorealCore extends JavaPlugin {
     private static TrapsManager trapsManager;
     private static ConfigEditorManager configEditorManager;
     private static TitleManagerManager titleManager;
+    private static MarketManager marketManager;
 
     @Override
     public void onLoad() {
@@ -99,12 +101,13 @@ public class BorealCore extends JavaPlugin {
         craftingManager = new CraftingManager();
         analyticsManager = new AnalyticsManager(db);
         plushieManager = new PlushieManager();
-        duelsManager = new DuelsManager();
+        //duelsManager = new DuelsManager();
         bendingManager = new BendingManager();
         breweryManager = new BreweryManager();
         trapsManager = new TrapsManager();
         configEditorManager = new ConfigEditorManager();
         titleManager = new TitleManagerManager();
+        marketManager = new MarketManager();
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());
@@ -118,9 +121,11 @@ public class BorealCore extends JavaPlugin {
         getCommand("recipes").setExecutor(new RecipeBookCommand());
         getCommand("recipes").setTabCompleter(new RecipeBookTabCompletion());
         getCommand("herbalism").setExecutor(new HerbalismCommand());
-        //getCommand("herbalism").setTabCompleter(new HerbalismTabCompletion());#
+        //getCommand("herbalism").setTabCompleter(new HerbalismTabCompletion());
         getCommand("traps").setExecutor(new TrapsCommand());
         getCommand("sit").setExecutor(new SitCommand());
+        getCommand("market").setExecutor(marketManager);
+        getCommand("market").setTabCompleter(marketManager);
 
         AdventureUtil.consoleMessage("Plugin Enabled!");
     }
@@ -145,7 +150,7 @@ public class BorealCore extends JavaPlugin {
         masteryManager.unload();
         analyticsManager.unload();
         plushieManager.unload();
-        duelsManager.unload();
+       // duelsManager.unload();
         bendingManager.unload();
         breweryManager.unload();
         db.unload();
@@ -153,6 +158,7 @@ public class BorealCore extends JavaPlugin {
         trapsManager.unload();
         configEditorManager.unload();
         titleManager.unload();
+        marketManager.unload();
 
         AdventureUtil.consoleMessage("[BorealCore] Plugin Disabled!");
 
@@ -273,6 +279,10 @@ public class BorealCore extends JavaPlugin {
 
     public static TitleManagerManager getTitleManager() {
         return titleManager;
+    }
+
+    public static MarketManager getMarketManager() {
+        return marketManager;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {
