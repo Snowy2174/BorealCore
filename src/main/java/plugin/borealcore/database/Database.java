@@ -401,7 +401,6 @@ public abstract class Database extends Function {
         try {
             conn = this.getSQLConnection();
 
-            // Base query
             String baseQuery = """
             SELECT ROW_NUMBER() OVER (ORDER BY SUM(amount) DESC) AS position, uuid, player, SUM(amount) AS jade
             FROM jade_transactions
@@ -447,6 +446,15 @@ public abstract class Database extends Function {
                 }
                 case FISHINGWEEKLY -> {
                     condition = " WHERE source = 'fishing' AND timestamp >= ? GROUP BY uuid, player";
+                    requiresTimestamp = true;
+                }
+                case SPENT -> condition = " WHERE amount < 0 GROUP BY uuid, player";
+                case SPENTMONTHLY -> {
+                    condition = " WHERE amount < 0 AND timestamp >= ? GROUP BY uuid, player";
+                    requiresTimestamp = true;
+                }
+                case SPENTWEEKLY -> {
+                    condition = " WHERE amount < 0 AND timestamp >= ? GROUP BY uuid, player";
                     requiresTimestamp = true;
                 }
                 default -> {
@@ -510,7 +518,7 @@ public abstract class Database extends Function {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            closeResources(conn, ps, rs); // Ensure resources are closed properly
+            closeResources(conn, ps, rs);
         }
         return uuids;
     }
@@ -745,6 +753,5 @@ public abstract class Database extends Function {
    // playerRecipeDataExists;
    // updatePlayerRecipeData;
    // updateRecipeStatus;
-
 
 }

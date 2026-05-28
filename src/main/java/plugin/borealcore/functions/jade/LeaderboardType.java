@@ -15,4 +15,7 @@ public enum LeaderboardType {
     FISHING,
     FISHINGMONTHLY,
     FISHINGWEEKLY,
+    SPENT,
+    SPENTMONTHLY,
+    SPENTWEEKLY
 }
