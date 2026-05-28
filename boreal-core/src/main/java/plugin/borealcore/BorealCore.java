@@ -13,7 +13,6 @@ import plugin.borealcore.depreciated.AnalyticsManager;
 import plugin.borealcore.depreciated.CraftingManager;
 import plugin.borealcore.functions.bending.BendingManager;
 import plugin.borealcore.functions.brewery.BreweryManager;
-import plugin.borealcore.functions.configeditor.ConfigEditorManager;
 import plugin.borealcore.functions.cooking.CookingCompetitionManager;
 import plugin.borealcore.functions.cooking.CookingManager;
 import plugin.borealcore.functions.cooking.MasteryManager;
@@ -67,7 +66,6 @@ public class BorealCore extends JavaPlugin {
     private static BendingManager bendingManager;
     private static BreweryManager breweryManager;
     private static TrapsManager trapsManager;
-    private static ConfigEditorManager configEditorManager;
     private static TitleManagerManager titleManager;
     private static MarketManager marketManager;
 
@@ -105,7 +103,6 @@ public class BorealCore extends JavaPlugin {
         bendingManager = new BendingManager();
         breweryManager = new BreweryManager();
         trapsManager = new TrapsManager();
-        configEditorManager = new ConfigEditorManager();
         titleManager = new TitleManagerManager();
         marketManager = new MarketManager();
 
@@ -156,7 +153,6 @@ public class BorealCore extends JavaPlugin {
         db.unload();
         traps.unload();
         trapsManager.unload();
-        configEditorManager.unload();
         titleManager.unload();
         marketManager.unload();
 
@@ -271,10 +267,6 @@ public class BorealCore extends JavaPlugin {
 
     public static TrapsManager getTrapsManager() {
         return trapsManager;
-    }
-
-    public static ConfigEditorManager getConfigEditorManager() {
-        return configEditorManager;
     }
 
     public static TitleManagerManager getTitleManager() {

@@ -5,10 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>plugin.borealcore</groupId>
-    <artifactId>BorealCore</artifactId>
+    <artifactId>BorealCore-Parent</artifactId>
     <version>1.1.9.1</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <name>BorealCore</name>
+    <modules>
+        <module>boreal-core</module>
+        <module>config-editor</module>
+    </modules>
 
     <properties>
         <java.version>21</java.version>
@@ -28,6 +32,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <outputDirectory>${maven.multiModuleProjectDirectory}/target</outputDirectory>
                             <artifactSet>
                                 <includes>
                                     <include>net.kyori:*</include>
@@ -38,6 +43,16 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <outputDirectory>${maven.multiModuleProjectDirectory}/target</outputDirectory>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -49,14 +64,6 @@
                 </configuration>
             </plugin>
         </plugins>
-
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-
     </build>
 
     <repositories>

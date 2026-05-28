@@ -1,4 +1,4 @@
-package plugin.borealcore.functions.configeditor;
+package plugin.borealcore;
 
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.SmartInventory;
@@ -14,8 +14,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.configeditor.ConfigEditorManager.Pair;
 
 import java.io.File;
 import java.util.*;
@@ -32,7 +30,7 @@ public class ConfigEditorGUI implements InventoryProvider {
     private ConfigurationSection section;
     private Runnable backAction;
     private Runnable saveAction;
-    private Map<String, Pair<Object, Object>> changeLog;
+    private Map<String, ConfigEditorModule.Pair<Object, Object>> changeLog;
     private SmartInventory inventory;
 
     public ConfigEditorGUI(
@@ -58,7 +56,7 @@ public class ConfigEditorGUI implements InventoryProvider {
             ConfigSectionClickHandler configSectionClickHandler,
             Runnable backAction,
             Runnable saveAction,
-            Map<String, Pair<Object, Object>> changeLog
+            Map<String, ConfigEditorModule.Pair<Object, Object>> changeLog
     ) {
         this.title = title;
         this.rows = rows;

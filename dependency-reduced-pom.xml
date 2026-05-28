@@ -2,16 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>plugin.borealcore</groupId>
-  <artifactId>BorealCore</artifactId>
+  <artifactId>BorealCore-Parent</artifactId>
+  <packaging>pom</packaging>
   <name>BorealCore</name>
   <version>1.1.9.1</version>
   <build>
-    <resources>
-      <resource>
-        <filtering>true</filtering>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
@@ -23,6 +18,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <outputDirectory>${maven.multiModuleProjectDirectory}/target</outputDirectory>
               <artifactSet>
                 <includes>
                   <include>net.kyori:*</include>
@@ -32,6 +28,13 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <outputDirectory>${maven.multiModuleProjectDirectory}/target</outputDirectory>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -44,6 +47,9 @@
       </plugin>
     </plugins>
   </build>
+  <modules>
+    <module>boreal-core</module>
+  </modules>
   <repositories>
     <repository>
       <id>papermc</id>

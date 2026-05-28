@@ -1,4 +1,4 @@
-package plugin.borealcore.functions.configeditor;
+package plugin.borealcore;
 
 import java.util.Arrays;
 import java.util.List;

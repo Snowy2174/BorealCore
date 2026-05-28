@@ -1,0 +1,56 @@
+package plugin.borealcore.api.module;
+
+/**
+ * Metadata about an module loaded from the module manifest.
+ * Used for tracking module information without instantiation.
+ */
+public class ModuleMetadata {
+
+    private final String moduleId;
+    private final String moduleName;
+    private final String version;
+    private final String author;
+    private final String mainClass;
+    private final String minimumBorealCoreVersion;
+
+    public ModuleMetadata(String moduleId, String moduleName, String version, String author,
+                         String mainClass, String minimumBorealCoreVersion) {
+        this.moduleId = moduleId;
+        this.moduleName = moduleName;
+        this.version = version;
+        this.author = author;
+        this.mainClass = mainClass;
+        this.minimumBorealCoreVersion = minimumBorealCoreVersion;
+    }
+
+    public String getModuleId() {
+        return moduleId;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getMainClass() {
+        return mainClass;
+    }
+
+    public String getMinimumBorealCoreVersion() {
+        return minimumBorealCoreVersion;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s v%s by %s (requires BC %s)",
+                moduleName, version, author, minimumBorealCoreVersion);
+    }
+}
+

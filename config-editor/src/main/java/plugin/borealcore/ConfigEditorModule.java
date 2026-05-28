@@ -1,4 +1,4 @@
-package plugin.borealcore.functions.configeditor;
+package plugin.borealcore;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
@@ -15,7 +15,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
-import plugin.borealcore.BorealCore;
+import plugin.borealcore.api.module.BorealModule;
+import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.object.SimpleListener;
@@ -26,8 +27,9 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ConfigEditorManager extends Function implements CommandExecutor, TabCompleter {
+public class ConfigEditorModule extends Function implements BorealModule, CommandExecutor, TabCompleter {
 
+    private ModuleContext context;
     private final SimpleListener simpleListener;
     private final Permission configEditorPermission;
     private final Map<String, YamlConfiguration> configCache;
@@ -35,7 +37,8 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
     private final Map<Player, Map<String, Pair<Object, Object>>> changeLogMap;
     private final Map<Player, SmartInventoryContext> activeInventories;
 
-    public ConfigEditorManager() {
+    public ConfigEditorModule() {
+        // Keep the original reference 'this' for SimpleListener if it expects the parent class
         this.simpleListener = new SimpleListener(this);
         this.configEditorPermission = new Permission("borealcore.configeditor", PermissionDefault.OP);
         this.configCache = new HashMap<>();
@@ -45,22 +48,69 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
     }
 
     @Override
-    public void load() {
-        Bukkit.getPluginManager().registerEvents(this.simpleListener, BorealCore.getInstance());
-        registerCommand();
+    public String getModuleId() {
+        return "config-editor";
+    }
+
+    @Override
+    public String getModuleName() {
+        return "Config Editor";
+    }
+
+    @Override
+    public String getModuleVersion() {
+        return "1.0.0";
+    }
+
+    @Override
+    public String getModuleAuthor() {
+        return "BorealCore";
+    }
+
+    @Override
+    public String getMinimumBorealCoreVersion() {
+        return "1.1.9";
+    }
+
+    @Override
+    public void onModuleInitialize(ModuleContext context) throws Exception {
+        this.context = context;
+        context.getLogger().info("Initializing " + getModuleName() + "...");
+    }
+
+    @Override
+    public void onModuleEnable() throws Exception {
+        // Register events using the context
+        context.getPluginManager().registerEvents(this.simpleListener, context.getPlugin());
+
+        // Register commands
+        if (context.getPlugin().getCommand("configeditor") != null) {
+            context.getPlugin().getCommand("configeditor").setExecutor(this);
+            context.getPlugin().getCommand("configeditor").setTabCompleter(this);
+        } else {
+            context.getLogger().warning("Command 'configeditor' is not defined in plugin.yml!");
+        }
+
         AdventureUtil.consoleMessage("Config Editor Module Enabled!");
     }
 
     @Override
-    public void unload() {
-        if (this.simpleListener != null) HandlerList.unregisterAll(this.simpleListener);
+    public void onModuleDisable() throws Exception {
+        // Unregister events safely
+        if (this.simpleListener != null) {
+            HandlerList.unregisterAll(this.simpleListener);
+        }
+
+        // Clean up caches
+        this.configCache.clear();
+        this.configFileCache.clear();
+        this.changeLogMap.clear();
+        this.activeInventories.clear();
+
         AdventureUtil.consoleMessage("Config Editor Module Disabled!");
     }
 
-    private void registerCommand() {
-        BorealCore.getInstance().getCommand("configeditor").setExecutor(this);
-        BorealCore.getInstance().getCommand("configeditor").setTabCompleter(this);
-    }
+    // --- COMMAND HANDLING ---
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -167,8 +217,10 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
         AdventureUtil.playerMessage(player, "/configeditor browse <plugin> - Browse the data folder of the specified plugin");
     }
 
+    // --- GUI & CONFIG LOGIC ---
+
     public void openDataFolderScreen(Player player, Plugin plugin, File folder) {
-        Bukkit.getScheduler().runTaskAsynchronously(BorealCore.getInstance(), () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(context.getPlugin(), () -> {
             File dataFolder = folder != null ? folder : plugin.getDataFolder();
             boolean isRoot = dataFolder.getAbsolutePath().equals(plugin.getDataFolder().getAbsolutePath());
 
@@ -206,7 +258,7 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
                         }
                 );
 
-                Bukkit.getScheduler().runTask(BorealCore.getInstance(), () -> {
+                Bukkit.getScheduler().runTask(context.getPlugin(), () -> {
                     gui.open(player);
                 });
 
@@ -240,7 +292,7 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
             boolean fromDataFolderScreen,
             Runnable afterSaveAction
     ) {
-        Bukkit.getScheduler().runTaskAsynchronously(BorealCore.getInstance(), () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(context.getPlugin(), () -> {
             try {
                 File configFile = file != null ? file : new File(plugin.getDataFolder(), "config.yml");
                 if (!configFile.exists()) {
@@ -290,13 +342,11 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
                                 openPluginConfigScreen(player, plugin, parentPath, config, configFile, changeLog, fromDataFolderScreen);
                             }
                         },
-                        () -> {
-                            saveConfig(player, plugin, config, configFile, changeLog, afterSaveAction);
-                        },
+                        () -> saveConfig(player, plugin, config, configFile, changeLog, afterSaveAction),
                         changeLog
                 );
 
-                Bukkit.getScheduler().runTask(BorealCore.getInstance(), () -> {
+                Bukkit.getScheduler().runTask(context.getPlugin(), () -> {
                     activeInventories.put(player, new SmartInventoryContext(
                             gui, plugin, sectionPath, config, configFile, fromDataFolderScreen
                     ));
@@ -340,12 +390,10 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
                 config.set(sectionPath + "." + key, newValue);
             }
 
-            // Refresh the GUI instead of reopening it
             refreshInventory(player);
             return;
         }
 
-        // For non-boolean values, we need to get chat input
         player.closeInventory();
 
         String messageText = "<green>Enter new value for " + key + ":\n" +
@@ -354,7 +402,6 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
 
         ChatInputUtil.getChatInput(player, messageText, value.toString(), (input) -> {
             if (input == null) {
-                // Reopen the GUI if canceled
                 reopenLastInventory(player);
                 return;
             }
@@ -380,7 +427,6 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
                         MessageManager.configEditorInvalidValue.replace("{error}", e.getMessage()));
             }
 
-            // Reopen the GUI after editing
             reopenLastInventory(player);
         });
     }
@@ -409,32 +455,28 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
 
             changeLog.remove(fullPath);
             AdventureUtil.playerMessage(player, MessageManager.infoPositive + "Value restored to original.");
-
-            // Refresh the GUI instead of reopening it
             refreshInventory(player);
         }
     }
 
     private void refreshInventory(Player player) {
-        SmartInventoryContext context = activeInventories.get(player);
-        if (context != null && player.getOpenInventory() != null) {
-            Bukkit.getScheduler().runTask(BorealCore.getInstance(), () -> {
-                context.gui.refresh(player);
-            });
+        SmartInventoryContext inventoryContext = activeInventories.get(player);
+        if (inventoryContext != null && player.getOpenInventory() != null) {
+            Bukkit.getScheduler().runTask(context.getPlugin(), () -> inventoryContext.gui.refresh(player));
         }
     }
 
     private void reopenLastInventory(Player player) {
-        SmartInventoryContext context = activeInventories.get(player);
-        if (context != null) {
+        SmartInventoryContext inventoryContext = activeInventories.get(player);
+        if (inventoryContext != null) {
             openPluginConfigScreen(
                     player,
-                    context.plugin,
-                    context.sectionPath,
-                    context.config,
-                    context.configFile,
+                    inventoryContext.plugin,
+                    inventoryContext.sectionPath,
+                    inventoryContext.config,
+                    inventoryContext.configFile,
                     getChangeLog(player),
-                    context.fromDataFolderScreen
+                    inventoryContext.fromDataFolderScreen
             );
         }
     }
@@ -465,19 +507,15 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
                     ));
                 }
 
-                // Only send Discord notification for ProjectKorra changes
                 if (!changes.isEmpty() && plugin.getName().equalsIgnoreCase("ProjectKorra")) {
                     sendChangesToDiscord(player.getName(), configFile.getName(), changes);
 
-                    // Run the "pk reload" command for ProjectKorra
-                    Bukkit.getScheduler().runTask(BorealCore.getInstance(), () -> {
+                    Bukkit.getScheduler().runTask(context.getPlugin(), () -> {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "pk reload");
                     });
                 }
 
                 changeLog.clear();
-
-                // Refresh the GUI to show the cleared changelog
                 refreshInventory(player);
             } else {
                 AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.configEditorNoChanges);
@@ -531,11 +569,13 @@ public class ConfigEditorManager extends Function implements CommandExecutor, Ta
         return changeLogMap.computeIfAbsent(player, k -> new HashMap<>());
     }
 
-    @Override
+    // Called externally, likely by SimpleListener
     public void onQuit(Player player) {
         changeLogMap.remove(player);
         activeInventories.remove(player);
     }
+
+    // --- INNER CLASSES ---
 
     public static class Pair<K, V> {
         private final K first;

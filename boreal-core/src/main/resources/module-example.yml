@@ -1,0 +1,21 @@
+# Example module.yml manifest file for a BorealCore module
+# Place this file in the root of your module JAR file
+
+# Unique identifier for your module (no spaces, lowercase recommended)
+id: my-awesome-module
+
+# Display name for your module
+name: My Awesome Module
+
+# Version following semantic versioning (major.minor.patch)
+version: 1.0.0
+
+# Author(s) of the module
+author: ShadowThePlayer
+
+# The main class that implements BorealModule
+main: com.example.module.MyAwesomeModule
+
+# Minimum BorealCore version required for this module
+minimum-borealcore-version: 1.1.9
+
