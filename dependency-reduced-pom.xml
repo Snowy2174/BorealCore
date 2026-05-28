@@ -4,7 +4,7 @@
   <groupId>plugin.borealcore</groupId>
   <artifactId>BorealCore-Parent</artifactId>
   <packaging>pom</packaging>
-  <name>BorealCore</name>
+  <name>BorealCore-Parent</name>
   <version>1.1.9.1</version>
   <build>
     <plugins>
@@ -40,7 +40,6 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <release>17</release>
           <source>21</source>
           <target>21</target>
         </configuration>
@@ -49,6 +48,7 @@
   </build>
   <modules>
     <module>boreal-core</module>
+    <module>config-editor</module>
   </modules>
   <repositories>
     <repository>

@@ -1,7 +1,7 @@
 package plugin.borealcore.api.module;
 
 /**
- * Metadata about an module loaded from the module manifest.
+ * Metadata about a module loaded from the module manifest.
  * Used for tracking module information without instantiation.
  */
 public class ModuleMetadata {
@@ -11,16 +11,16 @@ public class ModuleMetadata {
     private final String version;
     private final String author;
     private final String mainClass;
-    private final String minimumBorealCoreVersion;
+    private final String minimumCoreVersion;
 
     public ModuleMetadata(String moduleId, String moduleName, String version, String author,
-                         String mainClass, String minimumBorealCoreVersion) {
+                         String mainClass, String minimumCoreVersion) {
         this.moduleId = moduleId;
         this.moduleName = moduleName;
         this.version = version;
         this.author = author;
         this.mainClass = mainClass;
-        this.minimumBorealCoreVersion = minimumBorealCoreVersion;
+        this.minimumCoreVersion = minimumCoreVersion;
     }
 
     public String getModuleId() {
@@ -43,14 +43,14 @@ public class ModuleMetadata {
         return mainClass;
     }
 
-    public String getMinimumBorealCoreVersion() {
-        return minimumBorealCoreVersion;
+    public String getMinimumCoreVersion() {
+        return minimumCoreVersion;
     }
 
     @Override
     public String toString() {
         return String.format("%s v%s by %s (requires BC %s)",
-                moduleName, version, author, minimumBorealCoreVersion);
+                moduleName, version, author, minimumCoreVersion);
     }
 }
 

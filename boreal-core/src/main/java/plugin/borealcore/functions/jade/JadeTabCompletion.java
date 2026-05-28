@@ -1,11 +1,10 @@
-package plugin.borealcore.commands;
+package plugin.borealcore.functions.jade;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import plugin.borealcore.functions.jade.LeaderboardType;
 
 import java.util.ArrayList;
 import java.util.Arrays;

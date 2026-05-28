@@ -1,4 +1,4 @@
-package plugin.borealcore.commands;
+package plugin.borealcore.functions.cooking;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -6,8 +6,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.cooking.CookingManager;
-import plugin.borealcore.functions.cooking.MasteryManager;
 import plugin.borealcore.functions.cooking.competition.Competition;
 import plugin.borealcore.functions.cooking.competition.CompetitionSchedule;
 import plugin.borealcore.manager.GuiManager;

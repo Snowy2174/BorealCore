@@ -16,31 +16,6 @@ public class JadeModule implements BorealModule {
     private ModuleContext context;
 
     @Override
-    public String getModuleId() {
-        return "jade";
-    }
-
-    @Override
-    public String getModuleName() {
-        return "Jade";
-    }
-
-    @Override
-    public String getModuleVersion() {
-        return "1.0.0";
-    }
-
-    @Override
-    public String getModuleAuthor() {
-        return "BMC";
-    }
-
-    @Override
-    public String getMinimumBorealCoreVersion() {
-        return "1.1.9.1";
-    }
-
-    @Override
     public void onModuleInitialize(ModuleContext context) throws Exception {
         this.context = context;
         this.database = context.getDatabase();

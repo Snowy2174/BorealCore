@@ -1,12 +1,16 @@
 package plugin.borealcore.module.loader;
 
+import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.*;
 import plugin.borealcore.database.Database;
+import plugin.borealcore.manager.PlaceholderManager;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.*;
 import java.util.jar.JarEntry;
@@ -21,14 +25,16 @@ public class ModuleLoader {
 
     private final BorealCore plugin;
     private final Database database;
+    private final PlaceholderManager placeholderManager;
     private final File modulesDirectory;
     private final Map<String, BorealModule> loadedModules;
     private final Map<String, ModuleMetadata> moduleMetadata;
     private final Map<String, ModuleClassLoader> moduleClassLoaders;
 
-    public ModuleLoader(BorealCore plugin, Database database) {
+    public ModuleLoader(BorealCore plugin, Database database, PlaceholderManager  placeholderManager) {
         this.plugin = plugin;
         this.database = database;
+        this.placeholderManager = placeholderManager;
         this.modulesDirectory = new File(plugin.getDataFolder(), "modules");
         this.loadedModules = new HashMap<>();
         this.moduleMetadata = new HashMap<>();
@@ -80,12 +86,12 @@ public class ModuleLoader {
                 throw new ModuleLoadException("module.yml not found in " + jarFile.getName());
             }
 
-            ModuleMetadata metadata = ModuleManifestParser.parseManifest(jar.getInputStream(manifestEntry));
+            ModuleMetadata metadata = parseManifest(jar.getInputStream(manifestEntry));
             
             // Check BorealCore version compatibility
-            if (!isVersionCompatible(metadata.getMinimumBorealCoreVersion())) {
+            if (!isVersionCompatible(metadata.getMinimumCoreVersion())) {
                 throw new ModuleLoadException("Module '" + metadata.getModuleName() + 
-                    "' requires BorealCore " + metadata.getMinimumBorealCoreVersion() + 
+                    "' requires BorealCore " + metadata.getMinimumCoreVersion() + 
                     " but only " + plugin.getDescription().getVersion() + " is installed");
             }
 
@@ -124,7 +130,7 @@ public class ModuleLoader {
      * Initializes and enables all loaded modules.
      */
     private void enableAllModules() {
-        ModuleContext context = new ModuleContext(plugin, database);
+        ModuleContext context = new ModuleContext(plugin, database, placeholderManager);
 
         for (String moduleId : loadedModules.keySet()) {
             try {
@@ -141,7 +147,7 @@ public class ModuleLoader {
     /**
      * Disables all loaded modules.
      */
-    public void disableAllModules() {
+    public void unloadAllModules() {
         for (String moduleId : new ArrayList<>(loadedModules.keySet())) {
             try {
                 BorealModule module = loadedModules.get(moduleId);
@@ -213,19 +219,72 @@ public class ModuleLoader {
      * Compares two semantic versions.
      * Returns: positive if v1 > v2, zero if equal, negative if v1 < v2
      */
+    /**
+     * Compares two semantic versions.
+     * Returns: positive if v1 > v2, zero if equal, negative if v1 < v2
+     */
     private int compareVersions(String v1, String v2) {
         String[] parts1 = v1.split("\\.");
         String[] parts2 = v2.split("\\.");
 
         for (int i = 0; i < Math.max(parts1.length, parts2.length); i++) {
-            int num1 = i < parts1.length ? Integer.parseInt(parts1[i].replaceAll("[^0-9]", "")) : 0;
-            int num2 = i < parts2.length ? Integer.parseInt(parts2[i].replaceAll("[^0-9]", "")) : 0;
+            String raw1 = i < parts1.length ? parts1[i] : "0";
+            String raw2 = i < parts2.length ? parts2[i] : "0";
+
+            String clean1 = raw1.replaceAll("[^0-9]", "");
+            String clean2 = raw2.replaceAll("[^0-9]", "");
+
+            int num1 = clean1.isEmpty() ? 0 : Integer.parseInt(clean1);
+            int num2 = clean2.isEmpty() ? 0 : Integer.parseInt(clean2);
 
             if (num1 != num2) {
                 return Integer.compare(num1, num2);
             }
         }
         return 0;
+    }
+
+    /**
+     * Parses a module.yml manifest file.
+     *
+     * @param inputStream The input stream to the module.yml file
+     * @return The parsed module metadata
+     * @throws ModuleLoadException if parsing fails
+     */
+    public static ModuleMetadata parseManifest(InputStream inputStream) throws ModuleLoadException {
+        try (InputStreamReader reader = new InputStreamReader(inputStream)) {
+            YamlConfiguration config = YamlConfiguration.loadConfiguration(reader);
+
+            String moduleId = config.getString("id");
+            String name = config.getString("name");
+            String version = config.getString("version");
+            String author = config.getString("author");
+            String mainClass = config.getString("main");
+            String minimumCoreVersion = config.getString("minimum-borealcore-version", "1.0.0");
+
+            if (moduleId == null || moduleId.isEmpty()) {
+                throw new ModuleLoadException("module.yml is missing required field 'id'");
+            }
+            if (name == null || name.isEmpty()) {
+                throw new ModuleLoadException("module.yml is missing required field 'name'");
+            }
+            if (version == null || version.isEmpty()) {
+                throw new ModuleLoadException("module.yml is missing required field 'version'");
+            }
+            if (author == null || author.isEmpty()) {
+                throw new ModuleLoadException("module.yml is missing required field 'author'");
+            }
+            if (mainClass == null || mainClass.isEmpty()) {
+                throw new ModuleLoadException("module.yml is missing required field 'main'");
+            }
+
+            return new ModuleMetadata(moduleId, name, version, author, mainClass, minimumCoreVersion);
+
+        } catch (ModuleLoadException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ModuleLoadException("Failed to parse module.yml", e);
+        }
     }
 }
 

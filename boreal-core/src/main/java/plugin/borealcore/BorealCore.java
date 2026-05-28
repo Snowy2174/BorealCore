@@ -5,7 +5,7 @@ import com.comphenix.protocol.ProtocolManager;
 import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
-import plugin.borealcore.commands.*;
+import plugin.borealcore.api.module.ModuleLoadException;
 import plugin.borealcore.database.Database;
 import plugin.borealcore.database.SQLiteData;
 import plugin.borealcore.database.SQLiteJade;
@@ -13,25 +13,39 @@ import plugin.borealcore.depreciated.AnalyticsManager;
 import plugin.borealcore.depreciated.CraftingManager;
 import plugin.borealcore.functions.bending.BendingManager;
 import plugin.borealcore.functions.brewery.BreweryManager;
+import plugin.borealcore.functions.cooking.CookCommand;
+import plugin.borealcore.functions.cooking.CookTabCompletion;
 import plugin.borealcore.functions.cooking.CookingCompetitionManager;
 import plugin.borealcore.functions.cooking.CookingManager;
 import plugin.borealcore.functions.cooking.MasteryManager;
+import plugin.borealcore.functions.cooking.RecipeBookCommand;
+import plugin.borealcore.functions.cooking.RecipeBookTabCompletion;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.functions.duels.DuelsManager;
+import plugin.borealcore.functions.herbalism.HerbalismCommand;
 import plugin.borealcore.functions.herbalism.HerbalismManager;
 import plugin.borealcore.functions.herbalism.configs.HerbManager;
+import plugin.borealcore.functions.jade.JadeCommand;
 import plugin.borealcore.functions.jade.JadeManager;
+import plugin.borealcore.functions.jade.JadeTabCompletion;
+import plugin.borealcore.functions.karmicnode.NodeCommand;
 import plugin.borealcore.functions.karmicnode.NodeManager;
 import plugin.borealcore.functions.market.MarketManager;
+import plugin.borealcore.functions.misc.SitCommand;
+import plugin.borealcore.functions.plushies.GambleCommand;
 import plugin.borealcore.functions.plushies.PlushieManager;
 import plugin.borealcore.functions.titles.TitleManagerManager;
+import plugin.borealcore.functions.traps.TrapsCommand;
 import plugin.borealcore.functions.traps.TrapsManager;
+import plugin.borealcore.functions.wiki.WikiCommand;
 import plugin.borealcore.functions.wiki.WikiManager;
+import plugin.borealcore.functions.wiki.WikiTabCompletion;
 import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.manager.FurnitureManager;
 import plugin.borealcore.manager.GuiManager;
 import plugin.borealcore.manager.PlaceholderManager;
+import plugin.borealcore.module.loader.ModuleLoader;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ConfigUtil;
 
@@ -68,6 +82,7 @@ public class BorealCore extends JavaPlugin {
     private static TrapsManager trapsManager;
     private static TitleManagerManager titleManager;
     private static MarketManager marketManager;
+    private static ModuleLoader moduleLoader;
 
     @Override
     public void onLoad() {
@@ -105,6 +120,13 @@ public class BorealCore extends JavaPlugin {
         trapsManager = new TrapsManager();
         titleManager = new TitleManagerManager();
         marketManager = new MarketManager();
+
+        moduleLoader = new ModuleLoader(this, db, placeholderManager);
+        try {
+            moduleLoader.loadAllModules();
+        } catch (ModuleLoadException e) {
+            throw new RuntimeException(e);
+        }
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());
@@ -155,6 +177,10 @@ public class BorealCore extends JavaPlugin {
         trapsManager.unload();
         titleManager.unload();
         marketManager.unload();
+
+        if (moduleLoader != null) {
+            moduleLoader.unloadAllModules();
+        }
 
         AdventureUtil.consoleMessage("[BorealCore] Plugin Disabled!");
 
@@ -275,6 +301,10 @@ public class BorealCore extends JavaPlugin {
 
     public static MarketManager getMarketManager() {
         return marketManager;
+    }
+
+    public static ModuleLoader getModuleLoader() {
+        return moduleLoader;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {

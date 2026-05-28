@@ -48,34 +48,9 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
     }
 
     @Override
-    public String getModuleId() {
-        return "config-editor";
-    }
-
-    @Override
-    public String getModuleName() {
-        return "Config Editor";
-    }
-
-    @Override
-    public String getModuleVersion() {
-        return "1.0.0";
-    }
-
-    @Override
-    public String getModuleAuthor() {
-        return "BorealCore";
-    }
-
-    @Override
-    public String getMinimumBorealCoreVersion() {
-        return "1.1.9";
-    }
-
-    @Override
     public void onModuleInitialize(ModuleContext context) throws Exception {
         this.context = context;
-        context.getLogger().info("Initializing " + getModuleName() + "...");
+        context.getLogger().info("Initializing Config Editor Module...");
     }
 
     @Override

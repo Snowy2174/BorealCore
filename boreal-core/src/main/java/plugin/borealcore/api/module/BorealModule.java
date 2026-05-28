@@ -5,32 +5,23 @@ package plugin.borealcore.api.module;
  * External developers should extend Function and implement this interface
  * to create modules that can be loaded dynamically by the module loader.
  */
-public interface BorealModule extends ModuleInitializer {
+public interface BorealModule {
 
     /**
-     * @return The unique identifier for this module (e.g., "jade", "cooking")
+     * Called when the module is enabled.
+     * This is where listeners should be registered and services initialized.
+     *
+     * @throws Exception if enabling fails
      */
-    String getModuleId();
+    void onModuleEnable() throws Exception;
 
     /**
-     * @return The display name of this module
+     * Called when the module is disabled.
+     * This is where listeners should be unregistered and resources cleaned up.
+     *
+     * @throws Exception if disabling fails
      */
-    String getModuleName();
-
-    /**
-     * @return The version of this module
-     */
-    String getModuleVersion();
-
-    /**
-     * @return The author(s) of this module
-     */
-    String getModuleAuthor();
-
-    /**
-     * @return The minimum version of BorealCore required for this module
-     */
-    String getMinimumBorealCoreVersion();
+    void onModuleDisable() throws Exception;
 
     /**
      * Called when the module is being loaded into the system.

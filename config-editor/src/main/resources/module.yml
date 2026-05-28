@@ -5,7 +5,7 @@
 id: config-editor
 
 # Display name for your module
-name: Configuration Editor
+name: Config Editor
 
 # Version following semantic versioning (major.minor.patch)
 version: 1.0.0
@@ -14,7 +14,7 @@ version: 1.0.0
 author: SnowyOwl217
 
 # The main class that implements BorealModule
-main: plugin.borealcore.module.ConfigEditorModule
+main: plugin.borealcore.ConfigEditorModule
 
 # Minimum BorealCore version required for this module
 minimum-borealcore-version: 1.1.9

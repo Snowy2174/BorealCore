@@ -5,6 +5,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.api.module.ModuleLoadException;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
 
@@ -63,12 +64,17 @@ public class ConfigUtil {
         BorealCore.getBreweryManager().load();
         BorealCore.getTrapsManager().unload();
         BorealCore.getTrapsManager().load();
-        BorealCore.getConfigEditorModule().unload();
-        BorealCore.getConfigEditorModule().load();
         BorealCore.getTitleManager().unload();
         BorealCore.getTitleManager().load();
         BorealCore.getMarketManager().unload();
         BorealCore.getMarketManager().load();
+
+        BorealCore.getModuleLoader().unloadAllModules();
+        try {
+            BorealCore.getModuleLoader().loadAllModules();
+        } catch (ModuleLoadException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 

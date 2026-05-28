@@ -164,7 +164,7 @@ public class MyModule implements BorealModule, Listener {
     }
 
     @Override
-    public String getMinimumBorealCoreVersion() {
+    public String getMinimumCoreVersion() {
         return "1.1.9";
     }
 

@@ -1,10 +1,9 @@
-package plugin.borealcore.commands;
+package plugin.borealcore.functions.karmicnode;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.karmicnode.NodeManager;
 
 
 public class NodeCommand implements CommandExecutor {

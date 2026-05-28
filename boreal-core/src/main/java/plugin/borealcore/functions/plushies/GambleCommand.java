@@ -1,4 +1,4 @@
-package plugin.borealcore.commands;
+package plugin.borealcore.functions.plushies;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -6,7 +6,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.plushies.PlushieManager;
 
 
 public class GambleCommand implements CommandExecutor {

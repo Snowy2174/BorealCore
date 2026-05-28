@@ -1,4 +1,4 @@
-package plugin.borealcore.commands;
+package plugin.borealcore.functions.cooking;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

@@ -1,13 +1,11 @@
 package plugin.borealcore.functions.cooking;
 
 
-import com.mojang.brigadier.Command;
 import dev.lone.itemsadder.api.CustomFurniture;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -21,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.action.Action;
 import plugin.borealcore.api.event.CookResultEvent;
-import plugin.borealcore.commands.SitCommand;
 import plugin.borealcore.functions.cooking.competition.Competition;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;

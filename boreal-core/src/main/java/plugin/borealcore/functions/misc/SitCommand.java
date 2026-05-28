@@ -1,4 +1,4 @@
-package plugin.borealcore.commands;
+package plugin.borealcore.functions.misc;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
