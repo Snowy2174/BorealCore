@@ -7,20 +7,24 @@ import com.meteordevelopments.duels.api.arena.ArenaManager;
 import com.meteordevelopments.duels.api.spectate.SpectateManager;
 import com.meteordevelopments.duels.api.spectate.Spectator;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import static plugin.borealcore.manager.configs.MessageManager.actionBarHealth;
+
 public class MatchRunnable extends BukkitRunnable {
-    private Set<Player> players;
+    private final Set<Player> players;
     private Player player1;
     private Player player2;
-    private SpectateManager spectateManager;
-    private ArenaManager arenaManager;
+    private final SpectateManager spectateManager;
+    private final ArenaManager arenaManager;
     private Arena arena;
 
 
@@ -33,11 +37,10 @@ public class MatchRunnable extends BukkitRunnable {
         this.spectateManager = api.getSpectateManager();
         this.arenaManager = api.getArenaManager();
 
-        if(player1 != null) {
+        if (player1 != null) {
             this.arena = arenaManager.get(player1);
         }
     }
-
 
     @Override
     public void run() {
@@ -45,7 +48,13 @@ public class MatchRunnable extends BukkitRunnable {
         List<Spectator> spectators = getSpectators(spectateManager);
         for (Spectator spectator : spectators) {
             Player player = spectator.getPlayer();
-            AdventureUtil.playerActionbar(player, getFormat());
+            if (player.getGameMode() != GameMode.SPECTATOR) {
+                player.setGameMode(GameMode.SPECTATOR);
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Player " + player.getName() + "'s game mode changed to spectator whilst spectating " + arena.getName());
+            }
+            AdventureUtil.playerActionbar(player, String.format(actionBarHealth,
+                    player1.getName(), (int) player1.getHealth(), player1.getMaxHealth(),
+                    player2.getName(), (int) player2.getHealth(), player2.getMaxHealth()));
         }
     }
 
@@ -55,10 +64,10 @@ public class MatchRunnable extends BukkitRunnable {
 
     public void setPlayers(Set<Player> players) {
         Iterator<Player> iterator = players.iterator();
-        if(iterator.hasNext()) {
+        if (iterator.hasNext()) {
             player1 = iterator.next();
         }
-        if(iterator.hasNext()) {
+        if (iterator.hasNext()) {
             player2 = iterator.next();
         }
     }
@@ -67,14 +76,19 @@ public class MatchRunnable extends BukkitRunnable {
         return spectateManager.getSpectators(arena);
     }
 
-    public String getFormat() {
-        return String.format("<gray>%s: <red>%d / %.0f <grey>| %s: <red>%d / %.0f",
-                player1.getName(), (int) player1.getHealth(), player1.getMaxHealth(),
-                player2.getName(), (int) player2.getHealth(), player2.getMaxHealth());
+    public Player getPlayer1() {
+        return player1;
     }
 
-    public Player getPlayer1() { return player1; }
-    public Player getPlayer2() { return player2; }
-    public double getHealth1() { return player1.getHealth(); }
-    public double getHealth2() { return player2.getHealth(); }
+    public Player getPlayer2() {
+        return player2;
+    }
+
+    public double getHealth1() {
+        return player1.getHealth();
+    }
+
+    public double getHealth2() {
+        return player2.getHealth();
+    }
 }

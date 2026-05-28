@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitScheduler;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.event.JadeEvent;
@@ -18,7 +19,7 @@ import plugin.borealcore.database.Database;
 import plugin.borealcore.functions.jade.object.JadeSource;
 import plugin.borealcore.functions.jade.object.JadeTransaction;
 import plugin.borealcore.functions.jade.object.Leaderboard;
-import plugin.borealcore.listener.JadeSourceListener;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
@@ -34,17 +35,18 @@ import java.util.List;
 import static org.bukkit.Bukkit.getServer;
 import static plugin.borealcore.manager.configs.ConfigManager.brewingRequiredQuality;
 import static plugin.borealcore.manager.configs.ConfigManager.refarmableCrops;
+import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 
 public class JadeManager extends Function {
 
     protected static Database database;
     public static HashMap<String, JadeSource> jadeSources = new HashMap<>();
     private static BukkitScheduler scheduler;
-    private JadeSourceListener jadeSourceListener;
+    private final JadeSourceListener jadeSourceListener;
     public static HashMap<LeaderboardType, Leaderboard> leaderboardCache = new HashMap<>();
 
     public JadeManager(Database database) {
-        this.database = database;
+        JadeManager.database = database;
         this.jadeSourceListener = new JadeSourceListener(this);
     }
 
@@ -63,6 +65,7 @@ public class JadeManager extends Function {
     public void unload() {
         jadeSources.clear();
         leaderboardCache.clear();
+        if (this.jadeSourceListener != null) HandlerList.unregisterAll(this.jadeSourceListener);
 
         if (scheduler != null) {
             scheduler.cancelTasks(BorealCore.getInstance());
@@ -173,6 +176,9 @@ public class JadeManager extends Function {
         if (jadeData.size() == 1 && jadeData.containsKey("not_in_database")) {
             return -1;
         }
+        if (jadeData.containsKey("not_in_last_24_hours")) {
+            return 0;
+        }
         StringBuilder message = new StringBuilder();
         message.append(MessageManager.jadeLimitHeader);
         for (String source : jadeSources.keySet()) {
@@ -192,15 +198,15 @@ public class JadeManager extends Function {
         return jadeData.size();
     }
 
-    public static void reconsileJadeData(Player player) {
+    public static void reconcileJadeData(Player player) {
         VotingPluginUser user = VotingPluginHooks.getInstance().getUserManager().getVotingPluginUser(player);
         if (user == null) {
-            System.out.println("User not found for " + player.getName());
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "User not found for " + player.getName());
             return;
         }
         int avPoints = user.getPoints();
         if (avPoints == 0) {
-            System.out.println("Jade data is already reconciled for " + player.getName());
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Jade data is already reconciled for " + player.getName());
             return;
         }
         database.getJadeForPlayerAsync(player, currentJade -> {
@@ -208,9 +214,9 @@ public class JadeManager extends Function {
                 int diff = avPoints - currentJade;
                 give(player, diff, "");
                 user.setPoints(0);
-                System.out.println("Reconciled " + diff + " jade for " + player.getName());
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Reconciled " + diff + " jade for " + player.getName());
             } else {
-                System.out.println("No reconciliation needed for " + player.getName());
+                consoleMessage(DebugLevel.DEBUG, "No reconciliation needed for " + player.getName());
             }
         });
     }
@@ -222,7 +228,7 @@ public class JadeManager extends Function {
         int age = brew.getCurrentRecipe().getAge();
         boolean distilled = brew.getCurrentRecipe().getDistillTime() > 1;
         double brewingRate = jadeSources.get("brewing").getRate();
-        BorealCore.getInstance().getLogger().info(String.format(
+        consoleMessage(DebugLevel.DEBUG, String.format(
                 "Processing breweryJade for player: %s, quality: %d, brew: %s, age: %d, distilled: %b",
                 player.getName(), quality, Arrays.toString(brew.getCurrentRecipe().getName()), age, distilled
         ));
@@ -236,17 +242,16 @@ public class JadeManager extends Function {
     }
 
     public static void fishingJade(FishingResultEvent event) {
-        System.out.println("Fishing result: " + event.getResult() + ", player: " + event.getPlayer().getName() + ", loot: " + event.getLoot() + " group: " + event.getLoot().lootGroup().toString());
+        consoleMessage(DebugLevel.DEBUG, "Fishing result: " + event.getResult() + ", player: " + event.getPlayer().getName() + ", loot: " + event.getLoot() + " group: " + event.getLoot().lootGroup().toString());
         if (event.getResult().equals(FishingResultEvent.Result.SUCCESS) && Math.random() <= jadeSources.get("fishing").getRate()) {
             giveJadeCommand(event.getPlayer(), "fishing", 1);
         }
     }
 
     public void farmingJade(CropBreakEvent event) {
-        if (event.entityBreaker() instanceof Player) {
-            Player player = (Player) event.entityBreaker();
+        if (event.entityBreaker() instanceof Player player) {
             CropConfig cropConfig = event.cropConfig();
-            BorealCore.getInstance().getLogger().info("Processing farmingJade for player: " + player.getName() +
+            consoleMessage(DebugLevel.DEBUG, "Processing farmingJade for player: " + player.getName() +
                     ", crop: " + event.cropStageItemID() + ", reason: " + event.reason());
             if (refarmableCrops.contains(cropConfig.id()) ? Math.random() <= jadeSources.get("farming").getRate() * 0.5 : Math.random() <= jadeSources.get("farming").getRate()) {
                 giveJadeCommand(player, "farming", 1);
@@ -255,7 +260,7 @@ public class JadeManager extends Function {
     }
 
     public static void cookingJade(Player player) {
-        BorealCore.getInstance().getLogger().info("Processing cookingJade for player: " + player.getName());
+        consoleMessage(DebugLevel.DEBUG, "Processing cookingJade for player: " + player.getName());
         if (Math.random() <= jadeSources.get("cooking").getRate()) {
             giveJadeCommand(player, "cooking", 1);
         }

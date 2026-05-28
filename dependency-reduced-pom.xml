@@ -93,6 +93,10 @@
       <id>Rosewood</id>
       <url>https://repo.rosewooddev.io/repository/public/</url>
     </repository>
+    <repository>
+      <id>glaremasters repo</id>
+      <url>https://repo.glaremasters.me/repository/towny/</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -122,19 +126,19 @@
     <dependency>
       <groupId>de.tr7zw</groupId>
       <artifactId>item-nbt-api-plugin</artifactId>
-      <version>2.15.1</version>
+      <version>2.15.5</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>me.clip</groupId>
       <artifactId>placeholderapi</artifactId>
-      <version>2.11.6</version>
+      <version>2.11.7</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.github.decentsoftware-eu</groupId>
       <artifactId>decentholograms</artifactId>
-      <version>2.9.2</version>
+      <version>2.9.9</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -177,6 +181,12 @@
       <groupId>com.github.dumbo-the-developer.Duels</groupId>
       <artifactId>duels-api</artifactId>
       <version>3.9</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.palmergames.bukkit.towny</groupId>
+      <artifactId>towny</artifactId>
+      <version>0.101.1.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

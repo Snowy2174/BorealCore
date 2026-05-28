@@ -2,10 +2,12 @@ package plugin.borealcore.functions.cooking.configs;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.borealcore.functions.cooking.object.Layout;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ConfigUtil;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
@@ -18,6 +20,10 @@ public class LayoutManager extends Function {
     public void load() {
         LAYOUTS = new HashMap<>();
         YamlConfiguration config = ConfigUtil.getConfig("recipes/bars.yml");
+        if (config == null) {
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "bars.yml not found or failed to load");
+            return;
+        }
         Set<String> keys = config.getKeys(false);
         for (String key : keys) {
             int range = config.getInt(key + ".range");

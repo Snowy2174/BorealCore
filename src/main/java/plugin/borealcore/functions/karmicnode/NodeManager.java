@@ -54,7 +54,6 @@ public class NodeManager extends Function {
             config.save(file);
         } catch (IOException e) {
             e.printStackTrace();
-            return;
         }
     }
 
@@ -93,4 +92,6 @@ public class NodeManager extends Function {
         Map.Entry<String, Integer> entry = sortedPlayers.get(index);
         return entry.getKey() + " &7- &e" + entry.getValue();
     }
+
+
 }

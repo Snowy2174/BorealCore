@@ -1,4 +1,4 @@
-package plugin.borealcore.manager;
+package plugin.borealcore.functions.cooking;
 
 import dev.lone.itemsadder.api.ItemsAdder;
 import net.luckperms.api.LuckPerms;

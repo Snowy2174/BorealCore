@@ -1,14 +1,13 @@
 package plugin.borealcore.functions.cooking;
 
 
-import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
+import com.mojang.brigadier.Command;
 import dev.lone.itemsadder.api.CustomFurniture;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -22,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.action.Action;
 import plugin.borealcore.api.event.CookResultEvent;
+import plugin.borealcore.commands.SitCommand;
 import plugin.borealcore.functions.cooking.competition.Competition;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
@@ -29,15 +29,15 @@ import plugin.borealcore.functions.cooking.object.DroppedItem;
 import plugin.borealcore.functions.cooking.object.Ingredient;
 import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.functions.cooking.object.Recipe;
-import plugin.borealcore.functions.herbalism.HerbalismManager;
 import plugin.borealcore.functions.jade.JadeManager;
-import plugin.borealcore.listener.ConsumeItemListener;
-import plugin.borealcore.listener.InteractListener;
+import plugin.borealcore.functions.misc.CropInteractEventListener;
+import plugin.borealcore.functions.misc.SitListener;
 import plugin.borealcore.manager.FurnitureManager;
-import plugin.borealcore.manager.MasteryManager;
 import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
+import plugin.borealcore.object.SimpleListener;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GUIUtil;
 import plugin.borealcore.utility.InventoryUtil;
@@ -54,32 +54,38 @@ import static plugin.borealcore.utility.AdventureUtil.playerSound;
 
 public class CookingManager extends Function {
     private final Random random;
-    private final InteractListener interactListener;
-    private final ConsumeItemListener consumeItemListener;
     private final HashMap<Player, Recipe> cookedRecipe;
     private final HashMap<Player, Location> cookingPotLocations;
     public final ConcurrentHashMap<Player, CookingPlayer> cookingPlayerCache;
-    private Map<UUID, BukkitRunnable> playerSoundTasks = new HashMap<>();
+    private final Map<UUID, BukkitRunnable> playerSoundTasks = new HashMap<>();
+    private final SimpleListener simpleListener;
+    public final SitListener listener;
 
     public CookingManager() {
         this.random = new Random();
-        this.interactListener = new InteractListener(this);
-        this.consumeItemListener = new ConsumeItemListener(this);
         this.cookedRecipe = new HashMap<>();
         this.cookingPotLocations = new HashMap<>();
         this.cookingPlayerCache = new ConcurrentHashMap<>();
+        this.simpleListener = new SimpleListener(this);
+        this.listener = new SitListener(BorealCore.getInstance());
     }
 
     @Override
     public void load() {
-        Bukkit.getPluginManager().registerEvents(this.interactListener, BorealCore.plugin);
-        Bukkit.getPluginManager().registerEvents(this.consumeItemListener, BorealCore.plugin);
+        listener.register(BorealCore.getInstance());
+        Bukkit.getPluginManager().registerEvents(this.simpleListener, BorealCore.plugin);
+        Bukkit.getPluginManager().registerEvents(new CropInteractEventListener(), BorealCore.plugin); //@TODO MOVE URGENTLY
+    }
+
+    // REMOVE/UPDATE
+    public SitListener getSitListener() {
+        return listener;
     }
 
     @Override
     public void unload() {
-        HandlerList.unregisterAll(this.interactListener);
-        HandlerList.unregisterAll(this.consumeItemListener);
+        if (this.simpleListener != null) HandlerList.unregisterAll(this.simpleListener);
+        if (this.listener != null) HandlerList.unregisterAll(this.listener);
     }
 
     public void handleCooking(String recipe, Player player, CustomFurniture clickedFurniture) {
@@ -94,7 +100,7 @@ public class CookingManager extends Function {
                     Location loc = clickedFurniture.getArmorstand().getLocation();
                     FurnitureManager.ingredientsSFX(player, ingredients, loc);
                 }
-                    onCookedItem(player, bar, clickedFurniture);
+                onCookedItem(player, bar, clickedFurniture);
             } else {
                 AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.noIngredients);
             }
@@ -102,16 +108,16 @@ public class CookingManager extends Function {
     }
 
     public void handleMaterialAutocooking(String recipeId, Player player, Integer amount) {
-            Ingredient recipe = INGREDIENTS.get(recipeId);
-            List<String> ingredients = recipe.getIngredients();
-            if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
-                InventoryUtil.removeIngredients(player.getInventory(), ingredients, amount);
-                InventoryUtil.giveItem(player, recipe.getKey(), amount, true);
-                playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
-                AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
-            } else {
-                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.noIngredients);
-            }
+        Ingredient recipe = INGREDIENTS.get(recipeId);
+        List<String> ingredients = recipe.getIngredients();
+        if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
+            InventoryUtil.removeIngredients(player.getInventory(), ingredients, amount);
+            InventoryUtil.giveItem(player, recipe.getKey(), amount, true);
+            playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
+        } else {
+            AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.noIngredients);
+        }
     }
 
     public void handleAutocooking(String recipeId, Player player, Integer amount) {
@@ -142,15 +148,16 @@ public class CookingManager extends Function {
 
         CookingPlayer cookingPlayer = cookingPlayerCache.remove(player);
         if (cookingPlayer == null && (recipe != Recipe.EMPTY)) {
-                if (recipe == null) {
-                    AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>There ain't no custom recipe");
-                } else {
-                    showPlayerBar(player, recipe);
-                }
+            if (recipe == null) {
+                AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>There ain't no custom recipe");
+            } else {
+                showPlayerBar(player, recipe);
+            }
         }
     }
 
-    public void onBarInteract(PlayerInteractEvent event) {
+    @Override
+    public void onInteract(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         CookingPlayer cookingPlayer = cookingPlayerCache.remove(player);
         if (cookingPlayer != null) {
@@ -180,7 +187,7 @@ public class CookingManager extends Function {
         }
 
         double masteryPerfectionMultiplier = RecipeDataUtil.hasMastery(player, droppedItem.getKey()) ? 1.5 : 1;
-        boolean perfect = cookingPlayer.isPerfect() && (Math.random() < perfectChance*masteryPerfectionMultiplier);
+        boolean perfect = cookingPlayer.isPerfect() && (Math.random() < perfectChance * masteryPerfectionMultiplier);
         String drop = recipe.getCookedItems();
 
         CookResultEvent cookResultEvent = new CookResultEvent(player, perfect, InventoryUtil.build(drop), drop);
@@ -190,7 +197,7 @@ public class CookingManager extends Function {
         }
 
         if (perfect) {
-            AdventureUtil.playerMessage(player,MessageManager.infoPositive + MessageManager.cookingPerfect.replace("{recipe}", droppedItem.getNick()));
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingPerfect.replace("{recipe}", droppedItem.getNick()));
             drop = drop + ConfigManager.perfectItemSuffix;
             if (!RecipeDataUtil.hasMastery(player, droppedItem.getKey())) {
                 MasteryManager.handleMastery(player, droppedItem.getKey());
@@ -209,6 +216,7 @@ public class CookingManager extends Function {
         }
 
         if (Competition.currentCompetition != null) {
+            Competition.currentCompetition.tryAddBossBarToPlayer(player);
             float score = ((float) droppedItem.getScore());
             Competition.currentCompetition.refreshData(player, score, perfect);
         }
@@ -266,7 +274,7 @@ public class CookingManager extends Function {
         if (recipe != null && recipe.getLayout() != null) {
             layout = recipe.getLayout()[random.nextInt(recipe.getLayout().length)];
         } else {
-            layout = (Layout) LayoutManager.LAYOUTS.values().toArray()[random.nextInt(LayoutManager.LAYOUTS.values().size())];
+            layout = (Layout) LayoutManager.LAYOUTS.values().toArray()[random.nextInt(LayoutManager.LAYOUTS.size())];
         }
         int speed;
         int timer;
@@ -285,10 +293,6 @@ public class CookingManager extends Function {
             speed = 1;
         }
         Difficulty difficult = new Difficulty(timer, speed);
-
-        if (Competition.currentCompetition != null) {
-            Competition.currentCompetition.tryAddBossBarToPlayer(player);
-        }
 
         CookingPlayer cookingPlayer = new CookingPlayer(System.currentTimeMillis() + time, player, layout, difficult, this);
         cookingPlayer.runTaskTimer(BorealCore.plugin, 0, 1);
@@ -315,7 +319,6 @@ public class CookingManager extends Function {
         CookingPlayer cookingPlayer = getCookingPlayer(player);
         return cookingPlayer != null;
     }
-
 
     public void playSoundLoop(Player player) {
         BukkitRunnable soundTask = new BukkitRunnable() {
@@ -346,37 +349,31 @@ public class CookingManager extends Function {
     @Override
     public void onConsumeItem(PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
+        ItemStack itemStack = event.getItem();
+        String bcId = itemStack.getItemMeta().getPersistentDataContainer()
+                .get(new NamespacedKey(BorealCore.getInstance(), "id"), PersistentDataType.STRING);
+        if (bcId == null) {
+            return;
+        }
 
-            ItemStack itemStack = event.getItem();
+        bcId = bcId.replaceAll("[\\[\\]]", "");
 
-            //List<PotionEffect> effects = HerbalismManager.readInfusionEffectsFromNBT(itemStack);
-        // for (PotionEffect effect : effects) {
-        //player.addPotionEffect(effect);
-            //}
+        boolean perfect = bcId.contains(ConfigManager.perfectItemSuffix);
+        String recipeKey = bcId.replace(ConfigManager.perfectItemSuffix, "");
+        Recipe recipe = RecipeManager.COOKING_RECIPES.get(recipeKey);
+        if (!(recipe instanceof DroppedItem droppedItem)) {
+            AdventureUtil.consoleMessage(DebugLevel.ERROR, "Recipe not found or not a DroppedItem: " + recipeKey);
+            AdventureUtil.playerMessage(player, MessageManager.pluginError + ": <gray>Recipe not found or not a DroppedItem: " + recipeKey);
+            return;
+        }
 
-            String lootKey = itemStack.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(BorealCore.getInstance(), "id"), PersistentDataType.STRING);
-            if (lootKey == null ) {
-                return;
+        Action[] actions = perfect ? droppedItem.getConsumeActions().get(1) : droppedItem.getConsumeActions().get(0);
+
+        if (actions != null) {
+            for (Action action : actions) {
+                action.doOn(player, null);
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Action performed: " + action.getClass().getSimpleName() + " for player: " + player.getName() + " for dish: " + recipeKey);
             }
-
-            boolean perfect = lootKey.contains(ConfigManager.perfectItemSuffix);
-            String recipeKey = lootKey.replace(ConfigManager.perfectItemSuffix, "");
-            Recipe recipe = RecipeManager.COOKING_RECIPES.get(recipeKey);
-            if (!(recipe instanceof DroppedItem)) {
-                System.out.println("Recipe not found or not a DroppedItem: " + recipeKey);
-                return;
-            }
-
-            System.out.println(recipeKey);
-
-            DroppedItem droppedItem = (DroppedItem) recipe;
-            Action[] actions = perfect ? droppedItem.getPerfectConsumeActions() : droppedItem.getConsumeActions();
-
-            if (actions != null) {
-                for (Action action : actions) {
-                    action.doOn(player, null);
-                    System.out.println("Action performed: " + action.getClass().getSimpleName() + " for player: " + player.getName());
-                }
-            }
+        }
     }
 }

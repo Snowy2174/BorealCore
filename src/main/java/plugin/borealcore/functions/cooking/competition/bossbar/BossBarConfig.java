@@ -1,16 +1,17 @@
 package plugin.borealcore.functions.cooking.competition.bossbar;
 
-import org.bukkit.boss.BarColor;
+import net.kyori.adventure.bossbar.BossBar;
+import org.jetbrains.annotations.NotNull;
 
 public class BossBarConfig {
 
     private final String[] text;
     private final int interval;
-    private final BossBarOverlay overlay;
-    private final BarColor color;
+    private final BossBar.Overlay overlay;
+    private final BossBar.Color color;
     private final int rate;
 
-    public BossBarConfig(String[] text, BossBarOverlay overlay, BarColor color, int rate, int interval) {
+    public BossBarConfig(String[] text, BossBar.Overlay overlay, BossBar.Color color, int rate, int interval) {
         this.text = text;
         this.overlay = overlay;
         this.color = color;
@@ -26,11 +27,11 @@ public class BossBarConfig {
         return interval;
     }
 
-    public BossBarOverlay getOverlay() {
+    public @NotNull BossBar.Overlay getOverlay() {
         return overlay;
     }
 
-    public BarColor getColor() {
+    public @NotNull BossBar.Color getColor() {
         return color;
     }
 

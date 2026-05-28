@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 
@@ -26,7 +27,7 @@ public class BreweryRecipeBookProvider implements InventoryProvider {
 
     @Override
     public void update(Player player, InventoryContents contents) {
-        // not really useful lets be fr
+        // not really useful lets be honest
     }
 
     @Override
@@ -36,7 +37,7 @@ public class BreweryRecipeBookProvider implements InventoryProvider {
                 e -> AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown)));
         contents.fillBorders(ClickableItem.empty(new ItemStack(Material.AIR)));
 
-         List<String> unlockedRecipes = getUnlockedBreweryRecipes(player); // @TODO re implement this to check your current permission system
+        List<String> unlockedRecipes = getUnlockedBreweryRecipes(player); // @TODO re implement this to check your current permission system
         // I'll swap it for the db implemention later
 
         for (String recipe : BreweryManager.RECIPES.keySet()) {
@@ -79,7 +80,7 @@ public class BreweryRecipeBookProvider implements InventoryProvider {
                 itemMeta.setLore(unknownRecipeStack.getItemMeta().getLore());
                 stack.setItemMeta(itemMeta);
             } else {
-                System.out.println("ItemMeta is null!");
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "ItemMeta is null!");
             }
             return stack;
         }

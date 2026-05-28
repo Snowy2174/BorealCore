@@ -10,7 +10,7 @@ public class JadeTransaction {
     private final double amount;
     private final String source;
     private final LocalDateTime timestamp;
-    private UUID uuid;
+    private final UUID uuid;
 
     public JadeTransaction(String player, @NotNull UUID uuid, double amount, String source, LocalDateTime timestamp) {
         this.player = player;

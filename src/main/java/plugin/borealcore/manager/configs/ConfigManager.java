@@ -10,6 +10,7 @@ import java.util.List;
 
 public class ConfigManager {
     public static String lang;
+    public static DebugLevel debugLevel;
     public static double perfectChance;
     public static double ingredientRefundChance;
     public static int splashTime;
@@ -19,6 +20,8 @@ public class ConfigManager {
     public static String perfectItemSuffix;
     public static String particleItemSuffix;
     public static String effectLore;
+    public static String hungerLore;
+    public static String saturationLore;
     public static String failureItem;
     public static String unlitCookingPot;
     public static String litCookingPot;
@@ -46,16 +49,17 @@ public class ConfigManager {
     public static int failureFadeIn;
     public static int failureFadeStay;
     public static int failureFadeOut;
-    public static double cookingJadeRewardRate;
-    public static double brewingJadeRewardRate;
     public static int brewingRequiredQuality;
     public static boolean processAnalyticsEnabled;
     public static List<String> refarmableCrops;
+    public static int lavaContactDamage;
+    public static int fireContactDamage;
 
     public static void load() {
         YamlConfiguration config = ConfigUtil.getConfig("config.yml");
 
         lang = config.getString("lang", "english");
+        debugLevel = DebugLevel.valueOf(config.getString("debug-level", "INFO").toUpperCase());
 
         perfectChance = config.getDouble("mechanics.perfect-chance", 0.35);
         ingredientRefundChance = config.getDouble("mechanics.ingredients-refund-chance", 0.1);
@@ -67,6 +71,8 @@ public class ConfigManager {
         particleItemSuffix = config.getString("mechanics.particle-item-suffix", "_particle");
 
         effectLore = config.getString("mechanics.effect-lore", " <!italic><gold>\uD83E\uDDEA <white>{effect} <gold>{amplifier} {duration}");
+        hungerLore = config.getString("mechanics.hunger-lore", " <!italic><gold>\uD83C\uDF56 Restores {hunger} hunger");
+        saturationLore = config.getString("mechanics.saturation-lore", " <!italic><gold>\uD83C\uDF56 Restores {saturation} saturation");
         failureItem = config.getString("mechanics.failure-item", "failureitem");
         unlitCookingPot = config.getString("mechanics.unlit-cooking-pot", "cooking_pot_unlit");
         litCookingPot = config.getString("mechanics.lit-cooking-pot", "cooking_pot_lit");
@@ -92,6 +98,9 @@ public class ConfigManager {
         unknownItem = config.getString("gui.items.unknown-item", "unknownrecipe");
         grinderItem = config.getString("gui.items.grinder-item", "grinder");
 
+        lavaContactDamage = config.getInt("bending.lava-contact-damage", 1);
+        fireContactDamage = config.getInt("bending.fire-contact-damage", 1);
+
         successTitle = config.getStringList("titles.success.title").toArray(new String[0]);
         successSubTitle = config.getStringList("titles.success.subtitle").toArray(new String[0]);
         successFadeIn = config.getInt("titles.success.fade.in", 10) * 50;
@@ -114,5 +123,10 @@ public class ConfigManager {
 
     public static @NotNull NamespacedKey getNamespacedKey(String key) {
         return new NamespacedKey(BorealCore.plugin, key);
+    }
+
+    public static void setDebugLevel(DebugLevel debugLevel) {
+        YamlConfiguration config = ConfigUtil.getConfig("config.yml");
+        config.set("debug-level", debugLevel.toString());
     }
 }
