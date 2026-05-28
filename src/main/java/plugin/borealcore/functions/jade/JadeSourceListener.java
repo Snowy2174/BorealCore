@@ -1,4 +1,4 @@
-package plugin.borealcore.listener;
+package plugin.borealcore.functions.jade;
 
 import com.bencodez.votingplugin.events.PlayerVoteEvent;
 import com.dre.brewery.api.events.brew.BrewModifyEvent;
@@ -8,12 +8,14 @@ import net.momirealms.customfishing.api.event.FishingResultEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import plugin.borealcore.functions.jade.JadeManager;
+import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.utility.AdventureUtil;
 
 import static com.dre.brewery.api.events.brew.BrewModifyEvent.Type.SEAL;
 
 public class JadeSourceListener implements Listener {
     private final JadeManager jadeManager;
+
     public JadeSourceListener(JadeManager jadeManager) {
         this.jadeManager = jadeManager;
     }
@@ -23,15 +25,15 @@ public class JadeSourceListener implements Listener {
         if (event.isCancelled()) {
             return;
         }
-        jadeManager.fishingJade(event);
+        JadeManager.fishingJade(event);
     }
 
     @EventHandler
     public void onCropBreakEvent(CropBreakEvent event) {
-        if (event.isCancelled() || event.reason() != BreakReason.ACTION ) {
+        if (event.isCancelled() || event.reason() != BreakReason.ACTION) {
             return;
         }
-        System.out.println("Processing farmingJade for player: " + event.entityBreaker());
+        AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Processing farmingJade for player: " + event.entityBreaker());
         jadeManager.farmingJade(event);
     }
 
@@ -46,9 +48,9 @@ public class JadeSourceListener implements Listener {
     @EventHandler
     public void onVote(PlayerVoteEvent event) {
         if (event.isWasOnline()) {
-            jadeManager.give(Bukkit.getPlayer(event.getPlayer()), 1, "voting");
+            JadeManager.give(Bukkit.getPlayer(event.getPlayer()), 1, "voting");
         } else {
-            jadeManager.giveOffline(Bukkit.getOfflinePlayer(event.getPlayer()), 1, "voting");
+            JadeManager.giveOffline(Bukkit.getOfflinePlayer(event.getPlayer()), 1, "voting");
         }
     }
 }

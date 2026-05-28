@@ -1,6 +1,6 @@
 package plugin.borealcore.functions.cooking;
 
-import org.bukkit.boss.BarColor;
+import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.borealcore.action.Action;
 import plugin.borealcore.action.CommandActionImpl;
@@ -16,7 +16,7 @@ import plugin.borealcore.utility.ConfigUtil;
 import java.util.*;
 
 
-public class CompetitionManager extends Function {
+public class CookingCompetitionManager extends Function {
 
     public static HashMap<String, CompetitionConfig> competitionsT;
     public static HashMap<String, CompetitionConfig> competitionsC;
@@ -45,8 +45,8 @@ public class CompetitionManager extends Function {
             boolean enableBsb = config.getBoolean(key + ".bossbar.enable", false);
             BossBarConfig bossBarConfig = new BossBarConfig(
                     config.getStringList(key + ".bossbar.text").toArray(new String[0]),
-                    BossBarConfig.BossBarOverlay.valueOf(config.getString(key + ".bossbar.overlay", "SOLID").toUpperCase()),
-                    BarColor.valueOf(config.getString(key + ".bossbar.color", "WHITE").toUpperCase()),
+                    BossBar.Overlay.valueOf(config.getString(key + ".bossbar.overlay", "SOLID").toUpperCase()),
+                    BossBar.Color.valueOf(config.getString(key + ".bossbar.color", "WHITE").toUpperCase()),
                     config.getInt(key + ".bossbar.refresh-rate", 10),
                     config.getInt(key + ".bossbar.switch-interval", 200)
             );

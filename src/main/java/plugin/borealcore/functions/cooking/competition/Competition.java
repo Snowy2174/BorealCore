@@ -108,7 +108,6 @@ public class Competition {
             bossBarManager.unload();
         }
         this.timerTask.cancel();
-        givePrize();
 
         List<String> newMessage = new ArrayList<>();
         PlaceholderManager placeholderManager = BorealCore.getPlaceholderManager();
@@ -137,6 +136,8 @@ public class Competition {
         for (String endCmd : competitionConfig.getEndCommand()) {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), endCmd);
         }
+
+        givePrize();
 
         currentCompetition = null;
 

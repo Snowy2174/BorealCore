@@ -4,17 +4,19 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.borealcore.commands.*;
 import plugin.borealcore.database.Database;
-import plugin.borealcore.database.SQLite;
+import plugin.borealcore.database.SQLiteData;
+import plugin.borealcore.database.SQLiteJade;
+import plugin.borealcore.depreciated.AnalyticsManager;
+import plugin.borealcore.depreciated.CraftingManager;
 import plugin.borealcore.functions.bending.BendingManager;
 import plugin.borealcore.functions.brewery.BreweryManager;
-import plugin.borealcore.functions.cooking.CompetitionManager;
+import plugin.borealcore.functions.configeditor.ConfigEditorManager;
+import plugin.borealcore.functions.cooking.CookingCompetitionManager;
 import plugin.borealcore.functions.cooking.CookingManager;
-import plugin.borealcore.functions.cooking.configs.EffectManager;
+import plugin.borealcore.functions.cooking.MasteryManager;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.functions.duels.DuelsManager;
@@ -22,9 +24,15 @@ import plugin.borealcore.functions.herbalism.HerbalismManager;
 import plugin.borealcore.functions.herbalism.configs.HerbManager;
 import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.functions.karmicnode.NodeManager;
+import plugin.borealcore.functions.market.MarketManager;
 import plugin.borealcore.functions.plushies.PlushieManager;
+import plugin.borealcore.functions.titles.TitleManagerManager;
+import plugin.borealcore.functions.traps.TrapsManager;
 import plugin.borealcore.functions.wiki.WikiManager;
-import plugin.borealcore.manager.*;
+import plugin.borealcore.manager.EffectManager;
+import plugin.borealcore.manager.FurnitureManager;
+import plugin.borealcore.manager.GuiManager;
+import plugin.borealcore.manager.PlaceholderManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ConfigUtil;
 
@@ -37,7 +45,7 @@ public class BorealCore extends JavaPlugin {
     public static ProtocolManager protocolManager;
     private static CookingManager cookingManager;
     private static HerbalismManager herbalismManager;
-    private static CompetitionManager competitionManager;
+    private static CookingCompetitionManager competitionManager;
     private static GuiManager guiManager;
     private static RecipeManager recipeManager;
     private static HerbManager herbManager;
@@ -50,6 +58,7 @@ public class BorealCore extends JavaPlugin {
     private static NodeManager nodeManager;
     private static JadeManager jadeManager;
     private static Database db;
+    private static Database traps;
     private static WikiManager wikiManager;
     private static CraftingManager craftingManager;
     private static AnalyticsManager analyticsManager;
@@ -57,6 +66,10 @@ public class BorealCore extends JavaPlugin {
     private static DuelsManager duelsManager;
     private static BendingManager bendingManager;
     private static BreweryManager breweryManager;
+    private static TrapsManager trapsManager;
+    private static ConfigEditorManager configEditorManager;
+    private static TitleManagerManager titleManager;
+    private static MarketManager marketManager;
 
     @Override
     public void onLoad() {
@@ -71,7 +84,7 @@ public class BorealCore extends JavaPlugin {
 
         cookingManager = new CookingManager();
         herbalismManager = new HerbalismManager();
-        competitionManager = new CompetitionManager();
+        competitionManager = new CookingCompetitionManager();
         layoutManager = new LayoutManager();
         effectManager = new EffectManager();
         furnitureManager = new FurnitureManager();
@@ -82,14 +95,19 @@ public class BorealCore extends JavaPlugin {
         placeholderManager = new PlaceholderManager();
         nodeManager = new NodeManager();
         wikiManager = new WikiManager();
-        db = new SQLite(this);
+        db = new SQLiteJade(this);
+        traps = new SQLiteData(this);
         jadeManager = new JadeManager(db);
         craftingManager = new CraftingManager();
         analyticsManager = new AnalyticsManager(db);
         plushieManager = new PlushieManager();
-        duelsManager = new DuelsManager();
+        //duelsManager = new DuelsManager();
         bendingManager = new BendingManager();
         breweryManager = new BreweryManager();
+        trapsManager = new TrapsManager();
+        configEditorManager = new ConfigEditorManager();
+        titleManager = new TitleManagerManager();
+        marketManager = new MarketManager();
 
         reloadConfig();
         getCommand("cooking").setExecutor(new CookCommand());
@@ -104,16 +122,10 @@ public class BorealCore extends JavaPlugin {
         getCommand("recipes").setTabCompleter(new RecipeBookTabCompletion());
         getCommand("herbalism").setExecutor(new HerbalismCommand());
         //getCommand("herbalism").setTabCompleter(new HerbalismTabCompletion());
-
-
-        // @TODO
-        // Debug what this does and if it is still needed
-        Bukkit.getScheduler().runTaskLater(this, new Runnable() {
-            @Override
-            public void run() {
-                Bukkit.dispatchCommand((CommandSender)Bukkit.getConsoleSender(), "mythicmobs reload");
-            }
-        }, 100L);
+        getCommand("traps").setExecutor(new TrapsCommand());
+        getCommand("sit").setExecutor(new SitCommand());
+        getCommand("market").setExecutor(marketManager);
+        getCommand("market").setTabCompleter(marketManager);
 
         AdventureUtil.consoleMessage("Plugin Enabled!");
     }
@@ -138,10 +150,15 @@ public class BorealCore extends JavaPlugin {
         masteryManager.unload();
         analyticsManager.unload();
         plushieManager.unload();
-        duelsManager.unload();
+       // duelsManager.unload();
         bendingManager.unload();
         breweryManager.unload();
         db.unload();
+        traps.unload();
+        trapsManager.unload();
+        configEditorManager.unload();
+        titleManager.unload();
+        marketManager.unload();
 
         AdventureUtil.consoleMessage("[BorealCore] Plugin Disabled!");
 
@@ -159,21 +176,27 @@ public class BorealCore extends JavaPlugin {
     public static BorealCore getInstance() {
         return plugin;
     }
+
     public static CookingManager getCookingManager() {
         return cookingManager;
     }
-    public static CompetitionManager getCompetitionManager() {
+
+    public static CookingCompetitionManager getCompetitionManager() {
         return competitionManager;
     }
+
     public static PlaceholderManager getPlaceholderManager() {
         return placeholderManager;
     }
+
     public static LayoutManager getLayoutManager() {
         return layoutManager;
     }
+
     public static GuiManager getGuiManager() {
         return guiManager;
     }
+
     public static FurnitureManager getFurnitureManager() {
         return furnitureManager;
     }
@@ -181,6 +204,7 @@ public class BorealCore extends JavaPlugin {
     public static RecipeManager getRecipeManager() {
         return recipeManager;
     }
+
     public static EffectManager getEffectManager() {
         return effectManager;
     }
@@ -188,44 +212,77 @@ public class BorealCore extends JavaPlugin {
     public static MasteryManager getMasteryManager() {
         return masteryManager;
     }
+
     public static JadeManager getJadeManager() {
         return jadeManager;
     }
+
     public static InventoryManager getInventoryManager() {
         return inventoryManager;
     }
+
     public static Database getDatabase() {
         return db;
     }
+
     public static NodeManager getNodeManager() {
         return nodeManager;
     }
+
     public static WikiManager getWikiManager() {
         return wikiManager;
     }
+
     public static CraftingManager getCraftingManager() {
         return craftingManager;
     }
+
     public static AnalyticsManager getAnalyticsManager() {
         return analyticsManager;
     }
+
     public static PlushieManager getPlushieManager() {
         return plushieManager;
     }
+
     public static DuelsManager getDuelsManager() {
         return duelsManager;
     }
+
     public static BendingManager getBendingManager() {
         return bendingManager;
     }
+
     public static BreweryManager getBreweryManager() {
         return breweryManager;
     }
+
     public static HerbManager getHerbManager() {
         return herbManager;
     }
+
     public static HerbalismManager getHerbalismManager() {
         return herbalismManager;
+    }
+
+    public static Database getTrapsDatabase() {
+        return traps;
+    }
+
+    public static TrapsManager getTrapsManager() {
+        return trapsManager;
+    }
+
+    public static ConfigEditorManager getConfigEditorManager() {
+        return configEditorManager;
+    }
+
+    public static TitleManagerManager getTitleManager() {
+        return titleManager;
+    }
+
+    public static MarketManager getMarketManager() {
+        return marketManager;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {

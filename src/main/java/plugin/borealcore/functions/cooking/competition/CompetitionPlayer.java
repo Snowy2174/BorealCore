@@ -2,7 +2,7 @@ package plugin.borealcore.functions.cooking.competition;
 
 import org.jetbrains.annotations.NotNull;
 
-public class CompetitionPlayer implements Comparable<CompetitionPlayer>{
+public class CompetitionPlayer implements Comparable<CompetitionPlayer> {
 
     private long time;
     private final String player;
@@ -16,12 +16,12 @@ public class CompetitionPlayer implements Comparable<CompetitionPlayer>{
         this.time = System.currentTimeMillis();
     }
 
-    public void addScore(float score){
+    public void addScore(float score) {
         this.score += score;
         this.time = System.currentTimeMillis();
     }
 
-    public void setScore(float score){
+    public void setScore(float score) {
         this.score = score;
         this.time = System.currentTimeMillis();
     }
@@ -30,7 +30,7 @@ public class CompetitionPlayer implements Comparable<CompetitionPlayer>{
         return this.score;
     }
 
-    public String getPlayer(){
+    public String getPlayer() {
         return this.player;
     }
 

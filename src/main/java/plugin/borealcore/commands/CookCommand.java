@@ -7,10 +7,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.CookingManager;
+import plugin.borealcore.functions.cooking.MasteryManager;
 import plugin.borealcore.functions.cooking.competition.Competition;
 import plugin.borealcore.functions.cooking.competition.CompetitionSchedule;
 import plugin.borealcore.manager.GuiManager;
-import plugin.borealcore.manager.MasteryManager;
+import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ConfigUtil;
@@ -48,6 +50,8 @@ public class CookCommand implements CommandExecutor {
             handleCookCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("reload")) {
             handleReloadCommand(sender);
+        } else if (subcommand.equalsIgnoreCase("debugLevel")) {
+            handleDebugLevelCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("migrateperms")) {
             handleMigratePermsCommand(sender);
         } else if (subcommand.equalsIgnoreCase("unlock")) {
@@ -68,6 +72,8 @@ public class CookCommand implements CommandExecutor {
             handleClearCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("stats")) {
             showStatsCommand(sender);
+        } else if (subcommand.equalsIgnoreCase("purge")) {
+            handlePurgeCommand(sender, subargs);
         } else {
             // Unknown subcommand
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.unavailableArgs);
@@ -127,6 +133,27 @@ public class CookCommand implements CommandExecutor {
         long startTime = System.currentTimeMillis();
         ConfigUtil.reload();
         AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.reload.replace("{time}", String.valueOf(System.currentTimeMillis() - startTime)));
+        if (ConfigManager.debugLevel == DebugLevel.DEBUG) {
+            AdventureUtil.sendMessage(sender, MessageManager.prefix + "Debug Level: <green>" + ConfigManager.debugLevel);
+        }
+    }
+
+    private void handleDebugLevelCommand(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking debugLevel <level>");
+            return;
+        }
+        DebugLevel debugLevel = DebugLevel.valueOf(args[0].toUpperCase());
+        if (debugLevel == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid debug level. Use: INFO, DEBUG");
+            return;
+        }
+        if (ConfigManager.debugLevel != debugLevel) {
+            ConfigManager.setDebugLevel(debugLevel);
+            AdventureUtil.sendMessage(sender, MessageManager.prefix + "Debug level set to <green>" + debugLevel);
+        } else {
+            AdventureUtil.sendMessage(sender, MessageManager.prefix + "Debug level is already set to <green>" + debugLevel);
+        }
     }
 
     private void handleMigratePermsCommand(CommandSender sender) {
@@ -304,6 +331,21 @@ public class CookCommand implements CommandExecutor {
         InventoryUtil.removeItem(player.getInventory(), itemName, amount);
 
         AdventureUtil.sendMessage(sender, "Cleared " + amount + " of " + itemName + " from " + player.getName());
+    }
+
+    private void handlePurgeCommand(CommandSender sender, String[] args) {
+        if (args.length < 1) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/cooking purge <player>");
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return;
+        }
+        BorealCore.getDatabase().purgeUser(player.getUniqueId().toString());
+        AdventureUtil.sendMessage(sender, "Purged all jade data for player: " + player.getName());
     }
 
 }

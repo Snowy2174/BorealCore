@@ -1,8 +1,8 @@
 package plugin.borealcore.functions.bending;
 
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.listener.BendingListener;
 import plugin.borealcore.object.Function;
 
 public class BendingManager extends Function {
@@ -20,6 +20,9 @@ public class BendingManager extends Function {
 
     @Override
     public void unload() {
+        if (this.bendingListener != null) {
+            HandlerList.unregisterAll(this.bendingListener);
+        }
     }
 
 

@@ -41,7 +41,7 @@ public class HerbalismCommand implements CommandExecutor {
                 }
                 break;
             default:
-                sendMessage(sender,"Unknown command. Use /herbalism help for a list of commands.");
+                sendMessage(sender, "Unknown command. Use /herbalism help for a list of commands.");
         }
         return false;
     }

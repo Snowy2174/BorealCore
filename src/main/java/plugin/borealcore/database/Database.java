@@ -1,7 +1,9 @@
 package plugin.borealcore.database;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Consumer;
 import plugin.borealcore.BorealCore;
@@ -9,9 +11,13 @@ import plugin.borealcore.functions.jade.LeaderboardType;
 import plugin.borealcore.functions.jade.object.JadeTransaction;
 import plugin.borealcore.functions.jade.object.Leaderboard;
 import plugin.borealcore.functions.jade.object.LeaderboardEntry;
+import plugin.borealcore.functions.traps.Trap;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
+import plugin.borealcore.utility.SerialisationUtil;
 
+import java.io.IOException;
 import java.sql.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -22,11 +28,12 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import static plugin.borealcore.functions.jade.JadeManager.jadeSources;
+import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 
 public abstract class Database extends Function {
     public final BorealCore plugin;
     public Connection connection;
-    public String table = "jade_transactions";
+    public String table;
     private final ConcurrentLinkedQueue<JadeTransaction> pendingTransactions = new ConcurrentLinkedQueue<>();
 
     public Database(BorealCore instance) {
@@ -34,16 +41,18 @@ public abstract class Database extends Function {
     }
 
     public abstract Connection getSQLConnection();
+
     public abstract void load();
+
     public abstract void unload();
 
     public void initialize() {
         this.connection = this.getSQLConnection();
         try {
-            PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM " + this.table + " WHERE player = ?");
+            PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM " + this.table + " WHERE uuid = ?");
             ResultSet rs = ps.executeQuery();
             this.close(ps, rs);
-            AdventureUtil.consoleMessage("[BorealCore] Loaded SQLite database");
+            consoleMessage("Loaded SQLiteJade database");
         } catch (SQLException ex) {
             BorealCore.disablePlugin("Unable to retrieve connection during database initialization", ex);
         }
@@ -54,7 +63,6 @@ public abstract class Database extends Function {
             if (ps != null) {
                 ps.close();
             }
-
             if (rs != null) {
                 rs.close();
             }
@@ -73,8 +81,6 @@ public abstract class Database extends Function {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
         }
     }
-
-
 
     private int getSingleIntResult(String query, Object... params) {
         Connection conn = null;
@@ -163,7 +169,7 @@ public abstract class Database extends Function {
             ps = conn.prepareStatement(query);
             ps.setString(1, player.getUniqueId().toString());
             ps.setString(2, source);
-            ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now().minus(24, ChronoUnit.HOURS)));
+            ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now().minusHours(24)));
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -206,7 +212,7 @@ public abstract class Database extends Function {
             // Check for transactions in the last 24 hours
             ps = conn.prepareStatement(query);
             ps.setString(1, player.getUniqueId().toString());
-            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minus(24, ChronoUnit.HOURS)));
+            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minusHours(24)));
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -221,7 +227,7 @@ public abstract class Database extends Function {
 
                 ps = conn.prepareStatement(query);
                 ps.setString(1, player.getUniqueId().toString());
-                ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minus(30, ChronoUnit.DAYS)));
+                ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().minusDays(30)));
                 rs = ps.executeQuery();
 
                 while (rs.next()) {
@@ -232,6 +238,8 @@ public abstract class Database extends Function {
 
                 if (sourceJadeMap.isEmpty()) {
                     sourceJadeMap.put("not_in_database", 0.0);
+                } else {
+                    sourceJadeMap.put("not_in_last_24_hours", 0.0);
                 }
             }
         } catch (SQLException e) {
@@ -254,19 +262,42 @@ public abstract class Database extends Function {
 
             String transactionQuery = "INSERT INTO jade_transactions (player, uuid, amount, source, timestamp) VALUES (?, ?, ?, ?, ?);";
             psTransaction = conn.prepareStatement(transactionQuery);
-            psTransaction.setString(1, transaction.getPlayer());
-            psTransaction.setString(2, transaction.getUuid());
-            psTransaction.setDouble(3, transaction.getAmount());
-            psTransaction.setString(4, transaction.getSource());
-            psTransaction.setTimestamp(5, Timestamp.valueOf(transaction.getTimestamp()));
-            psTransaction.executeUpdate();
+
+            boolean inserted = false;
+            int attempts = 0;
+            Timestamp ts = Timestamp.valueOf(transaction.getTimestamp());
+
+            while (!inserted && attempts < 5) {
+                try {
+                    psTransaction.setString(1, transaction.getPlayer());
+                    psTransaction.setString(2, transaction.getUuid());
+                    psTransaction.setDouble(3, transaction.getAmount());
+                    psTransaction.setString(4, transaction.getSource());
+                    psTransaction.setTimestamp(5, ts);
+                    psTransaction.executeUpdate();
+                    inserted = true;
+                } catch (SQLException e) {
+                    if (e.getMessage().contains("PRIMARY KEY") || e.getMessage().contains("UNIQUE")) {
+                        // Add 1 millisecond and retry
+                        ts = new Timestamp(ts.getTime() + 1);
+                        attempts++;
+                        AdventureUtil.consoleMessage(DebugLevel.DEBUG, "This is a debug message from AdventureUtil");
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+
+            if (!inserted) {
+                throw new SQLException("Failed to insert transaction after multiple attempts due to primary key constraint.");
+            }
 
             // Update or insert the player's total in jade_totals
             String totalsQuery = """
-                        INSERT INTO jade_totals (player, uuid, jade)
-                        VALUES (?, ?, ?)
-                        ON CONFLICT(uuid) DO UPDATE SET jade = jade + ?;
-                    """;
+                    INSERT INTO jade_totals (player, uuid, jade)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT(uuid) DO UPDATE SET jade = jade + ?;
+                """;
             psTotals = conn.prepareStatement(totalsQuery);
             psTotals.setString(1, transaction.getPlayer());
             psTotals.setString(2, transaction.getUuid());
@@ -278,7 +309,7 @@ public abstract class Database extends Function {
         } catch (SQLException e) {
             if (conn != null) {
                 try {
-                    conn.rollback(); // Rollback on failure
+                    conn.rollback();
                 } catch (SQLException rollbackEx) {
                     plugin.getLogger().log(Level.SEVERE, "Transaction rollback failed", rollbackEx);
                 }
@@ -304,7 +335,7 @@ public abstract class Database extends Function {
                     JadeTransaction transaction = pendingTransactions.poll();
                     if (transaction != null) {
                         addTransaction(
-                            transaction
+                                transaction
                         );
                     }
                 }
@@ -355,6 +386,21 @@ public abstract class Database extends Function {
 
                     plugin.getLogger().info("Fixed total for uuid " + uuid + " (player: " + player + "): Updated total = " + actualTotal);
                 }
+
+                if (actualTotal < 0) {
+                    int offsetAmount = Math.abs(actualTotal);
+                    String insertTransactionQuery = "INSERT INTO jade_transactions (player, uuid, amount, source, timestamp) VALUES (?, ?, ?, ?, ?);";
+                    PreparedStatement psOffsetTransaction = conn.prepareStatement(insertTransactionQuery);
+                    psOffsetTransaction.setString(1, player);
+                    psOffsetTransaction.setString(2, uuid);
+                    psOffsetTransaction.setInt(3, offsetAmount);
+                    psOffsetTransaction.setString(4, "migration");
+                    psOffsetTransaction.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+                    psOffsetTransaction.executeUpdate();
+                    psOffsetTransaction.close();
+
+                    plugin.getLogger().info("Added correction transaction for uuid " + uuid + " (player: " + player + "): Offset amount = " + offsetAmount);
+                }
             }
 
             String queryMissingPlayers = "SELECT uuid, player, SUM(amount) AS total FROM jade_transactions WHERE uuid NOT IN (SELECT uuid FROM jade_totals) GROUP BY uuid, player;";
@@ -393,6 +439,27 @@ public abstract class Database extends Function {
         }
     }
 
+    public void purgeUser(String uuid) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = this.getSQLConnection();
+            String query = "DELETE FROM jade_totals WHERE uuid = ?;";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, uuid);
+            ps.executeUpdate();
+
+            query = "DELETE FROM jade_transactions WHERE uuid = ?;";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, uuid);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } finally {
+            closeResources(conn, ps, null);
+        }
+    }
+
     public Leaderboard queryLeaderboard(LeaderboardType type) {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -402,16 +469,21 @@ public abstract class Database extends Function {
             conn = this.getSQLConnection();
 
             String baseQuery = """
-            SELECT ROW_NUMBER() OVER (ORDER BY SUM(amount) DESC) AS position, uuid, player, SUM(amount) AS jade
-            FROM jade_transactions
-        """;
+                        SELECT ROW_NUMBER() OVER (ORDER BY SUM(amount) DESC) AS position, uuid, player, SUM(amount) AS jade
+                        FROM jade_transactions
+                    """;
             String condition = "";
             boolean requiresTimestamp = false;
+            String orderBy = " ORDER BY jade DESC LIMIT 50;";
 
             // Add conditions based on type
             switch (type) {
                 case CURRENT -> condition = " GROUP BY uuid, player";
                 case ALLTIME -> condition = " WHERE amount > 0 GROUP BY uuid, player";
+                case SPENT -> {
+                    condition = " WHERE amount < 0 GROUP BY uuid, player";
+                    orderBy = " ORDER BY jade ASC LIMIT 50;";
+                }
                 case FARMING -> condition = " WHERE source = 'farming' GROUP BY uuid, player";
                 case FARMINGMONTHLY -> {
                     condition = " WHERE source = 'farming' AND timestamp >= ? GROUP BY uuid, player";
@@ -458,29 +530,23 @@ public abstract class Database extends Function {
                     requiresTimestamp = true;
                 }
                 default -> {
-                    plugin.getLogger().warning("Unknown leaderboard type: " + type);
+                    AdventureUtil.consoleMessage(DebugLevel.ERROR, "Unknown leaderboard type: " + type);
                     return null;
                 }
             }
-
-            // Final query
-            String query = baseQuery + condition + " ORDER BY jade DESC LIMIT 50;";
+            String query = baseQuery + condition + orderBy;
             ps = conn.prepareStatement(query);
-
-            // Set timestamp if required
             if (requiresTimestamp) {
                 ps.setTimestamp(1, Timestamp.valueOf(
-                        LocalDateTime.now().minus(type.name().contains("WEEKLY") ? 7 : 30, ChronoUnit.DAYS)
+                        LocalDateTime.now().minusDays(type.name().contains("WEEKLY") ? 7 : 30)
                 ));
             }
-
             rs = ps.executeQuery();
-
             while (rs.next()) {
                 int position = rs.getInt("position");
                 UUID uuid = UUID.fromString(rs.getString("uuid"));
                 String playerName = rs.getString("player");
-                int jadeAmount = rs.getInt("jade");
+                int jadeAmount = Math.abs(rs.getInt("jade"));
                 leaderboard.add(new LeaderboardEntry(uuid, playerName, jadeAmount, position));
             }
         } catch (SQLException e) {
@@ -721,11 +787,11 @@ public abstract class Database extends Function {
 
     public Map<String, Double> getSourceEfficiencyAnalysis() {
         String query = """
-            SELECT source, SUM(amount) AS total, COUNT(DISTINCT uuid) AS users
-            FROM jade_transactions
-            WHERE source != '' AND amount > 0
-            GROUP BY source
-        """;
+                    SELECT source, SUM(amount) AS total, COUNT(DISTINCT uuid) AS users
+                    FROM jade_transactions
+                    WHERE source != '' AND amount > 0
+                    GROUP BY source
+                """;
         Map<String, Double> sourceEfficiency = new HashMap<>();
         Connection conn = null;
         PreparedStatement ps = null;
@@ -750,8 +816,176 @@ public abstract class Database extends Function {
         return sourceEfficiency;
     }
 
-   // playerRecipeDataExists;
-   // updatePlayerRecipeData;
-   // updateRecipeStatus;
+    // playerRecipeDataExists;
+    // updatePlayerRecipeData;
+    // updateRecipeStatus;
+
+
+    public List<Trap> getActiveFishingTraps() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            List<Trap> fishingTraps = new ArrayList<>();
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("SELECT * FROM fishing_traps WHERE active = 1");
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                UUID uuid = UUID.fromString(rs.getString("uuid"));
+                UUID owner = UUID.fromString(rs.getString("owner"));
+                String key = rs.getString("key");
+                Location location = SerialisationUtil.deserializeLocation(rs.getString("location"));
+                boolean active = rs.getInt("active") == 1;
+                List<ItemStack> items = SerialisationUtil.deserializeItems(rs.getString("items"));
+                int maxItems = rs.getInt("maxItems");
+                ItemStack bait = SerialisationUtil.deserializeItems(rs.getString("bait")).get(0);
+
+                fishingTraps.add(new Trap(key, uuid, owner, location, active, items, maxItems, bait));
+            }
+            return fishingTraps;
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to deserialize items", e);
+            e.printStackTrace();
+        } finally {
+            closeResources(conn, ps, rs);
+        }
+        return null;
+    }
+
+    public Trap getFishingTrapById(String uuid) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("SELECT * FROM fishing_traps WHERE uuid = ?");
+            ps.setString(1, uuid);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                UUID owner = UUID.fromString(rs.getString("owner"));
+                String key = rs.getString("key");
+                Location location = SerialisationUtil.deserializeLocation(rs.getString("location"));
+                boolean active = rs.getInt("active") == 1;
+                List<ItemStack> items = SerialisationUtil.deserializeItems(rs.getString("items"));
+                int maxItems = rs.getInt("maxItems");
+                ItemStack bait = SerialisationUtil.deserializeItems(rs.getString("bait")).get(0);
+
+                return new Trap(key, UUID.fromString(uuid), owner, location, active, items, maxItems, bait);
+            }
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to deserialize items", e);
+            e.printStackTrace();
+        } finally {
+            closeResources(conn, ps, rs);
+        }
+        return null;
+    }
+
+    public void saveFishingTrap(Trap trap) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("REPLACE INTO fishing_traps(uuid, owner, key, location, active, items, maxItems, bait) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+
+            ps.setString(1, trap.getUuid().toString());
+            ps.setString(2, trap.getOwner().toString());
+            ps.setString(3, trap.getKey());
+            ps.setString(4, SerialisationUtil.serializeLocation(trap.getLocation()));
+            ps.setInt(5, trap.isActive() ? 1 : 0);
+            ps.setString(6, SerialisationUtil.serializeItems(trap.getItems()));
+            ps.setInt(7, trap.getMaxItems());
+            ps.setString(8, SerialisationUtil.serializeItems(Collections.singletonList(trap.getBait())));
+
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+    }
+}
+
+    public void deleteFishingTrapById(String uuid) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("DELETE FROM fishing_traps WHERE uuid = ?");
+            ps.setString(1, uuid);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+                consoleMessage("Deleted fishing trap with UUID: " + uuid);
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+    }
+
+    public List<ItemStack> getIngredientBagItems(Player player) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<ItemStack> items = new ArrayList<>();
+        try {
+            conn = this.getSQLConnection();
+            String query = "SELECT items FROM ingredient_bag WHERE uuid = ?;";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, player.getUniqueId().toString());
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String serializedItems = rs.getString("items");
+                if (serializedItems != null && !serializedItems.isEmpty()) {
+                    items = SerialisationUtil.deserializeItems(serializedItems);
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeResources(conn, ps, rs);
+        }
+        return items;
+    }
+
+    public void saveIngredientBagItems(Player player, List<ItemStack> items) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = this.getSQLConnection();
+            String query = "REPLACE INTO ingredient_bag (uuid, items) VALUES (?, ?);";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, player.getUniqueId().toString());
+            ps.setString(2, SerialisationUtil.serializeItems(items));
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        } finally {
+            closeResources(conn, ps, null);
+        }
+    }
+
 
 }
