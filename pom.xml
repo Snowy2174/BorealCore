@@ -35,7 +35,6 @@
                             <outputDirectory>${maven.multiModuleProjectDirectory}/target</outputDirectory>
                             <artifactSet>
                                 <includes>
-                                    <include>net.kyori:*</include>
                                     <include>fr.minuskube.inv:*</include>
                                 </includes>
                             </artifactSet>

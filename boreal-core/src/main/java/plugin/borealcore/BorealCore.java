@@ -11,8 +11,8 @@ import plugin.borealcore.database.SQLiteData;
 import plugin.borealcore.database.SQLiteJade;
 import plugin.borealcore.depreciated.AnalyticsManager;
 import plugin.borealcore.depreciated.CraftingManager;
-import plugin.borealcore.functions.bending.BendingManager;
-import plugin.borealcore.functions.brewery.BreweryManager;
+import plugin.borealcore.functions.BorealExtras.bending.BendingManager;
+import plugin.borealcore.functions.BorealExtras.brewery.BreweryManager;
 import plugin.borealcore.functions.cooking.CookCommand;
 import plugin.borealcore.functions.cooking.CookTabCompletion;
 import plugin.borealcore.functions.cooking.CookingCompetitionManager;
@@ -29,25 +29,26 @@ import plugin.borealcore.functions.herbalism.configs.HerbManager;
 import plugin.borealcore.functions.jade.JadeCommand;
 import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.functions.jade.JadeTabCompletion;
-import plugin.borealcore.functions.karmicnode.NodeCommand;
-import plugin.borealcore.functions.karmicnode.NodeManager;
-import plugin.borealcore.functions.market.MarketManager;
-import plugin.borealcore.functions.misc.SitCommand;
-import plugin.borealcore.functions.plushies.GambleCommand;
-import plugin.borealcore.functions.plushies.PlushieManager;
-import plugin.borealcore.functions.titles.TitleManagerManager;
+import plugin.borealcore.functions.BorealExtras.karmicnode.NodeCommand;
+import plugin.borealcore.functions.BorealExtras.karmicnode.NodeManager;
+import plugin.borealcore.functions.BorealExtras.market.MarketManager;
+import plugin.borealcore.functions.BorealExtras.misc.SitCommand;
+import plugin.borealcore.functions.BorealExtras.plushies.GambleCommand;
+import plugin.borealcore.functions.BorealExtras.plushies.PlushieManager;
+import plugin.borealcore.functions.BorealExtras.titles.TitleManagerManager;
 import plugin.borealcore.functions.traps.TrapsCommand;
 import plugin.borealcore.functions.traps.TrapsManager;
-import plugin.borealcore.functions.wiki.WikiCommand;
-import plugin.borealcore.functions.wiki.WikiManager;
-import plugin.borealcore.functions.wiki.WikiTabCompletion;
+import plugin.borealcore.functions.BorealExtras.wiki.WikiCommand;
+import plugin.borealcore.functions.BorealExtras.wiki.WikiManager;
+import plugin.borealcore.functions.BorealExtras.wiki.WikiTabCompletion;
 import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.manager.FurnitureManager;
 import plugin.borealcore.manager.GuiManager;
 import plugin.borealcore.manager.PlaceholderManager;
+import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.module.loader.ModuleLoader;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.ConfigUtil;
 
 import java.util.logging.Level;
 
@@ -95,6 +96,9 @@ public class BorealCore extends JavaPlugin {
         protocolManager = ProtocolLibrary.getProtocolManager();
         inventoryManager = new InventoryManager(this);
 
+        ConfigManager.load();
+        MessageManager.load();
+
         cookingManager = new CookingManager();
         herbalismManager = new HerbalismManager();
         competitionManager = new CookingCompetitionManager();
@@ -122,13 +126,8 @@ public class BorealCore extends JavaPlugin {
         marketManager = new MarketManager();
 
         moduleLoader = new ModuleLoader(this, db, placeholderManager);
-        try {
-            moduleLoader.loadAllModules();
-        } catch (ModuleLoadException e) {
-            throw new RuntimeException(e);
-        }
-
         reloadConfig();
+
         getCommand("cooking").setExecutor(new CookCommand());
         getCommand("cooking").setTabCompleter(new CookTabCompletion());
         getCommand("jade").setExecutor(new JadeCommand());
@@ -192,7 +191,7 @@ public class BorealCore extends JavaPlugin {
 
     @Override
     public void reloadConfig() {
-        ConfigUtil.reload();
+        reload();
     }
 
     public static BorealCore getInstance() {
@@ -310,5 +309,64 @@ public class BorealCore extends JavaPlugin {
     public static void disablePlugin(String errorMessage, Exception e) {
         plugin.getLogger().log(Level.SEVERE, errorMessage, e);
         plugin.getServer().getPluginManager().disablePlugin(plugin);
+    }
+
+
+    public static void reload() {
+        ConfigManager.load();
+        MessageManager.load();
+
+        getLayoutManager().unload();
+        getLayoutManager().load();
+        getEffectManager().unload();
+        getEffectManager().load();
+        getRecipeManager().unload();
+        getRecipeManager().load();
+        getHerbManager().unload();
+        getHerbManager().load();
+        getCookingManager().unload();
+        getCookingManager().load();
+        getHerbalismManager().unload();
+        getHerbalismManager().load();
+        getGuiManager().unload();
+        getGuiManager().load();
+        getCompetitionManager().unload();
+        getCompetitionManager().load();
+        getFurnitureManager().unload();
+        getFurnitureManager().load();
+        getJadeManager().unload();
+        getJadeManager().load();
+        getNodeManager().unload();
+        getNodeManager().load();
+        getWikiManager().unload();
+        getWikiManager().load();
+        getInventoryManager().init();
+        getDatabase().unload();
+        getDatabase().load();
+        getTrapsDatabase().unload();
+        getTrapsDatabase().load();
+        getAnalyticsManager().unload();
+        getAnalyticsManager().load();
+        getPlushieManager().unload();
+        getPlushieManager().load();
+        //BorealCore.getDuelsManager().unload(); @TODO REVERT!!!
+        //BorealCore.getDuelsManager().load();
+        getBendingManager().unload();
+        getBendingManager().load();
+        getBreweryManager().unload();
+        getBreweryManager().load();
+        getTrapsManager().unload();
+        getTrapsManager().load();
+        getTitleManager().unload();
+        getTitleManager().load();
+        getMarketManager().unload();
+        getMarketManager().load();
+
+        getModuleLoader().unloadAllModules();
+        try {
+            getModuleLoader().loadAllModules();
+        } catch (ModuleLoadException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

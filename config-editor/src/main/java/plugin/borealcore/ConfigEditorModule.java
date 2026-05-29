@@ -38,7 +38,6 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
     private final Map<Player, SmartInventoryContext> activeInventories;
 
     public ConfigEditorModule() {
-        // Keep the original reference 'this' for SimpleListener if it expects the parent class
         this.simpleListener = new SimpleListener(this);
         this.configEditorPermission = new Permission("borealcore.configeditor", PermissionDefault.OP);
         this.configCache = new HashMap<>();
@@ -51,6 +50,8 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
     public void onModuleInitialize(ModuleContext context) throws Exception {
         this.context = context;
         context.getLogger().info("Initializing Config Editor Module...");
+
+
     }
 
     @Override

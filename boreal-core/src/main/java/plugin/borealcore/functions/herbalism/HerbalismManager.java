@@ -15,11 +15,11 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.functions.cooking.CookingConfig;
 import plugin.borealcore.functions.cooking.Difficulty;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.functions.herbalism.objects.*;
-import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
@@ -339,15 +339,15 @@ public class HerbalismManager extends Function {
     private void sendIngredientSuccessTitle(Player player, String recipe) {
         AdventureUtil.playerTitle(
                 player,
-                ConfigManager.successTitle[random.nextInt(ConfigManager.successTitle.length)]
+                CookingConfig.successTitle[random.nextInt(CookingConfig.successTitle.length)]
                         .replace("{recipe}", recipe)
                         .replace("{player}", player.getName()),
-                ConfigManager.successSubTitle[random.nextInt(ConfigManager.successSubTitle.length)]
+                CookingConfig.successSubTitle[random.nextInt(CookingConfig.successSubTitle.length)]
                         .replace("{recipe}", recipe)
                         .replace("{player}", player.getName()),
-                ConfigManager.successFadeIn,
-                ConfigManager.successFadeStay,
-                ConfigManager.successFadeOut
+                CookingConfig.successFadeIn,
+                CookingConfig.successFadeStay,
+                CookingConfig.successFadeOut
         );
     }
 

@@ -1,7 +1,7 @@
 package plugin.borealcore.utility;
 
 import org.bukkit.entity.Player;
-import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.functions.cooking.CookingConfig;
 
 import java.util.List;
 
@@ -12,12 +12,12 @@ public class GUIUtil {
         Integer requiredMastery = RecipeDataUtil.getDefaultRequiredMastery(recipe);
         String[] masteryInfo;
         lore.add(" ");
-        lore.add(ConfigManager.masteryLine.replace("{mastery}", (masteryCount + "/" + requiredMastery)));
+        lore.add(CookingConfig.masteryLine.replace("{mastery}", (masteryCount + "/" + requiredMastery)));
         if (Boolean.TRUE.equals(hasMastery)) {
-            masteryInfo = ConfigManager.masteryInfoTrue.split("/");
+            masteryInfo = CookingConfig.masteryInfoTrue.split("/");
         } else {
-            lore.add(ConfigManager.masteryBar.replace("{bar}", GUIUtil.appendProgressBar((double) masteryCount / requiredMastery)));
-            masteryInfo = ConfigManager.masteryInfoFalse.split("/");
+            lore.add(CookingConfig.masteryBar.replace("{bar}", GUIUtil.appendProgressBar((double) masteryCount / requiredMastery)));
+            masteryInfo = CookingConfig.masteryInfoFalse.split("/");
         }
         lore.add(masteryInfo[0]);
         lore.add(masteryInfo[1]);
@@ -42,7 +42,7 @@ public class GUIUtil {
 
     public static void appendIngredients(List<String> lore, Player player, List<String> ingredients) {
         lore.add(" ");
-        lore.add(ConfigManager.ingredientsLine);
+        lore.add(CookingConfig.ingredientsLine);
         for (String ingredient : ingredients) {
             if (ingredient.contains("/")) {
                 handleOptions(lore, player, ingredient);

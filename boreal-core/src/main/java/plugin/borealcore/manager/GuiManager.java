@@ -11,17 +11,17 @@ import org.bukkit.inventory.ItemStack;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.brewery.BreweryRecipeBookProvider;
-import plugin.borealcore.functions.collections.CollectionTrackerProvider;
+import plugin.borealcore.functions.BorealExtras.brewery.BreweryRecipeBookProvider;
+import plugin.borealcore.depreciated.collections.CollectionTrackerProvider;
+import plugin.borealcore.functions.cooking.CookingConfig;
 import plugin.borealcore.functions.cooking.CookingRecipeBookProvider;
 import plugin.borealcore.functions.cooking.IngredientBookProvider;
 import plugin.borealcore.functions.cooking.object.Ingredient;
-import plugin.borealcore.functions.wiki.WikiGuiProvider;
+import plugin.borealcore.functions.BorealExtras.wiki.WikiGuiProvider;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.ConfigUtil;
 import plugin.borealcore.utility.InventoryUtil;
 
 import java.io.File;
@@ -68,7 +68,7 @@ public class GuiManager extends Function {
                 .id("recipeBook")
                 .provider(new CookingRecipeBookProvider(clickedFurniture))
                 .size(6, 9)
-                .title(ChatColor.WHITE + new FontImageWrapper(ConfigManager.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString(ChatColor.RESET + "Recipe Book", -190))
+                .title(ChatColor.WHITE + new FontImageWrapper(CookingConfig.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString(ChatColor.RESET + "Recipe Book", -190))
                 .build();
     }
 
@@ -78,7 +78,7 @@ public class GuiManager extends Function {
                 .id("brewBook")
                 .provider(new BreweryRecipeBookProvider())
                 .size(6, 9)
-                .title(ChatColor.WHITE + new FontImageWrapper(ConfigManager.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString(ChatColor.RESET + "Brewing Book", -190))
+                .title(ChatColor.WHITE + new FontImageWrapper(CookingConfig.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString(ChatColor.RESET + "Brewing Book", -190))
                 .build();
     }
 
@@ -157,7 +157,7 @@ public class GuiManager extends Function {
     }
 
     private void loadItems() {
-        YamlConfiguration config = ConfigUtil.getConfig("recipes/ingredients.yml");
+        YamlConfiguration config = ConfigManager.getConfig("recipes/ingredients.yml");
         Set<String> ingredients = config.getKeys(false);
 
         for (String key : ingredients) {

@@ -13,7 +13,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GUIUtil;
@@ -39,7 +38,7 @@ public class IngredientBookProvider implements InventoryProvider {
     @Override
     public void init(Player player, InventoryContents contents) {
         player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1, 1);
-        contents.fill(ClickableItem.of(build(ConfigManager.unknownItem),
+        contents.fill(ClickableItem.of(build(CookingConfig.unknownItem),
                 e -> AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown)));
         contents.fillBorders(ClickableItem.empty(new ItemStack(Material.AIR)));
 
@@ -60,7 +59,7 @@ public class IngredientBookProvider implements InventoryProvider {
     private ItemStack buildRecipeItem(String recipe, Player player) {
         CustomStack customStack = CustomStack.getInstance(recipe);
         if (customStack == null) {
-            return build(ConfigManager.unknownItem);
+            return build(CookingConfig.unknownItem);
         } else {
             ItemStack stack = customStack.getItemStack();
             modifyLore(stack, player, recipe);
@@ -86,8 +85,8 @@ public class IngredientBookProvider implements InventoryProvider {
         }
 
         lore.add(" ");
-        lore.add(ConfigManager.cookLine);
-        lore.add(ConfigManager.cookLineShift);
+        lore.add(CookingConfig.cookLine);
+        lore.add(CookingConfig.cookLineShift);
 
         // Create a new list to store parsed lore
         List<Component> parsedLore = new ArrayList<>();

@@ -9,13 +9,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import plugin.borealcore.action.*;
+import plugin.borealcore.functions.cooking.CookingConfig;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.functions.cooking.object.Recipe;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.ConfigUtil;
 import plugin.borealcore.utility.GUIUtil;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class EffectManager extends Function {
     }
 
     private void loadEffects() {
-        YamlConfiguration config = ConfigUtil.getConfig("recipes/buffs.yml");
+        YamlConfiguration config = ConfigManager.getConfig("recipes/buffs.yml");
         for (String sectionName : config.getKeys(false)) {
             ConfigurationSection section = config.getConfigurationSection(sectionName);
             List<PotionEffect> effectsList = new ArrayList<>();
@@ -68,7 +68,7 @@ public class EffectManager extends Function {
                 perfectEffectsList.add(new PotionEffect(type, duration / 2 * 3, amplifier + 1));
             }
             EFFECTS.put(sectionName, effectsList);
-            EFFECTS.put(sectionName + ConfigManager.perfectItemSuffix, perfectEffectsList);
+            EFFECTS.put(sectionName + CookingConfig.perfectItemSuffix, perfectEffectsList);
         }
     }
 
@@ -109,7 +109,7 @@ public class EffectManager extends Function {
                 case "dish-buff" -> {
                     String actionKey = section.getString(action);
                     if (perfect) {
-                        actionKey += ConfigManager.perfectItemSuffix;
+                        actionKey += CookingConfig.perfectItemSuffix;
                     }
                     actions.add(new PotionEffectImpl(EFFECTS.get(actionKey).toArray(new PotionEffect[0])));
                 }
@@ -134,17 +134,17 @@ public class EffectManager extends Function {
                 for (Action action : actionArray) {
                     if (action instanceof PotionEffectImpl potionEffectAction) {
                         for (PotionEffect potionEffect : potionEffectAction.potionEffects()) {
-                            actionLore.add(getComponentFromMiniMessage(ConfigManager.effectLore
+                            actionLore.add(getComponentFromMiniMessage(CookingConfig.effectLore
                                     .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
                                     .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier() + 1))
                                     .replace("{duration}", getDuration(potionEffect.getDuration() / 20))));
                         }
                         actionLore.add(Component.text(" "));
                     } else if (action instanceof HungerEffectImpl hungerEffectAction) {
-                        actionLore.add(getComponentFromMiniMessage(ConfigManager.hungerLore
+                        actionLore.add(getComponentFromMiniMessage(CookingConfig.hungerLore
                                 .replace("{hunger}", String.valueOf(hungerEffectAction.hunger()))));
                     } else if (action instanceof SaturationEffectImpl saturationEffectAction) {
-                        actionLore.add(getComponentFromMiniMessage(ConfigManager.saturationLore
+                        actionLore.add(getComponentFromMiniMessage(CookingConfig.saturationLore
                                 .replace("{saturation}", String.valueOf(saturationEffectAction.saturation()))));
                     }
                 }
@@ -187,7 +187,7 @@ public class EffectManager extends Function {
     }
 
     public static void addPotionEffectLore(ItemStack itemStack, String key, Boolean perfect) {
-        Recipe recipe = RecipeManager.COOKING_RECIPES.get(key.replaceAll("[\\[\\]]", "").replace(ConfigManager.perfectItemSuffix, ""));
+        Recipe recipe = RecipeManager.COOKING_RECIPES.get(key.replaceAll("[\\[\\]]", "").replace(CookingConfig.perfectItemSuffix, ""));
 
         if (recipe != null && recipe.getDishEffectsLore() != null) {
             ItemMeta itemMeta = itemStack.getItemMeta();

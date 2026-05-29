@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.functions.cooking.CookingConfig;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
@@ -59,13 +60,13 @@ public class FurnitureManager extends Function {
         Player player = event.getPlayer();
         CustomFurniture clickedFurniture = event.getFurniture();
 
-        if (clickedFurniture.getId().equals(ConfigManager.unlitCookingPot)) {
+        if (clickedFurniture.getId().equals(CookingConfig.unlitCookingPot)) {
             if (!cooldowns.containsKey(player) || (System.currentTimeMillis() - cooldowns.get(player) >= 2000)) {
                 cooldowns.put(player, System.currentTimeMillis());
                 if (player.getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
                     ItemFrame unlitpot = (ItemFrame) Objects.requireNonNull(clickedFurniture).getArmorstand();
                     Rotation rot = unlitpot.getRotation();
-                    ItemFrame litpot = (ItemFrame) CustomFurniture.spawnPreciseNonSolid(ConfigManager.litCookingPot, unlitpot.getLocation()).getArmorstand();
+                    ItemFrame litpot = (ItemFrame) CustomFurniture.spawnPreciseNonSolid(CookingConfig.litCookingPot, unlitpot.getLocation()).getArmorstand();
                     litpot.setRotation(rot);
                     clickedFurniture.remove(false);
                     unlitpot.getLocation().getBlock().setType(Material.BARRIER);
@@ -78,7 +79,7 @@ public class FurnitureManager extends Function {
                 String cooldown = String.valueOf((2000 - (System.currentTimeMillis() - cooldowns.get(player)) / 1000));
                 AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCooldown.replace("{time}", cooldown));
             }
-        } else if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
+        } else if (clickedFurniture.getId().equals(CookingConfig.litCookingPot)) {
             playCookingPotFX(clickedFurniture.getEntity().getLocation());
             GuiManager.getCookingRecipeBook(clickedFurniture).open(player);
         }
@@ -91,7 +92,7 @@ public class FurnitureManager extends Function {
         if (clickedFurniture.getNamespacedID().equals("fishing_trap")) {
             BorealCore.getTrapsDatabase().deleteFishingTrapById(clickedFurniture.getEntity().getUniqueId().toString());
         }
-        if (clickedFurniture.getId().equals(ConfigManager.litCookingPot)) {
+        if (clickedFurniture.getId().equals(CookingConfig.litCookingPot)) {
             cancelCookingPotFX(clickedFurniture.getArmorstand().getLocation());
         }
     }
@@ -149,7 +150,7 @@ public class FurnitureManager extends Function {
         armorStand.setGravity(false);
         armorStand.setCollidable(false);
         armorStand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
-        ItemStack splashItem = InventoryUtil.build(ConfigManager.splashEffect);
+        ItemStack splashItem = InventoryUtil.build(CookingConfig.splashEffect);
         armorStand.setItem(EquipmentSlot.HEAD, splashItem);
 
         new BukkitRunnable() {
@@ -157,7 +158,7 @@ public class FurnitureManager extends Function {
             public void run() {
                 armorStand.remove();
             }
-        }.runTaskLater(BorealCore.plugin, ConfigManager.splashTime);
+        }.runTaskLater(BorealCore.plugin, CookingConfig.splashTime);
     }
 
     public static void playCookingResultSFX(Location loc, ItemStack item, Boolean success) {

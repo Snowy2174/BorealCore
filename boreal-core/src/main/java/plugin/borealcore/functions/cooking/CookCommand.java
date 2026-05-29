@@ -13,7 +13,6 @@ import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.ConfigUtil;
 import plugin.borealcore.utility.InventoryUtil;
 import plugin.borealcore.utility.RecipeDataUtil;
 
@@ -129,7 +128,7 @@ public class CookCommand implements CommandExecutor {
 
     private void handleReloadCommand(CommandSender sender) {
         long startTime = System.currentTimeMillis();
-        ConfigUtil.reload();
+        BorealCore.reload();
         AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.reload.replace("{time}", String.valueOf(System.currentTimeMillis() - startTime)));
         if (ConfigManager.debugLevel == DebugLevel.DEBUG) {
             AdventureUtil.sendMessage(sender, MessageManager.prefix + "Debug Level: <green>" + ConfigManager.debugLevel);

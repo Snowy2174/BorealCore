@@ -17,7 +17,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.manager.EffectManager;
-import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
@@ -37,7 +36,7 @@ public class CookingRecipeBookProvider implements InventoryProvider {
     public CookingRecipeBookProvider(CustomFurniture clickedFurniture) {
         this.cookingManager = BorealCore.getCookingManager();
         CookingRecipeBookProvider.clickedFurniture = clickedFurniture;
-        unknownRecipeStack = build(ConfigManager.unknownItem);
+        unknownRecipeStack = build(CookingConfig.unknownItem);
     }
 
     @Override
@@ -79,7 +78,7 @@ public class CookingRecipeBookProvider implements InventoryProvider {
     private ItemStack buildRecipeItem(String recipe, Player player, boolean hasMastery) {
         CustomStack customStack = CustomStack.getInstance(recipe);
         if (hasMastery) {
-            customStack = CustomStack.getInstance(recipe + ConfigManager.perfectItemSuffix);
+            customStack = CustomStack.getInstance(recipe + CookingConfig.perfectItemSuffix);
         }
         if (customStack == null) {
             return unknownRecipeStack;
@@ -92,7 +91,7 @@ public class CookingRecipeBookProvider implements InventoryProvider {
     }
 
     private ItemStack buildUnknownRecipeItem(String recipe) {
-        CustomStack customStack = CustomStack.getInstance(recipe + ConfigManager.unknownItemSuffix);
+        CustomStack customStack = CustomStack.getInstance(recipe + CookingConfig.unknownItemSuffix);
         if (customStack == null) {
             return unknownRecipeStack;
         } else {
@@ -109,7 +108,7 @@ public class CookingRecipeBookProvider implements InventoryProvider {
     }
 
     private ItemStack buildIngredientsItem() {
-        return new ItemStack(CustomStack.getInstance(ConfigManager.grinderItem).getItemStack());
+        return new ItemStack(CustomStack.getInstance(CookingConfig.grinderItem).getItemStack());
         // @TODO: Modify grinder item to have a custom name and lore
     }
 
@@ -145,11 +144,11 @@ public class CookingRecipeBookProvider implements InventoryProvider {
         if (clickedFurniture != null) {
             lore.add(" ");
             if (Boolean.TRUE.equals(hasMastery)) {
-                lore.add(ConfigManager.cookLineRight);
-                lore.add(ConfigManager.cookLineLeft);
-                lore.add(ConfigManager.cookLineShift);
+                lore.add(CookingConfig.cookLineRight);
+                lore.add(CookingConfig.cookLineLeft);
+                lore.add(CookingConfig.cookLineShift);
             } else {
-                lore.add(ConfigManager.cookLine);
+                lore.add(CookingConfig.cookLine);
             }
         }
 

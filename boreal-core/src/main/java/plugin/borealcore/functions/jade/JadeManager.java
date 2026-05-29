@@ -19,11 +19,11 @@ import plugin.borealcore.database.Database;
 import plugin.borealcore.functions.jade.object.JadeSource;
 import plugin.borealcore.functions.jade.object.JadeTransaction;
 import plugin.borealcore.functions.jade.object.Leaderboard;
+import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.ConfigUtil;
 import plugin.borealcore.utility.GUIUtil;
 
 import java.time.LocalDateTime;
@@ -34,8 +34,8 @@ import java.util.List;
 
 import static org.bukkit.Bukkit.getServer;
 import static plugin.borealcore.BorealCore.getPlaceholderManager;
-import static plugin.borealcore.manager.configs.ConfigManager.brewingRequiredQuality;
-import static plugin.borealcore.manager.configs.ConfigManager.refarmableCrops;
+import static plugin.borealcore.functions.jade.JadeConfig.brewingRequiredQuality;
+import static plugin.borealcore.functions.jade.JadeConfig.refarmableCrops;
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 
 public class JadeManager extends Function {
@@ -75,7 +75,7 @@ public class JadeManager extends Function {
     }
 
     private void loadJadeLimits() {
-        YamlConfiguration config = ConfigUtil.getConfig("config.yml");
+        YamlConfiguration config = ConfigManager.getConfig("config.yml");
         List<String> jadeSourceList = new ArrayList<>();
         for (String key : config.getConfigurationSection("jade.sources").getKeys(false)) {
             int limit = config.getInt("jade.sources." + key + ".limit", -1);

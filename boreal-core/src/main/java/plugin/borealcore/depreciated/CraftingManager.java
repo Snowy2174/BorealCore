@@ -8,7 +8,6 @@ import org.bukkit.inventory.ShapelessRecipe;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.ConfigUtil;
 import plugin.borealcore.utility.InventoryUtil;
 
 import java.util.HashMap;
@@ -32,7 +31,7 @@ public class CraftingManager extends Function {
     }
 
     public void registerRecipes() {
-        YamlConfiguration recipes = ConfigUtil.getConfig("crafting.yml");
+        YamlConfiguration recipes = ConfigManager.getConfig("crafting.yml");
         recipes.getKeys(false).forEach(key -> {
             Recipe recipe = null;
             if (recipes.isConfigurationSection(key)) {

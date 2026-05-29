@@ -28,8 +28,8 @@ import plugin.borealcore.functions.cooking.object.Ingredient;
 import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.functions.cooking.object.Recipe;
 import plugin.borealcore.functions.jade.JadeManager;
-import plugin.borealcore.functions.misc.CropInteractEventListener;
-import plugin.borealcore.functions.misc.SitListener;
+import plugin.borealcore.functions.BorealExtras.misc.CropInteractEventListener;
+import plugin.borealcore.functions.BorealExtras.misc.SitListener;
 import plugin.borealcore.manager.FurnitureManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
@@ -48,7 +48,7 @@ import static net.kyori.adventure.key.Key.key;
 import static plugin.borealcore.BorealCore.getPlaceholderManager;
 import static plugin.borealcore.manager.FurnitureManager.playCookingResultSFX;
 import static plugin.borealcore.manager.GuiManager.INGREDIENTS;
-import static plugin.borealcore.manager.configs.ConfigManager.perfectChance;
+import static plugin.borealcore.functions.cooking.CookingConfig.perfectChance;
 import static plugin.borealcore.utility.AdventureUtil.playerSound;
 
 public class CookingManager extends Function {
@@ -183,7 +183,7 @@ public class CookingManager extends Function {
 
         if (!cookingPlayer.isSuccess()) {
             if (cookingPot != null) {
-                playCookingResultSFX(cookingPot, InventoryUtil.build(ConfigManager.failureItem), false);
+                playCookingResultSFX(cookingPot, InventoryUtil.build(CookingConfig.failureItem), false);
             }
             handleFailureResult(player);
             return;
@@ -205,7 +205,7 @@ public class CookingManager extends Function {
 
         if (perfect) {
             AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingPerfect.replace("{recipe}", droppedItem.getNick()));
-            drop = drop + ConfigManager.perfectItemSuffix;
+            drop = drop + CookingConfig.perfectItemSuffix;
             if (!RecipeDataUtil.hasMastery(player, droppedItem.getKey())) {
                 MasteryManager.handleMastery(player, droppedItem.getKey());
             }
@@ -228,7 +228,7 @@ public class CookingManager extends Function {
             Competition.currentCompetition.refreshData(player, score, perfect);
         }
 
-        if (Math.random() < ConfigManager.ingredientRefundChance) {
+        if (Math.random() < CookingConfig.ingredientRefundChance) {
             refundIngredients(player, recipe);
         }
 
@@ -251,28 +251,28 @@ public class CookingManager extends Function {
         playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "fail"), 1f, 1f);
         AdventureUtil.playerTitle(
                 player,
-                ConfigManager.failureTitle[random.nextInt(ConfigManager.failureTitle.length)],
-                ConfigManager.failureSubTitle[random.nextInt(ConfigManager.failureSubTitle.length)],
-                ConfigManager.failureFadeIn,
-                ConfigManager.failureFadeStay,
-                ConfigManager.failureFadeOut
+                CookingConfig.failureTitle[random.nextInt(CookingConfig.failureTitle.length)],
+                CookingConfig.failureSubTitle[random.nextInt(CookingConfig.failureSubTitle.length)],
+                CookingConfig.failureFadeIn,
+                CookingConfig.failureFadeStay,
+                CookingConfig.failureFadeOut
         );
-        InventoryUtil.giveItem(player, ConfigManager.failureItem, 1, false);
+        InventoryUtil.giveItem(player, CookingConfig.failureItem, 1, false);
     }
 
 
     private void sendSuccessTitle(Player player, String recipe) {
         AdventureUtil.playerTitle(
                 player,
-                ConfigManager.successTitle[random.nextInt(ConfigManager.successTitle.length)]
+                CookingConfig.successTitle[random.nextInt(CookingConfig.successTitle.length)]
                         .replace("{recipe}", recipe)
                         .replace("{player}", player.getName()),
-                ConfigManager.successSubTitle[random.nextInt(ConfigManager.successSubTitle.length)]
+                CookingConfig.successSubTitle[random.nextInt(CookingConfig.successSubTitle.length)]
                         .replace("{recipe}", recipe)
                         .replace("{player}", player.getName()),
-                ConfigManager.successFadeIn,
-                ConfigManager.successFadeStay,
-                ConfigManager.successFadeOut
+                CookingConfig.successFadeIn,
+                CookingConfig.successFadeStay,
+                CookingConfig.successFadeOut
         );
     }
 
@@ -365,8 +365,8 @@ public class CookingManager extends Function {
 
         bcId = bcId.replaceAll("[\\[\\]]", "");
 
-        boolean perfect = bcId.contains(ConfigManager.perfectItemSuffix);
-        String recipeKey = bcId.replace(ConfigManager.perfectItemSuffix, "");
+        boolean perfect = bcId.contains(CookingConfig.perfectItemSuffix);
+        String recipeKey = bcId.replace(CookingConfig.perfectItemSuffix, "");
         Recipe recipe = RecipeManager.COOKING_RECIPES.get(recipeKey);
         if (!(recipe instanceof DroppedItem droppedItem)) {
             AdventureUtil.consoleMessage(DebugLevel.ERROR, "Recipe not found or not a DroppedItem: " + recipeKey);

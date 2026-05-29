@@ -3,7 +3,6 @@ package plugin.borealcore.manager.configs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.utility.ConfigUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,7 +83,7 @@ public class MessageManager {
     public static String configEditorTimedOut;
 
     public static void load() {
-        YamlConfiguration config = ConfigUtil.getConfig("messages_" + ConfigManager.lang + ".yml");
+        YamlConfiguration config = ConfigManager.getConfig("messages_" + ConfigManager.lang + ".yml");
         prefix = getOrSet(config, "prefix", "<gradient:#FB5A00:#FDF300>[BorealCore] </gradient>");
         infoNegative = getOrSet(config, "prefix-negative", "<gray>[<red><bold>!</bold><gray>]<red> ");
         infoPositive = getOrSet(config, "prefix-positive", "<gray>[<green><bold>!</bold><gray>]<green> ");

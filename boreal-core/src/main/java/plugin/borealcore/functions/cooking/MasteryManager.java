@@ -16,14 +16,13 @@ import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.ConfigUtil;
 import plugin.borealcore.utility.RecipeDataUtil;
 
 import java.io.File;
 import java.io.IOException;
 
 import static plugin.borealcore.functions.cooking.configs.RecipeManager.COOKING_RECIPES;
-import static plugin.borealcore.utility.ConfigUtil.getConfig;
+import static plugin.borealcore.manager.configs.ConfigManager.getConfig;
 
 public class MasteryManager extends Function {
 
@@ -40,7 +39,7 @@ public class MasteryManager extends Function {
 
 
     public static void handleMastery(Player player, String recipe) {
-        YamlConfiguration config = ConfigUtil.getConfig("data/playerdata.yml");
+        YamlConfiguration config = ConfigManager.getConfig("data/playerdata.yml");
         File file = new File(BorealCore.plugin.getDataFolder(), "data/playerdata.yml");
 
         String playerName = player.getName();
@@ -73,8 +72,8 @@ public class MasteryManager extends Function {
     }
 
     private static void giveReward(Player player, String recipeFormatted) {
-        JadeManager.give(player, ConfigManager.masteryJadeReward, "mastery");
-        AdventureUtil.consoleMessage("Player <green>" + player.getName() + "</green> has been given" + ConfigManager.masteryJadeReward + " ₪ for gaining " + recipeFormatted + " mastery");
+        JadeManager.give(player, CookingConfig.masteryJadeReward, "mastery");
+        AdventureUtil.consoleMessage("Player <green>" + player.getName() + "</green> has been given" + CookingConfig.masteryJadeReward + " ₪ for gaining " + recipeFormatted + " mastery");
         AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryReward.replace("{recipe}", recipeFormatted));
     }
 

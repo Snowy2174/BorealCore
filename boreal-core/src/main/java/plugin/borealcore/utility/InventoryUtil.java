@@ -13,8 +13,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.functions.cooking.CookingConfig;
 import plugin.borealcore.manager.EffectManager;
-import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 
 import java.util.List;
@@ -66,7 +66,7 @@ public class InventoryUtil {
         ItemStack drop = build(item);
         drop.setAmount(amount);
         if (customCookingItem) {
-            EffectManager.addPotionEffectLore(drop, item, item.contains(ConfigManager.perfectItemSuffix));
+            EffectManager.addPotionEffectLore(drop, item, item.contains(CookingConfig.perfectItemSuffix));
             addIdentifier(drop, item.replace("[", "").replace("]", "")); // @TODO diagnose fix later
         }
         player.getLocation().getWorld().dropItem(player.getLocation(), drop);
@@ -121,7 +121,7 @@ public class InventoryUtil {
             }
         }
         if (COOKING_RECIPES.containsKey(key.toLowerCase().replace("_perfect", ""))) {
-            EffectManager.addPotionEffectLore(itemStack, key, key.contains(ConfigManager.perfectItemSuffix));
+            EffectManager.addPotionEffectLore(itemStack, key, key.contains(CookingConfig.perfectItemSuffix));
             addIdentifier(itemStack, key);
         }
         return itemStack;

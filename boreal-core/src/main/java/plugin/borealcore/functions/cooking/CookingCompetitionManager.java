@@ -9,9 +9,9 @@ import plugin.borealcore.functions.cooking.competition.CompetitionConfig;
 import plugin.borealcore.functions.cooking.competition.CompetitionGoal;
 import plugin.borealcore.functions.cooking.competition.CompetitionSchedule;
 import plugin.borealcore.functions.cooking.competition.bossbar.BossBarConfig;
+import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.ConfigUtil;
 
 import java.util.*;
 
@@ -39,7 +39,7 @@ public class CookingCompetitionManager extends Function {
     }
 
     public void loadCompetitions() {
-        YamlConfiguration config = ConfigUtil.getConfig("data/competition.yml");
+        YamlConfiguration config = ConfigManager.getConfig("data/competition.yml");
         Set<String> keys = config.getKeys(false);
         keys.forEach(key -> {
             boolean enableBsb = config.getBoolean(key + ".bossbar.enable", false);
