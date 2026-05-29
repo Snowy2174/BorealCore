@@ -1,13 +1,10 @@
 package plugin.borealcore.manager;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import plugin.borealcore.functions.cooking.CookingPapi;
-import plugin.borealcore.functions.cooking.competition.placeholder.CompetitionPapi;
-import plugin.borealcore.functions.jade.JadePapi;
-import plugin.borealcore.functions.karmicnode.NodePapi;
 import plugin.borealcore.object.Function;
 
 import java.util.ArrayList;
@@ -19,21 +16,34 @@ import java.util.regex.Pattern;
 public class PlaceholderManager extends Function {
 
     private final Pattern placeholderPattern = Pattern.compile("%([^%]*)%");
-    private CompetitionPapi competitionPapi;
-    private CookingPapi cookingPapi;
-    private JadePapi jadePapi;
-    private NodePapi nodePapi;
     private boolean hasPlaceholderAPI = false;
+    private final List<PlaceholderExpansion> registeredExpansions = new ArrayList<>();
 
     public PlaceholderManager() {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             hasPlaceholderAPI = true;
-            this.competitionPapi = new CompetitionPapi();
-            this.cookingPapi = new CookingPapi();
-            this.jadePapi = new JadePapi();
-            this.nodePapi = new NodePapi();
         }
-        load();
+    }
+
+    /**
+     * Allows modules to register their own placeholder expansions.
+     */
+    public void registerExpansion(PlaceholderExpansion expansion) {
+        if (hasPlaceholderAPI && expansion != null) {
+            if (expansion.register()) {
+                registeredExpansions.add(expansion);
+            }
+        }
+    }
+
+    /**
+     * Allows modules to unregister their expansions (e.g., on module disable).
+     */
+    public void unregisterExpansion(PlaceholderExpansion expansion) {
+        if (hasPlaceholderAPI && expansion != null) {
+            expansion.unregister();
+            registeredExpansions.remove(expansion);
+        }
     }
 
     public static String setPlaceholders(Player player, String text) {
@@ -53,18 +63,17 @@ public class PlaceholderManager extends Function {
 
     @Override
     public void load() {
-        if (competitionPapi != null) competitionPapi.register();
-        if (jadePapi != null) jadePapi.register();
-        if (cookingPapi != null) cookingPapi.register();
-        if (nodePapi != null) nodePapi.register();
+        // Modules handle placeholder loading internally
     }
 
     @Override
     public void unload() {
-        if (this.competitionPapi != null) competitionPapi.unregister();
-        if (this.jadePapi != null) jadePapi.unregister();
-        if (this.cookingPapi != null) cookingPapi.unregister();
-        if (this.nodePapi != null) nodePapi.unregister();
+        if (hasPlaceholderAPI) {
+            for (PlaceholderExpansion expansion : new ArrayList<>(registeredExpansions)) {
+                expansion.unregister();
+            }
+            registeredExpansions.clear();
+        }
     }
 
     public List<String> detectPlaceholders(String text) {

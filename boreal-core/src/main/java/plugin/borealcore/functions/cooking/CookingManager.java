@@ -20,6 +20,7 @@ import plugin.borealcore.BorealCore;
 import plugin.borealcore.action.Action;
 import plugin.borealcore.api.event.CookResultEvent;
 import plugin.borealcore.functions.cooking.competition.Competition;
+import plugin.borealcore.functions.cooking.competition.placeholder.CompetitionPapi;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.functions.cooking.object.DroppedItem;
@@ -44,6 +45,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.kyori.adventure.key.Key.key;
+import static plugin.borealcore.BorealCore.getPlaceholderManager;
 import static plugin.borealcore.manager.FurnitureManager.playCookingResultSFX;
 import static plugin.borealcore.manager.GuiManager.INGREDIENTS;
 import static plugin.borealcore.manager.configs.ConfigManager.perfectChance;
@@ -57,6 +59,8 @@ public class CookingManager extends Function {
     private final Map<UUID, BukkitRunnable> playerSoundTasks = new HashMap<>();
     private final SimpleListener simpleListener;
     public final SitListener listener;
+    private CookingPapi cookingPlaceholders;
+    private CompetitionPapi competitionPlaceholders;
 
     public CookingManager() {
         this.random = new Random();
@@ -70,6 +74,10 @@ public class CookingManager extends Function {
     @Override
     public void load() {
         listener.register(BorealCore.getInstance());
+        this.cookingPlaceholders = new CookingPapi();
+        this.competitionPlaceholders = new CompetitionPapi();
+        getPlaceholderManager().registerExpansion(cookingPlaceholders);
+        getPlaceholderManager().registerExpansion(competitionPlaceholders);
         Bukkit.getPluginManager().registerEvents(this.simpleListener, BorealCore.plugin);
         Bukkit.getPluginManager().registerEvents(new CropInteractEventListener(), BorealCore.plugin); //@TODO MOVE URGENTLY
     }
@@ -83,6 +91,8 @@ public class CookingManager extends Function {
     public void unload() {
         if (this.simpleListener != null) HandlerList.unregisterAll(this.simpleListener);
         if (this.listener != null) HandlerList.unregisterAll(this.listener);
+        if (this.cookingPlaceholders != null) getPlaceholderManager().unregisterExpansion(cookingPlaceholders); //Use context.getPlaceholderManager for modular implementation
+        if (this.competitionPlaceholders != null) getPlaceholderManager().unregisterExpansion(competitionPlaceholders);
     }
 
     public void handleCooking(String recipe, Player player, CustomFurniture clickedFurniture) {

@@ -21,9 +21,18 @@ import static plugin.borealcore.utility.ConfigUtil.getConfig;
 public class NodeManager extends Function {
 
 
+    private NodePapi nodePlaceholders;
+
     @Override
     public void load() {
         consoleMessage("Loaded Karmic Node Values");
+        this.nodePlaceholders = new NodePapi();
+        BorealCore.getPlaceholderManager().registerExpansion(nodePlaceholders);
+    }
+
+    @Override
+    public void unload() {
+        if (this.nodePlaceholders != null) BorealCore.getPlaceholderManager().unregisterExpansion(this.nodePlaceholders);
     }
 
     public static void handleUpdateMaxWave(String player, int wave) {

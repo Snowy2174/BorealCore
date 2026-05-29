@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.bukkit.Bukkit.getServer;
+import static plugin.borealcore.BorealCore.getPlaceholderManager;
 import static plugin.borealcore.manager.configs.ConfigManager.brewingRequiredQuality;
 import static plugin.borealcore.manager.configs.ConfigManager.refarmableCrops;
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
@@ -44,6 +45,7 @@ public class JadeManager extends Function {
     private static BukkitScheduler scheduler;
     private final JadeSourceListener jadeSourceListener;
     public static HashMap<LeaderboardType, Leaderboard> leaderboardCache = new HashMap<>();
+    private JadePapi jadePlaceholders;
 
     public JadeManager(Database database) {
         JadeManager.database = database;
@@ -54,6 +56,8 @@ public class JadeManager extends Function {
     public void load() {
         loadJadeLimits();
         Bukkit.getPluginManager().registerEvents(jadeSourceListener, BorealCore.plugin);
+        this.jadePlaceholders = new JadePapi();
+        getPlaceholderManager().registerExpansion(jadePlaceholders);
         database.verifyAndFixTotals();
         database.startRetryTask();
         reloadLeaderboards();
@@ -66,10 +70,8 @@ public class JadeManager extends Function {
         jadeSources.clear();
         leaderboardCache.clear();
         if (this.jadeSourceListener != null) HandlerList.unregisterAll(this.jadeSourceListener);
-
-        if (scheduler != null) {
-            scheduler.cancelTasks(BorealCore.getInstance());
-        }
+        if (scheduler != null) scheduler.cancelTasks(BorealCore.getInstance());
+        if (this.jadePlaceholders != null) getPlaceholderManager().unregisterExpansion(jadePlaceholders);
     }
 
     private void loadJadeLimits() {
