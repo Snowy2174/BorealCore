@@ -2,10 +2,16 @@ package plugin.borealcore.functions.cooking;
 
 
 import dev.lone.itemsadder.api.CustomFurniture;
+import dev.lone.itemsadder.api.Events.FurnitureBreakEvent;
+import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
+import eu.decentsoftware.holograms.api.holograms.Hologram;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Rotation;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -15,6 +21,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.action.Action;
@@ -30,27 +37,29 @@ import plugin.borealcore.functions.cooking.object.Ingredient;
 import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.functions.cooking.object.Recipe;
 import plugin.borealcore.functions.jade.JadeManager;
-import plugin.borealcore.functions.crops.CropInteractEventListener;
-import plugin.borealcore.functions.sit.SitListener;
-import plugin.borealcore.manager.FurnitureManager;
+import plugin.borealcore.functions.traps.TrapsManager;
+import plugin.borealcore.manager.GuiManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.object.SimpleListener;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.GUIUtil;
+import plugin.borealcore.utility.GuiUtil;
 import plugin.borealcore.utility.InventoryUtil;
-import plugin.borealcore.utility.RecipeDataUtil;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.kyori.adventure.key.Key.key;
 import static plugin.borealcore.BorealCore.getPlaceholderManager;
-import static plugin.borealcore.manager.FurnitureManager.playCookingResultSFX;
-import static plugin.borealcore.manager.GuiManager.INGREDIENTS;
 import static plugin.borealcore.functions.cooking.CookingConfig.perfectChance;
+import static plugin.borealcore.manager.GuiManager.INGREDIENTS;
 import static plugin.borealcore.utility.AdventureUtil.playerSound;
 
 public class CookingManager extends Function implements BorealModule {
@@ -60,9 +69,11 @@ public class CookingManager extends Function implements BorealModule {
     public final ConcurrentHashMap<Player, CookingPlayer> cookingPlayerCache;
     private final Map<UUID, BukkitRunnable> playerSoundTasks = new HashMap<>();
     private final SimpleListener simpleListener;
-    public final SitListener listener;
     private CookingPapi cookingPlaceholders;
     private CompetitionPapi competitionPlaceholders;
+    private static final Map<Location, Hologram> holograms = new HashMap<>();
+    private final Map<Player, Long> clickCooldowns;
+    static Map<Location, BukkitTask> activeFXTasks = new HashMap<>();
 
     public CookingManager() {
         this.random = new Random();
@@ -70,26 +81,28 @@ public class CookingManager extends Function implements BorealModule {
         this.cookingPotLocations = new HashMap<>();
         this.cookingPlayerCache = new ConcurrentHashMap<>();
         this.simpleListener = new SimpleListener(this);
-        this.listener = new SitListener(BorealCore.getInstance());
+        this.clickCooldowns = new ConcurrentHashMap<>();
     }
 
     @Override
     public void load() {
-        listener.register(BorealCore.getInstance());
         this.cookingPlaceholders = new CookingPapi();
         this.competitionPlaceholders = new CompetitionPapi();
         getPlaceholderManager().registerExpansion(cookingPlaceholders);
         getPlaceholderManager().registerExpansion(competitionPlaceholders);
         Bukkit.getPluginManager().registerEvents(this.simpleListener, BorealCore.plugin);
-        Bukkit.getPluginManager().registerEvents(new CropInteractEventListener(), BorealCore.plugin); //@TODO MOVE URGENTLY
+        GuiManager guiManager = BorealCore.getGuiManager();
+        guiManager.registerGui("cookingRecipeBook", () -> new CookingRecipeBookGUI(null));
     }
 
     @Override
     public void unload() {
         if (this.simpleListener != null) HandlerList.unregisterAll(this.simpleListener);
-        if (this.listener != null) HandlerList.unregisterAll(this.listener);
         if (this.cookingPlaceholders != null) getPlaceholderManager().unregisterExpansion(cookingPlaceholders); //Use context.getPlaceholderManager for modular implementation
         if (this.competitionPlaceholders != null) getPlaceholderManager().unregisterExpansion(competitionPlaceholders);
+        activeFXTasks.clear();
+        holograms.clear();
+        clickCooldowns.clear();
     }
 
     public void handleCooking(String recipe, Player player, CustomFurniture clickedFurniture) {
@@ -102,7 +115,7 @@ public class CookingManager extends Function implements BorealModule {
                 InventoryUtil.removeIngredients(player.getInventory(), ingredients, 1);
                 if (clickedFurniture != null) {
                     Location loc = clickedFurniture.getArmorstand().getLocation();
-                    FurnitureManager.ingredientsSFX(player, ingredients, loc);
+                    CookingPotUtil.ingredientsSFX(player, ingredients, loc);
                 }
                 onCookedItem(player, bar, clickedFurniture);
             } else {
@@ -180,7 +193,7 @@ public class CookingManager extends Function implements BorealModule {
 
         if (!cookingPlayer.isSuccess()) {
             if (cookingPot != null) {
-                playCookingResultSFX(cookingPot, InventoryUtil.build(CookingConfig.failureItem), false);
+                CookingPotUtil.playCookingResultSFX(cookingPot, InventoryUtil.build(CookingConfig.failureItem), false);
             }
             handleFailureResult(player);
             return;
@@ -210,7 +223,7 @@ public class CookingManager extends Function implements BorealModule {
         }
 
         if (cookingPot != null) {
-            playCookingResultSFX(cookingPot, InventoryUtil.build(drop), true);
+            CookingPotUtil.playCookingResultSFX(cookingPot, InventoryUtil.build(drop), true);
         }
 
         if (droppedItem.getSuccessActions() != null) {
@@ -240,7 +253,7 @@ public class CookingManager extends Function implements BorealModule {
         List<String> ingredients = loot.getIngredients();
         String ingredient = ingredients.get(random.nextInt(ingredients.size()));
         String[] parts = ingredient.split(":");
-        AdventureUtil.playerMessage(player, MessageManager.infoPositive + "You have used one less: " + GUIUtil.formatString(parts[0]));
+        AdventureUtil.playerMessage(player, MessageManager.infoPositive + "You have used one less: " + GuiUtil.formatString(parts[0]));
         InventoryUtil.giveItem(player, parts[0], 1, false);
     }
 
@@ -378,6 +391,48 @@ public class CookingManager extends Function implements BorealModule {
                 action.doOn(player, null);
                 AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Action performed: " + action.getClass().getSimpleName() + " for player: " + player.getName() + " for dish: " + recipeKey);
             }
+        }
+    }
+
+    @Override
+    public void onFurnitureInteract(FurnitureInteractEvent event) {
+        Player player = event.getPlayer();
+        CustomFurniture clickedFurniture = event.getFurniture();
+
+        if (clickedFurniture.getId().equals(CookingConfig.unlitCookingPot)) {
+            if (!clickCooldowns.containsKey(player) || (System.currentTimeMillis() - clickCooldowns.get(player) >= 2000)) {
+                clickCooldowns.put(player, System.currentTimeMillis());
+                if (player.getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
+                    ItemFrame unlitpot = (ItemFrame) Objects.requireNonNull(clickedFurniture).getArmorstand();
+                    Rotation rot = unlitpot.getRotation();
+                    ItemFrame litpot = (ItemFrame) CustomFurniture.spawnPreciseNonSolid(CookingConfig.litCookingPot, unlitpot.getLocation()).getArmorstand();
+                    litpot.setRotation(rot);
+                    clickedFurniture.remove(false);
+                    unlitpot.getLocation().getBlock().setType(Material.BARRIER);
+                    AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.potLight);
+                    CookingPotUtil.playCookingPotFX(clickedFurniture.getEntity().getLocation());
+                } else {
+                    AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCold);
+                }
+            } else {
+                String cooldown = String.valueOf((2000 - (System.currentTimeMillis() - clickCooldowns.get(player)) / 1000));
+                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCooldown.replace("{time}", cooldown));
+            }
+        } else if (clickedFurniture.getId().equals(CookingConfig.litCookingPot)) {
+            CookingPotUtil.playCookingPotFX(clickedFurniture.getEntity().getLocation());
+            new CookingRecipeBookGUI(clickedFurniture).open(player);
+        }
+    }
+
+    @Override
+    public void onFurnitureBreak(FurnitureBreakEvent event) {
+        CustomFurniture clickedFurniture = event.getFurniture();
+
+        if (clickedFurniture.getNamespacedID().equals("fishing_trap")) {
+            TrapsManager.getTrapsDatabase().deleteFishingTrapById(clickedFurniture.getEntity().getUniqueId().toString());
+        }
+        if (clickedFurniture.getId().equals(CookingConfig.litCookingPot)) {
+            CookingPotUtil.cancelCookingPotFX(clickedFurniture.getArmorstand().getLocation());
         }
     }
 

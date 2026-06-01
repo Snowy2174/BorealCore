@@ -19,7 +19,7 @@ public class DatabaseManager extends Function {
 
     public final BorealCore plugin;
 
-    // Stores active connections by their database name (e.g., "traps" -> Connection)
+    // Stores active connections by their database name (e.g., "machines" -> Connection)
     private final Map<String, Connection> activeConnections = new ConcurrentHashMap<>();
 
     public DatabaseManager(BorealCore instance) {

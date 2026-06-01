@@ -1,0 +1,7 @@
+id: karmic-node
+name: Karmic Node
+version: 1.0.0
+author: SnowyOwl217
+main: plugin.borealcore.karmicnode.NodeModule
+minimum-borealcore-version: 1.1.9.1
+

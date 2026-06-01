@@ -16,7 +16,6 @@ import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.RecipeDataUtil;
 
 import java.io.File;
 import java.io.IOException;

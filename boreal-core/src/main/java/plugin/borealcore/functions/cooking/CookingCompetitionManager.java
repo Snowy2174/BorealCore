@@ -13,7 +13,11 @@ import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 
 public class CookingCompetitionManager extends Function {

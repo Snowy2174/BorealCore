@@ -2,7 +2,12 @@ package plugin.borealcore.functions.cooking.competition.ranking;
 
 import plugin.borealcore.functions.cooking.competition.CompetitionPlayer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class LocalRankingImpl implements RankingInterface {
 

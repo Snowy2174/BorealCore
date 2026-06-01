@@ -1,9 +1,6 @@
 package plugin.borealcore.functions.cooking;
 
 import dev.lone.itemsadder.api.CustomStack;
-import fr.minuskube.inv.ClickableItem;
-import fr.minuskube.inv.content.InventoryContents;
-import fr.minuskube.inv.content.InventoryProvider;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -15,7 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.GUIUtil;
+import plugin.borealcore.utility.GuiUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,24 +20,19 @@ import java.util.List;
 import static plugin.borealcore.manager.GuiManager.INGREDIENTS;
 import static plugin.borealcore.utility.InventoryUtil.build;
 
-public class IngredientBookProvider implements InventoryProvider {
+public class IngredientBookProvider { //@TODO important, migrate this to use a BorealGUI
     private final CookingManager cookingManager;
 
     public IngredientBookProvider() {
         this.cookingManager = BorealCore.getCookingManager();
     }
 
-    @Override
-    public void update(Player player, InventoryContents contents) {
+    public void update(Player player) {
         // Doesn't do anything yet, eventually will update ingredients?
     }
 
-    @Override
-    public void init(Player player, InventoryContents contents) {
+    public void init(Player player) {
         player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1, 1);
-        contents.fill(ClickableItem.of(build(CookingConfig.unknownItem),
-                e -> AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown)));
-        contents.fillBorders(ClickableItem.empty(new ItemStack(Material.AIR)));
 
         for (String recipe : INGREDIENTS.keySet()) {
             ItemStack itemStack;
@@ -50,8 +42,6 @@ public class IngredientBookProvider implements InventoryProvider {
             if (slot != -1) {
                 int row = (slot - 1) / 9; // Calculate the row based on the slot
                 int column = (slot - 1) % 9;  // Calculate the column based on the slot
-
-                contents.set(row, column, ClickableItem.of(itemStack, e -> handleItemClick(e, player, recipe)));
             }
         }
     }
@@ -81,7 +71,7 @@ public class IngredientBookProvider implements InventoryProvider {
         }
 
         if (INGREDIENTS.get(recipe).getIngredients() != null) {
-            GUIUtil.appendIngredients(lore, player, INGREDIENTS.get(recipe).getIngredients());
+            GuiUtil.appendIngredients(lore, player, INGREDIENTS.get(recipe).getIngredients());
         }
 
         lore.add(" ");

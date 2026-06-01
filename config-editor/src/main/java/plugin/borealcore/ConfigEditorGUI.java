@@ -1,27 +1,27 @@
 package plugin.borealcore;
 
-import fr.minuskube.inv.ClickableItem;
-import fr.minuskube.inv.SmartInventory;
-import fr.minuskube.inv.content.InventoryContents;
-import fr.minuskube.inv.content.InventoryProvider;
-import fr.minuskube.inv.content.Pagination;
-import fr.minuskube.inv.content.SlotIterator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import plugin.borealcore.api.module.BorealGUI;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
-public class ConfigEditorGUI implements InventoryProvider {
+public class ConfigEditorGUI extends BorealGUI {
 
-    private final String title;
     private final int rows;
     private Object[] items;
     private Consumer<File> fileClickHandler;
@@ -31,7 +31,20 @@ public class ConfigEditorGUI implements InventoryProvider {
     private Runnable backAction;
     private Runnable saveAction;
     private Map<String, ConfigEditorModule.Pair<Object, Object>> changeLog;
-    private SmartInventory inventory;
+
+    // Pagination tracking
+    private int page = 0;
+
+    // Helper class to bind an item to its click action during generation
+    private static class ActionItem {
+        final ItemStack item;
+        final Consumer<InventoryClickEvent> action;
+
+        ActionItem(ItemStack item, Consumer<InventoryClickEvent> action) {
+            this.item = item;
+            this.action = action;
+        }
+    }
 
     public ConfigEditorGUI(
             String title,
@@ -41,7 +54,7 @@ public class ConfigEditorGUI implements InventoryProvider {
             Consumer<File> fileRightClickHandler,
             Runnable backAction
     ) {
-        this.title = title;
+        super(rows, Component.text(title));
         this.rows = rows;
         this.items = files;
         this.fileClickHandler = fileClickHandler;
@@ -58,7 +71,7 @@ public class ConfigEditorGUI implements InventoryProvider {
             Runnable saveAction,
             Map<String, ConfigEditorModule.Pair<Object, Object>> changeLog
     ) {
-        this.title = title;
+        super(rows, Component.text(title));
         this.rows = rows;
         this.section = section;
         this.sectionPath = sectionPath;
@@ -68,48 +81,40 @@ public class ConfigEditorGUI implements InventoryProvider {
         this.changeLog = changeLog;
     }
 
-    public void open(Player player) {
-        this.inventory = SmartInventory.builder()
-                .provider(this)
-                .size(rows, 9)
-                .title(title)
-                .manager(BorealCore.getInventoryManager())
-                .build();
-
-        inventory.open(player);
-    }
-
+    /**
+     * Refreshes the current inventory view for the player.
+     */
     public void refresh(Player player) {
-        if (inventory != null && player.getOpenInventory() != null) {
-            inventory.open(player);
-        }
+        init(player);
     }
 
     @Override
-    public void init(Player player, InventoryContents contents) {
-        Pagination pagination = contents.pagination();
+    public void init(Player player) {
+        // Clear all previous items to ensure clean page rendering
+        getInventory().clear();
 
+        // 1. Setup Borders
         ItemStack borderItem = createItem(Material.BLACK_STAINED_GLASS_PANE, Component.empty());
         for (int i = 0; i < 9; i++) {
-            contents.set(0, i, ClickableItem.empty(borderItem));
-            contents.set(rows - 1, i, ClickableItem.empty(borderItem));
+            setItem(0, i, borderItem, null);
+            setItem(rows - 1, i, borderItem, null);
         }
 
+        // 2. Setup Persistent Actions (Back / Save)
         if (backAction != null) {
-            contents.set(rows - 1, 0, ClickableItem.of(
-                    createItem(Material.ARROW, Component.text("Back").color(NamedTextColor.WHITE)
-                            .decoration(TextDecoration.ITALIC, false)),
-                    e -> backAction.run()));
+            setItem(rows - 1, 0,
+                    createItem(Material.ARROW, Component.text("Back").color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)),
+                    e -> backAction.run());
         }
 
         if (saveAction != null) {
-            contents.set(rows - 1, 4, ClickableItem.of(
-                    createItem(Material.LIME_STAINED_GLASS_PANE, Component.text("Save").color(NamedTextColor.GREEN)
-                            .decoration(TextDecoration.ITALIC, false)),
-                    e -> saveAction.run()));
+            setItem(rows - 1, 4,
+                    createItem(Material.LIME_STAINED_GLASS_PANE, Component.text("Save").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)),
+                    e -> saveAction.run());
         }
 
-        List<ClickableItem> clickableItems = new ArrayList<>();
+        // 3. Generate all clickable items for the central view
+        List<ActionItem> clickableItems = new ArrayList<>();
 
         if (items != null && items instanceof File[]) {
             Arrays.sort((File[]) items, (f1, f2) -> {
@@ -121,7 +126,7 @@ public class ConfigEditorGUI implements InventoryProvider {
             for (File file : (File[]) items) {
                 if (file != null) {
                     ItemStack item = createFileItem(file);
-                    clickableItems.add(ClickableItem.of(item, e -> {
+                    clickableItems.add(new ActionItem(item, e -> {
                         if (fileClickHandler != null) {
                             fileClickHandler.accept(file);
                         }
@@ -135,7 +140,7 @@ public class ConfigEditorGUI implements InventoryProvider {
                         Collections.singletonList(Component.text("Go back to parent section").color(NamedTextColor.YELLOW)
                                 .decoration(TextDecoration.ITALIC, false)));
 
-                clickableItems.add(ClickableItem.of(parentItem, e -> {
+                clickableItems.add(new ActionItem(parentItem, e -> {
                     if (backAction != null) {
                         backAction.run();
                     }
@@ -160,7 +165,7 @@ public class ConfigEditorGUI implements InventoryProvider {
                 boolean isModified = changeLog != null && changeLog.containsKey(fullPath);
 
                 ItemStack item = createConfigItem(key, value, isSection, isModified);
-                clickableItems.add(ClickableItem.of(item, e -> {
+                clickableItems.add(new ActionItem(item, e -> {
                     if (configSectionClickHandler != null) {
                         configSectionClickHandler.onConfigSectionClick(key, value, isSection, e.isRightClick());
                     }
@@ -168,49 +173,58 @@ public class ConfigEditorGUI implements InventoryProvider {
             }
         }
 
+        // 4. Handle Pagination & Rendering Grid Math
         if (!clickableItems.isEmpty()) {
-            pagination.setItems(clickableItems.toArray(new ClickableItem[0]));
-
-            int itemsPerPage = (rows - 2) * 9;
-            pagination.setItemsPerPage(itemsPerPage);
-
-            pagination.addToIterator(contents.newIterator(SlotIterator.Type.HORIZONTAL, 1, 0)
-                    .blacklist(0, 0).blacklist(0, 8)
-                    .blacklist(rows - 1, 0).blacklist(rows - 1, 8));
-
-            // Only show pagination controls if needed
+            int itemsPerPage = (rows - 2) * 9; // Available slots inside borders
             int totalPages = (int) Math.ceil((double) clickableItems.size() / itemsPerPage);
 
+            // Ensure current page is valid
+            if (page >= totalPages) page = Math.max(0, totalPages - 1);
+
+            int startIndex = page * itemsPerPage;
+            int endIndex = Math.min(startIndex + itemsPerPage, clickableItems.size());
+
+            // Place items in grid
+            int currentRow = 1;
+            int currentCol = 0;
+
+            for (int i = startIndex; i < endIndex; i++) {
+                ActionItem guiItem = clickableItems.get(i);
+                setItem(currentRow, currentCol, guiItem.item, guiItem.action);
+
+                currentCol++;
+                if (currentCol > 8) {
+                    currentCol = 0;
+                    currentRow++;
+                }
+            }
+
+            // 5. Draw Pagination Controls
             if (totalPages > 1) {
-                if (!pagination.isFirst()) {
-                    contents.set(rows - 1, 3, ClickableItem.of(
+                if (page > 0) {
+                    setItem(rows - 1, 3,
                             createItem(Material.ARROW, Component.text("Previous Page").color(NamedTextColor.YELLOW)),
-                            e -> open(player, pagination.getPage() - 1, contents)));
+                            e -> {
+                                this.page--;
+                                init(player);
+                            });
                 }
 
-                if (!pagination.isLast()) {
-                    contents.set(rows - 1, 5, ClickableItem.of(
+                if (page < totalPages - 1) {
+                    setItem(rows - 1, 5,
                             createItem(Material.ARROW, Component.text("Next Page").color(NamedTextColor.YELLOW)),
-                            e -> open(player, pagination.getPage() + 1, contents)));
+                            e -> {
+                                this.page++;
+                                init(player);
+                            });
                 }
 
-                contents.set(rows - 1, 2, ClickableItem.empty(
+                setItem(rows - 1, 2,
                         createItem(Material.PAPER,
-                                Component.text("Page " + (pagination.getPage() + 1) + "/" + totalPages)
-                                        .color(NamedTextColor.GRAY))));
+                                Component.text("Page " + (page + 1) + "/" + totalPages).color(NamedTextColor.GRAY)),
+                        null);
             }
         }
-    }
-
-    @Override
-    public void update(Player player, InventoryContents contents) {
-        // Not needed as we use refresh instead
-    }
-
-    private void open(Player player, int page, InventoryContents contents) {
-        contents.pagination().page(page);
-        player.getOpenInventory().getTopInventory().clear();
-        contents.inventory().open(player, page);
     }
 
     private ItemStack createFileItem(File file) {
@@ -272,13 +286,13 @@ public class ConfigEditorGUI implements InventoryProvider {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
-        meta.displayName(name);
-
-        if (lore != null && !lore.isEmpty()) {
-            meta.lore(lore);
+        if (meta != null) {
+            meta.displayName(name);
+            if (lore != null && !lore.isEmpty()) {
+                meta.lore(lore);
+            }
+            item.setItemMeta(meta);
         }
-
-        item.setItemMeta(meta);
         return item;
     }
 

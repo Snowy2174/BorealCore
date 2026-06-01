@@ -28,8 +28,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
-import static plugin.borealcore.functions.jade.JadeManager.database;
 import static plugin.borealcore.functions.jade.JadeManager.jadeSources;
 
 public class JadeDatabase {

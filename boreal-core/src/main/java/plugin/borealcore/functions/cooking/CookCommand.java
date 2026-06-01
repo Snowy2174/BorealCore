@@ -14,7 +14,6 @@ import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.InventoryUtil;
-import plugin.borealcore.utility.RecipeDataUtil;
 
 import java.util.List;
 
@@ -59,8 +58,6 @@ public class CookCommand implements CommandExecutor {
             handleMasteryCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("recipebook")) {
             handleRecipeBookCommand(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("progression")) {
-            handleProgressionCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("competition")) {
             handleCompetitionCommand(sender, subargs);
         } else if (subcommand.equalsIgnoreCase("give")) {
@@ -266,7 +263,7 @@ public class CookCommand implements CommandExecutor {
 
     private void handleRecipeBookCommand(CommandSender sender, String[] args) {
         if (sender instanceof Player player) {
-            GuiManager.getCookingRecipeBook(null).open(player);
+            GuiManager.openGui(player, "cookingRecipeBook");
         }
 
         Player player = Bukkit.getPlayer(args[0]);
@@ -274,20 +271,7 @@ public class CookCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-        GuiManager.getCookingRecipeBook(null).open(player);
-    }
-
-    private void handleProgressionCommand(CommandSender sender, String[] args) {
-        if (sender instanceof Player player) {
-            GuiManager.PROGRESSION_MENU.open(player);
-        }
-
-        Player player = Bukkit.getPlayer(args[0]);
-        if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
-            return;
-        }
-        GuiManager.PROGRESSION_MENU.open(player);
+        GuiManager.openGui(player, "cookingRecipeBook");
     }
 
     private void handleGiveItemCommand(CommandSender sender, String[] args) {

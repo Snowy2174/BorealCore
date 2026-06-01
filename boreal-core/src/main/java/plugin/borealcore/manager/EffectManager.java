@@ -8,7 +8,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import plugin.borealcore.action.*;
+import plugin.borealcore.action.Action;
+import plugin.borealcore.action.CommandActionImpl;
+import plugin.borealcore.action.DrunknessEffectImpl;
+import plugin.borealcore.action.HungerEffectImpl;
+import plugin.borealcore.action.MessageActionImpl;
+import plugin.borealcore.action.PotionEffectImpl;
+import plugin.borealcore.action.SaturationEffectImpl;
+import plugin.borealcore.action.SoundActionImpl;
+import plugin.borealcore.action.VanillaXPImpl;
 import plugin.borealcore.functions.cooking.CookingConfig;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.functions.cooking.object.Recipe;
@@ -16,7 +24,7 @@ import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.GUIUtil;
+import plugin.borealcore.utility.GuiUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +39,7 @@ public class EffectManager extends Function {
     @Override
     public void load() {
         EFFECTS = new HashMap<>();
-        loadEffects();
+        loadEffects("recipes/buffs");
         AdventureUtil.consoleMessage("Loaded <green>" + EFFECTS.size() + " <gray>buff categories");
     }
 
@@ -40,8 +48,8 @@ public class EffectManager extends Function {
         if (EFFECTS != null) EFFECTS.clear();
     }
 
-    private void loadEffects() {
-        YamlConfiguration config = ConfigManager.getConfig("recipes/buffs.yml");
+    private void loadEffects(String configPath) {
+        YamlConfiguration config = ConfigManager.getConfig(configPath + ".yml");
         for (String sectionName : config.getKeys(false)) {
             ConfigurationSection section = config.getConfigurationSection(sectionName);
             List<PotionEffect> effectsList = new ArrayList<>();
@@ -135,7 +143,7 @@ public class EffectManager extends Function {
                     if (action instanceof PotionEffectImpl potionEffectAction) {
                         for (PotionEffect potionEffect : potionEffectAction.potionEffects()) {
                             actionLore.add(getComponentFromMiniMessage(CookingConfig.effectLore
-                                    .replace("{effect}", GUIUtil.formatString(potionEffect.getType().getName()))
+                                    .replace("{effect}", GuiUtil.formatString(potionEffect.getType().getName()))
                                     .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier() + 1))
                                     .replace("{duration}", getDuration(potionEffect.getDuration() / 20))));
                         }

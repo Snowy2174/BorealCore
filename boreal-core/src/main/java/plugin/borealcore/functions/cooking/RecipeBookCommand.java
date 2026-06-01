@@ -47,7 +47,7 @@ public class RecipeBookCommand implements CommandExecutor {
 
     private void handleCookingCommand(CommandSender sender, String[] subargs) {
         if (sender instanceof Player player) {
-            GuiManager.getCookingRecipeBook(null).open(player);
+            GuiManager.openGui(player, "cookingRecipeBook");
         }
 
         Player player = Bukkit.getPlayer(subargs[0]);
@@ -55,12 +55,12 @@ public class RecipeBookCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-        GuiManager.getCookingRecipeBook(null).open(player);
+        GuiManager.openGui(player, "cookingRecipeBook");
     }
 
     private void handleBrewingCommand(CommandSender sender, String[] subargs) {
         if (sender instanceof Player player) {
-            GuiManager.getBrewingRecipeBook().open(player);
+            GuiManager.openGui(player, "brewingRecipeBook");
         }
 
         Player player = Bukkit.getPlayer(subargs[0]);
@@ -68,7 +68,7 @@ public class RecipeBookCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-        GuiManager.getBrewingRecipeBook().open(player);
+        GuiManager.openGui(player, "brewingRecipeBook");
     }
 }
 

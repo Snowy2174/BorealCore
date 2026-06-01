@@ -12,6 +12,15 @@
     <modules>
         <module>boreal-core</module>
         <module>config-editor</module>
+        <module>bending</module>
+        <module>brewery</module>
+        <module>crops</module>
+        <module>duels</module>
+        <module>market</module>
+        <module>karmic-node</module>
+        <module>sit</module>
+        <module>wiki</module>
+        <module>plushies</module>
     </modules>
 
     <properties>
@@ -33,11 +42,6 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${maven.multiModuleProjectDirectory}/target</outputDirectory>
-                            <artifactSet>
-                                <includes>
-                                    <include>fr.minuskube.inv:*</include>
-                                </includes>
-                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
@@ -146,11 +150,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>fr.minuskube.inv</groupId>
-            <artifactId>smart-invs</artifactId>
-            <version>1.2.7</version>
-        </dependency>
-        <dependency>
             <groupId>de.tr7zw</groupId>
             <artifactId>item-nbt-api-plugin</artifactId>
             <version>2.15.5</version>
@@ -195,12 +194,6 @@
             <groupId>net.momirealms</groupId>
             <artifactId>custom-fishing</artifactId>
             <version>2.3.7</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ProjectKorra</groupId>
-            <artifactId>ProjectKorra</artifactId>
-            <version>v1.12.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -4,7 +4,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.bending.BendingConfig;
 import plugin.borealcore.functions.cooking.CookingConfig;
 import plugin.borealcore.functions.jade.JadeConfig;
 
@@ -73,8 +72,6 @@ public class ConfigManager {
         if (CookingConfig.failureTitle.length == 0) CookingConfig.failureTitle = new String[]{""};
         if (CookingConfig.failureSubTitle.length == 0) CookingConfig.failureSubTitle = new String[]{""};
 
-        BendingConfig.lavaContactDamage = config.getInt("bending.lava-contact-damage", 1);
-        BendingConfig.fireContactDamage = config.getInt("bending.fire-contact-damage", 1);
         JadeConfig.brewingRequiredQuality = config.getInt("mechanics.brewing-required-quality", 8);
         JadeConfig.refarmableCrops = config.getStringList("mechanics.refarmable-crops");
 

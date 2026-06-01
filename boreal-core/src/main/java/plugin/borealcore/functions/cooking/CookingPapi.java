@@ -4,7 +4,6 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import plugin.borealcore.utility.InventoryUtil;
-import plugin.borealcore.utility.RecipeDataUtil;
 
 public class CookingPapi extends PlaceholderExpansion {
     @Override

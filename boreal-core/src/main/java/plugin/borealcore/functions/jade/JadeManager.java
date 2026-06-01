@@ -25,7 +25,7 @@ import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.GUIUtil;
+import plugin.borealcore.utility.GuiUtil;
 
 import java.sql.Connection;
 import java.time.LocalDateTime;
@@ -122,7 +122,7 @@ public class JadeManager extends Function implements BorealModule {
         // Check if source exists
         if (!jadeSources.containsKey(source) && !source.isEmpty()) {
             AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeSourceNotFound
-                    .replace("{source}", GUIUtil.formatString(source)));
+                    .replace("{source}", GuiUtil.formatString(source)));
             return;
         }
         // Check if player is on cooldown
@@ -136,7 +136,7 @@ public class JadeManager extends Function implements BorealModule {
             give(player, amount, source);
         } else {
             AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeLimitReached
-                    .replace("{source}", GUIUtil.formatString(source)));
+                    .replace("{source}", GuiUtil.formatString(source)));
             sendJadeLimitMessage(player);
         }
     }
@@ -145,7 +145,7 @@ public class JadeManager extends Function implements BorealModule {
         boolean first = source.isBlank() || database.getRecentPositiveTransactionTimestamps(player, source).isEmpty();
         if (first && !source.isEmpty()) {
             AdventureUtil.sendMessage(player, MessageManager.infoPositive + MessageManager.jadeFirstTime
-                    .replace("{source}", GUIUtil.formatString(source))
+                    .replace("{source}", GuiUtil.formatString(source))
                     .replace("{limit}", String.valueOf(getLimitForSource(source))));
         } else {
             AdventureUtil.sendMessage(player, MessageManager.infoPositive + MessageManager.jadeReceived
@@ -158,7 +158,7 @@ public class JadeManager extends Function implements BorealModule {
         Bukkit.getPluginManager().callEvent(jadeEvent);
 
         String bcast = MessageManager.infoPositive + MessageManager.jadeBroadcast
-                .replace("{source}", source.isEmpty() ? "playing" : GUIUtil.formatString(source))
+                .replace("{source}", source.isEmpty() ? "playing" : GuiUtil.formatString(source))
                 .replace("{player}", player.getName())
                 .replace("{amount}", String.valueOf((int) amount));
         getServer().broadcast(AdventureUtil.getComponentFromMiniMessage(bcast));
@@ -204,7 +204,7 @@ public class JadeManager extends Function implements BorealModule {
             }
             Double total = jadeData.getOrDefault(source, 0.0);
             String sourceMessage = MessageManager.jadeLimitSource
-                    .replace("{source}", GUIUtil.formatString(source))
+                    .replace("{source}", GuiUtil.formatString(source))
                     .replace("{total}", String.valueOf(total.intValue()))
                     .replace("{limit}", String.valueOf(limit));
             message.append(sourceMessage);

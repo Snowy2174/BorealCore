@@ -11,7 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.manager.configs.MessageManager;
-import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.function.Consumer;
 

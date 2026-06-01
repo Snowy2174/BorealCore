@@ -19,12 +19,22 @@ import plugin.borealcore.functions.cooking.CookingConfig;
 import plugin.borealcore.functions.cooking.Difficulty;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.object.Layout;
-import plugin.borealcore.functions.herbalism.objects.*;
+import plugin.borealcore.functions.herbalism.objects.Herb;
+import plugin.borealcore.functions.herbalism.objects.Infusion;
+import plugin.borealcore.functions.herbalism.objects.InvertedEffect;
+import plugin.borealcore.functions.herbalism.objects.Modifier;
+import plugin.borealcore.functions.herbalism.objects.ModifierType;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.kyori.adventure.key.Key.key;

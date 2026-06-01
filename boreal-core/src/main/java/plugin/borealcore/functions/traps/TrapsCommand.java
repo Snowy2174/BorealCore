@@ -5,9 +5,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.borealcore.functions.cooking.MasteryManager;
+import plugin.borealcore.functions.cooking.RecipeDataUtil;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.RecipeDataUtil;
 
 import java.util.List;
 
