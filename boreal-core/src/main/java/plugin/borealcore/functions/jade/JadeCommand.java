@@ -10,7 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.database.Database;
+import plugin.borealcore.database.DatabaseManager;
 import plugin.borealcore.functions.jade.object.Leaderboard;
 import plugin.borealcore.functions.jade.object.LeaderboardEntry;
 import plugin.borealcore.manager.configs.MessageManager;
@@ -22,11 +22,11 @@ import static plugin.borealcore.functions.jade.JadeManager.reconcileJadeData;
 public class JadeCommand implements CommandExecutor {
 
     private final JadeManager jadeManager;
-    private final Database database;
+    private final JadeDatabase database;
 
     public JadeCommand() {
         this.jadeManager = BorealCore.getJadeManager();
-        this.database = BorealCore.getDatabase();
+        this.database = JadeManager.getDatabase();
     }
 
     @Override

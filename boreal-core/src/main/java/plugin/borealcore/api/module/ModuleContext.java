@@ -4,7 +4,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.database.Database;
+import plugin.borealcore.database.DatabaseManager;
 import plugin.borealcore.manager.PlaceholderManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 
@@ -18,12 +18,12 @@ import java.util.logging.Logger;
 public class ModuleContext {
 
     private final BorealCore plugin;
-    private final Database database;
+    private final DatabaseManager database;
     private final Logger logger;
     private final PluginManager pluginManager;
     private final PlaceholderManager placeholderManager;
 
-    public ModuleContext(BorealCore plugin, Database database, PlaceholderManager placeholderManager) {
+    public ModuleContext(BorealCore plugin, DatabaseManager database, PlaceholderManager placeholderManager) {
         this.plugin = plugin;
         this.database = database;
         this.logger = plugin.getLogger();
@@ -41,7 +41,7 @@ public class ModuleContext {
     /**
      * @return The primary database instance
      */
-    public Database getDatabase() {
+    public DatabaseManager getDatabaseManager() {
         return database;
     }
 

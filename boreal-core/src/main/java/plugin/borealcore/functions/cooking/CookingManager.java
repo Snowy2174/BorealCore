@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.action.Action;
 import plugin.borealcore.api.event.CookResultEvent;
+import plugin.borealcore.api.module.BorealModule;
+import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.functions.cooking.competition.Competition;
 import plugin.borealcore.functions.cooking.competition.placeholder.CompetitionPapi;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
@@ -51,7 +53,7 @@ import static plugin.borealcore.manager.GuiManager.INGREDIENTS;
 import static plugin.borealcore.functions.cooking.CookingConfig.perfectChance;
 import static plugin.borealcore.utility.AdventureUtil.playerSound;
 
-public class CookingManager extends Function {
+public class CookingManager extends Function implements BorealModule {
     private final Random random;
     private final HashMap<Player, Recipe> cookedRecipe;
     private final HashMap<Player, Location> cookingPotLocations;
@@ -80,11 +82,6 @@ public class CookingManager extends Function {
         getPlaceholderManager().registerExpansion(competitionPlaceholders);
         Bukkit.getPluginManager().registerEvents(this.simpleListener, BorealCore.plugin);
         Bukkit.getPluginManager().registerEvents(new CropInteractEventListener(), BorealCore.plugin); //@TODO MOVE URGENTLY
-    }
-
-    // REMOVE/UPDATE
-    public SitListener getSitListener() {
-        return listener;
     }
 
     @Override
@@ -382,5 +379,20 @@ public class CookingManager extends Function {
                 AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Action performed: " + action.getClass().getSimpleName() + " for player: " + player.getName() + " for dish: " + recipeKey);
             }
         }
+    }
+
+    @Override
+    public void onModuleEnable() throws Exception {
+
+    }
+
+    @Override
+    public void onModuleDisable() throws Exception {
+
+    }
+
+    @Override
+    public void onModuleInitialize(ModuleContext context) throws Exception {
+
     }
 }

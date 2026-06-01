@@ -3,7 +3,7 @@ package plugin.borealcore.depreciated;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
-import plugin.borealcore.database.Database;
+import plugin.borealcore.BorealCore;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.object.Function;
 
@@ -15,16 +15,16 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 
 public class AnalyticsManager extends Function {
 
-    private final Database database;
+    private final AnalyticsDatabase database;
 
-    public AnalyticsManager(Database database) {
-        this.database = database;
+    public AnalyticsManager() {
+        this.database = new AnalyticsDatabase(BorealCore.getDatabaseManager());
     }
 
     @Override
     public void load() {
         if (database == null) {
-            getLogger().error("Database is not initialized. Analytics Manager cannot be loaded.");
+            getLogger().error("DatabaseManager is not initialized. Analytics Manager cannot be loaded.");
             return;
         }
         if (ConfigManager.processAnalyticsEnabled) {

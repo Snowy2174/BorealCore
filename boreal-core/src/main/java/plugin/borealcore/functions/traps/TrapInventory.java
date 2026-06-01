@@ -23,6 +23,7 @@ public class TrapInventory implements InventoryHolder {
     private static List<ItemStack> items;
     private static ItemStack infoItem;
     private static ItemStack baitItem;
+    private static TrapsDatabase database;
 
     public TrapInventory(Trap trap, BorealCore plugin) {
         this.inventory = plugin.getServer().createInventory(this, 27, "Fishing Trap");
@@ -31,6 +32,7 @@ public class TrapInventory implements InventoryHolder {
         infoItem = getInfoItem();
         baitItem = getBaitItem();
         setInfoItems();
+        database = TrapsManager.getTrapsDatabase();
         // Add items to the inventory
         for (ItemStack item : items) {
             inventory.addItem(item);
@@ -110,14 +112,14 @@ public class TrapInventory implements InventoryHolder {
 
     public void updateFishingTrap() {
         trap.setItems(items);
-        BorealCore.getTrapsDatabase().saveFishingTrap(trap);
+        database.saveFishingTrap(trap);
         // @TODO Method to update the fishing trap
     }
 
     public void setBaitItem(ItemStack baitItem) {
         TrapInventory.baitItem = baitItem;
         trap.setBait(baitItem);
-        BorealCore.getTrapsDatabase().saveFishingTrap(trap);
+        database.saveFishingTrap(trap);
     }
 
     @Override

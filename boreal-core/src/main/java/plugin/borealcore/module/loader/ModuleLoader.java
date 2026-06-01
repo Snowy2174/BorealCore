@@ -3,7 +3,7 @@ package plugin.borealcore.module.loader;
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.*;
-import plugin.borealcore.database.Database;
+import plugin.borealcore.database.DatabaseManager;
 import plugin.borealcore.manager.PlaceholderManager;
 import plugin.borealcore.utility.AdventureUtil;
 
@@ -24,14 +24,14 @@ import java.util.logging.Level;
 public class ModuleLoader {
 
     private final BorealCore plugin;
-    private final Database database;
+    private final DatabaseManager database;
     private final PlaceholderManager placeholderManager;
     private final File modulesDirectory;
     private final Map<String, BorealModule> loadedModules;
     private final Map<String, ModuleMetadata> moduleMetadata;
     private final Map<String, ModuleClassLoader> moduleClassLoaders;
 
-    public ModuleLoader(BorealCore plugin, Database database, PlaceholderManager  placeholderManager) {
+    public ModuleLoader(BorealCore plugin, DatabaseManager database, PlaceholderManager  placeholderManager) {
         this.plugin = plugin;
         this.database = database;
         this.placeholderManager = placeholderManager;

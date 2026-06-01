@@ -50,8 +50,6 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
     public void onModuleInitialize(ModuleContext context) throws Exception {
         this.context = context;
         context.getLogger().info("Initializing Config Editor Module...");
-
-
     }
 
     @Override

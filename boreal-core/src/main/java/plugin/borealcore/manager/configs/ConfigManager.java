@@ -23,6 +23,7 @@ public class ConfigManager {
         lang = config.getString("lang", "english");
         customNamespace = config.getString("mechanics.namespace", "borealcore");
         debugLevel = DebugLevel.valueOf(config.getString("debug-level", "INFO").toUpperCase());
+        processAnalyticsEnabled = config.getBoolean("analytics.process.enabled", true);
 
         CookingConfig.perfectChance = config.getDouble("mechanics.perfect-chance", 0.35);
         CookingConfig.ingredientRefundChance = config.getDouble("mechanics.ingredients-refund-chance", 0.1);
@@ -42,10 +43,6 @@ public class ConfigManager {
         CookingConfig.splashEffect = config.getString("mechanics.pot-effect", "pot_effect");
         CookingConfig.splashTime = config.getInt("mechanics.splash-time", 100);
         CookingConfig.masteryJadeReward = config.getInt("mechanics.mastery-reward", 5);
-        JadeConfig.brewingRequiredQuality = config.getInt("mechanics.brewing-required-quality", 8);
-        JadeConfig.refarmableCrops = config.getStringList("mechanics.refarmable-crops");
-
-        processAnalyticsEnabled = config.getBoolean("analytics.process.enabled", true);
 
         CookingConfig.recipeBookTextureNamespace = config.getString("gui.config.recipe-book", "borealcore:recipe_book");
         CookingConfig.masteryLine = config.getString("gui.config.mastery-line", "<!italic><#ff9900>Mastery [{mastery}]");
@@ -59,9 +56,6 @@ public class ConfigManager {
         CookingConfig.cookLineShift = config.getString("gui.config.info-shift-cook", "<!italic><#ffcc33>[Middle Click] <#ffcc99>to Autocook x16");
         CookingConfig.unknownItem = config.getString("gui.items.unknown-item", "unknownrecipe");
         CookingConfig.grinderItem = config.getString("gui.items.grinder-item", "grinder");
-
-        BendingConfig.lavaContactDamage = config.getInt("bending.lava-contact-damage", 1);
-        BendingConfig.fireContactDamage = config.getInt("bending.fire-contact-damage", 1);
 
         CookingConfig.successTitle = config.getStringList("titles.success.title").toArray(new String[0]);
         CookingConfig.successSubTitle = config.getStringList("titles.success.subtitle").toArray(new String[0]);
@@ -79,6 +73,11 @@ public class ConfigManager {
         if (CookingConfig.successSubTitle.length == 0) CookingConfig.successSubTitle = new String[]{""};
         if (CookingConfig.failureTitle.length == 0) CookingConfig.failureTitle = new String[]{""};
         if (CookingConfig.failureSubTitle.length == 0) CookingConfig.failureSubTitle = new String[]{""};
+
+        BendingConfig.lavaContactDamage = config.getInt("bending.lava-contact-damage", 1);
+        BendingConfig.fireContactDamage = config.getInt("bending.fire-contact-damage", 1);
+        JadeConfig.brewingRequiredQuality = config.getInt("mechanics.brewing-required-quality", 8);
+        JadeConfig.refarmableCrops = config.getStringList("mechanics.refarmable-crops");
 
 
     }
@@ -98,7 +97,6 @@ public class ConfigManager {
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         if (!file.exists()) {
             try {
-                // Try to copy from jar, if it doesn't exist in jar, create a blank one
                 BorealCore.plugin.saveResource(configName.substring(configName.lastIndexOf("/") + 1), false);
             } catch (IllegalArgumentException e) {
                 try { file.createNewFile(); } catch (Exception ignored) {}

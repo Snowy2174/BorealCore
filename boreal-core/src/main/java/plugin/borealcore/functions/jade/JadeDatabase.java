@@ -1,111 +1,73 @@
-package plugin.borealcore.database;
+package plugin.borealcore.functions.jade;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Consumer;
-import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.jade.LeaderboardType;
+import plugin.borealcore.database.DatabaseManager;
+import plugin.borealcore.database.Errors;
 import plugin.borealcore.functions.jade.object.JadeTransaction;
 import plugin.borealcore.functions.jade.object.Leaderboard;
 import plugin.borealcore.functions.jade.object.LeaderboardEntry;
-import plugin.borealcore.functions.traps.Trap;
 import plugin.borealcore.manager.configs.DebugLevel;
-import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.SerialisationUtil;
 
-import java.io.IOException;
-import java.sql.*;
-import java.time.Duration;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
+import static org.apache.logging.log4j.LogManager.getLogger;
+import static plugin.borealcore.functions.jade.JadeManager.database;
 import static plugin.borealcore.functions.jade.JadeManager.jadeSources;
-import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 
-public abstract class Database extends Function {
-    public final BorealCore plugin;
-    public Connection connection;
-    public String table;
+public class JadeDatabase {
+
+    private final DatabaseManager coreDbManager;
+    private final Plugin plugin;
     private final ConcurrentLinkedQueue<JadeTransaction> pendingTransactions = new ConcurrentLinkedQueue<>();
 
-    public Database(BorealCore instance) {
-        plugin = instance;
+    public JadeDatabase(DatabaseManager coreDbManager) {
+        this.coreDbManager = coreDbManager;
+        this.plugin = coreDbManager.plugin;
     }
 
-    public abstract Connection getSQLConnection();
+    public void initializeSchema() {
+        Connection conn = coreDbManager.getConnection("jade_transactions");
+        if (conn == null) return;
 
-    public abstract void load();
 
-    public abstract void unload();
+        String createTransactionsTable = "CREATE TABLE IF NOT EXISTS jade_transactions (" + // make sure to put your table name in here too.
+                "`player` varchar(32) NOT NULL," + // This creates the different columns you will save data to. varchar(32) Is a string, int = integer
+                "`amount` int(11) NOT NULL," +
+                "`uuid` VARCHAR(36)," +
+                "`source` varchar(32) NOT NULL," +
+                "`timestamp` datetime NOT NULL," +
+                "PRIMARY KEY (`player`, `timestamp`)" +
+                ");";
+        String createJadeTable = "CREATE TABLE IF NOT EXISTS jade_totals (" +
+                "    `player` varchar(32) NOT NULL PRIMARY KEY," +
+                "    `uuid` VARCHAR(36)," +
+                "    `jade` int(11) NOT NULL" +
+                ");";
 
-    public void initialize() {
-        this.connection = this.getSQLConnection();
-        try {
-            PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM " + this.table + " WHERE uuid = ?");
-            ResultSet rs = ps.executeQuery();
-            this.close(ps, rs);
-            consoleMessage("Loaded SQLiteJade database");
-        } catch (SQLException ex) {
-            BorealCore.disablePlugin("Unable to retrieve connection during database initialization", ex);
-        }
-    }
-
-    public void close(PreparedStatement ps, ResultSet rs) {
-        try {
-            if (ps != null) {
-                ps.close();
-            }
-            if (rs != null) {
-                rs.close();
-            }
-        } catch (SQLException var4) {
-            Error.close(plugin, var4);
-        }
-
-    }
-
-    private void closeResources(Connection conn, PreparedStatement ps, ResultSet rs) {
-        try {
-            if (rs != null) rs.close();
-            if (ps != null) ps.close();
-            if (conn != null) conn.close();
+        try (Statement statement = conn.createStatement()) {
+            statement.execute(createJadeTable);
+            statement.execute(createTransactionsTable);
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
+            e.printStackTrace();
         }
-    }
-
-    private int getSingleIntResult(String query, Object... params) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = this.getSQLConnection();
-            ps = conn.prepareStatement(query);
-
-            for (int i = 0; i < params.length; i++) {
-                ps.setObject(i + 1, params[i]);
-            }
-
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-        } finally {
-            closeResources(conn, ps, rs);
-        }
-
-        return 0;
     }
 
     public void getJadeForPlayerAsync(Player player, Consumer<Integer> callback) {
@@ -125,12 +87,54 @@ public abstract class Database extends Function {
 
     public int getJadeForPlayer(Player player) {
         String query = "SELECT jade FROM jade_totals WHERE uuid = ?;";
-        return getSingleIntResult(query, player.getUniqueId().toString());
+        Connection conn = coreDbManager.getConnection("jade_transactions");
+
+        if (conn == null) return 0;
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setString(1, player.getUniqueId().toString());
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("jade");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            coreDbManager.close(ps, rs);
+        }
+
+        return 0;
     }
 
     public int getTotalJadeFromSource(String source) {
         String query = "SELECT SUM(amount) AS total FROM jade_transactions WHERE source = ?;";
-        return getSingleIntResult(query, source);
+        Connection conn = coreDbManager.getConnection("jade_transactions");
+
+        if (conn == null) return 0;
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setString(1, source);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            coreDbManager.close(ps, rs);
+        }
+
+        return 0;
     }
 
     public LocalDateTime getLastTransactionTimestamp(Player player, String source) {
@@ -139,7 +143,7 @@ public abstract class Database extends Function {
         ResultSet rs = null;
 
         try {
-            conn = this.getSQLConnection();
+            conn = coreDbManager.getConnection("jade_transactions");
             String query = "SELECT timestamp FROM jade_transactions WHERE uuid = ? AND source = ? ORDER BY timestamp DESC LIMIT 1;";
             ps = conn.prepareStatement(query);
             ps.setString(1, player.getUniqueId().toString());
@@ -152,7 +156,7 @@ public abstract class Database extends Function {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            closeResources(conn, ps, rs);
+            coreDbManager.close(ps, rs);
         }
         return null;
     }
@@ -164,7 +168,7 @@ public abstract class Database extends Function {
         List<LocalDateTime> timestamps = new ArrayList<>();
 
         try {
-            conn = this.getSQLConnection();
+            conn = coreDbManager.getConnection("jade_transactions");
             String query = "SELECT timestamp FROM jade_transactions WHERE uuid = ? AND source = ? AND amount > 0 AND timestamp >= ? ORDER BY timestamp DESC;";
             ps = conn.prepareStatement(query);
             ps.setString(1, player.getUniqueId().toString());
@@ -178,7 +182,7 @@ public abstract class Database extends Function {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            closeResources(conn, ps, rs);
+            coreDbManager.close(ps, rs);
         }
         return timestamps;
     }
@@ -206,7 +210,7 @@ public abstract class Database extends Function {
         HashMap<String, Double> sourceJadeMap = new HashMap<>();
 
         try {
-            conn = this.getSQLConnection();
+            conn = coreDbManager.getConnection("jade_transactions");
             String query = "SELECT source, SUM(amount) AS total FROM jade_transactions WHERE uuid = ? AND amount > 0 AND timestamp >= ? GROUP BY source";
 
             // Check for transactions in the last 24 hours
@@ -245,7 +249,7 @@ public abstract class Database extends Function {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            closeResources(conn, ps, rs);
+            coreDbManager.close(ps, rs);
         }
 
         return sourceJadeMap;
@@ -257,7 +261,7 @@ public abstract class Database extends Function {
         PreparedStatement psTotals = null;
 
         try {
-            conn = this.getSQLConnection();
+            conn = coreDbManager.getConnection("jade_transactions");
             conn.setAutoCommit(false);
 
             String transactionQuery = "INSERT INTO jade_transactions (player, uuid, amount, source, timestamp) VALUES (?, ?, ?, ?, ?);";
@@ -350,7 +354,7 @@ public abstract class Database extends Function {
         ResultSet rsPlayers = null;
 
         try {
-            conn = this.getSQLConnection();
+            conn = coreDbManager.getConnection("jade_transactions");
 
             String queryPlayers = "SELECT uuid, player, jade FROM jade_totals;";
             psTotals = conn.prepareStatement(queryPlayers);
@@ -443,7 +447,7 @@ public abstract class Database extends Function {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
-            conn = this.getSQLConnection();
+            conn = coreDbManager.getConnection("jade_transactions");
             String query = "DELETE FROM jade_totals WHERE uuid = ?;";
             ps = conn.prepareStatement(query);
             ps.setString(1, uuid);
@@ -456,7 +460,7 @@ public abstract class Database extends Function {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            closeResources(conn, ps, null);
+            coreDbManager.close(ps, null);
         }
     }
 
@@ -466,7 +470,7 @@ public abstract class Database extends Function {
         ResultSet rs = null;
         List<LeaderboardEntry> leaderboard = new ArrayList<>();
         try {
-            conn = this.getSQLConnection();
+            conn = coreDbManager.getConnection("jade_transactions");
 
             String baseQuery = """
                         SELECT ROW_NUMBER() OVER (ORDER BY SUM(amount) DESC) AS position, uuid, player, SUM(amount) AS jade
@@ -551,7 +555,7 @@ public abstract class Database extends Function {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            closeResources(conn, ps, rs);
+            coreDbManager.close(ps, rs);
         }
         return new Leaderboard(type, leaderboard);
     }
@@ -572,7 +576,7 @@ public abstract class Database extends Function {
         List<String> uuids = new ArrayList<>();
 
         try {
-            conn = this.getSQLConnection();
+            conn = coreDbManager.getConnection("jade_transactions");
             String query = "SELECT uuid FROM jade_totals;";
             ps = conn.prepareStatement(query);
             rs = ps.executeQuery();
@@ -583,7 +587,7 @@ public abstract class Database extends Function {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            closeResources(conn, ps, rs);
+            coreDbManager.close(ps, rs);
         }
         return uuids;
     }
@@ -595,7 +599,7 @@ public abstract class Database extends Function {
         List<String> sources = new ArrayList<>();
 
         try {
-            conn = this.getSQLConnection();
+            conn = coreDbManager.getConnection("jade_transactions");
             String query = "SELECT DISTINCT source FROM jade_transactions;";
             ps = conn.prepareStatement(query);
             rs = ps.executeQuery();
@@ -622,7 +626,7 @@ public abstract class Database extends Function {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            conn = this.getSQLConnection();
+            conn = coreDbManager.getConnection("jade_transactions");
             String query = "SELECT jade FROM jade_totals WHERE uuid = ?;";
             ps = conn.prepareStatement(query);
             ps.setString(1, uuid);
@@ -634,356 +638,8 @@ public abstract class Database extends Function {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            closeResources(conn, ps, rs);
+            coreDbManager.close(ps, rs);
         }
         return 0;
     }
-
-    public Map<String, Double> getMostUsedSources(Duration duration) {
-        String query = "SELECT source, SUM(amount) AS total FROM jade_transactions WHERE source != '' AND amount > 0 AND timestamp >= ? GROUP BY source";
-        Map<String, Double> sourceUsage = new HashMap<>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = getSQLConnection();
-            ps = conn.prepareStatement(query);
-            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now().minus(duration)));
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                sourceUsage.put(rs.getString("source"), rs.getDouble("total"));
-            }
-
-            double total = sourceUsage.values().stream().mapToDouble(Double::doubleValue).sum();
-            return sourceUsage.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> (entry.getValue() / total) * 100));
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-            return Collections.emptyMap();
-        } finally {
-            closeResources(conn, ps, rs);
-        }
-    }
-
-    public Map<String, Map<String, Double>> getSourceDistributionChanges() {
-        String query = "SELECT strftime('%Y-%W', timestamp) AS week, source, SUM(amount) AS total FROM jade_transactions WHERE source != '' AND timestamp >= ? GROUP BY week, source";
-        Map<String, Map<String, Double>> weeklyDistribution = new HashMap<>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = getSQLConnection();
-            ps = conn.prepareStatement(query);
-            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now().minusMonths(3)));
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                String week = rs.getString("week");
-                String source = rs.getString("source");
-                double total = rs.getDouble("total");
-
-                weeklyDistribution.computeIfAbsent(week, k -> new HashMap<>()).put(source, total);
-            }
-            return weeklyDistribution;
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-            return Collections.emptyMap();
-        } finally {
-            closeResources(conn, ps, rs);
-        }
-    }
-
-    public Map<String, Double> getAveragePlayerGainPerWeek() {
-        String query = "SELECT strftime('%Y-%W', timestamp) AS week, uuid, SUM(amount) AS total FROM jade_transactions WHERE amount > 0 GROUP BY week, uuid";
-        Map<String, Map<String, Double>> weeklyPlayerGains = new HashMap<>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = getSQLConnection();
-            ps = conn.prepareStatement(query);
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                String week = rs.getString("week");
-                String playerId = rs.getString("uuid");
-                double total = rs.getDouble("total");
-
-                weeklyPlayerGains.computeIfAbsent(week, k -> new HashMap<>()).put(playerId, total);
-            }
-
-            Map<String, Double> averageGains = new HashMap<>();
-            for (Map.Entry<String, Map<String, Double>> entry : weeklyPlayerGains.entrySet()) {
-                String week = entry.getKey();
-                Map<String, Double> playerGains = entry.getValue();
-                double average = playerGains.values().stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
-                averageGains.put(week, average);
-            }
-            return averageGains;
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-            return Collections.emptyMap();
-        } finally {
-            closeResources(conn, ps, rs);
-        }
-    }
-
-    public Map<String, Integer> getSourceDependencySpread() {
-        String query = "SELECT source, COUNT(DISTINCT uuid) AS users FROM jade_transactions WHERE source != '' AND amount > 0 GROUP BY source";
-        Map<String, Integer> sourceSpread = new HashMap<>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = getSQLConnection();
-            ps = conn.prepareStatement(query);
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                sourceSpread.put(rs.getString("source"), rs.getInt("users"));
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-        } finally {
-            closeResources(conn, ps, rs);
-        }
-        return sourceSpread;
-    }
-
-    public double getTop10PercentPlayersShare() {
-        String query = "SELECT uuid, SUM(amount) AS total FROM jade_transactions WHERE amount > 0 GROUP BY uuid ORDER BY total DESC";
-        List<Double> totals = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = getSQLConnection();
-            ps = conn.prepareStatement(query);
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                totals.add(rs.getDouble("total"));
-            }
-
-            int top10PercentCount = (int) Math.ceil(totals.size() * 0.1);
-            double top10PercentTotal = totals.stream().limit(top10PercentCount).mapToDouble(Double::doubleValue).sum();
-            double overallTotal = totals.stream().mapToDouble(Double::doubleValue).sum();
-
-            return (overallTotal == 0) ? 0 : (top10PercentTotal / overallTotal) * 100;
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-            return 0;
-        } finally {
-            closeResources(conn, ps, rs);
-        }
-    }
-
-    public Map<String, Double> getSourceEfficiencyAnalysis() {
-        String query = """
-                    SELECT source, SUM(amount) AS total, COUNT(DISTINCT uuid) AS users
-                    FROM jade_transactions
-                    WHERE source != '' AND amount > 0
-                    GROUP BY source
-                """;
-        Map<String, Double> sourceEfficiency = new HashMap<>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = getSQLConnection();
-            ps = conn.prepareStatement(query);
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                String source = rs.getString("source");
-                double total = rs.getDouble("total");
-                int users = rs.getInt("users");
-                sourceEfficiency.put(source, (users == 0) ? 0 : total / users);
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-        } finally {
-            closeResources(conn, ps, rs);
-        }
-        return sourceEfficiency;
-    }
-
-    // playerRecipeDataExists;
-    // updatePlayerRecipeData;
-    // updateRecipeStatus;
-
-
-    public List<Trap> getActiveFishingTraps() {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            List<Trap> fishingTraps = new ArrayList<>();
-            conn = getSQLConnection();
-            ps = conn.prepareStatement("SELECT * FROM fishing_traps WHERE active = 1");
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                UUID uuid = UUID.fromString(rs.getString("uuid"));
-                UUID owner = UUID.fromString(rs.getString("owner"));
-                String key = rs.getString("key");
-                Location location = SerialisationUtil.deserializeLocation(rs.getString("location"));
-                boolean active = rs.getInt("active") == 1;
-                List<ItemStack> items = SerialisationUtil.deserializeItems(rs.getString("items"));
-                int maxItems = rs.getInt("maxItems");
-                ItemStack bait = SerialisationUtil.deserializeItems(rs.getString("bait")).get(0);
-
-                fishingTraps.add(new Trap(key, uuid, owner, location, active, items, maxItems, bait));
-            }
-            return fishingTraps;
-        } catch (SQLException ex) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to deserialize items", e);
-            e.printStackTrace();
-        } finally {
-            closeResources(conn, ps, rs);
-        }
-        return null;
-    }
-
-    public Trap getFishingTrapById(String uuid) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = getSQLConnection();
-            ps = conn.prepareStatement("SELECT * FROM fishing_traps WHERE uuid = ?");
-            ps.setString(1, uuid);
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                UUID owner = UUID.fromString(rs.getString("owner"));
-                String key = rs.getString("key");
-                Location location = SerialisationUtil.deserializeLocation(rs.getString("location"));
-                boolean active = rs.getInt("active") == 1;
-                List<ItemStack> items = SerialisationUtil.deserializeItems(rs.getString("items"));
-                int maxItems = rs.getInt("maxItems");
-                ItemStack bait = SerialisationUtil.deserializeItems(rs.getString("bait")).get(0);
-
-                return new Trap(key, UUID.fromString(uuid), owner, location, active, items, maxItems, bait);
-            }
-        } catch (SQLException ex) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to deserialize items", e);
-            e.printStackTrace();
-        } finally {
-            closeResources(conn, ps, rs);
-        }
-        return null;
-    }
-
-    public void saveFishingTrap(Trap trap) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = getSQLConnection();
-            ps = conn.prepareStatement("REPLACE INTO fishing_traps(uuid, owner, key, location, active, items, maxItems, bait) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
-
-            ps.setString(1, trap.getUuid().toString());
-            ps.setString(2, trap.getOwner().toString());
-            ps.setString(3, trap.getKey());
-            ps.setString(4, SerialisationUtil.serializeLocation(trap.getLocation()));
-            ps.setInt(5, trap.isActive() ? 1 : 0);
-            ps.setString(6, SerialisationUtil.serializeItems(trap.getItems()));
-            ps.setInt(7, trap.getMaxItems());
-            ps.setString(8, SerialisationUtil.serializeItems(Collections.singletonList(trap.getBait())));
-
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
-        } finally {
-            try {
-                if (ps != null)
-                    ps.close();
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
-            }
-        }
-    }
-
-    public void deleteFishingTrapById(String uuid) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = getSQLConnection();
-            ps = conn.prepareStatement("DELETE FROM fishing_traps WHERE uuid = ?");
-            ps.setString(1, uuid);
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
-        } finally {
-            try {
-                if (ps != null)
-                    ps.close();
-                if (conn != null)
-                    conn.close();
-                consoleMessage("Deleted fishing trap with UUID: " + uuid);
-            } catch (SQLException ex) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
-            }
-        }
-    }
-
-    public List<ItemStack> getIngredientBagItems(Player player) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        List<ItemStack> items = new ArrayList<>();
-        try {
-            conn = this.getSQLConnection();
-            String query = "SELECT items FROM ingredient_bag WHERE uuid = ?;";
-            ps = conn.prepareStatement(query);
-            ps.setString(1, player.getUniqueId().toString());
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                String serializedItems = rs.getString("items");
-                if (serializedItems != null && !serializedItems.isEmpty()) {
-                    items = SerialisationUtil.deserializeItems(serializedItems);
-                }
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            closeResources(conn, ps, rs);
-        }
-        return items;
-    }
-
-    public void saveIngredientBagItems(Player player, List<ItemStack> items) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = this.getSQLConnection();
-            String query = "REPLACE INTO ingredient_bag (uuid, items) VALUES (?, ?);";
-            ps = conn.prepareStatement(query);
-            ps.setString(1, player.getUniqueId().toString());
-            ps.setString(2, SerialisationUtil.serializeItems(items));
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
-        } finally {
-            closeResources(conn, ps, null);
-        }
-    }
-
-
 }

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The BorealCore Module Development Kit allows external developers to create modular plugins that integrate seamlessly with the BorealCore plugin system. Modules are loaded dynamically at runtime and have full access to the core BorealCore database and event system.
+The BorealCore Module Development Kit allows external developers to create modular plugins that integrate seamlessly with the BorealCore plugin system. Modules are loaded dynamically at runtime and have full access to the core BorealCore database manager, configuration APIs, and event system.
 
 ## Getting Started
 
@@ -10,7 +10,7 @@ The BorealCore Module Development Kit allows external developers to create modul
 
 Create a new Maven project with the following structure:
 
-```
+```text
 my-module/
 ├── pom.xml
 └── src/
@@ -22,16 +22,17 @@ my-module/
         │               └── MyModule.java
         └── resources/
             └── module.yml
+
 ```
 
 ### 2. POM Configuration
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="[http://maven.apache.org/POM/4.0.0](http://maven.apache.org/POM/4.0.0)"
+         xmlns:xsi="[http://www.w3.org/2001/XMLSchema-instance](http://www.w3.org/2001/XMLSchema-instance)"
+         xsi:schemaLocation="[http://maven.apache.org/POM/4.0.0](http://maven.apache.org/POM/4.0.0) 
+         [http://maven.apache.org/xsd/maven-4.0.0.xsd](http://maven.apache.org/xsd/maven-4.0.0.xsd)">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
@@ -48,12 +49,11 @@ my-module/
     <repositories>
         <repository>
             <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <url>[https://hub.spigotmc.org/nexus/content/repositories/snapshots/](https://hub.spigotmc.org/nexus/content/repositories/snapshots/)</url>
         </repository>
     </repositories>
 
     <dependencies>
-        <!-- BorealCore API -->
         <dependency>
             <groupId>plugin.borealcore</groupId>
             <artifactId>BorealCore</artifactId>
@@ -61,7 +61,6 @@ my-module/
             <scope>provided</scope>
         </dependency>
 
-        <!-- Spigot API -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
@@ -102,6 +101,7 @@ my-module/
         </resources>
     </build>
 </project>
+
 ```
 
 ### 3. Create module.yml Manifest
@@ -115,15 +115,17 @@ version: 1.0.0
 author: Your Name
 main: com.example.module.MyModule
 minimum-borealcore-version: 1.1.9
+
 ```
 
 **Field Descriptions:**
-- `id`: Unique identifier for your module (use lowercase, no spaces)
-- `name`: Display name shown in console logs
-- `version`: Semantic version (major.minor.patch)
-- `author`: Your name or organization
-- `main`: Fully qualified class name implementing `BorealModule`
-- `minimum-borealcore-version`: Minimum BC version your module requires
+
+* `id`: Unique identifier for your module (use lowercase, no spaces)
+* `name`: Display name shown in console logs
+* `version`: Semantic version (major.minor.patch)
+* `author`: Your name or organization
+* `main`: Fully qualified class name implementing `BorealModule`
+* `minimum-borealcore-version`: Minimum BC version your module requires
 
 ### 4. Implement BorealModule Interface
 
@@ -134,63 +136,54 @@ package com.example.module;
 
 import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.api.module.BorealModule;
-import plugin.borealcore.database.Database;
-import org.bukkit.Bukkit;
+import plugin.borealcore.database.DatabaseManager;
 import org.bukkit.event.Listener;
+import org.bukkit.configuration.ConfigurationSection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyModule implements BorealModule, Listener {
 
     private ModuleContext context;
-    private Database database;
-
-    @Override
-    public String getModuleId() {
-        return "my-module";
-    }
-
-    @Override
-    public String getModuleName() {
-        return "My Custom Module";
-    }
-
-    @Override
-    public String getModuleVersion() {
-        return "1.0.0";
-    }
-
-    @Override
-    public String getModuleAuthor() {
-        return "Your Name";
-    }
-
-    @Override
-    public String getMinimumCoreVersion() {
-        return "1.1.9";
-    }
+    private DatabaseManager databaseManager;
+    private ConfigurationSection config;
 
     @Override
     public void onModuleInitialize(ModuleContext context) throws Exception {
         this.context = context;
-        this.database = context.getDatabase();
+        this.databaseManager = context.getDatabaseManager();
         
-        // Initialize your module here (load configs, setup data, etc.)
-        context.getLogger().info("Initializing " + getModuleName());
+        // Set up configuration defaults
+        Map<String, Object> defaults = new HashMap<>();
+        defaults.put("enabled", true);
+        defaults.put("messages.prefix", "&7[&bMyModule&7] ");
+        
+        // This registers defaults and loads the config section
+        this.config = context.setupModuleDefaults("modules.my-module", defaults);
+        
+        context.getLogger().info("Initializing My Custom Module");
     }
 
     @Override
     public void onModuleEnable() throws Exception {
+        if (!config.getBoolean("enabled")) {
+            context.getLogger().info("My Custom Module is disabled in config.");
+            return;
+        }
+
         // Register event listeners
         context.getPluginManager().registerEvents(this, context.getPlugin());
         
-        context.getLogger().info(getModuleName() + " has been enabled!");
+        context.getLogger().info("My Custom Module has been enabled!");
     }
 
     @Override
     public void onModuleDisable() throws Exception {
         // Cleanup resources
-        context.getLogger().info(getModuleName() + " has been disabled!");
+        context.getLogger().info("My Custom Module has been disabled!");
     }
 }
+
 ```
 
 ### 5. Access BorealCore Resources
@@ -203,31 +196,122 @@ public void onModuleInitialize(ModuleContext context) throws Exception {
     // Get the main plugin instance
     BorealCore plugin = context.getPlugin();
     
-    // Get the database
-    Database database = context.getDatabase();
+    // Get the dynamic Database Manager
+    DatabaseManager databaseManager = context.getDatabaseManager();
     
     // Get the logger
     Logger logger = context.getLogger();
     
     // Get the plugin manager (for registering listeners)
     PluginManager pluginManager = context.getPluginManager();
+    
+    // Get the Placeholder manager (for PAPI expansions)
+    PlaceholderManager placeholderManager = context.getPlaceholderManager();
 }
+
 ```
 
-### 6. Database Access
+### 6. Configuration Management
 
-Access the shared database to query jade data or store custom data:
+BorealCore provides a standardized configuration API through the `ModuleContext`. You can choose to save your module's settings either as a section within the main `config.yml` or as a standalone file.
+
+#### Setting up Defaults
+
+Always use `setupModuleDefaults` to ensure your configuration keys exist without overwriting user changes:
 
 ```java
+Map<String, Object> defaults = new HashMap<>();
+defaults.put("setting-one", 100);
+defaults.put("setting-two", "value");
+
+// Option A: Save inside the main config.yml under a sub-section
+// The identifier "modules.my-module" will create a section in config.yml
+ConfigurationSection sectionConfig = context.setupModuleDefaults("modules.my-module", defaults);
+
+// Option B: Save as a standalone file
+// Providing an identifier ending with ".yml" creates a new file in the data folder
+ConfigurationSection fileConfig = context.setupModuleDefaults("my-module.yml", defaults);
+
+```
+
+#### Reading and Saving
+
+If you need to retrieve or save configuration data manually during runtime:
+
+```java
+// Fetch the configuration manually
+ConfigurationSection myConfig = context.getModuleConfig("my-module.yml");
+
+// Update a value and save it back to disk
+myConfig.set("setting-one", 200);
+context.saveModuleConfig("my-module.yml", myConfig);
+
+```
+
+### 7. Database Access
+
+BorealCore provides a dynamic `DatabaseManager` that grants modules their own isolated SQLite database files. Modules are entirely responsible for defining their own tables and executing their own queries.
+
+```java
+// ... Inside your module or DAO class ...
+
 @Override
 public void onModuleInitialize(ModuleContext context) throws Exception {
-    Database db = context.getDatabase();
+    DatabaseManager dbManager = context.getDatabaseManager();
     
-    // Execute queries
-    String query = "SELECT * FROM jade_totals WHERE uuid = ?";
-    // Use db methods to query
+    // 1. Request a connection to your module's specific database file (creates my_module_data.db)
+    Connection conn = dbManager.getConnection("my_module_data");
+    
+    if (conn == null) {
+        context.getLogger().severe("Failed to connect to module database!");
+        return;
+    }
+
+    // 2. Initialize your module's schema (Only runs if the table doesn't exist)
+    String createTable = "CREATE TABLE IF NOT EXISTS my_custom_table ("
+            + "`uuid` VARCHAR(36) NOT NULL,"
+            + "`score` INTEGER NOT NULL,"
+            + "PRIMARY KEY (`uuid`)"
+            + ");";
+
+    // Use try-with-resources to automatically close the Statement
+    try (Statement statement = conn.createStatement()) {
+        statement.execute(createTable);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
 }
+
+public int getPlayerScore(String uuid) {
+    // Retrieve the cached connection
+    Connection conn = context.getDatabaseManager().getConnection("my_module_data");
+    if (conn == null) return 0;
+
+    String query = "SELECT score FROM my_custom_table WHERE uuid = ?;";
+    
+    // 3. Execute queries using try-with-resources to automatically close statements and result sets
+    try (PreparedStatement ps = conn.prepareStatement(query)) {
+        ps.setString(1, uuid);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("score");
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return 0;
+}
+
 ```
+
+**Important Database Rules for Modules:**
+
+1. **Own Your Schema:** The BorealCore plugin will not create tables for you. Always run your `CREATE TABLE IF NOT EXISTS` queries when your module initializes.
+2. **Do NOT Close the `Connection`:** The `DatabaseManager` caches and shares the `Connection` object. If you call `conn.close()`, you will lock your module out of the database. BorealCore will close the connection safely when the server shuts down.
+3. **Always Close Statements & ResultSets:** Use Java's `try-with-resources` block (as shown above) to ensure your `PreparedStatement` and `ResultSet` objects are closed automatically to prevent memory leaks.
 
 ## Deployment
 
@@ -237,6 +321,7 @@ Build the JAR file:
 
 ```bash
 mvn clean package
+
 ```
 
 This creates `my-module-1.0.0.jar` in the `target/` directory.
@@ -244,22 +329,27 @@ This creates `my-module-1.0.0.jar` in the `target/` directory.
 ### Installing Your Module
 
 1. Create the modules directory if it doesn't exist:
-   ```
-   plugins/BorealCore/modules/
-   ```
+
+```text
+plugins/BorealCore/modules/
+
+```
 
 2. Copy your module JAR into the directory:
-   ```
-   cp target/my-module-1.0.0.jar plugins/BorealCore/modules/
-   ```
+
+```text
+cp target/my-module-1.0.0.jar plugins/BorealCore/modules/
+
+```
 
 3. Restart the server
-
 4. Check the console for module load messages:
-   ```
-   [BorealCore] Loaded module: My Custom Module v1.0.0 by Your Name (requires BC 1.1.9)
-   [BorealCore] Enabled module: my-module
-   ```
+
+```text
+[BorealCore] Loaded module: My Custom Module v1.0.0 by Your Name (requires BC 1.1.9)
+[BorealCore] Enabled module: my-module
+
+```
 
 ## Event Listeners
 
@@ -271,26 +361,28 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class MyModule implements BorealModule, Listener {
-    
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         context.getLogger().info(event.getPlayer().getName() + " joined!");
     }
-    
+
     @Override
     public void onModuleEnable() throws Exception {
         context.getPluginManager().registerEvents(this, context.getPlugin());
     }
 }
+
 ```
 
 ## Error Handling
 
 If your module fails to initialize, it will be skipped and logged:
 
-```
+```text
 [SEVERE] Failed to enable module: my-module
 java.lang.Exception: ...
+
 ```
 
 Always wrap code that might throw exceptions:
@@ -305,6 +397,7 @@ public void onModuleEnable() throws Exception {
         throw e;
     }
 }
+
 ```
 
 ## Best Practices
@@ -312,14 +405,19 @@ public void onModuleEnable() throws Exception {
 1. **Use unique module IDs** - Follow Java package naming conventions (reverse domain notation)
 2. **Handle startup failures gracefully** - Catch exceptions and log issues
 3. **Clean up resources** - Always implement `onModuleDisable()` properly
-4. **Don't access static fields from other modules** - Use database for communication
-5. **Version your module properly** - Use semantic versioning (major.minor.patch)
-6. **Test with multiple BC versions** - Ensure compatibility with your minimum version
+4. **Utilize Context Configuration APIs** - Use `setupModuleDefaults` instead of manual File writing to ensure proper integration with BorealCore's config caches and systems.
+5. **Don't access static fields from other modules** - Use database for communication
+6. **Version your module properly** - Use semantic versioning (major.minor.patch)
+7. **Test with multiple BC versions** - Ensure compatibility with your minimum version
 
 ## Support
 
 For issues or questions:
-- Check the example modules included with BorealCore
-- Review the BorealCore source code
-- Check the module logs for error messages
 
+* Check the example modules included with BorealCore (like the ConfigEditorModule)
+* Review the BorealCore source code
+* Check the module logs for error messages
+
+```
+
+```

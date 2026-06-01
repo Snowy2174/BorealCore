@@ -15,6 +15,7 @@ import plugin.borealcore.manager.configs.DebugLevel;
 
 import java.util.ArrayList;
 
+import static plugin.borealcore.functions.traps.TrapsManager.getTrapsDatabase;
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 
 public class TrapDataManager {
@@ -30,7 +31,7 @@ public class TrapDataManager {
                 64, // Get from Config eventually
                 null); // Get from Config eventually
         fishingTrap.checkActive();
-        BorealCore.getTrapsDatabase().saveFishingTrap(fishingTrap);
+        getTrapsDatabase().saveFishingTrap(fishingTrap);
         return fishingTrap;
     }
 
@@ -38,7 +39,7 @@ public class TrapDataManager {
         BukkitCustomFishingPlugin api = BukkitCustomFishingPlugin.getInstance();
         Context<Player> context = Context.player(null);
         context.arg(ContextKeys.SURROUNDING, "water");
-        for (Trap trap : BorealCore.getTrapsDatabase().getActiveFishingTraps()) {
+        for (Trap trap : getTrapsDatabase().getActiveFishingTraps()) {
             consoleMessage("Updating fishing trap with id: " + trap.getUuid());
             if (trap.getBait() == null || trap.getBait().getType() == Material.AIR) {
                 //continue;
@@ -52,7 +53,7 @@ public class TrapDataManager {
                 ItemStack itemStack = api.getItemManager().buildInternal(context, loot.id());
                 trap.addItem(itemStack);
                 consoleMessage(DebugLevel.DEBUG, "Added item to trap: " + itemStack.getType() + " with id: " + trap.getUuid());
-                BorealCore.getTrapsDatabase().saveFishingTrap(trap);
+                getTrapsDatabase().saveFishingTrap(trap);
             }
         }
     }

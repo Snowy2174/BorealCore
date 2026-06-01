@@ -14,6 +14,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.CookingConfig;
+import plugin.borealcore.functions.traps.TrapsDatabase;
+import plugin.borealcore.functions.traps.TrapsManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
@@ -90,7 +92,7 @@ public class FurnitureManager extends Function {
         CustomFurniture clickedFurniture = event.getFurniture();
 
         if (clickedFurniture.getNamespacedID().equals("fishing_trap")) {
-            BorealCore.getTrapsDatabase().deleteFishingTrapById(clickedFurniture.getEntity().getUniqueId().toString());
+            TrapsManager.getTrapsDatabase().deleteFishingTrapById(clickedFurniture.getEntity().getUniqueId().toString());
         }
         if (clickedFurniture.getId().equals(CookingConfig.litCookingPot)) {
             cancelCookingPotFX(clickedFurniture.getArmorstand().getLocation());

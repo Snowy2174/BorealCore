@@ -15,7 +15,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitScheduler;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.event.JadeEvent;
-import plugin.borealcore.database.Database;
+import plugin.borealcore.api.module.BorealModule;
+import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.functions.jade.object.JadeSource;
 import plugin.borealcore.functions.jade.object.JadeTransaction;
 import plugin.borealcore.functions.jade.object.Leaderboard;
@@ -26,6 +27,7 @@ import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GUIUtil;
 
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,22 +40,34 @@ import static plugin.borealcore.functions.jade.JadeConfig.brewingRequiredQuality
 import static plugin.borealcore.functions.jade.JadeConfig.refarmableCrops;
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 
-public class JadeManager extends Function {
+public class JadeManager extends Function implements BorealModule {
 
-    protected static Database database;
+    protected static JadeDatabase database;
     public static HashMap<String, JadeSource> jadeSources = new HashMap<>();
     private static BukkitScheduler scheduler;
     private final JadeSourceListener jadeSourceListener;
     public static HashMap<LeaderboardType, Leaderboard> leaderboardCache = new HashMap<>();
     private JadePapi jadePlaceholders;
+    private ModuleContext context;
 
-    public JadeManager(Database database) {
-        JadeManager.database = database;
+    public JadeManager() {
+        this.database = new JadeDatabase(BorealCore.getInstance().getDatabaseManager());
         this.jadeSourceListener = new JadeSourceListener(this);
+    }
+
+    public static JadeDatabase getDatabase() {
+        return database;
     }
 
     @Override
     public void load() {
+        Connection conn = BorealCore.getInstance().getDatabaseManager().getConnection("jade_transactions");
+        if (conn == null) {
+            consoleMessage(DebugLevel.ERROR, "Failed to connect to database for JadeManager. Disabling module.");
+            return;
+        }
+        database.initializeSchema();
+
         loadJadeLimits();
         Bukkit.getPluginManager().registerEvents(jadeSourceListener, BorealCore.plugin);
         this.jadePlaceholders = new JadePapi();
@@ -266,5 +280,20 @@ public class JadeManager extends Function {
         if (Math.random() <= jadeSources.get("cooking").getRate()) {
             giveJadeCommand(player, "cooking", 1);
         }
+    }
+
+    @Override
+    public void onModuleEnable() throws Exception {
+
+    }
+
+    @Override
+    public void onModuleDisable() throws Exception {
+
+    }
+
+    @Override
+    public void onModuleInitialize(ModuleContext context) throws Exception {
+        this.context = context;
     }
 }

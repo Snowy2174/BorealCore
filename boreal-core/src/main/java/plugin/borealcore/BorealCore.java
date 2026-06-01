@@ -6,9 +6,7 @@ import fr.minuskube.inv.InventoryManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.borealcore.api.module.ModuleLoadException;
-import plugin.borealcore.database.Database;
-import plugin.borealcore.database.SQLiteData;
-import plugin.borealcore.database.SQLiteJade;
+import plugin.borealcore.database.DatabaseManager;
 import plugin.borealcore.depreciated.AnalyticsManager;
 import plugin.borealcore.depreciated.CraftingManager;
 import plugin.borealcore.functions.BorealExtras.bending.BendingManager;
@@ -71,8 +69,7 @@ public class BorealCore extends JavaPlugin {
     private static InventoryManager inventoryManager;
     private static NodeManager nodeManager;
     private static JadeManager jadeManager;
-    private static Database db;
-    private static Database traps;
+    private static DatabaseManager databaseManager;
     private static WikiManager wikiManager;
     private static CraftingManager craftingManager;
     private static AnalyticsManager analyticsManager;
@@ -99,6 +96,7 @@ public class BorealCore extends JavaPlugin {
         ConfigManager.load();
         MessageManager.load();
 
+        databaseManager = new DatabaseManager(this);
         cookingManager = new CookingManager();
         herbalismManager = new HerbalismManager();
         competitionManager = new CookingCompetitionManager();
@@ -112,20 +110,17 @@ public class BorealCore extends JavaPlugin {
         placeholderManager = new PlaceholderManager();
         nodeManager = new NodeManager();
         wikiManager = new WikiManager();
-        db = new SQLiteJade(this);
-        traps = new SQLiteData(this);
-        jadeManager = new JadeManager(db);
+        jadeManager = new JadeManager();
         craftingManager = new CraftingManager();
-        analyticsManager = new AnalyticsManager(db);
+        analyticsManager = new AnalyticsManager();
         plushieManager = new PlushieManager();
-        //duelsManager = new DuelsManager();
         bendingManager = new BendingManager();
         breweryManager = new BreweryManager();
         trapsManager = new TrapsManager();
         titleManager = new TitleManagerManager();
         marketManager = new MarketManager();
 
-        moduleLoader = new ModuleLoader(this, db, placeholderManager);
+        moduleLoader = new ModuleLoader(this, databaseManager, placeholderManager);
         reloadConfig();
 
         getCommand("cooking").setExecutor(new CookCommand());
@@ -151,10 +146,15 @@ public class BorealCore extends JavaPlugin {
     @Override
     public void onDisable() {
 
+        if (moduleLoader != null) {
+            moduleLoader.unloadAllModules();
+        }
+
         cookingManager.unload();
         herbalismManager.unload();
         competitionManager.unload();
         placeholderManager.unload();
+        databaseManager.unload();
         recipeManager.unload();
         herbManager.unload();
         layoutManager.unload();
@@ -171,15 +171,9 @@ public class BorealCore extends JavaPlugin {
        // duelsManager.unload();
         bendingManager.unload();
         breweryManager.unload();
-        db.unload();
-        traps.unload();
         trapsManager.unload();
         titleManager.unload();
         marketManager.unload();
-
-        if (moduleLoader != null) {
-            moduleLoader.unloadAllModules();
-        }
 
         AdventureUtil.consoleMessage("[BorealCore] Plugin Disabled!");
 
@@ -242,8 +236,8 @@ public class BorealCore extends JavaPlugin {
         return inventoryManager;
     }
 
-    public static Database getDatabase() {
-        return db;
+    public static DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 
     public static NodeManager getNodeManager() {
@@ -286,10 +280,6 @@ public class BorealCore extends JavaPlugin {
         return herbalismManager;
     }
 
-    public static Database getTrapsDatabase() {
-        return traps;
-    }
-
     public static TrapsManager getTrapsManager() {
         return trapsManager;
     }
@@ -316,6 +306,13 @@ public class BorealCore extends JavaPlugin {
         ConfigManager.load();
         MessageManager.load();
 
+        getModuleLoader().unloadAllModules();
+        try {
+            getModuleLoader().loadAllModules();
+        } catch (ModuleLoadException e) {
+            throw new RuntimeException(e);
+        }
+
         getLayoutManager().unload();
         getLayoutManager().load();
         getEffectManager().unload();
@@ -341,10 +338,8 @@ public class BorealCore extends JavaPlugin {
         getWikiManager().unload();
         getWikiManager().load();
         getInventoryManager().init();
-        getDatabase().unload();
-        getDatabase().load();
-        getTrapsDatabase().unload();
-        getTrapsDatabase().load();
+        getDatabaseManager().unload();
+        getDatabaseManager().load();
         getAnalyticsManager().unload();
         getAnalyticsManager().load();
         getPlushieManager().unload();
@@ -361,12 +356,5 @@ public class BorealCore extends JavaPlugin {
         getTitleManager().load();
         getMarketManager().unload();
         getMarketManager().load();
-
-        getModuleLoader().unloadAllModules();
-        try {
-            getModuleLoader().loadAllModules();
-        } catch (ModuleLoadException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

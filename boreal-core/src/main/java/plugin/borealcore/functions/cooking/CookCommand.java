@@ -341,7 +341,7 @@ public class CookCommand implements CommandExecutor {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return;
         }
-        BorealCore.getDatabase().purgeUser(player.getUniqueId().toString());
+        // @TODO Yeah bud, gotta move this to jade module
         AdventureUtil.sendMessage(sender, "Purged all jade data for player: " + player.getName());
     }
 
