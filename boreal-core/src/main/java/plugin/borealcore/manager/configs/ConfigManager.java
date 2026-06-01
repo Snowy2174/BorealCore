@@ -1,11 +1,10 @@
 package plugin.borealcore.manager.configs;
 
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.BorealExtras.bending.BendingConfig;
+import plugin.borealcore.functions.bending.BendingConfig;
 import plugin.borealcore.functions.cooking.CookingConfig;
 import plugin.borealcore.functions.jade.JadeConfig;
 

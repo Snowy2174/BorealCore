@@ -9,8 +9,8 @@ import plugin.borealcore.api.module.ModuleLoadException;
 import plugin.borealcore.database.DatabaseManager;
 import plugin.borealcore.depreciated.AnalyticsManager;
 import plugin.borealcore.depreciated.CraftingManager;
-import plugin.borealcore.functions.BorealExtras.bending.BendingManager;
-import plugin.borealcore.functions.BorealExtras.brewery.BreweryManager;
+import plugin.borealcore.functions.bending.BendingManager;
+import plugin.borealcore.functions.brewery.BreweryManager;
 import plugin.borealcore.functions.cooking.CookCommand;
 import plugin.borealcore.functions.cooking.CookTabCompletion;
 import plugin.borealcore.functions.cooking.CookingCompetitionManager;
@@ -27,18 +27,18 @@ import plugin.borealcore.functions.herbalism.configs.HerbManager;
 import plugin.borealcore.functions.jade.JadeCommand;
 import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.functions.jade.JadeTabCompletion;
-import plugin.borealcore.functions.BorealExtras.karmicnode.NodeCommand;
-import plugin.borealcore.functions.BorealExtras.karmicnode.NodeManager;
-import plugin.borealcore.functions.BorealExtras.market.MarketManager;
-import plugin.borealcore.functions.BorealExtras.misc.SitCommand;
-import plugin.borealcore.functions.BorealExtras.plushies.GambleCommand;
-import plugin.borealcore.functions.BorealExtras.plushies.PlushieManager;
-import plugin.borealcore.functions.BorealExtras.titles.TitleManagerManager;
+import plugin.borealcore.functions.karmicnode.NodeCommand;
+import plugin.borealcore.functions.karmicnode.NodeManager;
+import plugin.borealcore.functions.market.MarketManager;
+import plugin.borealcore.functions.sit.SitCommand;
+import plugin.borealcore.functions.GambleCommand;
+import plugin.borealcore.functions.PlushieManager;
+import plugin.borealcore.functions.titles.TitlesModule;
 import plugin.borealcore.functions.traps.TrapsCommand;
 import plugin.borealcore.functions.traps.TrapsManager;
-import plugin.borealcore.functions.BorealExtras.wiki.WikiCommand;
-import plugin.borealcore.functions.BorealExtras.wiki.WikiManager;
-import plugin.borealcore.functions.BorealExtras.wiki.WikiTabCompletion;
+import plugin.borealcore.functions.wiki.WikiCommand;
+import plugin.borealcore.functions.wiki.WikiManager;
+import plugin.borealcore.functions.wiki.WikiTabCompletion;
 import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.manager.FurnitureManager;
 import plugin.borealcore.manager.GuiManager;
@@ -78,7 +78,7 @@ public class BorealCore extends JavaPlugin {
     private static BendingManager bendingManager;
     private static BreweryManager breweryManager;
     private static TrapsManager trapsManager;
-    private static TitleManagerManager titleManager;
+    private static TitlesModule titleManager;
     private static MarketManager marketManager;
     private static ModuleLoader moduleLoader;
 
@@ -117,7 +117,7 @@ public class BorealCore extends JavaPlugin {
         bendingManager = new BendingManager();
         breweryManager = new BreweryManager();
         trapsManager = new TrapsManager();
-        titleManager = new TitleManagerManager();
+        titleManager = new TitlesModule();
         marketManager = new MarketManager();
 
         moduleLoader = new ModuleLoader(this, databaseManager, placeholderManager);
@@ -284,7 +284,7 @@ public class BorealCore extends JavaPlugin {
         return trapsManager;
     }
 
-    public static TitleManagerManager getTitleManager() {
+    public static TitlesModule getTitleManager() {
         return titleManager;
     }
 
