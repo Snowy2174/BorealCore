@@ -175,6 +175,18 @@ public class MyModule implements BorealModule, Listener {
 
         // Register event listeners
         context.getPluginManager().registerEvents(this, context.getPlugin());
+
+        // Register a custom action with the EffectManager
+        EffectManager.registerAction(
+                "ignite", // The config key (e.g., ignite: 5)
+                IgniteActionImpl.class,
+
+                // 1. How to parse it from the config
+                (section, key, nick, perfect) -> new IgniteActionImpl(section.getInt(key)),
+
+                // 2. How to render it in lore (Optional, can be null)
+                action -> List.of(AdventureUtil.getComponentFromMiniMessage("<red>Ignites target for " + action.getSeconds() + "s"))
+        );
         
         context.getLogger().info("My Custom Module has been enabled!");
     }

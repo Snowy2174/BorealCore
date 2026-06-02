@@ -13,7 +13,7 @@ import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.InventoryUtil;
+import plugin.borealcore.utility.ItemUtil;
 
 import java.util.List;
 
@@ -289,7 +289,7 @@ public class CookCommand implements CommandExecutor {
         String itemName = args[1];
         int amount = (args[2] == null) ? 1 : Integer.parseInt(args[2]);
 
-        InventoryUtil.giveItem(player, itemName, amount, true);
+        ItemUtil.giveItem(player, itemName, amount, true);
 
         AdventureUtil.sendMessage(sender, "Gave " + amount + " " + itemName + " to " + player.getName());
     }
@@ -309,7 +309,7 @@ public class CookCommand implements CommandExecutor {
         String itemName = args[1];
         int amount = (args[2] == null) ? 1 : Integer.parseInt(args[2]);
 
-        InventoryUtil.removeItem(player.getInventory(), itemName, amount);
+        ItemUtil.removeItem(player.getInventory(), itemName, amount);
 
         AdventureUtil.sendMessage(sender, "Cleared " + amount + " of " + itemName + " from " + player.getName());
     }

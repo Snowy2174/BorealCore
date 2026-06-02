@@ -49,7 +49,7 @@ public class GuiUtil {
                 handleOptions(lore, player, ingredient);
             } else if (ingredient.startsWith("fish")) {
                 String[] parts = ingredient.split(":");
-                if (InventoryUtil.playerHasIngredient(player.getInventory(), parts[0])) {
+                if (ItemUtil.playerHasIngredient(player.getInventory(), parts[0])) {
                     lore.add("<green><!italic>- (x" + parts[1] + ") " + "Fish (Any)");
                 } else {
                     lore.add("<red><!italic>- (x" + parts[1] + ") " + "Fish (Any)");
@@ -58,7 +58,7 @@ public class GuiUtil {
                 String[] parts = ingredient.split(":");
                 String ingredientFormatted = formatString(parts[0]);
 
-                if (InventoryUtil.playerHasIngredient(player.getInventory(), parts[0])) {
+                if (ItemUtil.playerHasIngredient(player.getInventory(), parts[0])) {
                     lore.add("<green><!italic>- (x" + parts[1] + ") " + ingredientFormatted);
                 } else {
                     lore.add("<red><!italic>- (x" + parts[1] + ") " + ingredientFormatted);
@@ -73,7 +73,7 @@ public class GuiUtil {
             String[] parts = option.split(":");
             String ingredientFormatted = formatString(parts[0]);
 
-            if (InventoryUtil.playerHasIngredient(player.getInventory(), parts[0])) {
+            if (ItemUtil.playerHasIngredient(player.getInventory(), parts[0])) {
                 lore.add("<green><!italic>- (x" + parts[1] + ") " + ingredientFormatted);
                 return; // Exit the method after handling one option
             }

@@ -3,6 +3,7 @@ package plugin.borealcore.brewery;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.functions.cooking.object.Recipe;
+import plugin.borealcore.manager.EffectManager;
 
 import java.util.HashMap;
 
@@ -15,6 +16,9 @@ public class BreweryModule implements BorealModule {
 
     @Override
     public void onModuleEnable() {
+
+        EffectManager.registerAction("reduce-drunkenness", DrunknessEffectImpl.class,
+                (sec, key, nick, perfect) -> new DrunknessEffectImpl(sec.getInt(key)), null);
 
         RECIPES = new HashMap<>();
         // @TODO: loadItems();

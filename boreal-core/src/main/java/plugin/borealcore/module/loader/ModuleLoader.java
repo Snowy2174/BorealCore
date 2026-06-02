@@ -115,6 +115,10 @@ public class ModuleLoader {
 
             Class<?> moduleClass = classLoader.loadClass(metadata.getMainClass());
 
+            if (moduleClass == null) {
+                throw new ModuleLoadException("Main class " + metadata.getMainClass() + " not found in module " + metadata.getModuleName());
+            }
+
             if (!BorealModule.class.isAssignableFrom(moduleClass)) {
                 throw new ModuleLoadException("Main class " + metadata.getMainClass() + " does not implement BorealModule");
             }
@@ -126,11 +130,6 @@ public class ModuleLoader {
             moduleClassLoaders.put(metadata.getModuleId(), classLoader);
 
             ModuleRegistry.getInstance().registerModule(metadata.getModuleId(), module, metadata);
-
-            AdventureUtil.consoleMessage("Loaded module: " + metadata);
-
-            ModuleRegistry.getInstance().registerModule(metadata.getModuleId(), module, metadata);
-
             AdventureUtil.consoleMessage("Loaded module: " + metadata);
 
         } catch (ModuleLoadException e) {

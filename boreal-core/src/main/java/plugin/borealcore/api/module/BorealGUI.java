@@ -127,7 +127,6 @@ public abstract class BorealGUI implements InventoryHolder {
      * Handles the click event by looking up the registered consumer for the slot.
      */
     public void handleClick(InventoryClickEvent event) {
-        // By default, cancel clicks in custom GUIs so players can't steal items
         event.setCancelled(true);
 
         // Execute the attached action if one exists

@@ -14,7 +14,7 @@ import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.InventoryUtil;
+import plugin.borealcore.utility.ItemUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -205,7 +205,7 @@ public class MarketModule implements BorealModule, CommandExecutor, TabCompleter
                 return null;
             }
 
-            ItemStack display = InventoryUtil.build(id);
+            ItemStack display = ItemUtil.build(id);
 
             if (display == null) {
                 AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Failed to build item display for: " + id);

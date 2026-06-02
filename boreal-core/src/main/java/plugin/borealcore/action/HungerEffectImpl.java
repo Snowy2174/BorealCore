@@ -2,6 +2,7 @@ package plugin.borealcore.action;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+import plugin.borealcore.api.action.Action;
 import plugin.borealcore.manager.configs.DebugLevel;
 
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;

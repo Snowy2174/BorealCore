@@ -3,6 +3,7 @@ package plugin.borealcore.action;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.api.action.Action;
 
 import javax.annotation.Nullable;
 

@@ -14,7 +14,7 @@ import plugin.borealcore.utility.AdventureUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.borealcore.utility.InventoryUtil.build;
+import static plugin.borealcore.utility.ItemUtil.build;
 
 public class TrapInventory implements InventoryHolder {
 

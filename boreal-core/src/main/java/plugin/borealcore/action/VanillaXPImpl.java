@@ -3,6 +3,7 @@ package plugin.borealcore.action;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.entity.Player;
+import plugin.borealcore.api.action.Action;
 import plugin.borealcore.utility.AdventureUtil;
 
 public record VanillaXPImpl(int amount, boolean mending) implements Action {

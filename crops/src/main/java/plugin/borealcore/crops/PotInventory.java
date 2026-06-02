@@ -21,7 +21,7 @@ import plugin.borealcore.BorealCore;
 import java.util.List;
 import java.util.Optional;
 
-import static plugin.borealcore.utility.InventoryUtil.buildia;
+import static plugin.borealcore.utility.ItemUtil.buildia;
 
 public class PotInventory implements InventoryHolder {
 

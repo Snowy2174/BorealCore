@@ -10,7 +10,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GuiUtil;
 
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static plugin.borealcore.manager.GuiManager.INGREDIENTS;
-import static plugin.borealcore.utility.InventoryUtil.build;
+import static plugin.borealcore.utility.ItemUtil.build;
 
 public class IngredientBookProvider { //@TODO important, migrate this to use a BorealGUI
     private final CookingManager cookingManager;

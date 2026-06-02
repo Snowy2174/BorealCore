@@ -2,7 +2,7 @@ package plugin.borealcore.functions.cooking;
 
 import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.configuration.file.YamlConfiguration;
-import plugin.borealcore.action.Action;
+import plugin.borealcore.api.action.Action;
 import plugin.borealcore.action.CommandActionImpl;
 import plugin.borealcore.action.MessageActionImpl;
 import plugin.borealcore.functions.cooking.competition.CompetitionConfig;

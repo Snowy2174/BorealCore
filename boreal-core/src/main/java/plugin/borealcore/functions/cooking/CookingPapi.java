@@ -3,7 +3,7 @@ package plugin.borealcore.functions.cooking;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import plugin.borealcore.utility.InventoryUtil;
+import plugin.borealcore.utility.ItemUtil;
 
 public class CookingPapi extends PlaceholderExpansion {
     @Override
@@ -43,7 +43,7 @@ public class CookingPapi extends PlaceholderExpansion {
         switch (parts[0].toLowerCase()) {
             case "ingcheck":
                 String ingredient = parts[1];
-                boolean playerHasIngredient = InventoryUtil.playerHasIngredient(player.getInventory(), ingredient);
+                boolean playerHasIngredient = ItemUtil.playerHasIngredient(player.getInventory(), ingredient);
                 return playerHasIngredient ? "&a" : "&c"; // returns green if player has the item, red otherwise
             case "cooking-stats":
                 String playerName = parts[1];

@@ -16,16 +16,16 @@ import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.BorealGUI;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
-import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GuiUtil;
+import plugin.borealcore.utility.ItemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.borealcore.utility.InventoryUtil.build;
+import static plugin.borealcore.utility.ItemUtil.build;
 
 public class CookingRecipeBookGUI extends BorealGUI {
 
@@ -84,7 +84,7 @@ public class CookingRecipeBookGUI extends BorealGUI {
             return unknownRecipeStack;
         } else {
             ItemStack stack = customStack.getItemStack();
-            EffectManager.addPotionEffectLore(stack, recipe, false);
+            ItemUtil.addPotionEffectLore(stack, recipe, false);
             modifyLore(stack, player, recipe, hasMastery);
             return stack;
         }

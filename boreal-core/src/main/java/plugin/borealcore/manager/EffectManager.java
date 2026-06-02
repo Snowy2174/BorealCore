@@ -1,44 +1,61 @@
 package plugin.borealcore.manager;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import plugin.borealcore.action.Action;
-import plugin.borealcore.action.CommandActionImpl;
-import plugin.borealcore.action.DrunknessEffectImpl;
-import plugin.borealcore.action.HungerEffectImpl;
-import plugin.borealcore.action.MessageActionImpl;
-import plugin.borealcore.action.PotionEffectImpl;
-import plugin.borealcore.action.SaturationEffectImpl;
-import plugin.borealcore.action.SoundActionImpl;
-import plugin.borealcore.action.VanillaXPImpl;
+import plugin.borealcore.action.*;
+import plugin.borealcore.api.action.Action;
 import plugin.borealcore.functions.cooking.CookingConfig;
-import plugin.borealcore.functions.cooking.configs.RecipeManager;
-import plugin.borealcore.functions.cooking.object.Recipe;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GuiUtil;
+import plugin.borealcore.utility.ItemUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static plugin.borealcore.utility.AdventureUtil.getComponentFromMiniMessage;
 
 public class EffectManager extends Function {
+
     public static Map<String, List<PotionEffect>> EFFECTS;
+
+    @FunctionalInterface
+    public interface ActionFactory {
+        Action create(ConfigurationSection section, String actionKey, String nick, boolean perfect);
+    }
+
+    @FunctionalInterface
+    public interface ActionLoreProvider<T extends Action> {
+        List<Component> generateLore(T action);
+    }
+
+    private static final Map<String, ActionFactory> ACTION_FACTORIES = new HashMap<>();
+    private static final Map<Class<? extends Action>, ActionLoreProvider<?>> LORE_PROVIDERS = new HashMap<>();
+
+    /**
+     * Allows external modules to register custom actions and how they render lore.
+     *
+     * @param key          The string key used in config files (e.g., "teleport")
+     * @param actionClass  The class of the Action implementation
+     * @param factory      The factory that parses the config and builds the Action
+     * @param loreProvider (Optional) The provider that generates lore for this action
+     */
+    public static <T extends Action> void registerAction(String key, Class<T> actionClass, ActionFactory factory, ActionLoreProvider<T> loreProvider) {
+        ACTION_FACTORIES.put(key, factory);
+        if (loreProvider != null) {
+            LORE_PROVIDERS.put(actionClass, loreProvider);
+        }
+    }
 
     @Override
     public void load() {
         EFFECTS = new HashMap<>();
+        registerDefaultActions();
+
         loadEffects("recipes/buffs");
         AdventureUtil.consoleMessage("Loaded <green>" + EFFECTS.size() + " <gray>buff categories");
     }
@@ -46,6 +63,117 @@ public class EffectManager extends Function {
     @Override
     public void unload() {
         if (EFFECTS != null) EFFECTS.clear();
+        ACTION_FACTORIES.clear();
+        LORE_PROVIDERS.clear();
+    }
+
+    private void registerDefaultActions() {
+        registerAction("hunger", HungerEffectImpl.class,
+                (sec, key, nick, perfect) -> new HungerEffectImpl(sec.getInt(key)),
+                action -> List.of(getComponentFromMiniMessage(CookingConfig.hungerLore.replace("{hunger}", String.valueOf(action.hunger()))))
+        );
+
+        registerAction("saturation", SaturationEffectImpl.class,
+                (sec, key, nick, perfect) -> new SaturationEffectImpl(sec.getInt(key)),
+                action -> List.of(getComponentFromMiniMessage(CookingConfig.saturationLore.replace("{saturation}", String.valueOf(action.saturation()))))
+        );
+
+        registerAction("message", MessageActionImpl.class,
+                (sec, key, nick, perfect) -> new MessageActionImpl(sec.getStringList(key).toArray(new String[0]), nick),
+                null
+        );
+
+        registerAction("command", CommandActionImpl.class,
+                (sec, key, nick, perfect) -> new CommandActionImpl(sec.getStringList(key).toArray(new String[0]), nick),
+                null
+        );
+
+        registerAction("exp", VanillaXPImpl.class,
+                (sec, key, nick, perfect) -> new VanillaXPImpl(sec.getInt(key), false), null);
+        registerAction("mending", VanillaXPImpl.class,
+                (sec, key, nick, perfect) -> new VanillaXPImpl(sec.getInt(key), true), null);
+
+        registerAction("sound", SoundActionImpl.class,
+                (sec, key, nick, perfect) -> new SoundActionImpl(
+                        sec.getString(key + ".source"),
+                        sec.getString(key + ".key"),
+                        (float) sec.getDouble(key + ".volume"),
+                        (float) sec.getDouble(key + ".pitch")
+                ), null);
+
+        registerAction("potion-effect", PotionEffectImpl.class,
+                (sec, actionKey, nick, perfect) -> {
+                    List<PotionEffect> potionEffectList = new ArrayList<>();
+                    for (String key : sec.getConfigurationSection(actionKey).getKeys(false)) {
+                        String typeStr = sec.getString(actionKey + "." + key + ".type", "BLINDNESS").toUpperCase();
+                        PotionEffectType type = PotionEffectType.getByName(typeStr);
+                        if (type == null) {
+                            AdventureUtil.consoleMessage("<red>Potion effect " + typeStr + " doesn't exist");
+                            type = PotionEffectType.LUCK;
+                        }
+                        potionEffectList.add(new PotionEffect(
+                                type,
+                                sec.getInt(actionKey + "." + key + ".duration"),
+                                sec.getInt(actionKey + "." + key + ".amplifier")
+                        ));
+                    }
+                    return new PotionEffectImpl(potionEffectList.toArray(new PotionEffect[0]));
+                },
+                action -> {
+                    List<Component> actionLore = new ArrayList<>();
+                    for (PotionEffect potionEffect : action.potionEffects()) {
+                        actionLore.add(getComponentFromMiniMessage(CookingConfig.effectLore
+                                .replace("{effect}", GuiUtil.formatString(potionEffect.getType().getName()))
+                                .replace("{amplifier}", ItemUtil.amplifierToRoman(potionEffect.getAmplifier() + 1))
+                                .replace("{duration}", ItemUtil.getDuration(potionEffect.getDuration() / 20))));
+                    }
+                    actionLore.add(Component.text(" "));
+                    return actionLore;
+                }
+        );
+    }
+
+    public static Action[] getActions(ConfigurationSection section, String nick, boolean perfect) {
+        if (section == null) return null;
+        List<Action> actions = new ArrayList<>();
+
+        for (String actionKey : section.getKeys(false)) {
+            ActionFactory factory = ACTION_FACTORIES.get(actionKey);
+            if (factory != null) {
+                Action action = factory.create(section, actionKey, nick, perfect);
+                if (action != null) {
+                    actions.add(action);
+                }
+            } else {
+                AdventureUtil.consoleMessage(DebugLevel.WARNING, "Unregistered action type found in config: " + actionKey);
+            }
+        }
+        return actions.toArray(new Action[0]);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<List<Component>> buildActionsLore(List<Action[]> actions) {
+        if (actions == null || actions.isEmpty()) {
+            AdventureUtil.consoleMessage(DebugLevel.WARNING, " No actions provided for lore generation.");
+            return List.of(List.of(Component.text("No actions available.")));
+        }
+
+        List<List<Component>> lore = new ArrayList<>();
+        for (Action[] actionArray : actions) {
+            if (actionArray == null || actionArray.length == 0) continue;
+
+            List<Component> actionLore = new ArrayList<>();
+            for (Action action : actionArray) {
+                ActionLoreProvider<Action> provider = (ActionLoreProvider<Action>) LORE_PROVIDERS.get(action.getClass());
+                if (provider != null) {
+                    actionLore.addAll(provider.generateLore(action));
+                }
+            }
+            if (!actionLore.isEmpty()) {
+                lore.add(actionLore);
+            }
+        }
+        return lore;
     }
 
     private void loadEffects(String configPath) {
@@ -57,10 +185,7 @@ public class EffectManager extends Function {
 
             for (String levelKey : section.getKeys(false)) {
                 ConfigurationSection levelSection = section.getConfigurationSection(levelKey);
-                if (levelSection == null) {
-                    AdventureUtil.consoleMessage(DebugLevel.DEBUG, "This is a debug message from AdventureUtil");
-                    continue;
-                }
+                if (levelSection == null) continue;
 
                 String typeString = levelSection.getString("type");
                 PotionEffectType type = PotionEffectType.getByName(typeString.toUpperCase());
@@ -80,143 +205,4 @@ public class EffectManager extends Function {
         }
     }
 
-    public static Action[] getActions(ConfigurationSection section, String nick, boolean perfect) {
-        if (section == null) return null;
-        List<Action> actions = new ArrayList<>();
-        for (String action : section.getKeys(false)) {
-            switch (action) {
-                case "hunger" -> actions.add(new HungerEffectImpl(section.getInt(action)));
-                case "saturation" -> actions.add(new SaturationEffectImpl(section.getInt(action)));
-                case "message" ->
-                        actions.add(new MessageActionImpl(section.getStringList(action).toArray(new String[0]), nick));
-                case "command" ->
-                        actions.add(new CommandActionImpl(section.getStringList(action).toArray(new String[0]), nick));
-                case "exp" -> actions.add(new VanillaXPImpl(section.getInt(action), false));
-                case "mending" -> actions.add(new VanillaXPImpl(section.getInt(action), true));
-                case "reduce-drunkenness" -> actions.add(new DrunknessEffectImpl(section.getInt(action)));
-                case "sound" -> actions.add(new SoundActionImpl(
-                        section.getString(action + ".source"),
-                        section.getString(action + ".key"),
-                        (float) section.getDouble(action + ".volume"),
-                        (float) section.getDouble(action + ".pitch")
-                ));
-                case "potion-effect" -> {
-                    List<PotionEffect> potionEffectList = new ArrayList<>();
-                    for (String key : section.getConfigurationSection(action).getKeys(false)) {
-                        PotionEffectType type = PotionEffectType.getByName(section.getString(action + "." + key + ".type", "BLINDNESS").toUpperCase());
-                        if (type == null)
-                            AdventureUtil.consoleMessage("<red>Potion effect " + section.getString(action + "." + key + ".type", "BLINDNESS") + " doesn't exist");
-                        potionEffectList.add(new PotionEffect(
-                                type == null ? PotionEffectType.LUCK : type,
-                                section.getInt(action + "." + key + ".duration"),
-                                section.getInt(action + "." + key + ".amplifier")
-                        ));
-                    }
-                    actions.add(new PotionEffectImpl(potionEffectList.toArray(new PotionEffect[0])));
-                }
-                case "dish-buff" -> {
-                    String actionKey = section.getString(action);
-                    if (perfect) {
-                        actionKey += CookingConfig.perfectItemSuffix;
-                    }
-                    actions.add(new PotionEffectImpl(EFFECTS.get(actionKey).toArray(new PotionEffect[0])));
-                }
-            }
-        }
-        return actions.toArray(new Action[0]);
-    }
-
-    public static List<List<Component>> buildActionsLore(List<Action[]> actions) {
-        if (actions == null || actions.isEmpty()) {
-            AdventureUtil.consoleMessage(DebugLevel.WARNING, " No actions provided for lore generation.");
-            return List.of(List.of(Component.text("No actions available.")));
-        }
-        List<List<Component>> lore = new ArrayList<>();
-        for (Action[] actionArray : actions) {
-            List<Component> actionLore = new ArrayList<>();
-            if (actionArray == null || actionArray.length == 0) {
-                AdventureUtil.consoleMessage(DebugLevel.WARNING, " Empty action array found.");
-                continue;
-            }
-            if (actions != null) {
-                for (Action action : actionArray) {
-                    if (action instanceof PotionEffectImpl potionEffectAction) {
-                        for (PotionEffect potionEffect : potionEffectAction.potionEffects()) {
-                            actionLore.add(getComponentFromMiniMessage(CookingConfig.effectLore
-                                    .replace("{effect}", GuiUtil.formatString(potionEffect.getType().getName()))
-                                    .replace("{amplifier}", amplifierToRoman(potionEffect.getAmplifier() + 1))
-                                    .replace("{duration}", getDuration(potionEffect.getDuration() / 20))));
-                        }
-                        actionLore.add(Component.text(" "));
-                    } else if (action instanceof HungerEffectImpl hungerEffectAction) {
-                        actionLore.add(getComponentFromMiniMessage(CookingConfig.hungerLore
-                                .replace("{hunger}", String.valueOf(hungerEffectAction.hunger()))));
-                    } else if (action instanceof SaturationEffectImpl saturationEffectAction) {
-                        actionLore.add(getComponentFromMiniMessage(CookingConfig.saturationLore
-                                .replace("{saturation}", String.valueOf(saturationEffectAction.saturation()))));
-                    }
-                }
-                lore.add(actionLore);
-            } else {
-                AdventureUtil.consoleMessage(DebugLevel.WARNING, " No actions found for the provided key.");
-            }
-        }
-        return lore;
-    }
-
-    private static String getDuration(int durationInSeconds) {
-        if (durationInSeconds <= 0) {
-            return " ";
-        }
-        int minutes = durationInSeconds / 60;
-        int seconds = durationInSeconds % 60;
-        StringBuilder durationString = new StringBuilder().append("<gold>for ");
-        if (minutes > 0) {
-            durationString.append(minutes).append(minutes > 1 ? " mins " : " min ");
-        }
-        if (seconds > 0) {
-            durationString.append(seconds).append("s");
-        }
-        return durationString.toString();
-    }
-
-    private static String amplifierToRoman(int amplifier) {
-        int[] values = {10, 9, 5, 4, 1};
-        String[] romanLetters = {"X", "IX", "V", "IV", "I"};
-
-        StringBuilder roman = new StringBuilder();
-        for (int i = 0; i < values.length; i++) {
-            while (amplifier >= values[i]) {
-                amplifier -= values[i];
-                roman.append(romanLetters[i]);
-            }
-        }
-        return roman.toString();
-    }
-
-    public static void addPotionEffectLore(ItemStack itemStack, String key, Boolean perfect) {
-        Recipe recipe = RecipeManager.COOKING_RECIPES.get(key.replaceAll("[\\[\\]]", "").replace(CookingConfig.perfectItemSuffix, ""));
-
-        if (recipe != null && recipe.getDishEffectsLore() != null) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            if (itemMeta == null) {
-                itemMeta = Bukkit.getItemFactory().getItemMeta(itemStack.getType());
-                itemStack.setItemMeta(itemMeta);
-            }
-
-            List<Component> lore = itemMeta.lore();
-            if (lore == null) {
-                lore = new ArrayList<>();
-            }
-
-            int insertIndex = Math.min(2, lore.size()); // Insert after the second line or at the end if there are fewer than two lines
-            lore.add(insertIndex, Component.text(" "));
-            lore.addAll(insertIndex + 1, (perfect ? recipe.getDishEffectsLore().get(0) : recipe.getDishEffectsLore().get(1)));
-
-            itemMeta.lore(lore);
-            itemStack.setItemMeta(itemMeta);
-        } else {
-            AdventureUtil.consoleMessage(DebugLevel.WARNING, "No valid recipe found for key: " + key);
-        }
-    }
 }

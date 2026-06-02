@@ -17,7 +17,7 @@ import plugin.borealcore.functions.cooking.CookingConfig;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.InventoryUtil;
+import plugin.borealcore.utility.ItemUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +87,7 @@ public class PlushieModule implements BorealModule {
         }
 
         String selectedPlushie = plushieList.get(random.nextInt(plushieList.size()));
-        ItemStack plushieItem = InventoryUtil.build(selectedPlushie);
+        ItemStack plushieItem = ItemUtil.build(selectedPlushie);
 
         if (plushieItem == null) {
             AdventureUtil.playerMessage(player, "<red>Failed to create plushie item: " + selectedPlushie);

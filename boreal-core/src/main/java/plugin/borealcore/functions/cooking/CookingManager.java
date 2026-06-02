@@ -24,7 +24,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.action.Action;
+import plugin.borealcore.api.action.Action;
+import plugin.borealcore.action.PotionEffectImpl;
 import plugin.borealcore.api.event.CookResultEvent;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
@@ -38,6 +39,7 @@ import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.functions.cooking.object.Recipe;
 import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.functions.traps.TrapsManager;
+import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.manager.GuiManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.DebugLevel;
@@ -46,7 +48,7 @@ import plugin.borealcore.object.Function;
 import plugin.borealcore.object.SimpleListener;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GuiUtil;
-import plugin.borealcore.utility.InventoryUtil;
+import plugin.borealcore.utility.ItemUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -91,6 +93,17 @@ public class CookingManager extends Function implements BorealModule {
         getPlaceholderManager().registerExpansion(cookingPlaceholders);
         getPlaceholderManager().registerExpansion(competitionPlaceholders);
         Bukkit.getPluginManager().registerEvents(this.simpleListener, BorealCore.plugin);
+
+        EffectManager.registerAction("dish-buff", PotionEffectImpl.class,
+                (sec, key, nick, perfect) -> {
+                    String actionKey = sec.getString(key);
+                    if (perfect) actionKey += CookingConfig.perfectItemSuffix;
+                    List<PotionEffect> effects = EffectManager.EFFECTS.get(actionKey);
+                    return effects != null ? new PotionEffectImpl(effects.toArray(new PotionEffect[0])) : null;
+                },
+                null
+        );
+
         GuiManager guiManager = BorealCore.getGuiManager();
         guiManager.registerGui("cookingRecipeBook", () -> new CookingRecipeBookGUI(null));
     }
@@ -111,8 +124,8 @@ public class CookingManager extends Function implements BorealModule {
         } else {
             Recipe bar = RecipeManager.COOKING_RECIPES.get(recipe);
             List<String> ingredients = bar.getIngredients();
-            if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, 1)) {
-                InventoryUtil.removeIngredients(player.getInventory(), ingredients, 1);
+            if (ItemUtil.handleIngredientCheck(player.getInventory(), ingredients, 1)) {
+                ItemUtil.removeIngredients(player.getInventory(), ingredients, 1);
                 if (clickedFurniture != null) {
                     Location loc = clickedFurniture.getArmorstand().getLocation();
                     CookingPotUtil.ingredientsSFX(player, ingredients, loc);
@@ -127,9 +140,9 @@ public class CookingManager extends Function implements BorealModule {
     public void handleMaterialAutocooking(String recipeId, Player player, Integer amount) {
         Ingredient recipe = INGREDIENTS.get(recipeId);
         List<String> ingredients = recipe.getIngredients();
-        if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
-            InventoryUtil.removeIngredients(player.getInventory(), ingredients, amount);
-            InventoryUtil.giveItem(player, recipe.getKey(), amount, true);
+        if (ItemUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
+            ItemUtil.removeIngredients(player.getInventory(), ingredients, amount);
+            ItemUtil.giveItem(player, recipe.getKey(), amount, true);
             playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
             AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
         } else {
@@ -143,10 +156,10 @@ public class CookingManager extends Function implements BorealModule {
         } else {
             Recipe recipe = RecipeManager.COOKING_RECIPES.get(recipeId);
             List<String> ingredients = recipe.getIngredients();
-            if (InventoryUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
+            if (ItemUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
                 // Delay removal of items if furniture is not null
-                InventoryUtil.removeIngredients(player.getInventory(), ingredients, amount);
-                InventoryUtil.giveItem(player, String.valueOf(recipe.getCookedItems()), amount, true);
+                ItemUtil.removeIngredients(player.getInventory(), ingredients, amount);
+                ItemUtil.giveItem(player, String.valueOf(recipe.getCookedItems()), amount, true);
                 playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
                 AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
             } else {
@@ -193,7 +206,7 @@ public class CookingManager extends Function implements BorealModule {
 
         if (!cookingPlayer.isSuccess()) {
             if (cookingPot != null) {
-                CookingPotUtil.playCookingResultSFX(cookingPot, InventoryUtil.build(CookingConfig.failureItem), false);
+                CookingPotUtil.playCookingResultSFX(cookingPot, ItemUtil.build(CookingConfig.failureItem), false);
             }
             handleFailureResult(player);
             return;
@@ -207,7 +220,7 @@ public class CookingManager extends Function implements BorealModule {
         boolean perfect = cookingPlayer.isPerfect() && (Math.random() < perfectChance * masteryPerfectionMultiplier);
         String drop = recipe.getCookedItems();
 
-        CookResultEvent cookResultEvent = new CookResultEvent(player, perfect, InventoryUtil.build(drop), drop);
+        CookResultEvent cookResultEvent = new CookResultEvent(player, perfect, ItemUtil.build(drop), drop);
         Bukkit.getPluginManager().callEvent(cookResultEvent);
         if (cookResultEvent.isCancelled()) {
             return;
@@ -223,7 +236,7 @@ public class CookingManager extends Function implements BorealModule {
         }
 
         if (cookingPot != null) {
-            CookingPotUtil.playCookingResultSFX(cookingPot, InventoryUtil.build(drop), true);
+            CookingPotUtil.playCookingResultSFX(cookingPot, ItemUtil.build(drop), true);
         }
 
         if (droppedItem.getSuccessActions() != null) {
@@ -243,7 +256,7 @@ public class CookingManager extends Function implements BorealModule {
         }
 
         playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking.done"), 1f, 1f);
-        InventoryUtil.giveItem(player, drop, 1, true);
+        ItemUtil.giveItem(player, drop, 1, true);
         sendSuccessTitle(player, droppedItem.getNick());
 
         MasteryManager.incrementRecipeCount(player);
@@ -254,7 +267,7 @@ public class CookingManager extends Function implements BorealModule {
         String ingredient = ingredients.get(random.nextInt(ingredients.size()));
         String[] parts = ingredient.split(":");
         AdventureUtil.playerMessage(player, MessageManager.infoPositive + "You have used one less: " + GuiUtil.formatString(parts[0]));
-        InventoryUtil.giveItem(player, parts[0], 1, false);
+        ItemUtil.giveItem(player, parts[0], 1, false);
     }
 
     private void handleFailureResult(Player player) {
@@ -267,7 +280,7 @@ public class CookingManager extends Function implements BorealModule {
                 CookingConfig.failureFadeStay,
                 CookingConfig.failureFadeOut
         );
-        InventoryUtil.giveItem(player, CookingConfig.failureItem, 1, false);
+        ItemUtil.giveItem(player, CookingConfig.failureItem, 1, false);
     }
 
 

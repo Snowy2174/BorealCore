@@ -2,28 +2,32 @@ package plugin.borealcore.utility;
 
 
 import dev.lone.itemsadder.api.CustomStack;
+import net.kyori.adventure.text.Component;
 import net.momirealms.customfishing.api.BukkitCustomFishingPlugin;
 import net.momirealms.customfishing.api.mechanic.context.Context;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.CookingConfig;
-import plugin.borealcore.manager.EffectManager;
+import plugin.borealcore.functions.cooking.object.Recipe;
 import plugin.borealcore.manager.configs.DebugLevel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static plugin.borealcore.functions.cooking.configs.RecipeManager.COOKING_RECIPES;
 
-public class InventoryUtil {
+public class ItemUtil {
 
-    public InventoryUtil() {
+    public ItemUtil() {
     }
 
     @Nullable
@@ -66,7 +70,7 @@ public class InventoryUtil {
         ItemStack drop = build(item);
         drop.setAmount(amount);
         if (customCookingItem) {
-            EffectManager.addPotionEffectLore(drop, item, item.contains(CookingConfig.perfectItemSuffix));
+            addPotionEffectLore(drop, item, item.contains(CookingConfig.perfectItemSuffix));
             addIdentifier(drop, item.replace("[", "").replace("]", "")); // @TODO diagnose fix later
         }
         player.getLocation().getWorld().dropItem(player.getLocation(), drop);
@@ -121,7 +125,7 @@ public class InventoryUtil {
             }
         }
         if (COOKING_RECIPES.containsKey(key.toLowerCase().replace("_perfect", ""))) {
-            EffectManager.addPotionEffectLore(itemStack, key, key.contains(CookingConfig.perfectItemSuffix));
+            addPotionEffectLore(itemStack, key, key.contains(CookingConfig.perfectItemSuffix));
             addIdentifier(itemStack, key);
         }
         return itemStack;
@@ -307,5 +311,52 @@ public class InventoryUtil {
             }
         }
         AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Finished removing tiered or fish item: " + ingredient);
+    }
+
+    public static String getDuration(int durationInSeconds) {
+        if (durationInSeconds <= 0) return " ";
+        int minutes = durationInSeconds / 60;
+        int seconds = durationInSeconds % 60;
+        StringBuilder durationString = new StringBuilder().append("<gold>for ");
+        if (minutes > 0) durationString.append(minutes).append(minutes > 1 ? " mins " : " min ");
+        if (seconds > 0) durationString.append(seconds).append("s");
+        return durationString.toString();
+    }
+
+    public static String amplifierToRoman(int amplifier) {
+        int[] values = {10, 9, 5, 4, 1};
+        String[] romanLetters = {"X", "IX", "V", "IV", "I"};
+        StringBuilder roman = new StringBuilder();
+        for (int i = 0; i < values.length; i++) {
+            while (amplifier >= values[i]) {
+                amplifier -= values[i];
+                roman.append(romanLetters[i]);
+            }
+        }
+        return roman.toString();
+    }
+
+    public static void addPotionEffectLore(ItemStack itemStack, String key, Boolean perfect) {
+        Recipe recipe = COOKING_RECIPES.get(key.replaceAll("[\\[\\]]", "").replace(CookingConfig.perfectItemSuffix, ""));
+
+        if (recipe != null && recipe.getDishEffectsLore() != null) {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            if (itemMeta == null) {
+                itemMeta = Bukkit.getItemFactory().getItemMeta(itemStack.getType());
+                itemStack.setItemMeta(itemMeta);
+            }
+
+            List<Component> lore = itemMeta.lore();
+            if (lore == null) lore = new ArrayList<>();
+
+            int insertIndex = Math.min(2, lore.size());
+            lore.add(insertIndex, Component.text(" "));
+            lore.addAll(insertIndex + 1, (perfect ? recipe.getDishEffectsLore().get(0) : recipe.getDishEffectsLore().get(1)));
+
+            itemMeta.lore(lore);
+            itemStack.setItemMeta(itemMeta);
+        } else {
+            AdventureUtil.consoleMessage(DebugLevel.WARNING, "No valid recipe found for key: " + key);
+        }
     }
 }

@@ -1,4 +1,4 @@
-package plugin.borealcore.action;
+package plugin.borealcore.api.action;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;

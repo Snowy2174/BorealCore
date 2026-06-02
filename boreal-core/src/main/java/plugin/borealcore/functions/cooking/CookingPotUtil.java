@@ -17,7 +17,7 @@ import org.bukkit.scheduler.BukkitTask;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.InventoryUtil;
+import plugin.borealcore.utility.ItemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class CookingPotUtil {
     private static void spawnFakeIngredientItem(Location loc, String ingredient, Runnable onComplete) {
         Location spawnLocation = loc.clone().add(0, 2, 0);
 
-        Item itemEntity = loc.getWorld().dropItem(spawnLocation, InventoryUtil.build(ingredient));
+        Item itemEntity = loc.getWorld().dropItem(spawnLocation, ItemUtil.build(ingredient));
         itemEntity.setCanPlayerPickup(false);
         itemEntity.setVelocity(itemEntity.getVelocity().zero());
 
@@ -80,7 +80,7 @@ public class CookingPotUtil {
         armorStand.setGravity(false);
         armorStand.setCollidable(false);
         armorStand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
-        ItemStack splashItem = InventoryUtil.build(CookingConfig.splashEffect);
+        ItemStack splashItem = ItemUtil.build(CookingConfig.splashEffect);
         armorStand.setItem(EquipmentSlot.HEAD, splashItem);
 
         new BukkitRunnable() {

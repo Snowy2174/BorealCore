@@ -2,6 +2,7 @@ package plugin.borealcore.action;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+import plugin.borealcore.api.action.Action;
 
 public record SaturationEffectImpl(int saturation) implements Action {
 

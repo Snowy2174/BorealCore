@@ -3,6 +3,7 @@ package plugin.borealcore.action;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.entity.Player;
+import plugin.borealcore.api.action.Action;
 import plugin.borealcore.utility.AdventureUtil;
 
 public record SoundActionImpl(String source, String sound, float volume, float pitch) implements Action {

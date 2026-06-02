@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.action.Action;
+import plugin.borealcore.api.action.Action;
 import plugin.borealcore.functions.cooking.RecipeDataUtil;
 import plugin.borealcore.functions.cooking.competition.bossbar.BossBarManager;
 import plugin.borealcore.functions.cooking.competition.ranking.LocalRankingImpl;

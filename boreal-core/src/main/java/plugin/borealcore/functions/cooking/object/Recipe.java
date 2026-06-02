@@ -2,7 +2,7 @@ package plugin.borealcore.functions.cooking.object;
 
 
 import net.kyori.adventure.text.Component;
-import plugin.borealcore.action.Action;
+import plugin.borealcore.api.action.Action;
 import plugin.borealcore.functions.cooking.Difficulty;
 
 import java.util.Collections;

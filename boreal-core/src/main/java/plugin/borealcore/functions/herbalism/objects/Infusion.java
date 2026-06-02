@@ -2,7 +2,7 @@ package plugin.borealcore.functions.herbalism.objects;
 
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-import plugin.borealcore.action.Action;
+import plugin.borealcore.api.action.Action;
 
 import java.util.List;
 
