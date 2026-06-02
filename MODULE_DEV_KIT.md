@@ -115,7 +115,9 @@ version: 1.0.0
 author: Your Name
 main: com.example.module.MyModule
 minimum-borealcore-version: 1.1.9
-
+plugin-dependencies:
+  - PlaceholderAPI
+  - Towny
 ```
 
 **Field Descriptions:**

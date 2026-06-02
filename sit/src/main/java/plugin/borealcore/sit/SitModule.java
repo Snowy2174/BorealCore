@@ -21,6 +21,7 @@ public class SitModule implements BorealModule {
 
     @Override
     public void onModuleInitialize(ModuleContext context) throws Exception {
+        this.context = context;
         context.getPlugin().getCommand("sit").setExecutor(new SitCommand());
         this.sitListener = new SitListener(context.getPlugin());
     }

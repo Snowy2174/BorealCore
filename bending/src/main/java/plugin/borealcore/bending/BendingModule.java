@@ -6,17 +6,16 @@ import org.bukkit.event.HandlerList;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
-import plugin.borealcore.object.Function;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class BendingManager implements BorealModule {
+public class BendingModule implements BorealModule {
 
     private final BendingListener bendingListener;
     private ConfigurationSection config;
 
-    public BendingManager() {
+    public BendingModule() {
         this.bendingListener = new BendingListener();
     }
 

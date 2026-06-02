@@ -1,6 +1,8 @@
 package plugin.borealcore.module.loader;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -81,53 +84,57 @@ public class ModuleLoader {
 
     /**
      * Loads a single module from a JAR file.
-     * 
+     *
      * @param jarFile The JAR file containing the module
      * @throws ModuleLoadException if loading fails
      */
     private void loadModule(File jarFile) throws ModuleLoadException {
         try (JarFile jar = new JarFile(jarFile)) {
-            // Read module.yml manifest
             JarEntry manifestEntry = jar.getJarEntry("module.yml");
             if (manifestEntry == null) {
                 throw new ModuleLoadException("module.yml not found in " + jarFile.getName());
             }
 
             ModuleMetadata metadata = parseManifest(jar.getInputStream(manifestEntry));
-            
-            // Check BorealCore version compatibility
+
             if (!isVersionCompatible(metadata.getMinimumCoreVersion())) {
-                throw new ModuleLoadException("Module '" + metadata.getModuleName() + 
-                    "' requires BorealCore " + metadata.getMinimumCoreVersion() + 
-                    " but only " + plugin.getDescription().getVersion() + " is installed");
+                throw new ModuleLoadException("Module '" + metadata.getModuleName() +
+                        "' requires BorealCore " + metadata.getMinimumCoreVersion() +
+                        " but only " + plugin.getDescription().getVersion() + " is installed");
             }
 
-            // Load the module class
+            if (!checkPluginDependencies(metadata)) {
+                throw new ModuleLoadException("Missing required external plugins for module: " + metadata.getModuleName());
+            }
+
             ModuleClassLoader classLoader = new ModuleClassLoader(
-                metadata.getModuleId(),
-                new URL[]{jarFile.toURI().toURL()},
-                plugin.getClass().getClassLoader()
+                    metadata.getModuleId(),
+                    new URL[]{jarFile.toURI().toURL()},
+                    plugin.getClass().getClassLoader()
             );
 
             Class<?> moduleClass = classLoader.loadClass(metadata.getMainClass());
-            
+
             if (!BorealModule.class.isAssignableFrom(moduleClass)) {
-                throw new ModuleLoadException("Main class " + metadata.getMainClass() + 
-                    " does not implement BorealModule");
+                throw new ModuleLoadException("Main class " + metadata.getMainClass() + " does not implement BorealModule");
             }
 
             BorealModule module = (BorealModule) moduleClass.getDeclaredConstructor().newInstance();
-            
-            // Store metadata and module
+
             moduleMetadata.put(metadata.getModuleId(), metadata);
             loadedModules.put(metadata.getModuleId(), module);
             moduleClassLoaders.put(metadata.getModuleId(), classLoader);
 
-            // Register in the global module registry
             ModuleRegistry.getInstance().registerModule(metadata.getModuleId(), module, metadata);
 
             AdventureUtil.consoleMessage("Loaded module: " + metadata);
 
+            ModuleRegistry.getInstance().registerModule(metadata.getModuleId(), module, metadata);
+
+            AdventureUtil.consoleMessage("Loaded module: " + metadata);
+
+        } catch (ModuleLoadException e) {
+            throw e;
         } catch (Exception e) {
             throw new ModuleLoadException("Failed to load module from " + jarFile.getName(), e);
         }
@@ -139,14 +146,42 @@ public class ModuleLoader {
     private void enableAllModules() {
         ModuleContext context = new ModuleContext(plugin, database, placeholderManager);
 
-        for (String moduleId : loadedModules.keySet()) {
+        List<String> failedModules = new ArrayList<>();
+
+        for (Map.Entry<String, BorealModule> entry : loadedModules.entrySet()) {
+            String moduleId = entry.getKey();
+            BorealModule module = entry.getValue();
+
             try {
-                BorealModule module = loadedModules.get(moduleId);
                 module.onModuleInitialize(context);
                 module.onModuleEnable();
                 AdventureUtil.consoleMessage("Enabled module: " + moduleId);
             } catch (Exception e) {
-                plugin.getLogger().log(Level.SEVERE, "Failed to enable module: " + moduleId, e);
+                plugin.getLogger().log(Level.SEVERE, "Failed to enable module: " + moduleId + ". It will be disabled.", e);
+                failedModules.add(moduleId);
+            }
+        }
+
+        for (String failedId : failedModules) {
+            cleanupFailedModule(failedId);
+        }
+    }
+
+    /**
+     * Helper method to completely remove a module's footprint if it fails to load/enable.
+     */
+    private void cleanupFailedModule(String moduleId) {
+        loadedModules.remove(moduleId);
+        moduleMetadata.remove(moduleId);
+
+        ModuleRegistry.getInstance().unregisterModule(moduleId);
+
+        ModuleClassLoader classLoader = moduleClassLoaders.remove(moduleId);
+        if (classLoader != null) {
+            try {
+                classLoader.close();
+            } catch (IOException e) {
+                plugin.getLogger().log(Level.WARNING, "Failed to close classloader for failed module: " + moduleId, e);
             }
         }
     }
@@ -155,22 +190,28 @@ public class ModuleLoader {
      * Disables all loaded modules.
      */
     public void unloadAllModules() {
+        if (loadedModules.isEmpty()) {
+            return; // Nothing to do
+        }
+
         for (String moduleId : new ArrayList<>(loadedModules.keySet())) {
             try {
                 BorealModule module = loadedModules.get(moduleId);
-                module.onModuleDisable();
-                AdventureUtil.consoleMessage("Disabled module: " + moduleId);
+                if (module != null) {
+                    module.onModuleDisable();
+                    AdventureUtil.consoleMessage("Disabled module: " + moduleId);
+                }
             } catch (Exception e) {
-                plugin.getLogger().log(Level.SEVERE, "Failed to disable module: " + moduleId, e);
+                plugin.getLogger().log(Level.SEVERE, "Exception while disabling module: " + moduleId, e);
             }
         }
 
         loadedModules.clear();
         moduleMetadata.clear();
-        
+
         // Clear the global registry
         ModuleRegistry.getInstance().clear();
-        
+
         // Clean up classloaders
         for (ModuleClassLoader classLoader : moduleClassLoaders.values()) {
             try {
@@ -226,10 +267,6 @@ public class ModuleLoader {
      * Compares two semantic versions.
      * Returns: positive if v1 > v2, zero if equal, negative if v1 < v2
      */
-    /**
-     * Compares two semantic versions.
-     * Returns: positive if v1 > v2, zero if equal, negative if v1 < v2
-     */
     private int compareVersions(String v1, String v2) {
         String[] parts1 = v1.split("\\.");
         String[] parts2 = v2.split("\\.");
@@ -252,6 +289,29 @@ public class ModuleLoader {
     }
 
     /**
+     * Checks if the required plugins for a module are present and enabled.
+     * Returns: true if all dependencies are met, false otherwise
+     */
+    public boolean checkPluginDependencies(ModuleMetadata metadata) {
+        List<String> requiredPlugins = metadata.getPluginDependencies();
+
+        if (requiredPlugins == null || requiredPlugins.isEmpty()) {
+            return true;
+        }
+
+        for (String pluginName : requiredPlugins) {
+            Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
+
+            if (plugin == null || !plugin.isEnabled()) {
+                this.plugin.getLogger().warning("Cannot load module '" + metadata.getModuleName() + "'. Required plugin '" + pluginName + "' is missing or disabled!");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Parses a module.yml manifest file.
      *
      * @param inputStream The input stream to the module.yml file
@@ -268,6 +328,7 @@ public class ModuleLoader {
             String author = config.getString("author");
             String mainClass = config.getString("main");
             String minimumCoreVersion = config.getString("minimum-borealcore-version", "1.0.0");
+            List<String> pluginDependencies = config.getStringList("plugin-depends");
 
             if (moduleId == null || moduleId.isEmpty()) {
                 throw new ModuleLoadException("module.yml is missing required field 'id'");
@@ -285,7 +346,7 @@ public class ModuleLoader {
                 throw new ModuleLoadException("module.yml is missing required field 'main'");
             }
 
-            return new ModuleMetadata(moduleId, name, version, author, mainClass, minimumCoreVersion);
+            return new ModuleMetadata(moduleId, name, version, author, mainClass, minimumCoreVersion, pluginDependencies);
 
         } catch (ModuleLoadException e) {
             throw e;

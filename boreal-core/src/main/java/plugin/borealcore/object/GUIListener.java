@@ -4,7 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import plugin.borealcore.api.module.BorealGUI;
 
-public class GUIListener {
+public class GUIListener implements org.bukkit.event.Listener {
 
     @EventHandler
     public void onClickInventory(InventoryClickEvent event) {

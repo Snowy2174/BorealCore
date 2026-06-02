@@ -2,8 +2,10 @@ package plugin.borealcore.functions.cooking;
 
 import dev.lone.itemsadder.api.CustomFurniture;
 import dev.lone.itemsadder.api.CustomStack;
+import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -32,7 +34,7 @@ public class CookingRecipeBookGUI extends BorealGUI {
     private final CookingManager cookingManager;
 
     public CookingRecipeBookGUI(CustomFurniture clickedFurniture) {
-        super(6, Component.text("Recipe Book"));
+        super(6, Component.text(ChatColor.WHITE + new FontImageWrapper(CookingConfig.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString(ChatColor.RESET + "Recipe Book", -190)));
 
         this.cookingManager = BorealCore.getCookingManager();
         this.clickedFurniture = clickedFurniture;

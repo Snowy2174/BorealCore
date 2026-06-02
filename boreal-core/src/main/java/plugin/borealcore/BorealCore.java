@@ -29,6 +29,7 @@ import plugin.borealcore.manager.PlaceholderManager;
 import plugin.borealcore.manager.configs.ConfigManager;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.module.loader.ModuleLoader;
+import plugin.borealcore.object.GUIListener;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.logging.Level;
@@ -92,6 +93,7 @@ public class BorealCore extends JavaPlugin {
         getCommand("herbalism").setExecutor(new HerbalismCommand());
         //getCommand("herbalism").setTabCompleter(new HerbalismTabCompletion());
         getCommand("traps").setExecutor(new TrapsCommand());
+        getServer().getPluginManager().registerEvents(new GUIListener(), this);
 
         AdventureUtil.consoleMessage("Plugin Enabled!");
     }
