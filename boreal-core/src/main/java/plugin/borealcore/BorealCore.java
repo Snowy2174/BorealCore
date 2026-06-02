@@ -18,9 +18,7 @@ import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.functions.herbalism.HerbalismCommand;
 import plugin.borealcore.functions.herbalism.HerbalismManager;
 import plugin.borealcore.functions.herbalism.configs.HerbManager;
-import plugin.borealcore.functions.jade.JadeCommand;
 import plugin.borealcore.functions.jade.JadeManager;
-import plugin.borealcore.functions.jade.JadeTabCompletion;
 import plugin.borealcore.functions.traps.TrapsCommand;
 import plugin.borealcore.functions.traps.TrapsManager;
 import plugin.borealcore.manager.EffectManager;
@@ -86,8 +84,6 @@ public class BorealCore extends JavaPlugin {
 
         getCommand("cooking").setExecutor(new CookCommand());
         getCommand("cooking").setTabCompleter(new CookTabCompletion());
-        getCommand("jade").setExecutor(new JadeCommand());
-        getCommand("jade").setTabCompleter(new JadeTabCompletion());
         getCommand("recipes").setExecutor(new RecipeBookCommand());
         getCommand("recipes").setTabCompleter(new RecipeBookTabCompletion());
         getCommand("herbalism").setExecutor(new HerbalismCommand());

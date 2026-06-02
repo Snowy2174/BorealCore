@@ -1,24 +1,34 @@
 package plugin.borealcore.functions.jade;
 
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.jade.object.Leaderboard;
 import plugin.borealcore.functions.jade.object.LeaderboardEntry;
+import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 
+import java.util.concurrent.CompletableFuture;
+
 import static plugin.borealcore.functions.jade.JadeManager.reconcileJadeData;
 
-
-public class JadeCommand implements CommandExecutor {
+@SuppressWarnings("UnstableApiUsage")
+public class JadeCommand {
 
     private final JadeManager jadeManager;
     private final JadeDatabase database;
@@ -28,266 +38,227 @@ public class JadeCommand implements CommandExecutor {
         this.database = JadeManager.getDatabase();
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    /**
+     * Builds the Brigadier command tree with subcommands, aliases, and redirects.
+     */
+    public LiteralCommandNode<CommandSourceStack> buildCommandNode() {
 
+        // Node: /jade leaderboard
+        LiteralCommandNode<CommandSourceStack> leaderboardNode = Commands.literal("leaderboard")
+                .executes(ctx -> handleLeaderboardCommand(ctx, "CURRENT", 1))
+                .then(Commands.argument("type", StringArgumentType.word())
+                        .suggests(this::suggestLeaderboardTypes)
+                        .executes(ctx -> handleLeaderboardCommand(ctx, StringArgumentType.getString(ctx, "type"), 1))
+                        .then(Commands.argument("page", IntegerArgumentType.integer(1))
+                                .executes(ctx -> handleLeaderboardCommand(ctx,
+                                        StringArgumentType.getString(ctx, "type"),
+                                        IntegerArgumentType.getInteger(ctx, "page")))))
+                .build();
 
-        if (args.length == 0) {
-            return false;
-        }
+        // Node: /jade give (Root level admin command)
+        LiteralCommandNode<CommandSourceStack> giveNode = Commands.literal("give")
+                .requires(src -> src.getSender().hasPermission("borealcore.admin"))
+                .then(Commands.argument("player", StringArgumentType.word())
+                        .suggests(this::suggestOnlinePlayers)
+                        .then(Commands.argument("amount", IntegerArgumentType.integer())
+                                .executes(ctx -> handleGiveJade(ctx, StringArgumentType.getString(ctx, "player"), "", IntegerArgumentType.getInteger(ctx, "amount")))
+                                .then(Commands.argument("source", StringArgumentType.word())
+                                        .suggests(this::suggestJadeSources)
+                                        .executes(ctx -> handleGiveJade(ctx, StringArgumentType.getString(ctx, "player"), StringArgumentType.getString(ctx, "source"), IntegerArgumentType.getInteger(ctx, "amount"))))))
+                .build();
 
-        String subcommand = args[0];
-        String[] subargs = new String[args.length - 1];
-        System.arraycopy(args, 1, subargs, 0, subargs.length);
+        LiteralCommandNode<CommandSourceStack> removeNode = Commands.literal("remove")
+                .then(Commands.argument("player", StringArgumentType.word())
+                        .suggests(this::suggestOnlinePlayers)
+                        .then(Commands.argument("amount", IntegerArgumentType.integer())
+                                .executes(ctx -> handleRemoveJade(ctx, StringArgumentType.getString(ctx, "player"), IntegerArgumentType.getInteger(ctx, "amount"), ""))
+                                .then(Commands.argument("source", StringArgumentType.word())
+                                        .suggests(this::suggestJadeSources)
+                                        .executes(ctx -> handleRemoveJade(ctx, StringArgumentType.getString(ctx, "player"), IntegerArgumentType.getInteger(ctx, "amount"), StringArgumentType.getString(ctx, "source"))))))
+                .build();
 
+        LiteralCommandNode<CommandSourceStack> setNode = Commands.literal("set")
+                .then(Commands.argument("player", StringArgumentType.word())
+                        .suggests(this::suggestOnlinePlayers)
+                        .then(Commands.argument("amount", IntegerArgumentType.integer())
+                                .executes(ctx -> handleSetJade(ctx, StringArgumentType.getString(ctx, "player"), IntegerArgumentType.getInteger(ctx, "amount"), ""))
+                                .then(Commands.argument("source", StringArgumentType.word())
+                                        .suggests(this::suggestJadeSources)
+                                        .executes(ctx -> handleSetJade(ctx, StringArgumentType.getString(ctx, "player"), IntegerArgumentType.getInteger(ctx, "amount"), StringArgumentType.getString(ctx, "source"))))))
+                .build();
 
-        // Player Commands
+        LiteralCommandNode<CommandSourceStack> adminNode = Commands.literal("admin")
+                .requires(src -> src.getSender().hasPermission("borealcore.admin"))
 
-        if (subcommand.equalsIgnoreCase("limits")) {
-            handleLimitsCommand(sender);
-        } else if (subcommand.equalsIgnoreCase("balance")) {
-            handleBalanceCommand(sender);
-        } else if (subcommand.equalsIgnoreCase("top") || subcommand.equalsIgnoreCase("leaderboard")) {
-            handleLeaderboardCommand(sender, args);
-        } else if (subcommand.equalsIgnoreCase("toggleAnnouncements")) {
-            handleToggleAnnouncementsCommand(sender);
-        }
+                .then(removeNode)
+                .then(setNode)
 
-        if (!sender.hasPermission("borealcore.admin")) {
-            return true;
-        }
+                // /jade admin give -> redirects to /jade give
+                .then(Commands.literal("give").redirect(giveNode))
+                // /jade admin take -> redirects to /jade admin remove
+                .then(Commands.literal("take").redirect(removeNode))
 
-        // Admin Commands
+                .then(Commands.literal("reset")
+                        .then(Commands.argument("player", StringArgumentType.word())
+                                .suggests(this::suggestOnlinePlayers)
+                                .executes(ctx -> handleSetJade(ctx, StringArgumentType.getString(ctx, "player"), 0, "reset"))))
 
-        if (subcommand.equalsIgnoreCase("give")) {
-            handleGiveJadeCommand(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("remove")) {
-            handleRemoveJadeCommand(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("totalJadeForPlayer")) {
-            handleTotalJadeForPlayerCommand(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("totalJadeForSource")) {
-            handleTotalJadeForSourceCommand(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("getMostRecent")) {
-            handleGetMostRecent(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("getPlayerData")) {
-            handleGetPlayerData(sender, subargs);
-        } else if (subcommand.equalsIgnoreCase("verifyAndFixTotals")) {
-            handleVerifyAndFixTotals(sender);
-        } else if (subcommand.equalsIgnoreCase("reconsile")) {
-            handleReconsileCommand(sender, subargs);
-        } else {
-            return false;
-        }
-        return true;
+                .then(Commands.literal("totalJadeForPlayer")
+                        .then(Commands.argument("player", StringArgumentType.word())
+                                .suggests(this::suggestOnlinePlayers)
+                                .executes(ctx -> handleTotalJadeForPlayerCommand(ctx, StringArgumentType.getString(ctx, "player")))))
+
+                .then(Commands.literal("totalJadeForSource")
+                        .then(Commands.argument("source", StringArgumentType.word())
+                                .suggests(this::suggestJadeSources)
+                                .executes(ctx -> handleTotalJadeForSourceCommand(ctx, StringArgumentType.getString(ctx, "source")))))
+
+                .then(Commands.literal("getMostRecent")
+                        .then(Commands.argument("player", StringArgumentType.word())
+                                .suggests(this::suggestOnlinePlayers)
+                                .executes(ctx -> handleGetMostRecent(ctx, StringArgumentType.getString(ctx, "player"), ""))
+                                .then(Commands.argument("source", StringArgumentType.word())
+                                        .suggests(this::suggestJadeSources)
+                                        .executes(ctx -> handleGetMostRecent(ctx, StringArgumentType.getString(ctx, "player"), StringArgumentType.getString(ctx, "source"))))))
+
+                .then(Commands.literal("getPlayerData")
+                        .then(Commands.argument("player", StringArgumentType.word())
+                                .suggests(this::suggestOnlinePlayers)
+                                .executes(ctx -> handleGetPlayerData(ctx, StringArgumentType.getString(ctx, "player")))))
+
+                .then(Commands.literal("verifyAndFixTotals").executes(this::handleVerifyAndFixTotals))
+                .then(Commands.literal("reconsile").executes(this::handleReconcileCommand))
+                .executes(ctx -> {
+                    AdventureUtil.sendMessage(ctx.getSource().getSender(), MessageManager.infoNegative + "Usage: /jade admin <subcommand>");
+                    return Command.SINGLE_SUCCESS;
+                })
+                .build();
+
+        return Commands.literal("jade")
+                // Player Commands
+                .then(Commands.literal("limits").executes(this::handleLimitsCommand))
+                .then(Commands.literal("balance").executes(this::handleBalanceCommand))
+
+                .then(Commands.literal("toggle")
+                        .then(Commands.literal("announcements").executes(ctx -> handleAnnoucementPreferenceCommand(ctx, "announcements")))
+                        .then(Commands.literal("notifications").executes(ctx -> handleAnnoucementPreferenceCommand(ctx, "notifications"))))
+                .then(leaderboardNode)
+                .then(Commands.literal("top").redirect(leaderboardNode))
+
+                // Admin Paths
+                .then(giveNode) // Root level /jade give
+                .then(adminNode) // /jade admin ...
+                .executes(ctx -> {
+                    AdventureUtil.sendMessage(ctx.getSource().getSender(), MessageManager.infoNegative + "Usage: /jade <subcommand>");
+                    return Command.SINGLE_SUCCESS;
+                })
+                .build();
     }
 
-    private void handleToggleAnnouncementsCommand(CommandSender sender) {
+    // Suggestion Providers
+
+    private CompletableFuture<Suggestions> suggestOnlinePlayers(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
+        String remaining = builder.getRemaining().toLowerCase();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getName().toLowerCase().startsWith(remaining)) {
+                builder.suggest(player.getName());
+            }
+        }
+        return builder.buildFuture();
+    }
+
+    private CompletableFuture<Suggestions> suggestJadeSources(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
+        String remaining = builder.getRemaining().toLowerCase();
+        for (String source : JadeManager.jadeSources.keySet()) {
+            if (source.toLowerCase().startsWith(remaining)) {
+                builder.suggest(source);
+            }
+        }
+        return builder.buildFuture();
+    }
+
+    private CompletableFuture<Suggestions> suggestLeaderboardTypes(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
+        String remaining = builder.getRemaining().toLowerCase();
+        for (LeaderboardType type : LeaderboardType.values()) {
+            if (type.name().toLowerCase().startsWith(remaining)) {
+                builder.suggest(type.name());
+            }
+        }
+        return builder.buildFuture();
+    }
+
+    // Execution Handlers
+
+    private int handleAnnoucementPreferenceCommand(CommandContext<CommandSourceStack> ctx, String type) {
+        CommandSender sender = ctx.getSource().getSender();
         if (!(sender instanceof Player player)) {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
-            return;
+            return Command.SINGLE_SUCCESS;
         }
         LuckPerms api = LuckPermsProvider.get();
-        User user = api.getUserManager().getUser(player.getUniqueId());
-        Node node = Node.builder("jade.announcement").build();
-        boolean currentStatus = user.getCachedData().getPermissionData().checkPermission("jade.announcement").asBoolean();
-        if (currentStatus) {
-            user.data().remove(node);
-            AdventureUtil.sendMessage(player, MessageManager.infoPositive + "Jade announcements disabled.");
-        } else {
-            user.data().add(node);
-            AdventureUtil.sendMessage(player, MessageManager.infoPositive + "Jade announcements enabled.");
-        }
+            api.getUserManager().modifyUser(player.getUniqueId(), user -> {
+                Node node = Node.builder("jade." + type).build();
+                boolean currentStatus = user.getCachedData().getPermissionData().checkPermission("jade." + type).asBoolean();
+                AdventureUtil.consoleMessage(DebugLevel.DEBUG, MessageManager.infoPositive + "Current announcement status for " + player.getName() + ": " + currentStatus);
+                if (currentStatus) {
+                    user.data().remove(node);
+                    AdventureUtil.sendMessage(player, MessageManager.infoPositive + "Jade " + type + " disabled.");
+                } else {
+                    user.data().add(node);
+                    AdventureUtil.sendMessage(player, MessageManager.infoPositive + "Jade " + type + " enabled.");
+                }
+            });
+        return Command.SINGLE_SUCCESS;
     }
 
-    private void handleLimitsCommand(CommandSender sender) {
-        Player player = sender instanceof Player ? (Player) sender : null;
-        if (player == null) {
+    private int handleLimitsCommand(CommandContext<CommandSourceStack> ctx) {
+        CommandSender sender = ctx.getSource().getSender();
+        if (!(sender instanceof Player player)) {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
-            return;
+            return Command.SINGLE_SUCCESS;
         }
         JadeManager.sendJadeLimitMessage(player);
+        return Command.SINGLE_SUCCESS;
     }
 
-    private void handleBalanceCommand(CommandSender sender) {
-
-        Player player = sender instanceof Player ? (Player) sender : null;
-        if (player == null) {
+    private int handleBalanceCommand(CommandContext<CommandSourceStack> ctx) {
+        CommandSender sender = ctx.getSource().getSender();
+        if (!(sender instanceof Player player)) {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
-            return;
+            return Command.SINGLE_SUCCESS;
         }
         database.getJadeForPlayerAsync(player, jade -> {
             AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Total jade: " + jade);
         });
+        return Command.SINGLE_SUCCESS;
     }
 
-    private void handleRemoveJadeCommand(CommandSender sender, String[] args) {
-        if (args.length < 2) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade remove <player> <amount> <source>");
-            return;
-        }
+    private int handleLeaderboardCommand(CommandContext<CommandSourceStack> ctx, String typeStr, int page) {
+        CommandSender sender = ctx.getSource().getSender();
+        LeaderboardType type;
 
-        Player player = Bukkit.getPlayer(args[0]);
-        String source = "";
-        int amount = 0;
-        if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
-            return;
-        }
-
-        if (args.length == 2 && args[1].matches("-?\\d+(\\.\\d+)?")) {
-            amount = Integer.parseInt(args[1]);
-        } else if (args.length == 3 && args[2].matches("-?\\d+(\\.\\d+)?")) {
-            amount = Integer.parseInt(args[1]);
-            source = args[2];
-        } else {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade remove <player> <amount> <source>");
-            return;
-        }
-        JadeManager.remove(player, amount, source);
-        AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Removed" + amount + " from " + source + " from " + player.getName());
-    }
-
-    private void handleTotalJadeForPlayerCommand(CommandSender sender, String[] args) {
-        if (args.length < 1) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade totalJadeForPlayer <player>");
-            return;
-        }
-
-        Player player = Bukkit.getPlayer(args[0]);
-        if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
-            return;
-        }
-
-        database.getJadeForPlayerAsync(player, jade -> {
-            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);
-        });
-    }
-
-    private void handleTotalJadeForSourceCommand(CommandSender sender, String[] args) {
-        if (args.length < 1) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade totalJadeForSource <source>");
-            return;
-        }
-
-        String source = args[0];
-        int totalJade = database.getTotalJadeFromSource(source);
-        AdventureUtil.sendMessage(sender, "Total jade for source " + source + ": " + totalJade);
-    }
-
-    private void handleGetMostRecent(CommandSender sender, String[] args) {
-        if (args.length < 1) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade getMostRecent <player>");
-            return;
-        }
-
-        Player player = Bukkit.getPlayer(args[0]);
-        if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
-            return;
-        }
-
-        String source = args.length > 1 ? args[1] : "";
-        AdventureUtil.sendMessage(sender, "Most recent transaction for " + player.getName() + ": " + database.getRecentPositiveTransactionTimestamps(player, source));
-    }
-
-    private void handleGiveJadeCommand(CommandSender sender, String[] args) {
-        if (args.length < 2) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade give <player> <source> <amount>");
-            return;
-        }
-
-        Player player = Bukkit.getPlayer(args[0]);
-        String source = "";
-        int amount = 0;
-        if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
-            return;
-        }
-
-        if (args.length == 2 && args[1].matches("-?\\d+(\\.\\d+)?")) {
-            amount = Integer.parseInt(args[1]);
-        } else if (args.length == 3 && args[2].matches("-?\\d+(\\.\\d+)?")) {
-            source = args[1];
-            amount = Integer.parseInt(args[2]);
-        } else {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade give <player> <source> <amount>");
-            return;
-        }
-        JadeManager.giveJadeCommand(player, source, amount);
-        AdventureUtil.sendMessage(sender, "Gave " + amount + " from " + source + " to " + player.getName());
-    }
-
-    private void handleGetPlayerData(CommandSender sender, String[] args) {
-        if (args.length < 1) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade getPlayerData <player>");
-            return;
-        }
-
-        Player player = Bukkit.getPlayer(args[0]);
-        if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
-            return;
-        }
-
-        database.getJadeForPlayerAsync(player, jade -> {
-            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);
-        });
-    }
-
-    private void handleVerifyAndFixTotals(CommandSender sender) {
-        database.verifyAndFixTotals();
-        AdventureUtil.sendMessage(sender, "Jade totals verified and fixed");
-    }
-
-    private void handleReconsileCommand(CommandSender sender, String[] args) {
-        if (args.length < 0) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade reconsile>");
-            return;
-        }
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            reconcileJadeData(p);
-            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Reconciled jade data for " + p.getName());
-            return;
-        }
-    }
-
-    private void handleLeaderboardCommand(CommandSender sender, String[] args) {
-        if (args.length < 1) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "/jade leaderboard <type> <page>");
-            return;
-        }
-        LeaderboardType type = LeaderboardType.CURRENT;
-        int page = 1;
-        if (args.length > 2) {
-            try {
-                type = LeaderboardType.valueOf(args[1].toUpperCase());
-            } catch (IllegalArgumentException e) {
-                AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid leaderboard type");
-                return;
-            }
-            try {
-                page = Integer.parseInt(args[2]);
-            } catch (NumberFormatException e) {
-                AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid page number");
-                return;
-            }
+        try {
+            type = LeaderboardType.valueOf(typeStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Invalid leaderboard type");
+            return Command.SINGLE_SUCCESS;
         }
 
         Leaderboard leaderboard = jadeManager.getLeaderboard(type);
         int entriesPerPage = 5;
         int totalEntries = leaderboard.getEntries().size();
-        int totalPages = (int) Math.ceil((double) totalEntries / entriesPerPage);
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalEntries / entriesPerPage));
 
         if (page < 1 || page > totalPages) {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + "Page out of range. Total pages: " + totalPages);
-            return;
+            return Command.SINGLE_SUCCESS;
         }
 
         AdventureUtil.sendMessage(sender, MessageManager.leaderboardHeader
                 .replace("{type}", type.toString())
                 .replace("{page}", String.valueOf(page))
                 .replace("{totalPages}", String.valueOf(totalPages)));
+
         leaderboard.getEntries().stream()
                 .skip((long) (page - 1) * entriesPerPage)
                 .limit(entriesPerPage)
@@ -295,6 +266,7 @@ public class JadeCommand implements CommandExecutor {
                         .replace("{player}", entry.getPlayerName())
                         .replace("{position}", String.valueOf(entry.getPosition()))
                         .replace("{score}", String.valueOf(entry.getTotalAmount()))));
+
         AdventureUtil.sendMessage(sender, MessageManager.leaderboardFooter);
         AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Your position: " + leaderboard.getEntries()
                 .stream()
@@ -302,6 +274,123 @@ public class JadeCommand implements CommandExecutor {
                 .findFirst()
                 .map(LeaderboardEntry::getPosition)
                 .orElse(0));
+
+        return Command.SINGLE_SUCCESS;
     }
 
+    // Admin Handlers
+
+    private int handleGiveJade(CommandContext<CommandSourceStack> ctx, String playerName, String source, int amount) {
+        CommandSender sender = ctx.getSource().getSender();
+        Player player = Bukkit.getPlayer(playerName);
+
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        JadeManager.giveJadeCommand(player, source, amount);
+        AdventureUtil.sendMessage(sender, "Gave " + amount + " from " + (source.isEmpty() ? "unknown" : source) + " to " + player.getName());
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int handleRemoveJade(CommandContext<CommandSourceStack> ctx, String playerName, int amount, String source) {
+        CommandSender sender = ctx.getSource().getSender();
+        Player player = Bukkit.getPlayer(playerName);
+
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        JadeManager.remove(player, amount, source);
+        AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Removed " + amount + " from " + (source.isEmpty() ? "unknown" : source) + " from " + player.getName());
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int handleSetJade(CommandContext<CommandSourceStack> ctx, String playerName, int amount, String source) {
+        CommandSender sender = ctx.getSource().getSender();
+        Player player = Bukkit.getPlayer(playerName);
+
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        JadeManager.setBalance(player, amount, source);
+
+        if ("reset".equalsIgnoreCase(source)) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Reset balance for " + player.getName() + " to 0");
+        } else {
+            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Set balance of " + player.getName() + " to " + amount + (source.isEmpty() ? "" : " (" + source + ")"));
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int handleTotalJadeForPlayerCommand(CommandContext<CommandSourceStack> ctx, String playerName) {
+        CommandSender sender = ctx.getSource().getSender();
+        Player player = Bukkit.getPlayer(playerName);
+
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        database.getJadeForPlayerAsync(player, jade -> {
+            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);
+        });
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int handleTotalJadeForSourceCommand(CommandContext<CommandSourceStack> ctx, String source) {
+        CommandSender sender = ctx.getSource().getSender();
+        int totalJade = database.getTotalJadeFromSource(source);
+        AdventureUtil.sendMessage(sender, "Total jade for source " + source + ": " + totalJade);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int handleGetMostRecent(CommandContext<CommandSourceStack> ctx, String playerName, String source) {
+        CommandSender sender = ctx.getSource().getSender();
+        Player player = Bukkit.getPlayer(playerName);
+
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        AdventureUtil.sendMessage(sender, "Most recent transaction for " + player.getName() + ": " + database.getRecentPositiveTransactionTimestamps(player, source));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int handleGetPlayerData(CommandContext<CommandSourceStack> ctx, String playerName) {
+        CommandSender sender = ctx.getSource().getSender();
+        Player player = Bukkit.getPlayer(playerName);
+
+        if (player == null) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        database.getJadeForPlayerAsync(player, jade -> {
+            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);
+        });
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int handleVerifyAndFixTotals(CommandContext<CommandSourceStack> ctx) {
+        CommandSender sender = ctx.getSource().getSender();
+        database.verifyAndFixTotals();
+        AdventureUtil.sendMessage(sender, "Jade totals verified and fixed");
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int handleReconcileCommand(CommandContext<CommandSourceStack> ctx) {
+        CommandSender sender = ctx.getSource().getSender();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            reconcileJadeData(p);
+            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Reconciled jade data for " + p.getName());
+            return Command.SINGLE_SUCCESS;
+        }
+        return Command.SINGLE_SUCCESS;
+    }
 }

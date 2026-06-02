@@ -4,6 +4,7 @@ import com.bencodez.votingplugin.VotingPluginHooks;
 import com.bencodez.votingplugin.user.VotingPluginUser;
 import com.dre.brewery.Brew;
 import com.dre.brewery.api.events.brew.BrewModifyEvent;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.momirealms.customcrops.api.core.mechanic.crop.CropConfig;
 import net.momirealms.customcrops.api.event.CropBreakEvent;
 import net.momirealms.customfishing.api.event.FishingResultEvent;
@@ -14,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitScheduler;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.api.event.JadeEvent;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.functions.jade.object.JadeSource;
@@ -72,6 +72,12 @@ public class JadeManager extends Function implements BorealModule {
         Bukkit.getPluginManager().registerEvents(jadeSourceListener, BorealCore.plugin);
         this.jadePlaceholders = new JadePapi();
         getPlaceholderManager().registerExpansion(jadePlaceholders);
+
+        // context.getPlugin()
+        BorealCore.plugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> { //Importantly move to Init not load
+            JadeCommand jadeCommand = new JadeCommand();
+            event.registrar().register(jadeCommand.buildCommandNode());
+        });
         database.verifyAndFixTotals();
         database.startRetryTask();
         reloadLeaderboards();
@@ -138,6 +144,16 @@ public class JadeManager extends Function implements BorealModule {
             AdventureUtil.sendMessage(player, MessageManager.infoNegative + MessageManager.jadeLimitReached
                     .replace("{source}", GuiUtil.formatString(source)));
             sendJadeLimitMessage(player);
+        }
+    }
+
+    public static void setBalance(Player player, int amount, String source) {
+        int currentBalance = database.getJadeForPlayer(player);
+        int diff = amount - currentBalance;
+        if (diff > 0) {
+            give(player, diff, source);
+        } else if (diff < 0) {
+            remove(player, -diff, source);
         }
     }
 

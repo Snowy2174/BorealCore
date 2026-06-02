@@ -17,6 +17,7 @@ import plugin.borealcore.utility.ItemUtil;
 
 import java.util.*;
 
+import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 import static plugin.borealcore.utility.AdventureUtil.getComponentFromMiniMessage;
 
 public class EffectManager extends Function {
@@ -49,14 +50,13 @@ public class EffectManager extends Function {
         if (loreProvider != null) {
             LORE_PROVIDERS.put(actionClass, loreProvider);
         }
+        consoleMessage(DebugLevel.DEBUG, "Registered action: " + key + " with class " + actionClass.getSimpleName());
     }
 
     @Override
     public void load() {
         EFFECTS = new HashMap<>();
         registerDefaultActions();
-
-        loadEffects("recipes/buffs");
         AdventureUtil.consoleMessage("Loaded <green>" + EFFECTS.size() + " <gray>buff categories");
     }
 
@@ -176,7 +176,7 @@ public class EffectManager extends Function {
         return lore;
     }
 
-    private void loadEffects(String configPath) {
+    public static void loadEffects(String configPath) {
         YamlConfiguration config = ConfigManager.getConfig(configPath + ".yml");
         for (String sectionName : config.getKeys(false)) {
             ConfigurationSection section = config.getConfigurationSection(sectionName);

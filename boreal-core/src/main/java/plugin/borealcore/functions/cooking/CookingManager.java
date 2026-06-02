@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.action.Action;
 import plugin.borealcore.action.PotionEffectImpl;
-import plugin.borealcore.api.event.CookResultEvent;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.functions.cooking.competition.Competition;
@@ -103,6 +102,7 @@ public class CookingManager extends Function implements BorealModule {
                 },
                 null
         );
+        EffectManager.loadEffects("recipes/buffs");
 
         GuiManager guiManager = BorealCore.getGuiManager();
         guiManager.registerGui("cookingRecipeBook", () -> new CookingRecipeBookGUI(null));
@@ -216,7 +216,7 @@ public class CookingManager extends Function implements BorealModule {
             return;
         }
 
-        double masteryPerfectionMultiplier = RecipeDataUtil.hasMastery(player, droppedItem.getKey()) ? 1.5 : 1;
+        double masteryPerfectionMultiplier = RecipeDataUtil.hasMastery(player, droppedItem.getKey()) ? 1.5 : 1; //@TODO this shouldn't be hardcoded
         boolean perfect = cookingPlayer.isPerfect() && (Math.random() < perfectChance * masteryPerfectionMultiplier);
         String drop = recipe.getCookedItems();
 
@@ -232,7 +232,6 @@ public class CookingManager extends Function implements BorealModule {
             if (!RecipeDataUtil.hasMastery(player, droppedItem.getKey())) {
                 MasteryManager.handleMastery(player, droppedItem.getKey());
             }
-            JadeManager.cookingJade(player);
         }
 
         if (cookingPot != null) {

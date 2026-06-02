@@ -8,6 +8,7 @@ import net.momirealms.customfishing.api.event.FishingResultEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import plugin.borealcore.functions.cooking.CookResultEvent;
 import plugin.borealcore.manager.configs.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 
@@ -51,6 +52,15 @@ public class JadeSourceListener implements Listener {
             JadeManager.give(Bukkit.getPlayer(event.getPlayer()), 1, "voting");
         } else {
             JadeManager.giveOffline(Bukkit.getOfflinePlayer(event.getPlayer()), 1, "voting");
+        }
+    }
+
+    // @TODO add the listeners for the vote tier rewards
+
+    @EventHandler
+    public void onCook(CookResultEvent event){
+        if (event.isPerfect()) {
+            jadeManager.cookingJade(event.getPlayer());
         }
     }
 }

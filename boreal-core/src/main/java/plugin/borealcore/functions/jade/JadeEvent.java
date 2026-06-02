@@ -1,4 +1,4 @@
-package plugin.borealcore.api.event;
+package plugin.borealcore.functions.jade;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;

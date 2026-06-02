@@ -31,18 +31,10 @@ public class GuiManager extends Function {
     public static HashMap<String, ItemStack> collectionItems;
 
     @Override
-    public void load() {
-        INGREDIENTS = new HashMap<>();
-        //collectionItems = initCollectionItems();
-        loadItems();
-        //writeProgressionItemsToNascraft(collectionItems, new File(BorealCore.getInstance().getDataFolder(), "nascraft.yml"));
-
-        AdventureUtil.consoleMessage("Loaded <green>" + (INGREDIENTS.size()) + " <gray>ingredients");
-    }
+    public void load() {}
 
     @Override
     public void unload() {
-        if (INGREDIENTS != null) INGREDIENTS.clear();
         guiRegistry.clear();
     }
 
@@ -82,69 +74,6 @@ public class GuiManager extends Function {
         } else {
             AdventureUtil.consoleMessage(DebugLevel.WARNING, "Attempted to open unregistered GUI: " + id);
             return false;
-        }
-    }
-
-    // Note: Eventually, these should likely be moved to a dedicated IngredientManager / IntegrationManager.
-
-    private void loadItems() {
-        YamlConfiguration config = ConfigManager.getConfig("recipes/ingredients.yml");
-        if (config == null) return;
-
-        Set<String> ingredients = config.getKeys(false);
-
-        for (String key : ingredients) {
-            ConfigurationSection ingredientSection = config.getConfigurationSection(key);
-            if (ingredientSection == null) continue;
-
-            Ingredient ingredient = new Ingredient(
-                    key,
-                    ingredientSection.getString("nick", key),
-                    ingredientSection.getInt("slot", 1),
-                    ingredientSection.getStringList("ingredients")
-            );
-
-            INGREDIENTS.put(key, ingredient);
-        }
-    }
-
-    public static void writeProgressionItemsToNascraft(HashMap<String, ItemStack> map, File outputFile) {
-        // Configure YAML options
-        DumperOptions options = new DumperOptions();
-        options.setPrettyFlow(true);
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-
-        Yaml yaml = new Yaml(options);
-
-        Map<String, ItemStack> sortedMap = new TreeMap<>((key1, key2) -> {
-            String[] parts1 = key1.split(":");
-            String[] parts2 = key2.split(":");
-            int namespaceComparison = parts1[0].compareTo(parts2[0]);
-            if (namespaceComparison != 0) {
-                return namespaceComparison;
-            }
-            return parts1[1].compareTo(parts2[1]);
-        });
-        sortedMap.putAll(map);
-
-        Map<String, Object> yamlData = new LinkedHashMap<>();
-
-        for (Map.Entry<String, ItemStack> entry : sortedMap.entrySet()) {
-            String key = entry.getKey().split(":")[1];
-            ItemStack itemStack = entry.getValue();
-            Double price = 0.0;
-            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Price: " + price);
-
-            Map<String, Object> entryData = new HashMap<>();
-            entryData.put("initial-price", price);
-            yamlData.put(key, entryData);
-        }
-
-        try (FileWriter writer = new FileWriter(outputFile)) {
-            yaml.dump(yamlData, writer);
-            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Written file: " + outputFile.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }
