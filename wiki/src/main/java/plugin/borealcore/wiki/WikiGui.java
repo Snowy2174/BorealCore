@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.api.module.BorealGUI;
-import plugin.borealcore.functions.cooking.CookingConfig;
+import plugin.borealcore.functions.cooking.configs.CookingConfig;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.ArrayList;

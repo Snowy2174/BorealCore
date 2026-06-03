@@ -2,8 +2,8 @@ package plugin.borealcore.functions.cooking.configs;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.borealcore.functions.cooking.object.Layout;
-import plugin.borealcore.manager.configs.ConfigManager;
-import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.manager.ConfigManager;
+import plugin.borealcore.object.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 

@@ -13,9 +13,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
-import plugin.borealcore.functions.cooking.CookingConfig;
-import plugin.borealcore.manager.configs.ConfigManager;
-import plugin.borealcore.manager.configs.MessageManager;
+import plugin.borealcore.functions.cooking.configs.CookingConfig;
+import plugin.borealcore.manager.ConfigManager;
+import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ItemUtil;
 

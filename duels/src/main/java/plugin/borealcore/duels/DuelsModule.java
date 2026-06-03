@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
-import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.object.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.HashMap;
@@ -42,10 +42,16 @@ public class DuelsModule implements BorealModule {
     public void onModuleInitialize(ModuleContext context){}
 
     public static void startMatch(MatchStartEvent event) {
-        Set<Player> players = event.getMatch().getPlayers();
-        MatchRunnable task = new MatchRunnable(players);
-        Player player1 = task.getPlayer1();
-        Arena arena = arenaManager.get(player1);
+        Player[] players = event.getPlayers();
+        Arena arena = event.getMatch().getArena();
+
+        if (players.length != 2) {
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG,
+                    "Skipping healthbar runnable because this match has " + players.length + " players.");
+            return;
+        }
+
+        MatchRunnable task = new MatchRunnable(players[0], players[1], arena);
 
         if (ongoingRunnables.containsKey(arena)) {
             AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Match already ongoing for arena: " + arena.getName());
@@ -70,5 +76,4 @@ public class DuelsModule implements BorealModule {
         task.cancel();
         plugin.getLogger().info("Match ended: " + players);
     }
-
 }

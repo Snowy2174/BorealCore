@@ -2,8 +2,9 @@ package plugin.borealcore.functions.cooking;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import plugin.borealcore.functions.cooking.configs.CookingMessage;
+import plugin.borealcore.functions.cooking.object.Difficulty;
 import plugin.borealcore.functions.cooking.object.Layout;
-import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 
 public class CookingPlayer extends BukkitRunnable {
@@ -47,7 +48,7 @@ public class CookingPlayer extends BukkitRunnable {
     @Override
     public void run() {
         if (System.currentTimeMillis() > deadline) {
-            AdventureUtil.playerMessage(player, MessageManager.tooSlow);
+            AdventureUtil.playerMessage(player, CookingMessage.tooSlow);
             cookingManager.removeCookingPlayer(player);
             cancel();
             return;

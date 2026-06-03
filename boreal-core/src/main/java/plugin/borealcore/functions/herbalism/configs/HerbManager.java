@@ -5,7 +5,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffect;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.cooking.Difficulty;
+import plugin.borealcore.functions.cooking.object.Difficulty;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.functions.herbalism.objects.Herb;
@@ -13,7 +13,7 @@ import plugin.borealcore.functions.herbalism.objects.HerbalismType;
 import plugin.borealcore.functions.herbalism.objects.Modifier;
 import plugin.borealcore.functions.herbalism.objects.ModifierType;
 import plugin.borealcore.manager.EffectManager;
-import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.object.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 

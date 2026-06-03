@@ -5,8 +5,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.functions.cooking.configs.CookingConfig;
+import plugin.borealcore.functions.cooking.configs.CookingMessage;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
-import plugin.borealcore.manager.configs.MessageManager;
+import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 
 import javax.annotation.Nullable;
@@ -18,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static plugin.borealcore.manager.configs.ConfigManager.getConfig;
+import static plugin.borealcore.manager.ConfigManager.getConfig;
 
 public class RecipeDataUtil {
 
@@ -129,7 +131,7 @@ public class RecipeDataUtil {
             setRecipeData(player, recipe, 0);
             String recipeFormatted = RecipeManager.COOKING_RECIPES.get(recipe).getNick();
             ItemsAdder.playTotemAnimation(player, recipe + CookingConfig.particleItemSuffix);
-            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.recipeUnlocked.replace("{recipe}", recipeFormatted));
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + CookingMessage.recipeUnlocked.replace("{recipe}", recipeFormatted));
         } else {
             if (!unlockedRecipes.contains(recipe)) {
                 return;
@@ -137,7 +139,7 @@ public class RecipeDataUtil {
             setRecipeData(player, recipe, null);
             String recipeFormatted = RecipeManager.COOKING_RECIPES.get(recipe).getNick();
             ItemsAdder.playTotemAnimation(player, recipe + CookingConfig.particleItemSuffix);
-            AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeLocked.replace("{recipe}", recipeFormatted));
+            AdventureUtil.playerMessage(player, MessageManager.infoNegative + CookingMessage.recipeLocked.replace("{recipe}", recipeFormatted));
         }
     }
 
@@ -161,7 +163,7 @@ public class RecipeDataUtil {
             config.set(playerRecipePath, requiredMastery);
             ItemsAdder.playTotemAnimation(player, recipe + CookingConfig.particleItemSuffix);
             AdventureUtil.consoleMessage(MessageManager.prefix + "Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
-            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", RecipeManager.COOKING_RECIPES.get(recipe).getNick()));
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + CookingMessage.masteryMessage.replace("{recipe}", RecipeManager.COOKING_RECIPES.get(recipe).getNick()));
         }
     }
 

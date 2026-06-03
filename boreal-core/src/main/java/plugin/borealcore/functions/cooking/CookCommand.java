@@ -8,10 +8,11 @@ import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.competition.Competition;
 import plugin.borealcore.functions.cooking.competition.CompetitionSchedule;
+import plugin.borealcore.functions.cooking.configs.CookingMessage;
 import plugin.borealcore.manager.GuiManager;
-import plugin.borealcore.manager.configs.ConfigManager;
-import plugin.borealcore.manager.configs.DebugLevel;
-import plugin.borealcore.manager.configs.MessageManager;
+import plugin.borealcore.manager.ConfigManager;
+import plugin.borealcore.object.DebugLevel;
+import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ItemUtil;
 
@@ -244,16 +245,16 @@ public class CookCommand implements CommandExecutor {
                 return;
             }
             if (CompetitionSchedule.startCompetition(args[1])) {
-                AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.forceSuccess);
+                AdventureUtil.sendMessage(sender, MessageManager.prefix + CookingMessage.forceSuccess);
             } else {
-                AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.forceFailure);
+                AdventureUtil.sendMessage(sender, MessageManager.prefix + CookingMessage.forceFailure);
             }
         } else if (args[0].equals("end")) {
             CompetitionSchedule.endCompetition();
-            AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.forceEnd);
+            AdventureUtil.sendMessage(sender, MessageManager.prefix + CookingMessage.forceEnd);
         } else if (args[0].equals("cancel")) {
             CompetitionSchedule.cancelCompetition();
-            AdventureUtil.sendMessage(sender, MessageManager.prefix + MessageManager.forceCancel);
+            AdventureUtil.sendMessage(sender, MessageManager.prefix + CookingMessage.forceCancel);
         } else if (args[0].equals("join")) {
             if (sender instanceof Player player) {
                 Competition.currentCompetition.tryAddBossBarToPlayer(player);

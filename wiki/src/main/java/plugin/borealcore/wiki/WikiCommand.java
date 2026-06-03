@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.manager.GuiManager;
-import plugin.borealcore.manager.configs.MessageManager;
+import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.io.File;

@@ -2,9 +2,9 @@ package plugin.borealcore.functions.herbalism;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import plugin.borealcore.functions.cooking.Difficulty;
+import plugin.borealcore.functions.cooking.configs.CookingMessage;
+import plugin.borealcore.functions.cooking.object.Difficulty;
 import plugin.borealcore.functions.cooking.object.Layout;
-import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 
 public class InfusingPlayer extends BukkitRunnable {
@@ -47,7 +47,7 @@ public class InfusingPlayer extends BukkitRunnable {
     @Override
     public void run() {
         if (System.currentTimeMillis() > deadline) {
-            AdventureUtil.playerMessage(player, MessageManager.tooSlow);
+            AdventureUtil.playerMessage(player, CookingMessage.tooSlow);
             //@TODO ingredient fail, not infuse cancel
             herbalismManager.removeInfusingPlayer(player);
             cancel();

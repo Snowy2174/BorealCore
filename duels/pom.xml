@@ -23,6 +23,12 @@
             <version>1.1.9.1</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.dumbo-the-developer.Duels</groupId>
+            <artifactId>duels-api</artifactId>
+            <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

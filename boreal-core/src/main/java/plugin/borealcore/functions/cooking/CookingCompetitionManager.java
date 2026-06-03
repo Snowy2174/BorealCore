@@ -3,13 +3,13 @@ package plugin.borealcore.functions.cooking;
 import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.borealcore.api.action.Action;
-import plugin.borealcore.action.CommandActionImpl;
-import plugin.borealcore.action.MessageActionImpl;
+import plugin.borealcore.api.action.action.CommandActionImpl;
+import plugin.borealcore.api.action.action.MessageActionImpl;
 import plugin.borealcore.functions.cooking.competition.CompetitionConfig;
 import plugin.borealcore.functions.cooking.competition.CompetitionGoal;
 import plugin.borealcore.functions.cooking.competition.CompetitionSchedule;
 import plugin.borealcore.functions.cooking.competition.bossbar.BossBarConfig;
-import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.ConfigManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 

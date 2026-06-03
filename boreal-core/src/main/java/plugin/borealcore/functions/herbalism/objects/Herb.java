@@ -2,7 +2,7 @@ package plugin.borealcore.functions.herbalism.objects;
 
 import org.bukkit.potion.PotionEffect;
 import plugin.borealcore.api.action.Action;
-import plugin.borealcore.functions.cooking.Difficulty;
+import plugin.borealcore.functions.cooking.object.Difficulty;
 import plugin.borealcore.functions.cooking.object.Layout;
 
 import java.util.List;

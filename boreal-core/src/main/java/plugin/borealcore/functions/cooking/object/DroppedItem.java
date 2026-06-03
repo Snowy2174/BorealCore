@@ -1,7 +1,5 @@
 package plugin.borealcore.functions.cooking.object;
 
-import plugin.borealcore.functions.cooking.Difficulty;
-
 import java.util.List;
 
 public class DroppedItem extends Recipe {

@@ -1,13 +1,17 @@
 package plugin.borealcore.api.module;
 
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.database.DatabaseManager;
 import plugin.borealcore.manager.PlaceholderManager;
-import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.ConfigManager;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -22,6 +26,7 @@ public class ModuleContext {
     private final Logger logger;
     private final PluginManager pluginManager;
     private final PlaceholderManager placeholderManager;
+    private final List<LiteralCommandNode<CommandSourceStack>> registeredCommands = new ArrayList<>();
 
     public ModuleContext(BorealCore plugin, DatabaseManager database, PlaceholderManager placeholderManager) {
         this.plugin = plugin;
@@ -104,25 +109,54 @@ public class ModuleContext {
     /**
      * Applies default values to a module's config.
      * If the keys don't exist, they are written and saved to disk.
-     * @param identifier The file (".yml") or main config section path
+     * Supports both standalone .yml files and sections within config.yml.
+     * 
+     * @param identifier File name (.yml) or section path in config.yml
      * @param defaultValues A map of config paths to default values
      * @return The populated ConfigurationSection ready for reading
      */
     public ConfigurationSection setupModuleDefaults(String identifier, Map<String, Object> defaultValues) {
-        ConfigurationSection config = getModuleConfig(identifier);
-        boolean changed = false;
+        return ConfigManager.setupModuleDefaults(identifier, defaultValues);
+    }
 
-        for (Map.Entry<String, Object> entry : defaultValues.entrySet()) {
-            if (!config.contains(entry.getKey())) {
-                config.set(entry.getKey(), entry.getValue());
-                changed = true;
-            }
-        }
+    /**
+     * Applies default values to a module's messages.
+     * If the keys don't exist, they are written to the messages file.
+     * 
+     * @param messageDefaults A map of message keys to default values (without "messages." prefix)
+     * @return The populated ConfigurationSection of messages
+     */
+    public ConfigurationSection setupModuleMessages(Map<String, String> messageDefaults) {
+        return ConfigManager.setupModuleMessages(messageDefaults);
+    }
 
-        if (changed) {
-            saveModuleConfig(identifier, config);
-        }
-        return config;
+    /**
+     * Queues a Brigadier command node for registration.
+     * Modules should call this during their initialization phase. The core plugin
+     * will later bulk-register all queued commands during the LifecycleEvents.COMMANDS event.
+     *
+     * @param commandNode The root literal command node to register.
+     */
+    public void registerCommand(LiteralCommandNode<CommandSourceStack> commandNode) {
+        this.registeredCommands.add(commandNode);
+    }
+
+    /**
+     * Retrieves an unmodifiable list of all command nodes currently queued by loaded modules.
+     *
+     * @return A list of registered Brigadier command nodes.
+     */
+    public List<LiteralCommandNode<CommandSourceStack>> getRegisteredCommands() {
+        return this.registeredCommands;
+    }
+
+    /**
+     * Purges all tracked commands from the context.
+     * This must be called prior to reloading modules to ensure ghost commands
+     * are not carried over into the new initialization phase.
+     */
+    public void clearCommands() {
+        this.registeredCommands.clear();
     }
 }
 

@@ -1,7 +1,7 @@
 package plugin.borealcore.api.module;
 
 /**
- * Exception thrown when an module fails to load.
+ * Exception thrown when a module fails to load.
  */
 public class ModuleLoadException extends Exception {
     

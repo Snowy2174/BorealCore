@@ -52,6 +52,7 @@
     <module>sit</module>
     <module>wiki</module>
     <module>plushies</module>
+    <module>jade</module>
   </modules>
   <repositories>
     <repository>
@@ -172,12 +173,6 @@
       <groupId>net.momirealms</groupId>
       <artifactId>custom-fishing</artifactId>
       <version>2.3.7</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.github.dumbo-the-developer.Duels</groupId>
-      <artifactId>duels-api</artifactId>
-      <version>3.9</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

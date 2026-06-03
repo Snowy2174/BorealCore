@@ -12,9 +12,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.manager.configs.ConfigManager;
-import plugin.borealcore.manager.configs.DebugLevel;
-import plugin.borealcore.manager.configs.MessageManager;
+import plugin.borealcore.manager.ConfigManager;
+import plugin.borealcore.object.DebugLevel;
+import plugin.borealcore.manager.MessageManager;
 
 import java.time.Duration;
 
@@ -43,7 +43,7 @@ public class AdventureUtil {
         Component parsed = mm.deserialize(MessageManager.prefix + "[ " + debug.toString() + " ] " + replaceLegacy(s));
         au.sendMessage(parsed);
         if (debug == DebugLevel.ERROR) { // Send error messages to Discord, and ping snowy
-            DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName("developer-logs").sendMessage("<@701490040273895445>" + s);
+            DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName("\uD83E\uDE9B｜plugin-stuff").sendMessage("<@701490040273895445>" + s);
         }
     }
 

@@ -2,10 +2,10 @@ package plugin.borealcore.functions.cooking.competition.bossbar;
 
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.functions.cooking.configs.CookingMessage;
 import plugin.borealcore.functions.cooking.competition.Competition;
 import plugin.borealcore.functions.cooking.competition.ranking.RankingInterface;
 import plugin.borealcore.manager.PlaceholderManager;
-import plugin.borealcore.manager.configs.MessageManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,12 +61,12 @@ public class TextCache {
                 .replace("{minute}", String.format("%02d", Competition.currentCompetition.getRemainingTime() / 60))
                 .replace("{second}", String.format("%02d", Competition.currentCompetition.getRemainingTime() % 60))
                 .replace("{score}", String.format("%.1f", Competition.currentCompetition.getScore(owner)))
-                .replace("{1st_player}", Optional.ofNullable(ranking.getPlayerAt(1)).orElse(MessageManager.noPlayer))
-                .replace("{1st_score}", ranking.getScoreAt(1) <= 0 ? MessageManager.noScore : String.format("%.1f", ranking.getScoreAt(1)))
-                .replace("{2nd_player}", Optional.ofNullable(ranking.getPlayerAt(2)).orElse(MessageManager.noPlayer))
-                .replace("{2nd_score}", ranking.getScoreAt(2) <= 0 ? MessageManager.noScore : String.format("%.1f", ranking.getScoreAt(2)))
-                .replace("{3rd_player}", Optional.ofNullable(ranking.getPlayerAt(3)).orElse(MessageManager.noPlayer))
-                .replace("{3rd_score}", ranking.getScoreAt(3) <= 0 ? MessageManager.noScore : String.format("%.1f", ranking.getScoreAt(3)));
+                .replace("{1st_player}", Optional.ofNullable(ranking.getPlayerAt(1)).orElse(CookingMessage.noPlayer))
+                .replace("{1st_score}", ranking.getScoreAt(1) <= 0 ? CookingMessage.noScore : String.format("%.1f", ranking.getScoreAt(1)))
+                .replace("{2nd_player}", Optional.ofNullable(ranking.getPlayerAt(2)).orElse(CookingMessage.noPlayer))
+                .replace("{2nd_score}", ranking.getScoreAt(2) <= 0 ? CookingMessage.noScore : String.format("%.1f", ranking.getScoreAt(2)))
+                .replace("{3rd_player}", Optional.ofNullable(ranking.getPlayerAt(3)).orElse(CookingMessage.noPlayer))
+                .replace("{3rd_score}", ranking.getScoreAt(3) <= 0 ? CookingMessage.noScore : String.format("%.1f", ranking.getScoreAt(3)));
 
         if (!latestValue.equals(string)) {
             latestValue = string;

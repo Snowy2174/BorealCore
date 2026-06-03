@@ -10,7 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.object.DebugLevel;
 
 import java.util.ArrayList;
 

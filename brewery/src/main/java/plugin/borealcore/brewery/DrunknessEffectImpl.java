@@ -4,7 +4,7 @@ import com.dre.brewery.api.BreweryApi;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.api.action.Action;
-import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.object.DebugLevel;
 
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 

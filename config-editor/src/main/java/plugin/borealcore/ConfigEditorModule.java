@@ -17,11 +17,12 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
-import plugin.borealcore.manager.configs.MessageManager;
+import plugin.borealcore.config.ConfigEditorMessage;
+import plugin.borealcore.config.ConfigEditorMessageLoader;
+import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.object.SimpleListener;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.ChatInputUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,6 +61,8 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
 
     @Override
     public void onModuleEnable() throws Exception {
+        ConfigEditorMessageLoader.load();
+
         // Register events using the context
         context.getPluginManager().registerEvents(this.simpleListener, context.getPlugin());
 
@@ -100,7 +103,7 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
         }
 
         if (!player.hasPermission(configEditorPermission)) {
-            AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.configEditorNoPermission);
+            AdventureUtil.playerMessage(player, MessageManager.infoNegative + ConfigEditorMessage.configEditorNoPermission);
             return true;
         }
 
@@ -120,17 +123,17 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
 
             if (targetPlugin == null) {
                 AdventureUtil.playerMessage(player, MessageManager.infoNegative +
-                        MessageManager.configEditorPluginNotFound.replace("{plugin}", pluginName));
+                        ConfigEditorMessage.configEditorPluginNotFound.replace("{plugin}", pluginName));
                 return true;
             }
 
             if (!hasEditPermission(player, targetPlugin)) {
-                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.configEditorNoPermission);
+                AdventureUtil.playerMessage(player, MessageManager.infoNegative + ConfigEditorMessage.configEditorNoPermission);
                 return true;
             }
 
             AdventureUtil.playerMessage(player, MessageManager.infoPositive +
-                    MessageManager.configEditorOpening.replace("{plugin}", targetPlugin.getName()));
+                    ConfigEditorMessage.configEditorOpening.replace("{plugin}", targetPlugin.getName()));
             openDataFolderScreen(player, targetPlugin, null);
 
             return true;
@@ -141,17 +144,17 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
 
         if (targetPlugin == null) {
             AdventureUtil.playerMessage(player, MessageManager.infoNegative +
-                    MessageManager.configEditorPluginNotFound.replace("{plugin}", pluginName));
+                    ConfigEditorMessage.configEditorPluginNotFound.replace("{plugin}", pluginName));
             return true;
         }
 
         if (!hasEditPermission(player, targetPlugin)) {
-            AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.configEditorNoPermission);
+            AdventureUtil.playerMessage(player, MessageManager.infoNegative + ConfigEditorMessage.configEditorNoPermission);
             return true;
         }
 
         AdventureUtil.playerMessage(player, MessageManager.infoPositive +
-                MessageManager.configEditorOpening.replace("{plugin}", targetPlugin.getName()));
+                ConfigEditorMessage.configEditorOpening.replace("{plugin}", targetPlugin.getName()));
         openPluginConfigScreen(player, targetPlugin, "@root", null, null, getChangeLog(player), false);
 
         return true;
@@ -206,7 +209,7 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
 
             if (!dataFolder.exists()) {
                 AdventureUtil.playerMessage(player, MessageManager.infoNegative +
-                        MessageManager.configEditorDataFolderNotFound.replace("{plugin}", plugin.getName()));
+                        ConfigEditorMessage.configEditorDataFolderNotFound.replace("{plugin}", plugin.getName()));
                 return;
             }
 
@@ -215,7 +218,7 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
                         file.isDirectory() || file.getName().endsWith(".yml"));
 
                 if (filesArray == null || filesArray.length == 0) {
-                    AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.configEditorNoFiles);
+                    AdventureUtil.playerMessage(player, MessageManager.infoNegative + ConfigEditorMessage.configEditorNoFiles);
                     return;
                 }
 
@@ -244,7 +247,7 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
 
             } catch (Exception e) {
                 AdventureUtil.playerMessage(player, MessageManager.infoNegative +
-                        MessageManager.configEditorReadingError.replace("{error}", e.getMessage()));
+                        ConfigEditorMessage.configEditorReadingError.replace("{error}", e.getMessage()));
                 e.printStackTrace();
             }
         });
@@ -277,7 +280,7 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
                 File configFile = file != null ? file : new File(plugin.getDataFolder(), "config.yml");
                 if (!configFile.exists()) {
                     AdventureUtil.playerMessage(player, MessageManager.infoNegative +
-                            MessageManager.configEditorConfigNotFound.replace("{plugin}", plugin.getName()));
+                            ConfigEditorMessage.configEditorConfigNotFound.replace("{plugin}", plugin.getName()));
                     return;
                 }
 
@@ -290,7 +293,7 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
                     section = config.getConfigurationSection(sectionPath);
                     if (section == null) {
                         AdventureUtil.playerMessage(player, MessageManager.infoNegative +
-                                MessageManager.configEditorSectionNotFound.replace("{section}", sectionPath));
+                                ConfigEditorMessage.configEditorSectionNotFound.replace("{section}", sectionPath));
                         openPluginConfigScreen(player, plugin, "@root", config, configFile, changeLog, fromDataFolderScreen);
                         return;
                     }
@@ -335,7 +338,7 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
 
             } catch (Exception e) {
                 AdventureUtil.playerMessage(player, MessageManager.infoNegative +
-                        MessageManager.configEditorReadingError.replace("{error}", e.getMessage()));
+                        ConfigEditorMessage.configEditorReadingError.replace("{error}", e.getMessage()));
                 e.printStackTrace();
             }
         });
@@ -401,10 +404,10 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
                     config.set(sectionPath + "." + key, newValue);
                 }
 
-                AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.configEditorValueUpdated);
+                AdventureUtil.playerMessage(player, MessageManager.infoPositive + ConfigEditorMessage.configEditorValueUpdated);
             } catch (Exception e) {
                 AdventureUtil.playerMessage(player, MessageManager.infoNegative +
-                        MessageManager.configEditorInvalidValue.replace("{error}", e.getMessage()));
+                        ConfigEditorMessage.configEditorInvalidValue.replace("{error}", e.getMessage()));
             }
 
             reopenLastInventory(player);
@@ -473,7 +476,7 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
             config.save(configFile);
 
             if (!changeLog.isEmpty()) {
-                AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.configEditorChangesSaved);
+                AdventureUtil.playerMessage(player, MessageManager.infoPositive + ConfigEditorMessage.configEditorChangesSaved);
 
                 List<ConfigChange> changes = new ArrayList<>();
                 for (Map.Entry<String, Pair<Object, Object>> entry : changeLog.entrySet()) {
@@ -498,7 +501,7 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
                 changeLog.clear();
                 refreshInventory(player);
             } else {
-                AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.configEditorNoChanges);
+                AdventureUtil.playerMessage(player, MessageManager.infoPositive + ConfigEditorMessage.configEditorNoChanges);
             }
 
             String cacheKey = plugin.getName() + ":" + configFile.getAbsolutePath();
@@ -510,7 +513,7 @@ public class ConfigEditorModule extends Function implements BorealModule, Comman
 
         } catch (Exception e) {
             AdventureUtil.playerMessage(player, MessageManager.infoNegative +
-                    MessageManager.configEditorSavingError.replace("{error}", e.getMessage()));
+                    ConfigEditorMessage.configEditorSavingError.replace("{error}", e.getMessage()));
             e.printStackTrace();
         }
     }

@@ -2,8 +2,10 @@ package plugin.borealcore;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
+import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.api.module.ModuleLoadException;
 import plugin.borealcore.database.DatabaseManager;
 import plugin.borealcore.functions.cooking.CookCommand;
@@ -11,21 +13,20 @@ import plugin.borealcore.functions.cooking.CookTabCompletion;
 import plugin.borealcore.functions.cooking.CookingCompetitionManager;
 import plugin.borealcore.functions.cooking.CookingManager;
 import plugin.borealcore.functions.cooking.MasteryManager;
-import plugin.borealcore.functions.cooking.RecipeBookCommand;
-import plugin.borealcore.functions.cooking.RecipeBookTabCompletion;
+import plugin.borealcore.functions.cooking.recipebook.RecipeBookCommand;
+import plugin.borealcore.functions.cooking.recipebook.RecipeBookTabCompletion;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
 import plugin.borealcore.functions.herbalism.HerbalismCommand;
 import plugin.borealcore.functions.herbalism.HerbalismManager;
 import plugin.borealcore.functions.herbalism.configs.HerbManager;
-import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.functions.traps.TrapsCommand;
 import plugin.borealcore.functions.traps.TrapsManager;
 import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.manager.GuiManager;
 import plugin.borealcore.manager.PlaceholderManager;
-import plugin.borealcore.manager.configs.ConfigManager;
-import plugin.borealcore.manager.configs.MessageManager;
+import plugin.borealcore.manager.ConfigManager;
+import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.module.loader.ModuleLoader;
 import plugin.borealcore.object.GUIListener;
 import plugin.borealcore.utility.AdventureUtil;
@@ -47,10 +48,10 @@ public class BorealCore extends JavaPlugin {
     private static LayoutManager layoutManager;
     private static EffectManager effectManager;
     private static MasteryManager masteryManager;
-    private static JadeManager jadeManager;
     private static DatabaseManager databaseManager;
     private static TrapsManager trapsManager;
     private static ModuleLoader moduleLoader;
+    private static ModuleContext globalModuleContext;
 
     @Override
     public void onLoad() {
@@ -66,20 +67,37 @@ public class BorealCore extends JavaPlugin {
         MessageManager.load();
 
         databaseManager = new DatabaseManager(this);
+        effectManager = new EffectManager();
+        guiManager = new GuiManager();
+        placeholderManager = new PlaceholderManager();
+
+        globalModuleContext = new ModuleContext(this, databaseManager, placeholderManager);
+        moduleLoader = new ModuleLoader(globalModuleContext);
+
+        try {
+            moduleLoader.loadAllModules();
+        } catch (Exception e) {
+            getLogger().severe("Failed to load modules on startup: " + e.getMessage());
+        }
+
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            if (this.globalModuleContext != null) {
+                for (var node : this.globalModuleContext.getRegisteredCommands()) {
+                    event.registrar().register(node);
+                }
+            }
+        });
+
+        // Future modules
         cookingManager = new CookingManager();
         herbalismManager = new HerbalismManager();
         competitionManager = new CookingCompetitionManager();
         layoutManager = new LayoutManager();
-        effectManager = new EffectManager();
         masteryManager = new MasteryManager();
         recipeManager = new RecipeManager();
         herbManager = new HerbManager();
-        guiManager = new GuiManager();
-        placeholderManager = new PlaceholderManager();
-        jadeManager = new JadeManager();
         trapsManager = new TrapsManager();
 
-        moduleLoader = new ModuleLoader(this, databaseManager, placeholderManager);
         reloadConfig();
 
         getCommand("cooking").setExecutor(new CookCommand());
@@ -111,7 +129,6 @@ public class BorealCore extends JavaPlugin {
         layoutManager.unload();
         effectManager.unload();
         guiManager.unload();
-        jadeManager.unload();
         masteryManager.unload();
         trapsManager.unload();
 
@@ -160,14 +177,6 @@ public class BorealCore extends JavaPlugin {
         return effectManager;
     }
 
-    public static MasteryManager getMasteryManager() {
-        return masteryManager;
-    }
-
-    public static JadeManager getJadeManager() {
-        return jadeManager;
-    }
-
     public static DatabaseManager getDatabaseManager() {
         return databaseManager;
     }
@@ -180,12 +189,12 @@ public class BorealCore extends JavaPlugin {
         return herbalismManager;
     }
 
-    public static TrapsManager getTrapsManager() {
-        return trapsManager;
-    }
-
     public static ModuleLoader getModuleLoader() {
         return moduleLoader;
+    }
+
+    public static ModuleContext getGlobalModuleContext() {
+        return globalModuleContext;
     }
 
     public static void disablePlugin(String errorMessage, Exception e) {
@@ -198,12 +207,15 @@ public class BorealCore extends JavaPlugin {
         ConfigManager.load();
         MessageManager.load();
 
-        getModuleLoader().unloadAllModules();
+        moduleLoader.unloadAllModules();
+        globalModuleContext.clearCommands();
+
         try {
-            getModuleLoader().loadAllModules();
+            moduleLoader.loadAllModules();
         } catch (ModuleLoadException e) {
-            throw new RuntimeException(e);
+            plugin.getLogger().severe("Exception encountered during reload: " + e.getMessage());
         }
+        plugin.getServer().reloadCommandAliases();
 
         getLayoutManager().unload();
         getLayoutManager().load();
@@ -221,11 +233,7 @@ public class BorealCore extends JavaPlugin {
         getGuiManager().load();
         getCompetitionManager().unload();
         getCompetitionManager().load();
-        getJadeManager().unload();
-        getJadeManager().load();
         getDatabaseManager().unload();
         getDatabaseManager().load();
-        getTrapsManager().unload();
-        getTrapsManager().load();
     }
 }

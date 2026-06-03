@@ -1,6 +1,5 @@
 package plugin.borealcore.functions.cooking;
 
-
 import dev.lone.itemsadder.api.CustomFurniture;
 import dev.lone.itemsadder.api.Events.FurnitureBreakEvent;
 import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
@@ -25,24 +24,26 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.action.Action;
-import plugin.borealcore.action.PotionEffectImpl;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.functions.cooking.competition.Competition;
 import plugin.borealcore.functions.cooking.competition.placeholder.CompetitionPapi;
+import plugin.borealcore.functions.cooking.configs.CookingConfig;
+import plugin.borealcore.functions.cooking.configs.CookingConfigLoader;
+import plugin.borealcore.functions.cooking.configs.CookingMessage;
+import plugin.borealcore.functions.cooking.configs.CookingMessageLoader;
 import plugin.borealcore.functions.cooking.configs.LayoutManager;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
+import plugin.borealcore.functions.cooking.object.Difficulty;
 import plugin.borealcore.functions.cooking.object.DroppedItem;
 import plugin.borealcore.functions.cooking.object.Ingredient;
 import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.functions.cooking.object.Recipe;
-import plugin.borealcore.functions.jade.JadeManager;
 import plugin.borealcore.functions.traps.TrapsManager;
-import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.manager.GuiManager;
-import plugin.borealcore.manager.configs.ConfigManager;
-import plugin.borealcore.manager.configs.DebugLevel;
-import plugin.borealcore.manager.configs.MessageManager;
+import plugin.borealcore.manager.ConfigManager;
+import plugin.borealcore.object.DebugLevel;
+import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.object.SimpleListener;
 import plugin.borealcore.utility.AdventureUtil;
@@ -59,7 +60,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static net.kyori.adventure.key.Key.key;
 import static plugin.borealcore.BorealCore.getPlaceholderManager;
-import static plugin.borealcore.functions.cooking.CookingConfig.perfectChance;
+import static plugin.borealcore.functions.cooking.configs.CookingConfig.perfectChance;
 import static plugin.borealcore.manager.GuiManager.INGREDIENTS;
 import static plugin.borealcore.utility.AdventureUtil.playerSound;
 
@@ -87,22 +88,14 @@ public class CookingManager extends Function implements BorealModule {
 
     @Override
     public void load() {
+        CookingConfigLoader.load();
+        CookingMessageLoader.load();
+
         this.cookingPlaceholders = new CookingPapi();
         this.competitionPlaceholders = new CompetitionPapi();
         getPlaceholderManager().registerExpansion(cookingPlaceholders);
         getPlaceholderManager().registerExpansion(competitionPlaceholders);
         Bukkit.getPluginManager().registerEvents(this.simpleListener, BorealCore.plugin);
-
-        EffectManager.registerAction("dish-buff", PotionEffectImpl.class,
-                (sec, key, nick, perfect) -> {
-                    String actionKey = sec.getString(key);
-                    if (perfect) actionKey += CookingConfig.perfectItemSuffix;
-                    List<PotionEffect> effects = EffectManager.EFFECTS.get(actionKey);
-                    return effects != null ? new PotionEffectImpl(effects.toArray(new PotionEffect[0])) : null;
-                },
-                null
-        );
-        EffectManager.loadEffects("recipes/buffs");
 
         GuiManager guiManager = BorealCore.getGuiManager();
         guiManager.registerGui("cookingRecipeBook", () -> new CookingRecipeBookGUI(null));
@@ -120,7 +113,7 @@ public class CookingManager extends Function implements BorealModule {
 
     public void handleCooking(String recipe, Player player, CustomFurniture clickedFurniture) {
         if (isPlayerCooking(player)) {
-            AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.alreadyCooking);
+            AdventureUtil.playerMessage(player, MessageManager.infoNegative + CookingMessage.alreadyCooking);
         } else {
             Recipe bar = RecipeManager.COOKING_RECIPES.get(recipe);
             List<String> ingredients = bar.getIngredients();
@@ -132,7 +125,7 @@ public class CookingManager extends Function implements BorealModule {
                 }
                 onCookedItem(player, bar, clickedFurniture);
             } else {
-                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.noIngredients);
+                AdventureUtil.playerMessage(player, MessageManager.infoNegative + CookingMessage.noIngredients);
             }
         }
     }
@@ -144,15 +137,15 @@ public class CookingManager extends Function implements BorealModule {
             ItemUtil.removeIngredients(player.getInventory(), ingredients, amount);
             ItemUtil.giveItem(player, recipe.getKey(), amount, true);
             playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
-            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + CookingMessage.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
         } else {
-            AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.noIngredients);
+            AdventureUtil.playerMessage(player, MessageManager.infoNegative + CookingMessage.noIngredients);
         }
     }
 
     public void handleAutocooking(String recipeId, Player player, Integer amount) {
         if (isPlayerCooking(player)) {
-            AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.alreadyCooking);
+            AdventureUtil.playerMessage(player, MessageManager.infoNegative + CookingMessage.alreadyCooking);
         } else {
             Recipe recipe = RecipeManager.COOKING_RECIPES.get(recipeId);
             List<String> ingredients = recipe.getIngredients();
@@ -161,9 +154,9 @@ public class CookingManager extends Function implements BorealModule {
                 ItemUtil.removeIngredients(player.getInventory(), ingredients, amount);
                 ItemUtil.giveItem(player, String.valueOf(recipe.getCookedItems()), amount, true);
                 playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
-                AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
+                AdventureUtil.playerMessage(player, MessageManager.infoPositive + CookingMessage.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
             } else {
-                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.noIngredients);
+                AdventureUtil.playerMessage(player, MessageManager.infoNegative + CookingMessage.noIngredients);
             }
         }
 
@@ -227,7 +220,7 @@ public class CookingManager extends Function implements BorealModule {
         }
 
         if (perfect) {
-            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.cookingPerfect.replace("{recipe}", droppedItem.getNick()));
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + CookingMessage.cookingPerfect.replace("{recipe}", droppedItem.getNick()));
             drop = drop + CookingConfig.perfectItemSuffix;
             if (!RecipeDataUtil.hasMastery(player, droppedItem.getKey())) {
                 MasteryManager.handleMastery(player, droppedItem.getKey());
@@ -421,14 +414,14 @@ public class CookingManager extends Function implements BorealModule {
                     litpot.setRotation(rot);
                     clickedFurniture.remove(false);
                     unlitpot.getLocation().getBlock().setType(Material.BARRIER);
-                    AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.potLight);
+                    AdventureUtil.playerMessage(player, MessageManager.infoPositive + CookingMessage.potLight);
                     CookingPotUtil.playCookingPotFX(clickedFurniture.getEntity().getLocation());
                 } else {
-                    AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCold);
+                    AdventureUtil.playerMessage(player, MessageManager.infoNegative + CookingMessage.potCold);
                 }
             } else {
                 String cooldown = String.valueOf((2000 - (System.currentTimeMillis() - clickCooldowns.get(player)) / 1000));
-                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.potCooldown.replace("{time}", cooldown));
+                AdventureUtil.playerMessage(player, MessageManager.infoNegative + CookingMessage.potCooldown.replace("{time}", cooldown));
             }
         } else if (clickedFurniture.getId().equals(CookingConfig.litCookingPot)) {
             CookingPotUtil.playCookingPotFX(clickedFurniture.getEntity().getLocation());

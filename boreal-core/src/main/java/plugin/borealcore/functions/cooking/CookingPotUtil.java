@@ -15,7 +15,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.functions.cooking.configs.CookingConfig;
+import plugin.borealcore.manager.ConfigManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ItemUtil;
 

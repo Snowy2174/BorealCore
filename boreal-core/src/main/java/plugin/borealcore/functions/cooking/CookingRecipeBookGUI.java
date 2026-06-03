@@ -15,9 +15,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.BorealGUI;
+import plugin.borealcore.functions.cooking.configs.CookingConfig;
+import plugin.borealcore.functions.cooking.configs.CookingMessage;
 import plugin.borealcore.functions.cooking.configs.RecipeManager;
-import plugin.borealcore.manager.configs.DebugLevel;
-import plugin.borealcore.manager.configs.MessageManager;
+import plugin.borealcore.object.DebugLevel;
+import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GuiUtil;
 import plugin.borealcore.utility.ItemUtil;
@@ -47,7 +49,7 @@ public class CookingRecipeBookGUI extends BorealGUI {
     @Override
     public void init(Player player) {
         player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1, 1);
-        fill(unknownRecipeStack, e -> AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown));
+        fill(unknownRecipeStack, e -> AdventureUtil.playerMessage(player, MessageManager.infoNegative + CookingMessage.recipeUnknown));
         fillBorders(new ItemStack(Material.AIR), null);
 
         setItem(5, 4, buildIngredientsItem(), e -> handleIngredientsMenuClick(e, player));
@@ -164,12 +166,12 @@ public class CookingRecipeBookGUI extends BorealGUI {
 
         if (clickedItem != null && clickedItem.getType() != Material.AIR) {
             if (clickedFurniture == null) {
-                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeNoPot);
+                AdventureUtil.playerMessage(player, MessageManager.infoNegative + CookingMessage.recipeNoPot);
                 return;
             }
 
             if (!hasRecipe) {
-                AdventureUtil.playerMessage(player, MessageManager.infoNegative + MessageManager.recipeUnknown);
+                AdventureUtil.playerMessage(player, MessageManager.infoNegative + CookingMessage.recipeUnknown);
                 return;
             }
 

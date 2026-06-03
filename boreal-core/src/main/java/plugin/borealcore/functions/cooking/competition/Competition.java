@@ -6,12 +6,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.action.Action;
+import plugin.borealcore.functions.cooking.configs.CookingMessage;
 import plugin.borealcore.functions.cooking.RecipeDataUtil;
 import plugin.borealcore.functions.cooking.competition.bossbar.BossBarManager;
 import plugin.borealcore.functions.cooking.competition.ranking.LocalRankingImpl;
 import plugin.borealcore.functions.cooking.competition.ranking.RankingInterface;
 import plugin.borealcore.manager.PlaceholderManager;
-import plugin.borealcore.manager.configs.MessageManager;
+import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.time.Instant;
@@ -123,11 +124,11 @@ public class Competition {
             for (String placeholder : placeholders) {
                 if (placeholder.endsWith("_player%")) {
                     int rank = Integer.parseInt(placeholder.substring(1, placeholder.length() - 8));
-                    endMsg = endMsg.replace(placeholder, Optional.ofNullable(ranking.getPlayerAt(rank)).orElse(MessageManager.noPlayer));
+                    endMsg = endMsg.replace(placeholder, Optional.ofNullable(ranking.getPlayerAt(rank)).orElse(CookingMessage.noPlayer));
                 } else if (placeholder.endsWith("_score%")) {
                     int rank = Integer.parseInt(placeholder.substring(1, placeholder.length() - 7));
                     float score = ranking.getScoreAt(rank);
-                    endMsg = endMsg.replace(placeholder, score == 0 ? MessageManager.noScore : String.format("%.1f", score));
+                    endMsg = endMsg.replace(placeholder, score == 0 ? CookingMessage.noScore : String.format("%.1f", score));
                 }
             }
             newMessage.add(endMsg);
@@ -217,7 +218,7 @@ public class Competition {
     }
 
     public String getPlayerRank(Player player) {
-        return Optional.ofNullable(ranking.getPlayerRank(player.getName())).orElse(MessageManager.noRank);
+        return Optional.ofNullable(ranking.getPlayerRank(player.getName())).orElse(CookingMessage.noRank);
     }
 
     public long getRemainingTime() {

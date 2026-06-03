@@ -3,13 +3,15 @@ package plugin.borealcore.functions.cooking.configs;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.potion.PotionEffect;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.cooking.Difficulty;
+import plugin.borealcore.api.action.action.PotionEffectImpl;
+import plugin.borealcore.functions.cooking.object.Difficulty;
 import plugin.borealcore.functions.cooking.object.DroppedItem;
 import plugin.borealcore.functions.cooking.object.Layout;
 import plugin.borealcore.functions.cooking.object.Recipe;
 import plugin.borealcore.manager.EffectManager;
-import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.object.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 
@@ -26,6 +28,19 @@ public class RecipeManager extends Function {
     @Override
     public void load() {
         COOKING_RECIPES = new HashMap<>();
+
+        // Putting this here for the time being
+        EffectManager.registerAction("dish-buff", PotionEffectImpl.class,
+                (sec, key, nick, perfect) -> {
+                    String actionKey = sec.getString(key);
+                    if (perfect) actionKey += CookingConfig.perfectItemSuffix;
+                    List<PotionEffect> effects = EffectManager.EFFECTS.get(actionKey);
+                    return effects != null ? new PotionEffectImpl(effects.toArray(new PotionEffect[0])) : null;
+                },
+                null
+        );
+        EffectManager.loadEffects("recipes/buffs");
+
         loadItems();
         AdventureUtil.consoleMessage("Loaded <green>" + (COOKING_RECIPES.size()) + " <gray>dish recipes");
     }

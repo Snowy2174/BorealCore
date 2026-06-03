@@ -11,9 +11,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.jade.JadeManager;
-import plugin.borealcore.manager.configs.ConfigManager;
-import plugin.borealcore.manager.configs.MessageManager;
+import plugin.borealcore.functions.cooking.configs.CookingConfig;
+import plugin.borealcore.functions.cooking.configs.CookingMessage;
+import plugin.borealcore.manager.ConfigManager;
+import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 
@@ -21,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static plugin.borealcore.functions.cooking.configs.RecipeManager.COOKING_RECIPES;
-import static plugin.borealcore.manager.configs.ConfigManager.getConfig;
+import static plugin.borealcore.manager.ConfigManager.getConfig;
 
 public class MasteryManager extends Function {
 
@@ -65,15 +66,15 @@ public class MasteryManager extends Function {
 
             ItemsAdder.playTotemAnimation(player, recipe + "_particle");
             AdventureUtil.consoleMessage("Player <green>" + playerName + "</green> has achieved mastery for " + recipe);
-            AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryMessage.replace("{recipe}", recipeFormatted));
+            AdventureUtil.playerMessage(player, MessageManager.infoPositive + CookingMessage.masteryMessage.replace("{recipe}", recipeFormatted));
             giveReward(player, recipeFormatted);
         }
     }
 
     private static void giveReward(Player player, String recipeFormatted) {
-        JadeManager.give(player, CookingConfig.masteryJadeReward, "mastery");
+        //JadeManager.give(player, CookingConfig.masteryJadeReward, "mastery"); // @TODO must fix, make jade listen to an event sent by cooking for mastery achievement
         AdventureUtil.consoleMessage("Player <green>" + player.getName() + "</green> has been given" + CookingConfig.masteryJadeReward + " ₪ for gaining " + recipeFormatted + " mastery");
-        AdventureUtil.playerMessage(player, MessageManager.infoPositive + MessageManager.masteryReward.replace("{recipe}", recipeFormatted));
+        //AdventureUtil.playerMessage(player, MessageManager.infoPositive + CookingMessage.masteryReward.replace("{recipe}", recipeFormatted));
     }
 
     public static void incrementRecipeCount(Player player) {

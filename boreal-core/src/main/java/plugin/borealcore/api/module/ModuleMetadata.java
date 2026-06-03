@@ -15,9 +15,10 @@ public class ModuleMetadata {
     private final String mainClass;
     private final String minimumCoreVersion;
     private final List<String> pluginDependencies;
+    private final List<String> moduleDependencies;
 
     public ModuleMetadata(String moduleId, String moduleName, String version, String author,
-                          String mainClass, String minimumCoreVersion, List<String> pluginDependencies) {
+                          String mainClass, String minimumCoreVersion, List<String> pluginDependencies, List<String> moduleDependencies) {
         this.moduleId = moduleId;
         this.moduleName = moduleName;
         this.version = version;
@@ -25,6 +26,7 @@ public class ModuleMetadata {
         this.mainClass = mainClass;
         this.minimumCoreVersion = minimumCoreVersion;
         this.pluginDependencies = pluginDependencies;
+        this.moduleDependencies = moduleDependencies;
     }
 
     public String getModuleId() {
@@ -53,6 +55,10 @@ public class ModuleMetadata {
 
     public List<String> getPluginDependencies() {
         return pluginDependencies;
+    }
+
+    public List<String> getModuleDependencies() {
+        return moduleDependencies;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package plugin.borealcore.market; // Update to plugin.borealcore.functions.market if necessary
+package plugin.borealcore.market;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -6,7 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import plugin.borealcore.api.module.BorealGUI;
-import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.object.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.ArrayList;

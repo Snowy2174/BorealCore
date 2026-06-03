@@ -7,7 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
-import plugin.borealcore.manager.configs.ConfigManager;
+import plugin.borealcore.manager.ConfigManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static plugin.borealcore.manager.configs.ConfigManager.getConfig;
+import static plugin.borealcore.manager.ConfigManager.getConfig;
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 
 public class NodeModule implements BorealModule {

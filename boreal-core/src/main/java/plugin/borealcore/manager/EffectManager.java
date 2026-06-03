@@ -5,17 +5,25 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import plugin.borealcore.action.*;
 import plugin.borealcore.api.action.Action;
-import plugin.borealcore.functions.cooking.CookingConfig;
-import plugin.borealcore.manager.configs.ConfigManager;
-import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.api.action.action.CommandActionImpl;
+import plugin.borealcore.api.action.action.HungerEffectImpl;
+import plugin.borealcore.api.action.action.MessageActionImpl;
+import plugin.borealcore.api.action.action.PotionEffectImpl;
+import plugin.borealcore.api.action.action.SaturationEffectImpl;
+import plugin.borealcore.api.action.action.SoundActionImpl;
+import plugin.borealcore.api.action.action.VanillaXPImpl;
+import plugin.borealcore.functions.cooking.configs.CookingConfig;
+import plugin.borealcore.object.DebugLevel;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GuiUtil;
 import plugin.borealcore.utility.ItemUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static plugin.borealcore.utility.AdventureUtil.consoleMessage;
 import static plugin.borealcore.utility.AdventureUtil.getComponentFromMiniMessage;
@@ -70,12 +78,12 @@ public class EffectManager extends Function {
     private void registerDefaultActions() {
         registerAction("hunger", HungerEffectImpl.class,
                 (sec, key, nick, perfect) -> new HungerEffectImpl(sec.getInt(key)),
-                action -> List.of(getComponentFromMiniMessage(CookingConfig.hungerLore.replace("{hunger}", String.valueOf(action.hunger()))))
+                action -> List.of(getComponentFromMiniMessage(ConfigManager.hungerLore.replace("{hunger}", String.valueOf(action.hunger()))))
         );
 
         registerAction("saturation", SaturationEffectImpl.class,
                 (sec, key, nick, perfect) -> new SaturationEffectImpl(sec.getInt(key)),
-                action -> List.of(getComponentFromMiniMessage(CookingConfig.saturationLore.replace("{saturation}", String.valueOf(action.saturation()))))
+                action -> List.of(getComponentFromMiniMessage(ConfigManager.saturationLore.replace("{saturation}", String.valueOf(action.saturation()))))
         );
 
         registerAction("message", MessageActionImpl.class,
@@ -122,7 +130,7 @@ public class EffectManager extends Function {
                 action -> {
                     List<Component> actionLore = new ArrayList<>();
                     for (PotionEffect potionEffect : action.potionEffects()) {
-                        actionLore.add(getComponentFromMiniMessage(CookingConfig.effectLore
+                        actionLore.add(getComponentFromMiniMessage(ConfigManager.effectLore
                                 .replace("{effect}", GuiUtil.formatString(potionEffect.getType().getName()))
                                 .replace("{amplifier}", ItemUtil.amplifierToRoman(potionEffect.getAmplifier() + 1))
                                 .replace("{duration}", ItemUtil.getDuration(potionEffect.getDuration() / 20))));

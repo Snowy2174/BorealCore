@@ -4,8 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.functions.cooking.configs.CookingMessage;
 import plugin.borealcore.functions.cooking.competition.Competition;
-import plugin.borealcore.manager.configs.MessageManager;
 import plugin.borealcore.object.Function;
 import plugin.borealcore.object.SimpleListener;
 import plugin.borealcore.utility.AdventureUtil;
@@ -56,7 +56,7 @@ public class BossBarManager extends Function {
                 }
                 cache.put(player, sender);
             } else {
-                AdventureUtil.playerMessage(player, MessageManager.competitionOn);
+                AdventureUtil.playerMessage(player, CookingMessage.competitionOn);
             }
         }
     }

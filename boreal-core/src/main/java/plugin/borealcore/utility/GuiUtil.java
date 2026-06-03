@@ -1,7 +1,7 @@
 package plugin.borealcore.utility;
 
 import org.bukkit.entity.Player;
-import plugin.borealcore.functions.cooking.CookingConfig;
+import plugin.borealcore.functions.cooking.configs.CookingConfig;
 import plugin.borealcore.functions.cooking.RecipeDataUtil;
 
 import java.util.List;

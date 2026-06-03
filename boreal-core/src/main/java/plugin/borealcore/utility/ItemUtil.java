@@ -16,9 +16,9 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.cooking.CookingConfig;
+import plugin.borealcore.functions.cooking.configs.CookingConfig;
 import plugin.borealcore.functions.cooking.object.Recipe;
-import plugin.borealcore.manager.configs.DebugLevel;
+import plugin.borealcore.object.DebugLevel;
 
 import java.util.ArrayList;
 import java.util.List;

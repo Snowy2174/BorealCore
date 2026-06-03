@@ -3,7 +3,6 @@ package plugin.borealcore.module.loader;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.api.module.ModuleLoadException;
@@ -17,12 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -33,22 +27,20 @@ import java.util.logging.Level;
  */
 public class ModuleLoader {
 
-    private final BorealCore plugin;
-    private final DatabaseManager database;
-    private final PlaceholderManager placeholderManager;
+    private final ModuleContext globalContext;
     private final File modulesDirectory;
+
     private final Map<String, BorealModule> loadedModules;
     private final Map<String, ModuleMetadata> moduleMetadata;
     private final Map<String, ModuleClassLoader> moduleClassLoaders;
 
-    public ModuleLoader(BorealCore plugin, DatabaseManager database, PlaceholderManager  placeholderManager) {
-        this.plugin = plugin;
-        this.database = database;
-        this.placeholderManager = placeholderManager;
-        this.modulesDirectory = new File(plugin.getDataFolder(), "modules");
-        this.loadedModules = new HashMap<>();
-        this.moduleMetadata = new HashMap<>();
-        this.moduleClassLoaders = new HashMap<>();
+    public ModuleLoader(ModuleContext context) {
+        this.globalContext = context;
+        this.modulesDirectory = new File(globalContext.getPlugin().getDataFolder(), "modules");
+
+        this.loadedModules = new LinkedHashMap<>();
+        this.moduleMetadata = new LinkedHashMap<>();
+        this.moduleClassLoaders = new LinkedHashMap<>();
 
         if (!modulesDirectory.exists()) {
             modulesDirectory.mkdirs();
@@ -56,9 +48,8 @@ public class ModuleLoader {
     }
 
     /**
-     * Loads all modules from the modules directory.
-     * 
-     * @throws ModuleLoadException if loading fails
+     * Loads all modules from the modules directory in dependency order.
+     * * @throws ModuleLoadException if loading fails
      */
     public void loadAllModules() throws ModuleLoadException {
         File[] moduleJars = modulesDirectory.listFiles((dir, name) -> name.endsWith(".jar"));
@@ -68,39 +59,95 @@ public class ModuleLoader {
             return;
         }
 
-        AdventureUtil.consoleMessage("Loading " + moduleJars.length + " module(s)...");
+        AdventureUtil.consoleMessage("Discovered " + moduleJars.length + " module(s). Resolving dependencies...");
+
+        Map<String, File> jarFileMap = new HashMap<>();
+        Map<String, ModuleMetadata> preScanMetadata = new HashMap<>();
 
         for (File jarFile : moduleJars) {
-            try {
-                loadModule(jarFile);
-            } catch (ModuleLoadException e) {
-                plugin.getLogger().log(Level.SEVERE, "Failed to load module: " + jarFile.getName(), e);
+            try (JarFile jar = new JarFile(jarFile)) {
+                JarEntry manifestEntry = jar.getJarEntry("module.yml");
+                if (manifestEntry == null) continue;
+
+                ModuleMetadata metadata = parseManifest(jar.getInputStream(manifestEntry));
+                jarFileMap.put(metadata.getModuleId(), jarFile);
+                preScanMetadata.put(metadata.getModuleId(), metadata);
+            } catch (Exception e) {
+                globalContext.getLogger().log(Level.SEVERE, "Failed to read manifest for: " + jarFile.getName(), e);
             }
         }
 
-        // Enable all loaded modules
+        List<String> sortedModuleIds;
+        try {
+            sortedModuleIds = sortModules(preScanMetadata);
+        } catch (ModuleLoadException e) {
+            globalContext.getLogger().severe("Failed to resolve module dependency graph: " + e.getMessage());
+            return;
+        }
+
+        for (String moduleId : sortedModuleIds) {
+            try {
+                loadModule(jarFileMap.get(moduleId), preScanMetadata.get(moduleId));
+            } catch (ModuleLoadException e) {
+                globalContext.getLogger().log(Level.SEVERE, "Failed to load module: " + moduleId, e);
+            }
+        }
+
         enableAllModules();
     }
 
     /**
-     * Loads a single module from a JAR file.
-     *
-     * @param jarFile The JAR file containing the module
-     * @throws ModuleLoadException if loading fails
+     * Performs a topological sort on the modules using a depth-first search.
      */
-    private void loadModule(File jarFile) throws ModuleLoadException {
-        try (JarFile jar = new JarFile(jarFile)) {
-            JarEntry manifestEntry = jar.getJarEntry("module.yml");
-            if (manifestEntry == null) {
-                throw new ModuleLoadException("module.yml not found in " + jarFile.getName());
+    private List<String> sortModules(Map<String, ModuleMetadata> modulesToLoad) throws ModuleLoadException {
+        List<String> sorted = new ArrayList<>();
+        Set<String> visited = new HashSet<>();
+        Set<String> visiting = new HashSet<>();
+
+        for (String moduleId : modulesToLoad.keySet()) {
+            visitModule(moduleId, modulesToLoad, visited, visiting, sorted);
+        }
+        return sorted;
+    }
+
+    private void visitModule(String moduleId, Map<String, ModuleMetadata> modulesToLoad, Set<String> visited, Set<String> visiting, List<String> sorted) throws ModuleLoadException {
+        if (visiting.contains(moduleId)) {
+            throw new ModuleLoadException("Circular dependency detected involving module: " + moduleId);
+        }
+        if (visited.contains(moduleId)) {
+            return;
+        }
+
+        visiting.add(moduleId);
+
+        ModuleMetadata metadata = modulesToLoad.get(moduleId);
+        List<String> depends = metadata.getModuleDependencies();
+
+        if (depends != null) {
+            for (String depId : depends) {
+                if (!modulesToLoad.containsKey(depId) && !loadedModules.containsKey(depId)) {
+                    throw new ModuleLoadException("Module '" + moduleId + "' requires missing module '" + depId + "'");
+                }
+                if (modulesToLoad.containsKey(depId)) {
+                    visitModule(depId, modulesToLoad, visited, visiting, sorted);
+                }
             }
+        }
 
-            ModuleMetadata metadata = parseManifest(jar.getInputStream(manifestEntry));
+        visiting.remove(moduleId);
+        visited.add(moduleId);
+        sorted.add(moduleId);
+    }
 
+    /**
+     * Loads a single module from a JAR file (bypassing manifest re-parse).
+     */
+    private void loadModule(File jarFile, ModuleMetadata metadata) throws ModuleLoadException {
+        try {
             if (!isVersionCompatible(metadata.getMinimumCoreVersion())) {
                 throw new ModuleLoadException("Module '" + metadata.getModuleName() +
                         "' requires BorealCore " + metadata.getMinimumCoreVersion() +
-                        " but only " + plugin.getDescription().getVersion() + " is installed");
+                        " but only " + globalContext.getPlugin().getDescription().getVersion() + " is installed");
             }
 
             if (!checkPluginDependencies(metadata)) {
@@ -110,7 +157,7 @@ public class ModuleLoader {
             ModuleClassLoader classLoader = new ModuleClassLoader(
                     metadata.getModuleId(),
                     new URL[]{jarFile.toURI().toURL()},
-                    plugin.getClass().getClassLoader()
+                    globalContext.getPlugin().getClass().getClassLoader()
             );
 
             Class<?> moduleClass = classLoader.loadClass(metadata.getMainClass());
@@ -130,10 +177,8 @@ public class ModuleLoader {
             moduleClassLoaders.put(metadata.getModuleId(), classLoader);
 
             ModuleRegistry.getInstance().registerModule(metadata.getModuleId(), module, metadata);
-            AdventureUtil.consoleMessage("Loaded module: " + metadata);
+            AdventureUtil.consoleMessage("Loaded module: " + metadata.getModuleName());
 
-        } catch (ModuleLoadException e) {
-            throw e;
         } catch (Exception e) {
             throw new ModuleLoadException("Failed to load module from " + jarFile.getName(), e);
         }
@@ -141,10 +186,9 @@ public class ModuleLoader {
 
     /**
      * Initializes and enables all loaded modules.
+     * Iterates over LinkedHashMap to ensure dependencies are initialized first.
      */
     private void enableAllModules() {
-        ModuleContext context = new ModuleContext(plugin, database, placeholderManager);
-
         List<String> failedModules = new ArrayList<>();
 
         for (Map.Entry<String, BorealModule> entry : loadedModules.entrySet()) {
@@ -152,11 +196,11 @@ public class ModuleLoader {
             BorealModule module = entry.getValue();
 
             try {
-                module.onModuleInitialize(context);
+                module.onModuleInitialize(globalContext);
                 module.onModuleEnable();
                 AdventureUtil.consoleMessage("Enabled module: " + moduleId);
             } catch (Exception e) {
-                plugin.getLogger().log(Level.SEVERE, "Failed to enable module: " + moduleId + ". It will be disabled.", e);
+                globalContext.getLogger().log(Level.SEVERE, "Failed to enable module: " + moduleId + ". It will be disabled.", e);
                 failedModules.add(moduleId);
             }
         }
@@ -166,13 +210,9 @@ public class ModuleLoader {
         }
     }
 
-    /**
-     * Helper method to completely remove a module's footprint if it fails to load/enable.
-     */
     private void cleanupFailedModule(String moduleId) {
         loadedModules.remove(moduleId);
         moduleMetadata.remove(moduleId);
-
         ModuleRegistry.getInstance().unregisterModule(moduleId);
 
         ModuleClassLoader classLoader = moduleClassLoaders.remove(moduleId);
@@ -180,20 +220,22 @@ public class ModuleLoader {
             try {
                 classLoader.close();
             } catch (IOException e) {
-                plugin.getLogger().log(Level.WARNING, "Failed to close classloader for failed module: " + moduleId, e);
+                globalContext.getLogger().log(Level.WARNING, "Failed to close classloader for failed module: " + moduleId, e);
             }
         }
     }
 
     /**
-     * Disables all loaded modules.
+     * Disables all loaded modules in reverse dependency order.
      */
     public void unloadAllModules() {
         if (loadedModules.isEmpty()) {
-            return; // Nothing to do
+            return;
         }
 
-        for (String moduleId : new ArrayList<>(loadedModules.keySet())) {
+        List<String> reverseOrderIds = new ArrayList<>(loadedModules.keySet()).reversed();
+
+        for (String moduleId : reverseOrderIds) {
             try {
                 BorealModule module = loadedModules.get(moduleId);
                 if (module != null) {
@@ -201,22 +243,19 @@ public class ModuleLoader {
                     AdventureUtil.consoleMessage("Disabled module: " + moduleId);
                 }
             } catch (Exception e) {
-                plugin.getLogger().log(Level.SEVERE, "Exception while disabling module: " + moduleId, e);
+                globalContext.getLogger().log(Level.SEVERE, "Exception while disabling module: " + moduleId, e);
             }
         }
 
         loadedModules.clear();
         moduleMetadata.clear();
-
-        // Clear the global registry
         ModuleRegistry.getInstance().clear();
 
-        // Clean up classloaders
         for (ModuleClassLoader classLoader : moduleClassLoaders.values()) {
             try {
                 classLoader.close();
             } catch (IOException e) {
-                plugin.getLogger().log(Level.WARNING, "Failed to close module classloader", e);
+                globalContext.getLogger().log(Level.WARNING, "Failed to close module classloader", e);
             }
         }
         moduleClassLoaders.clear();
@@ -233,7 +272,7 @@ public class ModuleLoader {
     }
 
     /**
-     * Gets metadata for an module.
+     * Gets metadata for a module.
      * 
      * @param moduleId The module ID
      * @return The module metadata, or null if not found
@@ -258,7 +297,7 @@ public class ModuleLoader {
      * @return true if current plugin version meets requirement
      */
     private boolean isVersionCompatible(String required) {
-        String current = plugin.getDescription().getVersion();
+        String current = globalContext.getPlugin().getDescription().getVersion();
         return compareVersions(current, required) >= 0;
     }
 
@@ -302,7 +341,7 @@ public class ModuleLoader {
             Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 
             if (plugin == null || !plugin.isEnabled()) {
-                this.plugin.getLogger().warning("Cannot load module '" + metadata.getModuleName() + "'. Required plugin '" + pluginName + "' is missing or disabled!");
+                this.globalContext.getLogger().warning("Cannot load module '" + metadata.getModuleName() + "'. Required plugin '" + pluginName + "' is missing or disabled!");
                 return false;
             }
         }
@@ -328,6 +367,7 @@ public class ModuleLoader {
             String mainClass = config.getString("main");
             String minimumCoreVersion = config.getString("minimum-borealcore-version", "1.0.0");
             List<String> pluginDependencies = config.getStringList("plugin-depends");
+            List<String> moduleDependencies = config.getStringList("module-depends");
 
             if (moduleId == null || moduleId.isEmpty()) {
                 throw new ModuleLoadException("module.yml is missing required field 'id'");
@@ -345,7 +385,7 @@ public class ModuleLoader {
                 throw new ModuleLoadException("module.yml is missing required field 'main'");
             }
 
-            return new ModuleMetadata(moduleId, name, version, author, mainClass, minimumCoreVersion, pluginDependencies);
+            return new ModuleMetadata(moduleId, name, version, author, mainClass, minimumCoreVersion, pluginDependencies, moduleDependencies);
 
         } catch (ModuleLoadException e) {
             throw e;

@@ -2,7 +2,7 @@ package plugin.borealcore.api.module;
 
 /**
  * Base interface for all BorealCore modules.
- * External developers should extend Function and implement this interface
+ * External developers should implement this interface
  * to create modules that can be loaded dynamically by the module loader.
  */
 public interface BorealModule {
