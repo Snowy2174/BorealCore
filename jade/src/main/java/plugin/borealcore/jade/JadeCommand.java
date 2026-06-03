@@ -140,8 +140,13 @@ public class JadeCommand {
                 .then(Commands.literal("balance").executes(this::handleBalanceCommand))
 
                 .then(Commands.literal("toggle")
-                        .then(Commands.literal("announcements").executes(ctx -> handleAnnoucementPreferenceCommand(ctx, "announcements")))
-                        .then(Commands.literal("notifications").executes(ctx -> handleAnnoucementPreferenceCommand(ctx, "notifications"))))
+                        .then(Commands.literal("announcements").executes(ctx -> handleAnnouncementPreferenceCommand(ctx, "announcements")))
+                        .then(Commands.literal("notifications").executes(ctx -> handleAnnouncementPreferenceCommand(ctx, "notifications")))
+                        .executes(ctx -> {
+                            handleAnnouncementPreferenceCommand(ctx, "announcements");
+                            handleAnnouncementPreferenceCommand(ctx, "notifications");
+                            return Command.SINGLE_SUCCESS;
+                        }))
                 .then(leaderboardNode)
                 .then(Commands.literal("top").redirect(leaderboardNode))
 
@@ -189,25 +194,34 @@ public class JadeCommand {
 
     // Execution Handlers
 
-    private int handleAnnoucementPreferenceCommand(CommandContext<CommandSourceStack> ctx, String type) {
+    private int handleAnnouncementPreferenceCommand(CommandContext<CommandSourceStack> ctx, String type) {
         CommandSender sender = ctx.getSource().getSender();
+
         if (!(sender instanceof Player player)) {
             AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
             return Command.SINGLE_SUCCESS;
         }
+
         LuckPerms api = LuckPermsProvider.get();
-            api.getUserManager().modifyUser(player.getUniqueId(), user -> {
-                Node node = Node.builder("jade." + type).build();
-                boolean currentStatus = user.getCachedData().getPermissionData().checkPermission("jade." + type).asBoolean();
-                AdventureUtil.consoleMessage(DebugLevel.DEBUG, MessageManager.infoPositive + "Current announcement status for " + player.getName() + ": " + currentStatus);
-                if (currentStatus) {
-                    user.data().remove(node);
-                    AdventureUtil.sendMessage(player, MessageManager.infoPositive + "Jade " + type + " disabled.");
-                } else {
-                    user.data().add(node);
-                    AdventureUtil.sendMessage(player, MessageManager.infoPositive + "Jade " + type + " enabled.");
-                }
-            });
+
+        api.getUserManager().modifyUser(player.getUniqueId(), user -> {
+            Node trueNode = Node.builder("jade." + type).value(true).build();
+            Node falseNode = Node.builder("jade." + type).value(false).build();
+
+            boolean currentStatus = user.getCachedData().getPermissionData().checkPermission("jade." + type).asBoolean();
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, MessageManager.infoPositive + "Current announcement status for " + player.getName() + ": " + currentStatus);
+
+            if (currentStatus) {
+                user.data().remove(trueNode);
+                user.data().add(falseNode);
+                AdventureUtil.sendMessage(player, MessageManager.infoPositive + "Jade " + type + " disabled.");
+            } else {
+                user.data().remove(falseNode);
+                user.data().add(trueNode);
+                AdventureUtil.sendMessage(player, MessageManager.infoPositive + "Jade " + type + " enabled.");
+            }
+        });
+
         return Command.SINGLE_SUCCESS;
     }
 

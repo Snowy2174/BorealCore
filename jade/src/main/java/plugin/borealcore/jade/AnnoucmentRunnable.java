@@ -25,7 +25,7 @@ public class AnnoucmentRunnable implements Runnable {
             return;
         }
         List<? extends Player> validPlayers = players.stream()
-                .filter(player -> !player.hasPermission("jade.announcement"))
+                .filter(player -> !player.hasPermission("jade.announcements"))
                 .toList();
         AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Found " + validPlayers.size() + " valid players");
         for (Player p : validPlayers) {

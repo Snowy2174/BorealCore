@@ -335,6 +335,14 @@ public class JadeDatabase {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
             pendingTransactions.add(transaction);
         } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                } catch (SQLException e) {
+                    plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+                }
+            }
+
             coreDbManager.close(psTransaction, null);
             coreDbManager.close(psTotals, null);
         }
@@ -613,13 +621,9 @@ public class JadeDatabase {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            try {
-                if (rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), e);
-            }
+            // Use DatabaseManager.close to close statement/resultset only.
+            // Do NOT close the Connection here — the DatabaseManager caches connections.
+            coreDbManager.close(ps, rs);
         }
         return sources;
     }

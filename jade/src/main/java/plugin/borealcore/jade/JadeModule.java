@@ -166,7 +166,7 @@ public class JadeModule implements BorealModule {
                 .replace("{source}", source.isEmpty() ? "playing" : GuiUtil.formatString(source))
                 .replace("{player}", player.getName())
                 .replace("{amount}", String.valueOf((int) amount));
-        getServer().broadcast(AdventureUtil.getComponentFromMiniMessage(bcast));
+        getServer().getOnlinePlayers().stream().filter(p -> !p.hasPermission("jade.notifications")).forEach(p -> AdventureUtil.sendMessage(p, bcast));
     }
 
     public static void giveOffline(OfflinePlayer player, double amount, String source) {
