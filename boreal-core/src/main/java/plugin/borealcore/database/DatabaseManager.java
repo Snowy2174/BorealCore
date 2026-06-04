@@ -1,11 +1,12 @@
 package plugin.borealcore.database;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.object.Function;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,26 +20,23 @@ public class DatabaseManager extends Function {
 
     public final BorealCore plugin;
 
-    private final Map<String, Connection> activeConnections = new ConcurrentHashMap<>();
+    private final Map<String, HikariDataSource> dataSources = new ConcurrentHashMap<>();
 
     public DatabaseManager(BorealCore instance) {
         this.plugin = instance;
     }
 
     /**
-     * Retrieves an existing connection or creates a new one for the specified database name.
+     * Retrieves a connection from the pool for the specified database name.
      * Modules will call this method passing their desired database name (e.g., "jade_transactions").
      */
     public Connection getConnection(String dbName) {
-        // Return existing connection if it is active and open
-        if (activeConnections.containsKey(dbName)) {
-            Connection conn = activeConnections.get(dbName);
+        if (dataSources.containsKey(dbName)) {
             try {
-                if (conn != null && !conn.isClosed()) {
-                    return conn;
-                }
+                return dataSources.get(dbName).getConnection();
             } catch (SQLException e) {
-                plugin.getLogger().log(Level.WARNING, "Connection to " + dbName + " was closed unexpectedly. Reconnecting...");
+                plugin.getLogger().log(Level.SEVERE, "Failed to get connection from pool: " + dbName, e);
+                return null;
             }
         }
 
@@ -47,17 +45,22 @@ public class DatabaseManager extends Function {
                 plugin.getDataFolder().mkdirs();
             }
 
-            File dataFolder = new File(plugin.getDataFolder(), dbName + ".db");
-            if (!dataFolder.exists()) {
-                dataFolder.createNewFile();
-            }
+            File dbFile = new File(plugin.getDataFolder(), dbName + ".db");
+            
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl("jdbc:sqlite:" + dbFile.getAbsolutePath());
+            config.setMaximumPoolSize(5);
+            config.setMinimumIdle(1);
+            config.setConnectionTimeout(30000);
+            config.setIdleTimeout(600000);
+            config.setMaxLifetime(1800000);
+            config.setAutoCommit(true);
 
-            Class.forName("org.sqlite.JDBC");
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-            activeConnections.put(dbName, connection);
+            HikariDataSource dataSource = new HikariDataSource(config);
+            dataSources.put(dbName, dataSource);
 
-            consoleMessage("Loaded SQLite database: " + dbName + ".db");
-            return connection;
+            consoleMessage("Loaded SQLite database with HikariCP: " + dbName + ".db");
+            return dataSource.getConnection();
 
         } catch (Exception ex) {
             BorealCore.disablePlugin("Unable to retrieve connection for database: " + dbName, ex);
@@ -67,9 +70,9 @@ public class DatabaseManager extends Function {
 
     /**
      * Safely closes query resources.
-     * Note: Modules should NOT close the Connection object directly, as it is cached and shared.
+     * Note: Modules should NOT close the Connection object directly, as it is pooled by HikariCP.
      */
-    public void close(PreparedStatement ps, ResultSet rs) {
+    public void close(PreparedStatement ps, ResultSet rs, Connection conn) {
         try {
             if (rs != null) {
                 rs.close();
@@ -77,23 +80,26 @@ public class DatabaseManager extends Function {
             if (ps != null) {
                 ps.close();
             }
+            if (conn != null) {
+                conn.close();
+            }
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, "Failed to close SQL resources", ex);
         }
     }
 
     public void unload() {
-        for (Map.Entry<String, Connection> entry : activeConnections.entrySet()) {
+        for (Map.Entry<String, HikariDataSource> entry : dataSources.entrySet()) {
             try {
-                Connection conn = entry.getValue();
-                if (conn != null && !conn.isClosed()) {
-                    conn.close();
+                HikariDataSource dataSource = entry.getValue();
+                if (dataSource != null && !dataSource.isClosed()) {
+                    dataSource.close();
                     consoleMessage("Closed SQLite database: " + entry.getKey() + ".db");
                 }
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 plugin.getLogger().log(Level.SEVERE, "Failed to close database: " + entry.getKey(), e);
             }
         }
-        activeConnections.clear();
+        dataSources.clear();
     }
 }

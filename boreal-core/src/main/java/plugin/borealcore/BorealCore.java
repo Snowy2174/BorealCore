@@ -123,7 +123,7 @@ public class BorealCore extends JavaPlugin {
         herbalismManager.unload();
         competitionManager.unload();
         placeholderManager.unload();
-        databaseManager.unload();
+        databaseManager.unload(); // Important
         recipeManager.unload();
         herbManager.unload();
         layoutManager.unload();

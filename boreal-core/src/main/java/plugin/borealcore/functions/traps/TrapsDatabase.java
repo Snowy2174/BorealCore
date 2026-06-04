@@ -59,7 +59,7 @@ public class TrapsDatabase {
             plugin.getLogger().log(Level.SEVERE, "Failed to deserialize items", e);
             e.printStackTrace();
         } finally {
-            coreDbManager.close(ps, rs);
+            coreDbManager.close(ps, rs, conn);
         }
         return null;
     }
@@ -91,7 +91,7 @@ public class TrapsDatabase {
             plugin.getLogger().log(Level.SEVERE, "Failed to deserialize items", e);
             e.printStackTrace();
         } finally {
-            coreDbManager.close(ps, rs);
+            coreDbManager.close(ps, rs, conn);
         }
         return null;
     }

@@ -21,7 +21,7 @@
             <groupId>plugin.borealcore</groupId>
             <artifactId>BorealCore</artifactId>
             <version>1.1.9.1</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.dumbo-the-developer.Duels</groupId>

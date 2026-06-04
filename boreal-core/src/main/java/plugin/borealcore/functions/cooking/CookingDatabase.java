@@ -53,7 +53,7 @@ public class CookingDatabase {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            coreDbManager.close(ps, rs);
+            coreDbManager.close(ps, rs, conn);
         }
         return items;
     }
@@ -71,7 +71,7 @@ public class CookingDatabase {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         } finally {
-            coreDbManager.close(ps, null);
+            coreDbManager.close(ps, null, conn);
         }
     }
 
