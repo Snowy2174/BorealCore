@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Loads jade-specific messages from the messages file.
  * Called by JadeModule during module initialization.
- * 
+ * <p>
  * Uses ModuleContext pattern: All message defaults are applied automatically,
  * and messages are read from the messages_<lang>.yml file.
  */
@@ -17,7 +17,7 @@ public class JadeMessageLoader {
 
     public static void load() {
         Map<String, String> messageDefaults = new HashMap<>();
-        
+
         messageDefaults.put("jade-first-time", "This is the first time you've gotten Jade from {source} today, you have {limit} remaining.");
         messageDefaults.put("jade-received", "You have received {amount} Jade.");
         messageDefaults.put("jade-limit-reached", "You've reached your limit for Jade from {source} today, try again later.");

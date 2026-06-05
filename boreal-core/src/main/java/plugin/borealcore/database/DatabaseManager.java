@@ -3,7 +3,7 @@ package plugin.borealcore.database;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.object.Function;
+import plugin.borealcore.api.Function;
 
 import java.io.File;
 import java.sql.Connection;
@@ -46,7 +46,7 @@ public class DatabaseManager extends Function {
             }
 
             File dbFile = new File(plugin.getDataFolder(), dbName + ".db");
-            
+
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl("jdbc:sqlite:" + dbFile.getAbsolutePath());
             config.setMaximumPoolSize(5);

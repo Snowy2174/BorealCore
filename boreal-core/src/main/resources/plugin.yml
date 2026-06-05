@@ -15,11 +15,9 @@ softdepend:
   - DecentHolograms
   - DiscordSRV
   - Duels
+  - Towny
 
 commands:
-  cooking:
-    description: The command to manage BorealCore
-    aliases: [cc, bc, borealcore]
   herbalism:
     description: The command to manage CustomHerbalism
   jade:
@@ -36,7 +34,7 @@ commands:
     description: The command to manage Traps
   market:
     description: The command to manage the Market
-    aliases: [bazaar, shop]
+    aliases: [ bazaar, shop ]
   sit:
     description: Sit
     usage: /<command>
@@ -44,12 +42,12 @@ commands:
   configeditor:
     description: Open the in-game config editor for a specific plugin
     usage: /configeditor <plugin> | /configeditor browse <plugin> | /configeditor reload <plugin>
-    aliases: [confedit, editconfig]
+    aliases: [ confedit, editconfig ]
     permission: borealcore.configeditor
   titles:
     description: Manage your titles, prefixes, and suffixes
     usage: /titles [prefix|suffix]
-    aliases: [title]
+    aliases: [ title ]
 
 permissions:
   customcooking.*:

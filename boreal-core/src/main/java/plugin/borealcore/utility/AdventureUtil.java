@@ -13,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.manager.ConfigManager;
-import plugin.borealcore.object.DebugLevel;
 import plugin.borealcore.manager.MessageManager;
 
 import java.time.Duration;
@@ -48,7 +47,8 @@ public class AdventureUtil {
     }
 
     public static void playerMessage(Player player, String s) {
-        Audience au = Audience.audience(player);;
+        Audience au = Audience.audience(player);
+        ;
         MiniMessage mm = MiniMessage.miniMessage();
         Component parsed = mm.deserialize(replaceLegacy(s));
         au.sendMessage(parsed);
@@ -63,26 +63,30 @@ public class AdventureUtil {
     }
 
     public static void playerBook(Player player, Book book) {
-        Audience au = Audience.audience(player);;
+        Audience au = Audience.audience(player);
+        ;
         au.openBook(book);
     }
 
     public static void playerTitle(Player player, Component s1, Component s2, int in, int duration, int out) {
-        Audience au = Audience.audience(player);;
+        Audience au = Audience.audience(player);
+        ;
         Title.Times times = Title.Times.times(Duration.ofMillis(in), Duration.ofMillis(duration), Duration.ofMillis(out));
         Title title = Title.title(s1, s2, times);
         au.showTitle(title);
     }
 
     public static void playerActionbar(Player player, String s) {
-        Audience au = Audience.audience(player);;
+        Audience au = Audience.audience(player);
+        ;
         MiniMessage mm = MiniMessage.miniMessage();
         au.sendActionBar(mm.deserialize(replaceLegacy(s)));
     }
 
     public static void playerSound(Player player, Sound.Source source, Key key, float volume, float pitch) {
         Sound sound = Sound.sound(key, source, volume, pitch);
-        Audience au = Audience.audience(player);;
+        Audience au = Audience.audience(player);
+        ;
         au.playSound(sound);
     }
 

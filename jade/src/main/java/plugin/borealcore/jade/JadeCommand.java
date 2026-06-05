@@ -20,9 +20,10 @@ import plugin.borealcore.jade.config.JadeMessage;
 import plugin.borealcore.jade.object.Leaderboard;
 import plugin.borealcore.jade.object.LeaderboardEntry;
 import plugin.borealcore.jade.object.LeaderboardType;
-import plugin.borealcore.object.DebugLevel;
 import plugin.borealcore.manager.MessageManager;
+import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
+import plugin.borealcore.utility.CommandUtil;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -59,7 +60,7 @@ public class JadeCommand {
         LiteralCommandNode<CommandSourceStack> giveNode = Commands.literal("give")
                 .requires(src -> src.getSender().hasPermission("borealcore.admin"))
                 .then(Commands.argument("player", StringArgumentType.word())
-                        .suggests(this::suggestOnlinePlayers)
+                        .suggests(CommandUtil::suggestOnlinePlayers)
                         .then(Commands.argument("amount", IntegerArgumentType.integer())
                                 .executes(ctx -> handleGiveJade(ctx, StringArgumentType.getString(ctx, "player"), "", IntegerArgumentType.getInteger(ctx, "amount")))
                                 .then(Commands.argument("source", StringArgumentType.word())
@@ -69,7 +70,7 @@ public class JadeCommand {
 
         LiteralCommandNode<CommandSourceStack> removeNode = Commands.literal("remove")
                 .then(Commands.argument("player", StringArgumentType.word())
-                        .suggests(this::suggestOnlinePlayers)
+                        .suggests(CommandUtil::suggestOnlinePlayers)
                         .then(Commands.argument("amount", IntegerArgumentType.integer())
                                 .executes(ctx -> handleRemoveJade(ctx, StringArgumentType.getString(ctx, "player"), IntegerArgumentType.getInteger(ctx, "amount"), ""))
                                 .then(Commands.argument("source", StringArgumentType.word())
@@ -79,7 +80,7 @@ public class JadeCommand {
 
         LiteralCommandNode<CommandSourceStack> setNode = Commands.literal("set")
                 .then(Commands.argument("player", StringArgumentType.word())
-                        .suggests(this::suggestOnlinePlayers)
+                        .suggests(CommandUtil::suggestOnlinePlayers)
                         .then(Commands.argument("amount", IntegerArgumentType.integer())
                                 .executes(ctx -> handleSetJade(ctx, StringArgumentType.getString(ctx, "player"), IntegerArgumentType.getInteger(ctx, "amount"), ""))
                                 .then(Commands.argument("source", StringArgumentType.word())
@@ -100,12 +101,12 @@ public class JadeCommand {
 
                 .then(Commands.literal("reset")
                         .then(Commands.argument("player", StringArgumentType.word())
-                                .suggests(this::suggestOnlinePlayers)
+                                .suggests(CommandUtil::suggestOnlinePlayers)
                                 .executes(ctx -> handleSetJade(ctx, StringArgumentType.getString(ctx, "player"), 0, "reset"))))
 
                 .then(Commands.literal("totalJadeForPlayer")
                         .then(Commands.argument("player", StringArgumentType.word())
-                                .suggests(this::suggestOnlinePlayers)
+                                .suggests(CommandUtil::suggestOnlinePlayers)
                                 .executes(ctx -> handleTotalJadeForPlayerCommand(ctx, StringArgumentType.getString(ctx, "player")))))
 
                 .then(Commands.literal("totalJadeForSource")
@@ -115,7 +116,7 @@ public class JadeCommand {
 
                 .then(Commands.literal("getMostRecent")
                         .then(Commands.argument("player", StringArgumentType.word())
-                                .suggests(this::suggestOnlinePlayers)
+                                .suggests(CommandUtil::suggestOnlinePlayers)
                                 .executes(ctx -> handleGetMostRecent(ctx, StringArgumentType.getString(ctx, "player"), ""))
                                 .then(Commands.argument("source", StringArgumentType.word())
                                         .suggests(this::suggestJadeSources)
@@ -123,7 +124,7 @@ public class JadeCommand {
 
                 .then(Commands.literal("getPlayerData")
                         .then(Commands.argument("player", StringArgumentType.word())
-                                .suggests(this::suggestOnlinePlayers)
+                                .suggests(CommandUtil::suggestOnlinePlayers)
                                 .executes(ctx -> handleGetPlayerData(ctx, StringArgumentType.getString(ctx, "player")))))
 
                 .then(Commands.literal("verifyAndFixTotals").executes(this::handleVerifyAndFixTotals))
@@ -158,18 +159,6 @@ public class JadeCommand {
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();
-    }
-
-    // Suggestion Providers
-
-    private CompletableFuture<Suggestions> suggestOnlinePlayers(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
-        String remaining = builder.getRemaining().toLowerCase();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getName().toLowerCase().startsWith(remaining)) {
-                builder.suggest(player.getName());
-            }
-        }
-        return builder.buildFuture();
     }
 
     private CompletableFuture<Suggestions> suggestJadeSources(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {

@@ -6,7 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import plugin.borealcore.api.module.BorealGUI;
-import plugin.borealcore.object.DebugLevel;
+import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.ArrayList;

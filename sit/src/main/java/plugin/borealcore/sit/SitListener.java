@@ -183,8 +183,7 @@ public class SitListener implements Listener {
             final Location
                     tl = b.getLocation().clone().add(d),
                     ul = tl.clone().subtract(0, 1, 0),
-                    ul2 = tl.clone().add(0, 1, 0)
-                            ;
+                    ul2 = tl.clone().add(0, 1, 0);
             if (!bl.contains(ul.getBlock()) && b.isSolid())
                 removeSitsInBlock(ul);
             if (!bl.contains(ul2.getBlock()) && ul2.getBlock().isSolid()) {
@@ -227,5 +226,7 @@ public class SitListener implements Listener {
     }
 
     @EventHandler
-    public void onBreakBlock(final BlockBreakEvent event) { removeSitsInBlock(event.getBlock().getLocation()); }
+    public void onBreakBlock(final BlockBreakEvent event) {
+        removeSitsInBlock(event.getBlock().getLocation());
+    }
 }

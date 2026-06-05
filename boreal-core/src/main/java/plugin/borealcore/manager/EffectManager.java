@@ -6,16 +6,15 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import plugin.borealcore.api.action.Action;
-import plugin.borealcore.api.action.action.CommandActionImpl;
-import plugin.borealcore.api.action.action.HungerEffectImpl;
-import plugin.borealcore.api.action.action.MessageActionImpl;
-import plugin.borealcore.api.action.action.PotionEffectImpl;
-import plugin.borealcore.api.action.action.SaturationEffectImpl;
-import plugin.borealcore.api.action.action.SoundActionImpl;
-import plugin.borealcore.api.action.action.VanillaXPImpl;
-import plugin.borealcore.functions.cooking.configs.CookingConfig;
-import plugin.borealcore.object.DebugLevel;
-import plugin.borealcore.object.Function;
+import plugin.borealcore.action.CommandActionImpl;
+import plugin.borealcore.action.HungerEffectImpl;
+import plugin.borealcore.action.MessageActionImpl;
+import plugin.borealcore.action.PotionEffectImpl;
+import plugin.borealcore.action.SaturationEffectImpl;
+import plugin.borealcore.action.SoundActionImpl;
+import plugin.borealcore.action.VanillaXPImpl;
+import plugin.borealcore.utility.DebugLevel;
+import plugin.borealcore.api.Function;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.GuiUtil;
 import plugin.borealcore.utility.ItemUtil;
@@ -209,7 +208,7 @@ public class EffectManager extends Function {
                 perfectEffectsList.add(new PotionEffect(type, duration / 2 * 3, amplifier + 1));
             }
             EFFECTS.put(sectionName, effectsList);
-            EFFECTS.put(sectionName + CookingConfig.perfectItemSuffix, perfectEffectsList);
+            EFFECTS.put(sectionName + "_perfect", perfectEffectsList);
         }
     }
 

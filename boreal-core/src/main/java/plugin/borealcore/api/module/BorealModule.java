@@ -26,7 +26,7 @@ public interface BorealModule {
     /**
      * Called when the module is being loaded into the system.
      * This is called BEFORE {@link #onModuleEnable()}
-     * 
+     *
      * @param context The module context providing access to plugin resources
      * @throws Exception if initialization fails
      */

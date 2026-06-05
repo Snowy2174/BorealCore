@@ -3,8 +3,8 @@ package plugin.borealcore.jade;
 import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.jade.config.JadeMessage;
-import plugin.borealcore.object.DebugLevel;
 import plugin.borealcore.manager.MessageManager;
+import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.Collection;

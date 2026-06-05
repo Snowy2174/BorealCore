@@ -1,10 +1,13 @@
-Here is the updated BorealCore Module Development Kit reflecting the new Paper Brigadier centralized command registration system.
+Here is the updated BorealCore Module Development Kit reflecting the new Paper Brigadier centralized command
+registration system.
 
 # BorealCore Module Development Kit (ADK)
 
 ## Overview
 
-The BorealCore Module Development Kit allows external developers to create modular plugins that integrate seamlessly with the BorealCore plugin system. Modules are loaded dynamically at runtime and have full access to the core BorealCore database manager, configuration APIs, centralized command registration, and event system.
+The BorealCore Module Development Kit allows external developers to create modular plugins that integrate seamlessly
+with the BorealCore plugin system. Modules are loaded dynamically at runtime and have full access to the core BorealCore
+database manager, configuration APIs, centralized command registration, and event system.
 
 ## Getting Started
 
@@ -229,11 +232,13 @@ public void onModuleInitialize(ModuleContext context) throws Exception {
 
 ### 6. Configuration Management
 
-BorealCore provides a standardized configuration API through the `ModuleContext`. You can choose to save your module's settings either as a section within the main `config.yml` or as a standalone file.
+BorealCore provides a standardized configuration API through the `ModuleContext`. You can choose to save your module's
+settings either as a section within the main `config.yml` or as a standalone file.
 
 #### Setting up Configuration Defaults
 
-Always use `setupModuleDefaults()` to ensure your configuration keys exist without overwriting user changes. Define all defaults in a Map for clean, centralized management:
+Always use `setupModuleDefaults()` to ensure your configuration keys exist without overwriting user changes. Define all
+defaults in a Map for clean, centralized management:
 
 ```java
 Map<String, Object> defaults = new HashMap<>();
@@ -257,7 +262,8 @@ ConfigurationSection config = context.setupModuleDefaults("modules.my-module", d
 
 #### Setting up Message Defaults
 
-Similarly, use `setupModuleMessages()` for your module's messages. This loads defaults into the messages file and ensures consistent message handling:
+Similarly, use `setupModuleMessages()` for your module's messages. This loads defaults into the messages file and
+ensures consistent message handling:
 
 ```java
 Map<String, String> messageDefaults = new HashMap<>();
@@ -326,7 +332,8 @@ public void onModuleEnable() throws Exception {
 
 ### 7. Database Access
 
-BorealCore provides a dynamic `DatabaseManager` that grants modules their own isolated SQLite database files. Modules are entirely responsible for defining their own tables and executing their own queries.
+BorealCore provides a dynamic `DatabaseManager` that grants modules their own isolated SQLite database files. Modules
+are entirely responsible for defining their own tables and executing their own queries.
 
 ```java
 // ... Inside your module or DAO class ...
@@ -362,25 +369,36 @@ public void onModuleInitialize(ModuleContext context) throws Exception {
 
 **Important Database Rules for Modules:**
 
-1. **Own Your Schema:** The BorealCore plugin will not create tables for you. Always run your `CREATE TABLE IF NOT EXISTS` queries when your module initializes.
-2. **Do NOT Close the `Connection`:** The `DatabaseManager` caches and shares the `Connection` object. If you call `conn.close()`, you will lock your module out of the database.
-3. **Always Close Statements & ResultSets:** Use Java's `try-with-resources` block to ensure objects are closed automatically to prevent memory leaks.
+1. **Own Your Schema:** The BorealCore plugin will not create tables for you. Always run your
+   `CREATE TABLE IF NOT EXISTS` queries when your module initializes.
+2. **Do NOT Close the `Connection`:** The `DatabaseManager` caches and shares the `Connection` object. If you call
+   `conn.close()`, you will lock your module out of the database.
+3. **Always Close Statements & ResultSets:** Use Java's `try-with-resources` block to ensure objects are closed
+   automatically to prevent memory leaks.
 
 ## 8. Inter-Module Dependencies and Load Order
-   If your module acts as an add-on or requires API access to another BorealCore module, you must define it in the module-depends list in your module.yml.
 
-BorealCore features an intelligent Dependency Graph Resolver. When loading, it scans all modules and guarantees the following lifecycle safety:
+If your module acts as an add-on or requires API access to another BorealCore module, you must define it in the
+module-depends list in your module.yml.
 
-Strict Load Order: Modules you depend on will be fully initialized and enabled before your module's onModuleInitialize() or onModuleEnable() methods are called.
+BorealCore features an intelligent Dependency Graph Resolver. When loading, it scans all modules and guarantees the
+following lifecycle safety:
 
-Strict Unload Order: When the server stops or modules are reloaded, BorealCore disables modules in reverse order. Your module will be safely disabled before the modules you depend on are wiped.
+Strict Load Order: Modules you depend on will be fully initialized and enabled before your module's onModuleInitialize()
+or onModuleEnable() methods are called.
 
-Circular Dependency Protection: If Module A depends on B, and B depends on A, BorealCore will safely abort loading to prevent a stack overflow crash and print an error to the console.
+Strict Unload Order: When the server stops or modules are reloaded, BorealCore disables modules in reverse order. Your
+module will be safely disabled before the modules you depend on are wiped.
 
-Missing Dependency Protection: If you depend on a module that is not installed or failed to load, your module will not attempt to start.
+Circular Dependency Protection: If Module A depends on B, and B depends on A, BorealCore will safely abort loading to
+prevent a stack overflow crash and print an error to the console.
+
+Missing Dependency Protection: If you depend on a module that is not installed or failed to load, your module will not
+attempt to start.
 
 Accessing Another Module:
-Once your dependencies are guaranteed by module-depends, you can safely interact with them. For example, if you depend on a market module:
+Once your dependencies are guaranteed by module-depends, you can safely interact with them. For example, if you depend
+on a market module:
 
 ```java
 @Override
@@ -399,9 +417,12 @@ public void onModuleEnable() throws Exception {
 
 ## 9. Command Registration (Paper Brigadier)
 
-BorealCore manages command registration centrally to prevent memory leaks and ghost commands during runtime module reloads. **Do not** register `LifecycleEvents.COMMANDS` listeners directly inside your modules.
+BorealCore manages command registration centrally to prevent memory leaks and ghost commands during runtime module
+reloads. **Do not** register `LifecycleEvents.COMMANDS` listeners directly inside your modules.
 
-Instead, construct your commands using Paper's Brigadier API and pass the compiled `LiteralCommandNode` to the `ModuleContext` during the `onModuleInitialize` phase. BorealCore will automatically gather these nodes and register them to the server safely.
+Instead, construct your commands using Paper's Brigadier API and pass the compiled `LiteralCommandNode` to the
+`ModuleContext` during the `onModuleInitialize` phase. BorealCore will automatically gather these nodes and register
+them to the server safely.
 
 ```java
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -515,13 +536,16 @@ public void onModuleEnable() throws Exception {
 ## 12. Best Practices
 
 1. **Use unique module IDs** - Follow Java package naming conventions (reverse domain notation)
-2. **Centralize commands** - Pass Brigadier nodes to `context.registerCommand()` during initialization. Do not hook into server lifecycles manually.
-3. **Clean up resources** - Always cancel your module-specific `BukkitTasks` and unregister Listeners in `onModuleDisable()`.
+2. **Centralize commands** - Pass Brigadier nodes to `context.registerCommand()` during initialization. Do not hook into
+   server lifecycles manually.
+3. **Clean up resources** - Always cancel your module-specific `BukkitTasks` and unregister Listeners in
+   `onModuleDisable()`.
 4. **Organize configurations** - Use dedicated ConfigLoader and MessageLoader classes for clarity and maintainability.
 5. **Never hardcode config values** - Always use config classes populated from loaders.
 6. **Don't access static fields from other modules** - Use the database for communication or module context APIs.
 7. **Test with multiple BC versions** - Ensure compatibility with your minimum required version.
-8. **Use SetupModule* utilities** - Prefer `context.setupModuleDefaults()` over manual file handling to preserve user edits.
+8. **Use SetupModule* utilities** - Prefer `context.setupModuleDefaults()` over manual file handling to preserve user
+   edits.
 
 ## 13. Support
 

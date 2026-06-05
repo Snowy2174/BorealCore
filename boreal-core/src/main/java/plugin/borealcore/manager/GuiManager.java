@@ -3,9 +3,8 @@ package plugin.borealcore.manager;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import plugin.borealcore.api.module.BorealGUI;
-import plugin.borealcore.functions.cooking.object.Ingredient;
-import plugin.borealcore.object.DebugLevel;
-import plugin.borealcore.object.Function;
+import plugin.borealcore.utility.DebugLevel;
+import plugin.borealcore.api.Function;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.HashMap;
@@ -16,11 +15,9 @@ public class GuiManager extends Function {
 
     private static final Map<String, Supplier<BorealGUI>> guiRegistry = new HashMap<>();
 
-    public static HashMap<String, Ingredient> INGREDIENTS;
-    public static HashMap<String, ItemStack> collectionItems;
-
     @Override
-    public void load() {}
+    public void load() {
+    }
 
     @Override
     public void unload() {
@@ -31,7 +28,7 @@ public class GuiManager extends Function {
      * Registers a new GUI factory to the core manager.
      * External modules should call this during their onModuleEnable() phase.
      *
-     * @param id The unique identifier for this GUI (e.g., "wikiMenu")
+     * @param id          The unique identifier for this GUI (e.g., "wikiMenu")
      * @param guiSupplier A supplier that creates a new instance of the BorealGUI
      */
     public void registerGui(String id, Supplier<BorealGUI> guiSupplier) {
@@ -51,7 +48,7 @@ public class GuiManager extends Function {
      * Opens a registered GUI for a player.
      *
      * @param player The player to open the GUI for
-     * @param id The unique identifier of the GUI
+     * @param id     The unique identifier of the GUI
      * @return true if the GUI was found and opened, false otherwise
      */
     public static boolean openGui(Player player, String id) {

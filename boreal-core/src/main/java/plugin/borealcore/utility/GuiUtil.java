@@ -1,28 +1,10 @@
 package plugin.borealcore.utility;
 
 import org.bukkit.entity.Player;
-import plugin.borealcore.functions.cooking.configs.CookingConfig;
-import plugin.borealcore.functions.cooking.RecipeDataUtil;
 
 import java.util.List;
 
 public class GuiUtil {
-
-    public static void appendMastery(List<String> lore, Player player, String recipe, Boolean hasMastery) {
-        Integer masteryCount = RecipeDataUtil.getMasteryCount(player, recipe);
-        Integer requiredMastery = RecipeDataUtil.getDefaultRequiredMastery(recipe);
-        String[] masteryInfo;
-        lore.add(" ");
-        lore.add(CookingConfig.masteryLine.replace("{mastery}", (masteryCount + "/" + requiredMastery)));
-        if (Boolean.TRUE.equals(hasMastery)) {
-            masteryInfo = CookingConfig.masteryInfoTrue.split("/");
-        } else {
-            lore.add(CookingConfig.masteryBar.replace("{bar}", GuiUtil.appendProgressBar((double) masteryCount / requiredMastery)));
-            masteryInfo = CookingConfig.masteryInfoFalse.split("/");
-        }
-        lore.add(masteryInfo[0]);
-        lore.add(masteryInfo[1]);
-    }
 
     public static String appendProgressBar(double percentage) {
         int length = 10;

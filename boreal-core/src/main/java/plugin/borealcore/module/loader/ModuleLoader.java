@@ -7,8 +7,6 @@ import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.api.module.ModuleLoadException;
 import plugin.borealcore.api.module.ModuleMetadata;
-import plugin.borealcore.database.DatabaseManager;
-import plugin.borealcore.manager.PlaceholderManager;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.io.File;
@@ -16,7 +14,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -263,7 +269,7 @@ public class ModuleLoader {
 
     /**
      * Gets a loaded module by ID.
-     * 
+     *
      * @param moduleId The module ID
      * @return The module instance, or null if not loaded
      */
@@ -273,7 +279,7 @@ public class ModuleLoader {
 
     /**
      * Gets metadata for a module.
-     * 
+     *
      * @param moduleId The module ID
      * @return The module metadata, or null if not found
      */
@@ -283,7 +289,7 @@ public class ModuleLoader {
 
     /**
      * Gets all loaded module IDs.
-     * 
+     *
      * @return A collection of module IDs
      */
     public Collection<String> getLoadedModuleIds() {
@@ -292,7 +298,7 @@ public class ModuleLoader {
 
     /**
      * Checks if two versions are compatible (semantic versioning).
-     * 
+     *
      * @param required The required version
      * @return true if current plugin version meets requirement
      */

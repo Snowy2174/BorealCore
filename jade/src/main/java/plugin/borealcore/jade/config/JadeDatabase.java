@@ -5,16 +5,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import plugin.borealcore.api.module.ModuleContext;
-
-import java.util.function.Consumer;
-import java.util.concurrent.CompletableFuture;
+import plugin.borealcore.database.DatabaseErrors;
 import plugin.borealcore.database.DatabaseManager;
-import plugin.borealcore.database.Errors;
 import plugin.borealcore.jade.object.JadeTransaction;
 import plugin.borealcore.jade.object.Leaderboard;
 import plugin.borealcore.jade.object.LeaderboardEntry;
 import plugin.borealcore.jade.object.LeaderboardType;
-import plugin.borealcore.object.DebugLevel;
+import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.sql.Connection;
@@ -29,7 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import static plugin.borealcore.jade.JadeModule.jadeSources;
@@ -177,7 +176,7 @@ public class JadeDatabase {
                 }
             }
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+            plugin.getLogger().log(Level.SEVERE, DatabaseErrors.sqlConnectionExecute(), e);
         }
 
         return null;
@@ -202,7 +201,7 @@ public class JadeDatabase {
                 }
             }
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+            plugin.getLogger().log(Level.SEVERE, DatabaseErrors.sqlConnectionExecute(), e);
         }
 
         return timestamps;
@@ -261,7 +260,7 @@ public class JadeDatabase {
                 }
             }
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+            plugin.getLogger().log(Level.SEVERE, DatabaseErrors.sqlConnectionExecute(), e);
         }
 
         return sourceJadeMap;
@@ -311,10 +310,10 @@ public class JadeDatabase {
 
                 // Update or insert the player's total in jade_totals
                 String totalsQuery = """
-                        INSERT INTO jade_totals (player, uuid, jade)
-                        VALUES (?, ?, ?)
-                        ON CONFLICT(uuid) DO UPDATE SET jade = jade + ?;
-                    """;
+                            INSERT INTO jade_totals (player, uuid, jade)
+                            VALUES (?, ?, ?)
+                            ON CONFLICT(uuid) DO UPDATE SET jade = jade + ?;
+                        """;
                 try (PreparedStatement psTotals = conn.prepareStatement(totalsQuery)) {
                     psTotals.setString(1, transaction.getPlayer());
                     psTotals.setString(2, transaction.getUuid());
@@ -326,7 +325,7 @@ public class JadeDatabase {
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+                plugin.getLogger().log(Level.SEVERE, DatabaseErrors.sqlConnectionExecute(), e);
                 pendingTransactions.add(transaction);
             } finally {
                 conn.setAutoCommit(previousAutoCommit);
@@ -424,7 +423,7 @@ public class JadeDatabase {
                 }
             }
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+            plugin.getLogger().log(Level.SEVERE, DatabaseErrors.sqlConnectionExecute(), e);
         }
     }
 
@@ -444,7 +443,7 @@ public class JadeDatabase {
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+            plugin.getLogger().log(Level.SEVERE, DatabaseErrors.sqlConnectionExecute(), e);
         }
     }
 
@@ -539,7 +538,7 @@ public class JadeDatabase {
                 }
             }
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+            plugin.getLogger().log(Level.SEVERE, DatabaseErrors.sqlConnectionExecute(), e);
         }
 
         return new Leaderboard(type, leaderboard);
@@ -568,7 +567,7 @@ public class JadeDatabase {
                 }
             }
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+            plugin.getLogger().log(Level.SEVERE, DatabaseErrors.sqlConnectionExecute(), e);
         }
         return uuids;
     }
@@ -587,7 +586,7 @@ public class JadeDatabase {
                 }
             }
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+            plugin.getLogger().log(Level.SEVERE, DatabaseErrors.sqlConnectionExecute(), e);
         }
         return sources;
     }
@@ -607,7 +606,7 @@ public class JadeDatabase {
                 }
             }
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+            plugin.getLogger().log(Level.SEVERE, DatabaseErrors.sqlConnectionExecute(), e);
         }
         return 0;
     }

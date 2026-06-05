@@ -10,7 +10,8 @@ import org.bukkit.entity.Player;
 public class GambleCommand implements CommandExecutor {
 
 
-    public GambleCommand() {}
+    public GambleCommand() {
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

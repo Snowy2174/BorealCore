@@ -20,8 +20,8 @@ import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.config.ConfigEditorMessage;
 import plugin.borealcore.config.ConfigEditorMessageLoader;
 import plugin.borealcore.manager.MessageManager;
-import plugin.borealcore.object.Function;
-import plugin.borealcore.object.SimpleListener;
+import plugin.borealcore.api.Function;
+import plugin.borealcore.listener.SimpleListener;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.io.File;

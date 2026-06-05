@@ -5,7 +5,7 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import plugin.borealcore.object.Function;
+import plugin.borealcore.api.Function;
 
 import java.util.ArrayList;
 import java.util.Collections;

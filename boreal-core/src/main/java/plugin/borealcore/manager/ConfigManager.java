@@ -5,7 +5,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.object.DebugLevel;
+import plugin.borealcore.utility.DebugLevel;
 
 import java.io.File;
 import java.util.Map;
@@ -46,7 +46,7 @@ public class ConfigManager {
      * Utility method: Setup default config values for a module.
      * Provides backward-compatible config default initialization.
      *
-     * @param identifier File name (".yml") or section path in config.yml
+     * @param identifier    File name (".yml") or section path in config.yml
      * @param defaultValues Map of config paths to default values
      * @return ConfigurationSection with defaults applied
      */
@@ -134,7 +134,10 @@ public class ConfigManager {
             try {
                 BorealCore.plugin.saveResource(configName.substring(configName.lastIndexOf("/") + 1), false);
             } catch (IllegalArgumentException e) {
-                try { file.createNewFile(); } catch (Exception ignored) {}
+                try {
+                    file.createNewFile();
+                } catch (Exception ignored) {
+                }
             }
         }
         return YamlConfiguration.loadConfiguration(file);

@@ -7,7 +7,8 @@ import org.bukkit.command.CommandSender;
 
 public class NodeCommand implements CommandExecutor {
 
-    public NodeCommand() {}
+    public NodeCommand() {
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

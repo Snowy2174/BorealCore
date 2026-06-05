@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
-import plugin.borealcore.object.DebugLevel;
+import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.HashMap;
@@ -39,7 +39,8 @@ public class DuelsModule implements BorealModule {
     }
 
     @Override
-    public void onModuleInitialize(ModuleContext context){}
+    public void onModuleInitialize(ModuleContext context) {
+    }
 
     public static void startMatch(MatchStartEvent event) {
         Player[] players = event.getPlayers();

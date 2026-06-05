@@ -18,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.functions.cooking.configs.CookingConfig;
 import plugin.borealcore.functions.cooking.object.Recipe;
-import plugin.borealcore.object.DebugLevel;
 
 import java.util.ArrayList;
 import java.util.List;

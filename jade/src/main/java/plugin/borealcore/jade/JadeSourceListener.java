@@ -9,7 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import plugin.borealcore.functions.cooking.CookResultEvent;
-import plugin.borealcore.object.DebugLevel;
+import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 
 import static com.dre.brewery.api.events.brew.BrewModifyEvent.Type.SEAL;
@@ -58,7 +58,7 @@ public class JadeSourceListener implements Listener {
     // @TODO add the listeners for the vote tier rewards
 
     @EventHandler
-    public void onCook(CookResultEvent event){
+    public void onCook(CookResultEvent event) {
         if (event.isPerfect()) {
             jadeModule.cookingJade(event.getPlayer());
         }

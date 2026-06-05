@@ -11,8 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
-import plugin.borealcore.object.DebugLevel;
 import plugin.borealcore.manager.MessageManager;
+import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ItemUtil;
 

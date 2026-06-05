@@ -13,11 +13,12 @@ import org.jetbrains.annotations.NotNull;
 
 public final class SitCommand implements CommandExecutor {
 
-    public SitCommand() {}
+    public SitCommand() {
+    }
 
     @Override
     public boolean onCommand(final @NotNull CommandSender sender, final @NotNull Command command, final @NotNull String s, final @NotNull String[] strings) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage("This command is only for players.");
             return true;
         }

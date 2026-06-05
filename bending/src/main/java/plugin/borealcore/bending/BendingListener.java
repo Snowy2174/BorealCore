@@ -39,10 +39,10 @@ public class BendingListener implements Listener {
                 }
             }
             case LAVA -> {
-                    event.setCancelled(true);
+                event.setCancelled(true);
             }
             case FIRE -> {
-                    event.setDamage(fireContactDamage);
+                event.setDamage(fireContactDamage);
             }
             default -> {
             }

@@ -14,7 +14,6 @@ import static plugin.borealcore.duels.DuelsModule.startMatch;
 public class DuelsListener implements Listener {
 
 
-
     public DuelsListener() {
         Duels api = (Duels) Bukkit.getServer().getPluginManager().getPlugin("Duels");
     }

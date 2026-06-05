@@ -38,8 +38,8 @@ public class ModuleRegistry {
     /**
      * Registers a loaded module.
      *
-     * @param moduleId The module ID
-     * @param module The module instance
+     * @param moduleId       The module ID
+     * @param module         The module instance
      * @param moduleMetadata The module metadata
      */
     protected void registerModule(String moduleId, BorealModule module, ModuleMetadata moduleMetadata) {
