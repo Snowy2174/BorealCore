@@ -2,12 +2,6 @@ package plugin.borealcore.herbalism;
 
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
-import plugin.borealcore.herbalism.configs.HerbManager;
-import plugin.borealcore.herbalism.objects.Herb;
-import plugin.borealcore.herbalism.objects.Infusion;
-import plugin.borealcore.herbalism.objects.InvertedEffect;
-import plugin.borealcore.herbalism.objects.Modifier;
-import plugin.borealcore.herbalism.objects.ModifierType;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,12 +15,18 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.cooking.configs.CookingConfig;
-import plugin.borealcore.functions.cooking.configs.LayoutManager;
-import plugin.borealcore.functions.cooking.object.Difficulty;
-import plugin.borealcore.functions.cooking.object.Layout;
+import plugin.borealcore.api.Function;
+import plugin.borealcore.cooking.configs.CookingConfig;
+import plugin.borealcore.cooking.configs.LayoutManager;
+import plugin.borealcore.cooking.object.Difficulty;
+import plugin.borealcore.cooking.object.Layout;
+import plugin.borealcore.herbalism.configs.HerbManager;
+import plugin.borealcore.herbalism.objects.Herb;
+import plugin.borealcore.herbalism.objects.Infusion;
+import plugin.borealcore.herbalism.objects.InvertedEffect;
+import plugin.borealcore.herbalism.objects.Modifier;
+import plugin.borealcore.herbalism.objects.ModifierType;
 import plugin.borealcore.manager.MessageManager;
-import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.ArrayList;
@@ -38,9 +38,9 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static net.kyori.adventure.key.Key.key;
 import static plugin.borealcore.herbalism.configs.HerbManager.HERBS;
 import static plugin.borealcore.herbalism.objects.ModifierType.*;
-import static net.kyori.adventure.key.Key.key;
 
 public class HerbalismModule extends Function {
 

@@ -1,6 +1,5 @@
 package plugin.borealcore.cooking.recipebook;
 
-import plugin.borealcore.cooking.CookingModule;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,7 +8,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.borealcore.BorealCore;
+import plugin.borealcore.cooking.CookingModule;
 import plugin.borealcore.manager.GuiManager;
 import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
@@ -23,7 +22,7 @@ public class RecipeBookCommand implements CommandExecutor {
     // UNUSED: @todo migrate to brigadier api
 
     public RecipeBookCommand() {
-        this.cookingModule = BorealCore.getCookingManager();
+        this.cookingModule = null; // @TODO neenaw nee naw
     }
 
     @Override

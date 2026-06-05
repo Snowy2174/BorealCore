@@ -1,8 +1,8 @@
 package plugin.borealcore.cooking;
 
-import plugin.borealcore.cooking.configs.CookingConfig;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
+import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.cooking.configs.CookingConfig;
 import plugin.borealcore.manager.ConfigManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.ItemUtil;
@@ -50,7 +51,7 @@ public class CookingPotUtil {
                     spawnNextIngredient(loc, player, ingredients, currentIndex + 1);
                 });
                 spawnSplashItem(loc);
-                AdventureUtil.playerSound(player, net.kyori.adventure.sound.Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "ingredient" + i), 1f, 1f);
+                AdventureUtil.playerSound(player, net.kyori.adventure.sound.Sound.Source.AMBIENT, Key.key(ConfigManager.customNamespace, "ingredient" + i), 1f, 1f);
             }
         }.runTaskLater(BorealCore.plugin, 20);
     }

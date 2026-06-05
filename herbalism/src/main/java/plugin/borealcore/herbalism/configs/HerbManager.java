@@ -1,21 +1,21 @@
 package plugin.borealcore.herbalism.configs;
 
-import plugin.borealcore.herbalism.objects.Herb;
-import plugin.borealcore.herbalism.objects.HerbalismType;
-import plugin.borealcore.herbalism.objects.Modifier;
-import plugin.borealcore.herbalism.objects.ModifierType;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffect;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.cooking.configs.LayoutManager;
-import plugin.borealcore.functions.cooking.object.Difficulty;
-import plugin.borealcore.functions.cooking.object.Layout;
+import plugin.borealcore.api.Function;
+import plugin.borealcore.cooking.configs.LayoutManager;
+import plugin.borealcore.cooking.object.Difficulty;
+import plugin.borealcore.cooking.object.Layout;
+import plugin.borealcore.herbalism.objects.Herb;
+import plugin.borealcore.herbalism.objects.HerbalismType;
+import plugin.borealcore.herbalism.objects.Modifier;
+import plugin.borealcore.herbalism.objects.ModifierType;
 import plugin.borealcore.manager.EffectManager;
-import plugin.borealcore.object.DebugLevel;
-import plugin.borealcore.object.Function;
 import plugin.borealcore.utility.AdventureUtil;
+import plugin.borealcore.utility.DebugLevel;
 
 import java.io.File;
 import java.util.ArrayList;

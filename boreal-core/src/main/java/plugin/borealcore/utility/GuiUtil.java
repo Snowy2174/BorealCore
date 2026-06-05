@@ -23,9 +23,9 @@ public class GuiUtil {
         return progressBar.toString();
     }
 
-    public static void appendIngredients(List<String> lore, Player player, List<String> ingredients) {
+    public static void appendIngredients(List<String> lore, Player player, List<String> ingredients) { // @TODO needs generalisation
         lore.add(" ");
-        lore.add(CookingConfig.ingredientsLine);
+        lore.add("<!italic><#ffcc33>Ingredients:");
         for (String ingredient : ingredients) {
             if (ingredient.contains("/")) {
                 handleOptions(lore, player, ingredient);

@@ -8,6 +8,7 @@ import org.bukkit.plugin.PluginManager;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.database.DatabaseManager;
 import plugin.borealcore.manager.ConfigManager;
+import plugin.borealcore.manager.ItemEnrichmentManager;
 import plugin.borealcore.manager.PlaceholderManager;
 
 import java.util.ArrayList;
@@ -27,14 +28,16 @@ public class ModuleContext {
     private final Logger logger;
     private final PluginManager pluginManager;
     private final PlaceholderManager placeholderManager;
+    private final ItemEnrichmentManager itemEnrichmentManager;
     private final List<QueuedCommand> registeredCommands = new ArrayList<>();
 
-    public ModuleContext(BorealCore plugin, DatabaseManager database, PlaceholderManager placeholderManager) {
+    public ModuleContext(BorealCore plugin, DatabaseManager database, PlaceholderManager placeholderManager, ItemEnrichmentManager itemEnrichmentManager) {
         this.plugin = plugin;
         this.database = database;
         this.logger = plugin.getLogger();
         this.pluginManager = plugin.getServer().getPluginManager();
         this.placeholderManager = placeholderManager;
+        this.itemEnrichmentManager = itemEnrichmentManager;
     }
 
     /**
@@ -70,6 +73,13 @@ public class ModuleContext {
      */
     public PlaceholderManager getPlaceholderManager() {
         return this.placeholderManager;
+    }
+
+    /**
+     * @return The item enrichment manager for processing items
+     */
+    public ItemEnrichmentManager getItemEnrichmentManager() {
+        return this.itemEnrichmentManager;
     }
 
     /**

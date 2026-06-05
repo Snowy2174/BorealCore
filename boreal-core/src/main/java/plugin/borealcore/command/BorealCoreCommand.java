@@ -13,9 +13,9 @@ import org.bukkit.entity.Player;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.manager.ConfigManager;
 import plugin.borealcore.manager.MessageManager;
-import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.CommandUtil;
+import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.ItemUtil;
 
 public class BorealCoreCommand {
@@ -92,7 +92,7 @@ public class BorealCoreCommand {
         String itemName = StringArgumentType.getString(ctx, "item");
         int amount = hasAmount ? IntegerArgumentType.getInteger(ctx, "amount") : 1;
 
-        ItemUtil.giveItem(player, itemName, amount, true);
+        ItemUtil.giveItem(player, itemName, amount);
         AdventureUtil.sendMessage(sender, "Gave " + amount + " " + itemName + " to " + player.getName());
 
         return Command.SINGLE_SUCCESS;

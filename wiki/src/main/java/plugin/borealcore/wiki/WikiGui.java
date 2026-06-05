@@ -9,7 +9,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.api.module.BorealGUI;
-import plugin.borealcore.functions.cooking.configs.CookingConfig;
 import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.ArrayList;
@@ -61,8 +60,6 @@ public class WikiGui extends BorealGUI {
         }
 
         lore.add(" ");
-        lore.add(CookingConfig.cookLine);
-        lore.add(CookingConfig.cookLineShift);
 
         // Create a new list to store parsed lore
         List<Component> parsedLore = new ArrayList<>();

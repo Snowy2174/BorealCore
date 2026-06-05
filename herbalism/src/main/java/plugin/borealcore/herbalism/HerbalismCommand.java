@@ -4,7 +4,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import plugin.borealcore.BorealCore;
 
 import java.util.Arrays;
 
@@ -14,8 +13,8 @@ public class HerbalismCommand implements CommandExecutor {
 
     private final HerbalismModule herbalismModule;
 
-    public HerbalismCommand() {
-        this.herbalismModule = BorealCore.getHerbalismManager();
+    public HerbalismCommand(HerbalismModule herbalismModule) {
+        this.herbalismModule = herbalismModule;
     }
 
     @Override

@@ -16,5 +16,19 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>plugin.borealcore</groupId>
+            <artifactId>BorealCore</artifactId>
+            <version>1.1.9.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>plugin.borealcore</groupId>
+            <artifactId>cooking</artifactId>
+            <version>1.1.9.1</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
 </project>

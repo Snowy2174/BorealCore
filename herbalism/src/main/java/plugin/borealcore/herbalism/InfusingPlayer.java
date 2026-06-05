@@ -2,9 +2,9 @@ package plugin.borealcore.herbalism;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import plugin.borealcore.functions.cooking.configs.CookingMessage;
-import plugin.borealcore.functions.cooking.object.Difficulty;
-import plugin.borealcore.functions.cooking.object.Layout;
+import plugin.borealcore.cooking.configs.CookingMessage;
+import plugin.borealcore.cooking.object.Difficulty;
+import plugin.borealcore.cooking.object.Layout;
 import plugin.borealcore.utility.AdventureUtil;
 
 public class InfusingPlayer extends BukkitRunnable {

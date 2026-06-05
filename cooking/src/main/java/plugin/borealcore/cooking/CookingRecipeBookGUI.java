@@ -1,8 +1,5 @@
 package plugin.borealcore.cooking;
 
-import plugin.borealcore.cooking.configs.CookingConfig;
-import plugin.borealcore.cooking.configs.CookingMessage;
-import plugin.borealcore.cooking.configs.RecipeManager;
 import dev.lone.itemsadder.api.CustomFurniture;
 import dev.lone.itemsadder.api.CustomStack;
 import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
@@ -16,13 +13,14 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.module.BorealGUI;
+import plugin.borealcore.cooking.configs.CookingConfig;
+import plugin.borealcore.cooking.configs.CookingMessage;
+import plugin.borealcore.cooking.configs.RecipeManager;
 import plugin.borealcore.manager.MessageManager;
-import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
+import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.GuiUtil;
-import plugin.borealcore.utility.ItemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +33,10 @@ public class CookingRecipeBookGUI extends BorealGUI {
     private static ItemStack unknownRecipeStack;
     private final CookingModule cookingModule;
 
-    public CookingRecipeBookGUI(CustomFurniture clickedFurniture) {
+    public CookingRecipeBookGUI(CookingModule cookingModule, CustomFurniture clickedFurniture) {
         super(6, Component.text(ChatColor.WHITE + new FontImageWrapper(CookingConfig.recipeBookTextureNamespace).applyPixelsOffset(-16) + ChatColor.RESET + FontImageWrapper.applyPixelsOffsetToString(ChatColor.RESET + "Recipe Book", -190)));
 
-        this.cookingModule = BorealCore.getCookingManager();
+        this.cookingModule = cookingModule;
         this.clickedFurniture = clickedFurniture;
 
         if (unknownRecipeStack == null) {
@@ -101,8 +99,7 @@ public class CookingRecipeBookGUI extends BorealGUI {
         if (customStack == null) {
             return unknownRecipeStack;
         } else {
-            ItemStack stack = customStack.getItemStack();
-            ItemUtil.addPotionEffectLore(stack, recipe, false, RecipeManager.COOKING_RECIPES.get(recipe).getDishEffectsLore());
+            ItemStack stack = build(recipe);
             modifyLore(stack, player, recipe, hasMastery);
             return stack;
         }
@@ -150,7 +147,7 @@ public class CookingRecipeBookGUI extends BorealGUI {
             lore.add("This item does not have lore! Configure it correctly in ItemsAdder!");
         }
 
-        GuiUtil.appendMastery(lore, player, recipe, hasMastery);
+        appendMastery(lore, player, recipe, hasMastery);
 
         if (RecipeManager.COOKING_RECIPES.get(recipe).getIngredients() != null) {
             GuiUtil.appendIngredients(lore, player, RecipeManager.COOKING_RECIPES.get(recipe).getIngredients());

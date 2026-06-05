@@ -23,6 +23,12 @@
             <version>1.1.9.1</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>plugin.borealcore</groupId>
+            <artifactId>cooking</artifactId>
+            <version>1.1.9.1</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

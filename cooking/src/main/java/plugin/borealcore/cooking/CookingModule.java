@@ -1,5 +1,35 @@
 package plugin.borealcore.cooking;
 
+import dev.lone.itemsadder.api.CustomFurniture;
+import dev.lone.itemsadder.api.Events.FurnitureBreakEvent;
+import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
+import eu.decentsoftware.holograms.api.holograms.Hologram;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Rotation;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
+import plugin.borealcore.BorealCore;
+import plugin.borealcore.api.Function;
+import plugin.borealcore.api.action.Action;
+import plugin.borealcore.api.item.ItemEnricher;
+import plugin.borealcore.api.module.BorealModule;
+import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.cooking.competition.Competition;
 import plugin.borealcore.cooking.competition.placeholder.CompetitionPapi;
 import plugin.borealcore.cooking.configs.CookingConfig;
@@ -13,42 +43,16 @@ import plugin.borealcore.cooking.object.DroppedItem;
 import plugin.borealcore.cooking.object.Ingredient;
 import plugin.borealcore.cooking.object.Layout;
 import plugin.borealcore.cooking.object.Recipe;
-import dev.lone.itemsadder.api.CustomFurniture;
-import dev.lone.itemsadder.api.Events.FurnitureBreakEvent;
-import dev.lone.itemsadder.api.Events.FurnitureInteractEvent;
-import eu.decentsoftware.holograms.api.holograms.Hologram;
-import net.kyori.adventure.sound.Sound;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Rotation;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.Nullable;
-import plugin.borealcore.BorealCore;
-import plugin.borealcore.api.action.Action;
-import plugin.borealcore.api.module.BorealModule;
-import plugin.borealcore.api.module.ModuleContext;
+import plugin.borealcore.listener.SimpleListener;
 import plugin.borealcore.manager.ConfigManager;
 import plugin.borealcore.manager.GuiManager;
 import plugin.borealcore.manager.MessageManager;
-import plugin.borealcore.utility.DebugLevel;
-import plugin.borealcore.api.Function;
-import plugin.borealcore.listener.SimpleListener;
 import plugin.borealcore.utility.AdventureUtil;
+import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.GuiUtil;
 import plugin.borealcore.utility.ItemUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +61,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static plugin.borealcore.cooking.configs.CookingConfig.perfectChance;
 import static net.kyori.adventure.key.Key.key;
+import static plugin.borealcore.cooking.configs.CookingConfig.perfectChance;
 import static plugin.borealcore.utility.AdventureUtil.playerSound;
 
 public class CookingModule extends Function implements BorealModule {
@@ -104,7 +108,7 @@ public class CookingModule extends Function implements BorealModule {
         Bukkit.getPluginManager().registerEvents(this.simpleListener, BorealCore.plugin);
 
         GuiManager guiManager = BorealCore.getGuiManager();
-        guiManager.registerGui("cookingRecipeBook", () -> new CookingRecipeBookGUI(null));
+        guiManager.registerGui("cookingRecipeBook", () -> new CookingRecipeBookGUI(this, null));
     }
 
     @Override
@@ -126,6 +130,36 @@ public class CookingModule extends Function implements BorealModule {
     public void onModuleInitialize(ModuleContext context) throws Exception {
         this.context = context;
         context.registerCommand(new CookCommand(this).buildCommandNode(), "The command to manage the Cooking Module of BorealCore", List.of("cc"));
+        context.getItemEnrichmentManager().register(new ItemEnricher() {
+
+            @Override
+            public boolean handles(String itemKey) {
+                String cleanKey = itemKey.replaceAll("[\\[\\]]", "").replace(CookingConfig.perfectItemSuffix, "");
+                return RecipeManager.COOKING_RECIPES.containsKey(cleanKey);
+            }
+
+            @Override
+            public void enrich(ItemStack itemStack, String itemKey) {
+                String cleanKey = itemKey.replaceAll("[\\[\\]]", "").replace(CookingConfig.perfectItemSuffix, "");
+                boolean perfect = itemKey.contains(CookingConfig.perfectItemSuffix);
+                Recipe recipe = RecipeManager.COOKING_RECIPES.get(cleanKey);
+
+                if (recipe != null && recipe.getDishEffectsLore() != null) {
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    if (itemMeta == null) return;
+
+                    List<Component> lore = itemMeta.lore();
+                    if (lore == null) lore = new ArrayList<>();
+
+                    int insertIndex = Math.min(2, lore.size());
+                    lore.add(insertIndex, Component.text(" "));
+                    lore.addAll(insertIndex + 1, perfect ? recipe.getDishEffectsLore().get(0) : recipe.getDishEffectsLore().get(1));
+
+                    itemMeta.lore(lore);
+                    itemStack.setItemMeta(itemMeta);
+                }
+            }
+        });
 
         competitionManager = new CookingCompetitionManager();
         recipeManager = new RecipeManager();
@@ -157,7 +191,7 @@ public class CookingModule extends Function implements BorealModule {
         List<String> ingredients = recipe.getIngredients();
         if (ItemUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
             ItemUtil.removeIngredients(player.getInventory(), ingredients, amount);
-            ItemUtil.giveItem(player, recipe.getKey(), amount, true, RecipeManager.COOKING_RECIPES.get(recipe.getKey()).getDishEffectsLore());
+            ItemUtil.giveItem(player, recipe.getKey(), amount);
             playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
             AdventureUtil.playerMessage(player, MessageManager.infoPositive + CookingMessage.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
         } else {
@@ -174,7 +208,7 @@ public class CookingModule extends Function implements BorealModule {
             if (ItemUtil.handleIngredientCheck(player.getInventory(), ingredients, amount)) {
                 // Delay removal of items if furniture is not null
                 ItemUtil.removeIngredients(player.getInventory(), ingredients, amount);
-                ItemUtil.giveItem(player, String.valueOf(recipe.getCookedItems()), amount, true);
+                ItemUtil.giveItem(player, String.valueOf(recipe.getCookedItems()), amount);
                 playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "done"), 1f, 1f);
                 AdventureUtil.playerMessage(player, MessageManager.infoPositive + CookingMessage.cookingAutocooked.replace("{recipe}", recipe.getNick()) + " x" + amount);
             } else {
@@ -270,7 +304,7 @@ public class CookingModule extends Function implements BorealModule {
         }
 
         playerSound(player, Sound.Source.AMBIENT, key(ConfigManager.customNamespace, "cooking.done"), 1f, 1f);
-        ItemUtil.giveItem(player, drop, 1, true);
+        ItemUtil.giveItem(player, drop, 1);
         sendSuccessTitle(player, droppedItem.getNick());
 
         MasteryManager.incrementRecipeCount(player);
@@ -281,7 +315,7 @@ public class CookingModule extends Function implements BorealModule {
         String ingredient = ingredients.get(random.nextInt(ingredients.size()));
         String[] parts = ingredient.split(":");
         AdventureUtil.playerMessage(player, MessageManager.infoPositive + "You have used one less: " + GuiUtil.formatString(parts[0]));
-        ItemUtil.giveItem(player, parts[0], 1, false);
+        ItemUtil.giveItem(player, parts[0], 1);
     }
 
     private void handleFailureResult(Player player) {
@@ -294,7 +328,7 @@ public class CookingModule extends Function implements BorealModule {
                 CookingConfig.failureFadeStay,
                 CookingConfig.failureFadeOut
         );
-        ItemUtil.giveItem(player, CookingConfig.failureItem, 1, false);
+        ItemUtil.giveItem(player, CookingConfig.failureItem, 1);
     }
 
 
@@ -447,7 +481,7 @@ public class CookingModule extends Function implements BorealModule {
             }
         } else if (clickedFurniture.getId().equals(CookingConfig.litCookingPot)) {
             CookingPotUtil.playCookingPotFX(clickedFurniture.getEntity().getLocation());
-            new CookingRecipeBookGUI(clickedFurniture).open(player);
+            new CookingRecipeBookGUI(this, clickedFurniture).open(player);
         }
     }
 

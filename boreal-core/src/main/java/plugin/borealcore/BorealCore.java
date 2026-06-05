@@ -7,16 +7,16 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.api.module.ModuleLoadException;
+import plugin.borealcore.command.BorealCoreCommand;
 import plugin.borealcore.database.DatabaseManager;
+import plugin.borealcore.listener.GUIListener;
 import plugin.borealcore.manager.ConfigManager;
 import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.manager.GuiManager;
+import plugin.borealcore.manager.ItemEnrichmentManager;
 import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.manager.PlaceholderManager;
 import plugin.borealcore.module.loader.ModuleLoader;
-import plugin.borealcore.command.BorealCoreCommand;
-import plugin.borealcore.listener.GUIListener;
-import plugin.borealcore.utility.AdventureUtil;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -32,6 +32,7 @@ public class BorealCore extends JavaPlugin {
     private static PlaceholderManager placeholderManager;
     private static EffectManager effectManager;
     private static DatabaseManager databaseManager;
+    private static ItemEnrichmentManager itemEnrichmentManager;
     private static ModuleLoader moduleLoader;
     private static ModuleContext globalModuleContext;
 
@@ -52,8 +53,9 @@ public class BorealCore extends JavaPlugin {
         effectManager = new EffectManager();
         guiManager = new GuiManager();
         placeholderManager = new PlaceholderManager();
+        itemEnrichmentManager = new ItemEnrichmentManager();
 
-        globalModuleContext = new ModuleContext(this, databaseManager, placeholderManager);
+        globalModuleContext = new ModuleContext(this, databaseManager, placeholderManager, itemEnrichmentManager);
         moduleLoader = new ModuleLoader(globalModuleContext);
 
         try {
@@ -62,26 +64,18 @@ public class BorealCore extends JavaPlugin {
             getLogger().severe("Failed to load modules on startup: " + e.getMessage());
         }
 
-        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             if (this.globalModuleContext != null) {
                 for (ModuleContext.QueuedCommand queued : this.globalModuleContext.getRegisteredCommands()) {
-                    event.registrar().register(queued.node(), queued.description(), queued.aliases());
+                    commands.registrar().register(queued.node(), queued.description(), queued.aliases());
                     consoleMessage("Registered command from module: " + queued.node().getLiteral());
                 }
             }
-        });
-
-        reloadConfig();
-
-        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(new BorealCoreCommand().buildCommandNode(), "The main command to manage BorealCore functions and modules", List.of("bc"));
         });
-        //getCommand("cooking").setExecutor();
-        //getCommand("cooking").setTabCompleter(new CookTabCompletion());
-        //getCommand("herbalism").setExecutor(new HerbalismCommand());
-        //getCommand("herbalism").setTabCompleter(new HerbalismTabCompletion());
-        //getCommand("traps").setExecutor(new TrapsCommand());
+
         getServer().getPluginManager().registerEvents(new GUIListener(), this);
+        reloadConfig();
 
         consoleMessage("Plugin Enabled!");
     }
@@ -129,6 +123,10 @@ public class BorealCore extends JavaPlugin {
 
     public static DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    public static ItemEnrichmentManager getItemEnrichmentManager() {
+        return itemEnrichmentManager;
     }
 
     public static ModuleLoader getModuleLoader() {

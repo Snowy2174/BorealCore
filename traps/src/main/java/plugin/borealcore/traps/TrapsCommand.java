@@ -4,12 +4,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import plugin.borealcore.functions.cooking.MasteryManager;
-import plugin.borealcore.functions.cooking.RecipeDataUtil;
 import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
-
-import java.util.List;
 
 public class TrapsCommand implements CommandExecutor {
     @Override
@@ -40,14 +36,6 @@ public class TrapsCommand implements CommandExecutor {
 
     private void showStatsCommand(CommandSender sender) { //@TODO UPDATE
         if (sender instanceof Player player) {
-            List<String> unlockedRecipes = RecipeDataUtil.getUnlockedRecipes(player);
-
-            AdventureUtil.sendMessage(sender, "<gold><bold>BorealCore</bold><grey> version 1.1.4");
-            AdventureUtil.sendMessage(sender, "<grey>Created by <gold>SnowyOwl217");
-            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Cooked: " + MasteryManager.getRecipeCount(player.getName()));
-            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Unlocked: " + unlockedRecipes.size());
-            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Mastered: " + RecipeDataUtil.getMasteredRecipes(player, unlockedRecipes).size());
-            AdventureUtil.sendMessage(sender, "<gold> Total Recipes Unknown: " + RecipeDataUtil.getLockedRecipes(unlockedRecipes).size());
         }
     }
 

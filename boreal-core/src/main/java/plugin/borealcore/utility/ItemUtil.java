@@ -2,27 +2,19 @@ package plugin.borealcore.utility;
 
 
 import dev.lone.itemsadder.api.CustomStack;
-import net.kyori.adventure.text.Component;
 import net.momirealms.customfishing.api.BukkitCustomFishingPlugin;
 import net.momirealms.customfishing.api.mechanic.context.Context;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
-import plugin.borealcore.functions.cooking.configs.CookingConfig;
-import plugin.borealcore.functions.cooking.object.Recipe;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static plugin.borealcore.functions.cooking.configs.RecipeManager.COOKING_RECIPES;
 
 public class ItemUtil {
 
@@ -51,6 +43,11 @@ public class ItemUtil {
                 itemStack = new ItemStack(Material.AIR);
             }
         }
+
+        if (BorealCore.getInstance().getItemEnrichmentManager().processItem(itemStack, key)) {
+            addIdentifier(itemStack, key.replaceAll("[\\[\\]]", ""));
+        }
+
         return itemStack;
     }
 
@@ -65,13 +62,9 @@ public class ItemUtil {
         });
     }
 
-    public static void giveItem(Player player, String item, Integer amount, boolean customCookingItem) {
+    public static void giveItem(Player player, String item, Integer amount) {
         ItemStack drop = build(item);
         drop.setAmount(amount);
-        if (customCookingItem) {
-            addPotionEffectLore(drop, item, item.contains(CookingConfig.perfectItemSuffix));
-            addIdentifier(drop, item.replace("[", "").replace("]", "")); // @TODO diagnose fix later
-        }
         player.getLocation().getWorld().dropItem(player.getLocation(), drop);
     }
 
@@ -113,7 +106,7 @@ public class ItemUtil {
     }
 
     public static ItemStack buildItemAPI(String key) {
-        ItemStack itemStack = buildia(key);
+        ItemStack itemStack = build(key);
         if (itemStack == null) {
             try {
                 Material material = Material.valueOf(key.toUpperCase());
@@ -122,10 +115,6 @@ public class ItemUtil {
                 AdventureUtil.consoleMessage(DebugLevel.WARNING, "Invalid material name: " + key);
                 itemStack = new ItemStack(Material.AIR);
             }
-        }
-        if (COOKING_RECIPES.containsKey(key.toLowerCase().replace("_perfect", ""))) {
-            addPotionEffectLore(itemStack, key, key.contains(CookingConfig.perfectItemSuffix));
-            addIdentifier(itemStack, key);
         }
         return itemStack;
     }
@@ -333,29 +322,5 @@ public class ItemUtil {
             }
         }
         return roman.toString();
-    }
-
-    public static void addPotionEffectLore(ItemStack itemStack, String key, Boolean perfect) {
-        Recipe recipe = COOKING_RECIPES.get(key.replaceAll("[\\[\\]]", "").replace(CookingConfig.perfectItemSuffix, ""));
-
-        if (recipe != null && recipe.getDishEffectsLore() != null) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            if (itemMeta == null) {
-                itemMeta = Bukkit.getItemFactory().getItemMeta(itemStack.getType());
-                itemStack.setItemMeta(itemMeta);
-            }
-
-            List<Component> lore = itemMeta.lore();
-            if (lore == null) lore = new ArrayList<>();
-
-            int insertIndex = Math.min(2, lore.size());
-            lore.add(insertIndex, Component.text(" "));
-            lore.addAll(insertIndex + 1, (perfect ? recipe.getDishEffectsLore().get(0) : recipe.getDishEffectsLore().get(1)));
-
-            itemMeta.lore(lore);
-            itemStack.setItemMeta(itemMeta);
-        } else {
-            AdventureUtil.consoleMessage(DebugLevel.WARNING, "No valid recipe found for key: " + key);
-        }
     }
 }

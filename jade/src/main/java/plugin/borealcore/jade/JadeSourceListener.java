@@ -8,9 +8,9 @@ import net.momirealms.customfishing.api.event.FishingResultEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import plugin.borealcore.functions.cooking.CookResultEvent;
-import plugin.borealcore.utility.DebugLevel;
+import plugin.borealcore.cooking.CookResultEvent;
 import plugin.borealcore.utility.AdventureUtil;
+import plugin.borealcore.utility.DebugLevel;
 
 import static com.dre.brewery.api.events.brew.BrewModifyEvent.Type.SEAL;
 

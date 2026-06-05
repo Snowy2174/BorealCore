@@ -1,13 +1,10 @@
-Here is the updated BorealCore Module Development Kit reflecting the new Paper Brigadier centralized command
-registration system.
-
 # BorealCore Module Development Kit (ADK)
 
 ## Overview
 
 The BorealCore Module Development Kit allows external developers to create modular plugins that integrate seamlessly
 with the BorealCore plugin system. Modules are loaded dynamically at runtime and have full access to the core BorealCore
-database manager, configuration APIs, centralized command registration, and event system.
+database manager, configuration APIs, centralized command registration, item enrichment APIs, and event system.
 
 ## Getting Started
 
@@ -28,17 +25,16 @@ my-module/
         └── resources/
             └── module.yml
 
-
 ```
 
 ### 2. POM Configuration
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="[http://maven.apache.org/POM/4.0.0](http://maven.apache.org/POM/4.0.0)"
+         xmlns:xsi="[http://www.w3.org/2001/XMLSchema-instance](http://www.w3.org/2001/XMLSchema-instance)"
+         xsi:schemaLocation="[http://maven.apache.org/POM/4.0.0](http://maven.apache.org/POM/4.0.0) 
+         [http://maven.apache.org/xsd/maven-4.0.0.xsd](http://maven.apache.org/xsd/maven-4.0.0.xsd)">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
@@ -55,7 +51,7 @@ my-module/
     <repositories>
         <repository>
             <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <url>[https://hub.spigotmc.org/nexus/content/repositories/snapshots/](https://hub.spigotmc.org/nexus/content/repositories/snapshots/)</url>
         </repository>
     </repositories>
 
@@ -108,7 +104,6 @@ my-module/
     </build>
 </project>
 
-
 ```
 
 ### 3. Create module.yml Manifest
@@ -128,6 +123,7 @@ plugin-depends:
 module-depends:
   - jade
   - market
+
 ```
 
 **Field Descriptions:**
@@ -198,7 +194,6 @@ public class MyModule implements BorealModule, Listener {
     }
 }
 
-
 ```
 
 ### 5. Access BorealCore Resources
@@ -223,10 +218,9 @@ public void onModuleInitialize(ModuleContext context) throws Exception {
     // Get the Placeholder manager (for PAPI expansions)
     PlaceholderManager placeholderManager = context.getPlaceholderManager();
     
-    // Queue Brigadier commands for global registration
-    context.registerCommand(myCommandNode);
+    // Get the Item Enrichment Manager (for global item manipulation)
+    ItemEnrichmentManager itemManager = context.getItemEnrichmentManager();
 }
-
 
 ```
 
@@ -379,40 +373,31 @@ public void onModuleInitialize(ModuleContext context) throws Exception {
 ## 8. Inter-Module Dependencies and Load Order
 
 If your module acts as an add-on or requires API access to another BorealCore module, you must define it in the
-module-depends list in your module.yml.
+`module-depends` list in your `module.yml`.
 
 BorealCore features an intelligent Dependency Graph Resolver. When loading, it scans all modules and guarantees the
 following lifecycle safety:
 
-Strict Load Order: Modules you depend on will be fully initialized and enabled before your module's onModuleInitialize()
-or onModuleEnable() methods are called.
+* **Strict Load Order:** Modules you depend on will be fully initialized and enabled before your module's `onModuleInitialize()` or `onModuleEnable()` methods are called.
+* **Strict Unload Order:** When the server stops or modules are reloaded, BorealCore disables modules in reverse order. Your module will be safely disabled before the modules you depend on are wiped.
+* **Circular Dependency Protection:** If Module A depends on B, and B depends on A, BorealCore will safely abort loading to prevent a stack overflow crash and print an error to the console.
+* **Missing Dependency Protection:** If you depend on a module that is not installed or failed to load, your module will not attempt to start.
 
-Strict Unload Order: When the server stops or modules are reloaded, BorealCore disables modules in reverse order. Your
-module will be safely disabled before the modules you depend on are wiped.
-
-Circular Dependency Protection: If Module A depends on B, and B depends on A, BorealCore will safely abort loading to
-prevent a stack overflow crash and print an error to the console.
-
-Missing Dependency Protection: If you depend on a module that is not installed or failed to load, your module will not
-attempt to start.
-
-Accessing Another Module:
-Once your dependencies are guaranteed by module-depends, you can safely interact with them. For example, if you depend
-on a market module:
+**Accessing Another Module:**
+Once your dependencies are guaranteed by `module-depends`, you can safely interact with them. For example, if you depend on a market module:
 
 ```java
 @Override
 public void onModuleEnable() throws Exception {
-// Because we defined 'market' in module-depends, we can guarantee it exists
-// and is fully enabled at this point.
-
-    // (Assuming MarketModule provides a static getter or you retrieve it from a registry)
+    // Because we defined 'market' in module-depends, we can guarantee it exists
+    // and is fully enabled at this point.
     MarketModule market = (MarketModule) ModuleRegistry.getInstance().getModule("market");
     
     if (market != null) {
         market.registerCustomCategory("MyNewCategory");
     }
 }
+
 ```
 
 ## 9. Command Registration (Paper Brigadier)
@@ -421,13 +406,13 @@ BorealCore manages command registration centrally to prevent memory leaks and gh
 reloads. **Do not** register `LifecycleEvents.COMMANDS` listeners directly inside your modules.
 
 Instead, construct your commands using Paper's Brigadier API and pass the compiled `LiteralCommandNode` to the
-`ModuleContext` during the `onModuleInitialize` phase. BorealCore will automatically gather these nodes and register
-them to the server safely.
+`ModuleContext` during the `onModuleInitialize` phase. BorealCore will automatically gather these nodes and register them safely. You can also supply optional descriptions and aliases directly through the wrapper.
 
 ```java
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import java.util.List;
 
 // ... inside your module class ...
 
@@ -445,16 +430,66 @@ public void onModuleInitialize(ModuleContext context) throws Exception {
         .build();
 
     // 2. Queue it with the ModuleContext
+    // Option A: Just the node
     context.registerCommand(myCommandNode);
+    // Option B: Node + Description
+    context.registerCommand(myCommandNode, "A helpful description of what this does");
+    // Option C: Node + Description + Aliases
+    context.registerCommand(myCommandNode, "A helpful description", List.of("mycmd", "mc"));
     
     context.getLogger().info("Queued /mycommand for registration");
 }
 
 ```
 
-## 9. Event Listeners
+## 10. Item Enrichment API
 
-Your module can implement Bukkit's `Listener` interface to handle events:
+BorealCore features a decoupled Registry/Provider pattern for generating items via `ItemUtil`. If your module needs to apply persistent NBT data, Custom Model Data, or add special lore components to specific items whenever they are generated across the server, you should implement an `ItemEnricher`.
+
+By registering an enricher, your module natively hooks into `ItemUtil.build()` without needing to modify core utility classes.
+
+```java
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import plugin.borealcore.api.item.ItemEnricher;
+import net.kyori.adventure.text.Component;
+import java.util.ArrayList;
+import java.util.List;
+
+// ... inside your module class ...
+
+@Override
+public void onModuleEnable() throws Exception {
+    context.getItemEnrichmentManager().register(new ItemEnricher() {
+        
+        @Override
+        public boolean handles(String itemKey) {
+            // Check if your module is responsible for enriching this specific item string
+            return itemKey.startsWith("custom_module_item_");
+        }
+
+        @Override
+        public void enrich(ItemStack itemStack, String itemKey) {
+            ItemMeta meta = itemStack.getItemMeta();
+            if (meta == null) return;
+
+            List<Component> lore = meta.lore();
+            if (lore == null) lore = new ArrayList<>();
+
+            // Inject custom lore or PersistentDataContainer tags dynamically
+            lore.add(Component.text("<gray>Generated by My Module"));
+            
+            meta.lore(lore);
+            itemStack.setItemMeta(meta);
+        }
+    });
+}
+
+```
+
+## 11. Event Listeners
+
+Your module can implement Bukkit's `Listener` interface to handle standard events:
 
 ```java
 import org.bukkit.event.EventHandler;
@@ -482,7 +517,7 @@ public class MyModule implements BorealModule, Listener {
 
 ```
 
-## 10. Deployment
+## 12. Deployment
 
 ### Building Your Module
 
@@ -508,9 +543,9 @@ This creates `my-module-1.0.0.jar` in the `target/` directory.
 
 ```
 
-## 11. Error Handling
+## 13. Error Handling
 
-If your module fails to initialize, it will be skipped and logged:
+If your module fails to initialize, it will be skipped and logged safely by the core:
 
 ```text
 [SEVERE] Failed to enable module: my-module
@@ -518,39 +553,37 @@ java.lang.Exception: ...
 
 ```
 
-Always wrap code that might throw exceptions:
+Always wrap dangerous startup code that might throw exceptions:
 
 ```java
 @Override
 public void onModuleEnable() throws Exception {
     try {
-        // Your code here
+        // Your setup code here
     } catch (Exception e) {
-        context.getLogger().log(java.util.logging.Level.SEVERE, "Failed to enable", e);
-        throw e;
+        context.getLogger().log(java.util.logging.Level.SEVERE, "Failed to enable module components", e);
+        throw e; // Throwing guarantees the core knows this module failed
     }
 }
 
 ```
 
-## 12. Best Practices
+## 14. Best Practices
 
-1. **Use unique module IDs** - Follow Java package naming conventions (reverse domain notation)
-2. **Centralize commands** - Pass Brigadier nodes to `context.registerCommand()` during initialization. Do not hook into
-   server lifecycles manually.
-3. **Clean up resources** - Always cancel your module-specific `BukkitTasks` and unregister Listeners in
-   `onModuleDisable()`.
-4. **Organize configurations** - Use dedicated ConfigLoader and MessageLoader classes for clarity and maintainability.
-5. **Never hardcode config values** - Always use config classes populated from loaders.
-6. **Don't access static fields from other modules** - Use the database for communication or module context APIs.
-7. **Test with multiple BC versions** - Ensure compatibility with your minimum required version.
-8. **Use SetupModule* utilities** - Prefer `context.setupModuleDefaults()` over manual file handling to preserve user
-   edits.
+1. **Use unique module IDs** - Follow Java package naming conventions or unique plugin IDs to prevent conflicts.
+2. **Centralize commands** - Pass Brigadier nodes to `context.registerCommand()`. Do not hook into server lifecycles manually.
+3. **Use the ItemEnricher API** - Do not hardcode specific module lore checks inside generic utilities; register an enricher instead.
+4. **Clean up resources** - Always cancel your module-specific `BukkitTasks` and unregister `Listener`s in `onModuleDisable()`.
+5. **Organize configurations** - Use dedicated `ConfigLoader` and `MessageLoader` classes for clarity.
+6. **Never hardcode config values** - Always use your populated config classes.
+7. **Respect dependencies** - Don't access static fields from other modules unless you've declared them in `module-depends`.
+8. **Use SetupModule* utilities** - Prefer `context.setupModuleDefaults()` over manual file writing to preserve user edits safely.
 
-## 13. Support
+## 15. Support
 
 For issues or questions:
 
-* Check the example modules included with BorealCore (like the ConfigEditorModule)
-* Review the BorealCore source code
-* Check the module logs for error messages
+* Check the example modules included with BorealCore (like the `ConfigEditorModule`).
+* Review the BorealCore source code interfaces.
+* Just ask Snowy at the end of the day innit
+* Check the server logs during start-up for detailed dependency and injection error messages.

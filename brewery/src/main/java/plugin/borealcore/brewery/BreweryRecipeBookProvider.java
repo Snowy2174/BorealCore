@@ -8,8 +8,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import plugin.borealcore.api.module.BorealGUI;
-import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
+import plugin.borealcore.utility.DebugLevel;
 
 import java.util.List;
 
@@ -28,25 +28,6 @@ public class BreweryRecipeBookProvider extends BorealGUI {
 
         List<String> unlockedRecipes = getUnlockedBreweryRecipes(player); // @TODO re implement this to check your current permission system
         // I'll swap it for the db implemention later
-
-        for (String recipe : BreweryModule.RECIPES.keySet()) {
-            boolean hasRecipe = unlockedRecipes.contains(recipe);
-            ItemStack itemStack;
-
-            if (hasRecipe) {
-                itemStack = buildRecipeItem(recipe, player);
-            } else {
-                itemStack = buildUnknownRecipeItem(recipe);
-            }
-
-            int slot = BreweryModule.RECIPES.get(recipe).getSlot(); // @TODO: see if you want to hard code the slots or use an iterator to assign them dynamically
-            if (slot != -1) {
-                int row = (slot - 1) / 9; // Calculate the row based on the slot
-                int column = (slot - 1) % 9;  // Calculate the column based on the slot
-
-                //contents.set(row, column, ClickableItem.of(itemStack, e -> handleItemClick(e, player, recipe, hasRecipe)));
-            }
-        }
     }
 
     private ItemStack buildRecipeItem(String recipe, Player player) {

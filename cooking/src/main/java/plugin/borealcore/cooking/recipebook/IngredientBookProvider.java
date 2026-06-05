@@ -1,7 +1,5 @@
 package plugin.borealcore.cooking.recipebook;
 
-import plugin.borealcore.cooking.CookingModule;
-import plugin.borealcore.cooking.configs.CookingConfig;
 import dev.lone.itemsadder.api.CustomStack;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -11,21 +9,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import plugin.borealcore.BorealCore;
+import plugin.borealcore.cooking.CookingModule;
+import plugin.borealcore.cooking.configs.CookingConfig;
 import plugin.borealcore.utility.AdventureUtil;
-import plugin.borealcore.utility.GuiUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static plugin.borealcore.manager.GuiManager.INGREDIENTS;
+import static plugin.borealcore.cooking.recipebook.IngredientManager.INGREDIENTS;
 import static plugin.borealcore.utility.ItemUtil.build;
 
 public class IngredientBookProvider { //@TODO important, migrate this to use a BorealGUI
-    private final CookingModule cookingModule;
 
-    public IngredientBookProvider() {
-        this.cookingModule = BorealCore.getCookingManager();
+    private static CookingModule cooking;
+    public IngredientBookProvider(CookingModule cooking) {
+        this.cooking = cooking;
     }
 
     public void update(Player player) {
@@ -71,9 +69,9 @@ public class IngredientBookProvider { //@TODO important, migrate this to use a B
             lore.add("This item does not have lore! Configure it correctly in ItemsAdder!");
         }
 
-        if (INGREDIENTS.get(recipe).getIngredients() != null) {
-            GuiUtil.appendIngredients(lore, player, INGREDIENTS.get(recipe).getIngredients());
-        }
+       // if (INGREDIENTS.get(recipe).getIngredients() != null) {
+       //     GuiUtil.appendIngredients(lore, player, INGREDIENTS.get(recipe).getIngredients());
+       // }
 
         lore.add(" ");
         lore.add(CookingConfig.cookLine);
@@ -97,10 +95,10 @@ public class IngredientBookProvider { //@TODO important, migrate this to use a B
         if (clickedItem != null && clickedItem.getType() != Material.AIR) {
             if (event.isShiftClick()) {
                 // Shift click handling for cooking 15 Recipes
-                cookingModule.handleMaterialAutocooking(recipe, player, 15);
+                cooking.handleMaterialAutocooking(recipe, player, 15);
             } else if (event.isLeftClick() || event.isRightClick()) {
                 // Left-click handling logic for autocooking the recipe
-                cookingModule.handleMaterialAutocooking(recipe, player, 1);
+                cooking.handleMaterialAutocooking(recipe, player, 1);
             }
         }
         event.setCancelled(true);
