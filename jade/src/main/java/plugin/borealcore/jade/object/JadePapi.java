@@ -29,6 +29,11 @@ public class JadePapi extends PlaceholderExpansion {
     }
 
     @Override
+    public String getRequiredPlugin() {
+        return "BorealCore";
+    }
+
+    @Override
     public String onPlaceholderRequest(Player player, String identifier) {
         if (player == null) {
             return "No Player";

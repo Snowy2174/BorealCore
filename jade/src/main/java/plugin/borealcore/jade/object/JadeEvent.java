@@ -49,4 +49,10 @@ public class JadeEvent extends PlayerEvent implements Cancellable {
     public String getSource() {
         return source;
     }
+
+    public void sendDiscordMessage() {
+        if (!cancelled) {
+            // Future Jade implementation?
+        }
+    }
 }

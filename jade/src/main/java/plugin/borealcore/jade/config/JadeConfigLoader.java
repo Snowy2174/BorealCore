@@ -16,7 +16,6 @@ import java.util.Map;
 public class JadeConfigLoader {
 
     public static void load() {
-        // Define all jade config defaults in a single map
         Map<String, Object> defaults = new HashMap<>();
 
         defaults.put("mechanics.brewing-required-quality", 8);

@@ -143,19 +143,9 @@ public class BorealCore extends JavaPlugin {
     }
 
 
-    public static void reload() {
+    public static void reload() { // @TODO it's very silly to reload everything just to load the config on Enable
         ConfigManager.load();
         MessageManager.load();
-
-        moduleLoader.unloadAllModules();
-        globalModuleContext.clearCommands();
-
-        try {
-            moduleLoader.loadAllModules();
-        } catch (ModuleLoadException e) {
-            plugin.getLogger().severe("Exception encountered during reload: " + e.getMessage());
-        }
-        plugin.getServer().reloadCommandAliases();
 
         getEffectManager().unload();
         getEffectManager().load();
@@ -165,5 +155,14 @@ public class BorealCore extends JavaPlugin {
         getGuiManager().load();
         getDatabaseManager().unload();
         getDatabaseManager().load();
+
+        moduleLoader.unloadAllModules();
+        globalModuleContext.clearCommands();
+
+        try {
+            moduleLoader.loadAllModules();
+        } catch (ModuleLoadException e) {
+            plugin.getLogger().severe("Exception encountered during reload: " + e.getMessage());
+        }
     }
 }

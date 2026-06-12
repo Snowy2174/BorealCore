@@ -22,6 +22,11 @@ public class CookingPapi extends PlaceholderExpansion {
     }
 
     @Override
+    public String getRequiredPlugin() {
+        return "BorealCore";
+    }
+
+    @Override
     public boolean persist() {
         return true;
     }

@@ -14,15 +14,15 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.api.Function;
 import plugin.borealcore.api.module.BorealModule;
 import plugin.borealcore.api.module.ModuleContext;
-import plugin.borealcore.utility.DebugLevel;
-import plugin.borealcore.api.Function;
 import plugin.borealcore.listener.SimpleListener;
-import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.traps.listener.TownyListener;
 import plugin.borealcore.traps.object.Trap;
 import plugin.borealcore.traps.object.TrapInventory;
+import plugin.borealcore.utility.AdventureUtil;
+import plugin.borealcore.utility.DebugLevel;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -150,7 +150,7 @@ public class TrapsModule extends Function implements BorealModule {
 
     @Override
     public void onModuleInitialize(ModuleContext context) throws Exception {
-        Connection conn = context.getDatabaseManager().getConnection("plugin/borealcore/traps");
+        Connection conn = context.getDatabaseManager().getConnection("traps");
         if (conn == null) {
             return;
         }

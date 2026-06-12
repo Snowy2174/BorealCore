@@ -578,6 +578,8 @@ public void onModuleEnable() throws Exception {
 6. **Never hardcode config values** - Always use your populated config classes.
 7. **Respect dependencies** - Don't access static fields from other modules unless you've declared them in `module-depends`.
 8. **Use SetupModule* utilities** - Prefer `context.setupModuleDefaults()` over manual file writing to preserve user edits safely.
+9. **Handle exceptions gracefully** - Always catch and log exceptions during startup to prevent entire server crashes.
+10. **Use placeholder getRequiredPlugin()** - Implement the `getRequiredPlugin()` method to specify the required plugin dependency as BorealCore for placeholder addons!
 
 ## 15. Support
 
