@@ -16,6 +16,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 import plugin.borealcore.api.Function;
+import plugin.borealcore.api.module.BorealModule;
+import plugin.borealcore.api.module.ModuleContext;
 import plugin.borealcore.cooking.configs.CookingConfig;
 import plugin.borealcore.cooking.configs.LayoutManager;
 import plugin.borealcore.cooking.object.Difficulty;
@@ -42,7 +44,7 @@ import static net.kyori.adventure.key.Key.key;
 import static plugin.borealcore.herbalism.configs.HerbManager.HERBS;
 import static plugin.borealcore.herbalism.objects.ModifierType.*;
 
-public class HerbalismModule extends Function {
+public class HerbalismModule extends Function implements BorealModule {
 
     private final Random random;
     private final HashMap<Player, Infusion> currentInfusions;
@@ -448,5 +450,20 @@ public class HerbalismModule extends Function {
             }
         }
         return effects;
+    }
+
+    @Override
+    public void onModuleEnable() throws Exception {
+
+    }
+
+    @Override
+    public void onModuleDisable() throws Exception {
+
+    }
+
+    @Override
+    public void onModuleInitialize(ModuleContext context) throws Exception {
+
     }
 }

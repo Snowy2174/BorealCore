@@ -25,6 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.action.PotionEffectImpl;
 import plugin.borealcore.api.Function;
 import plugin.borealcore.api.action.Action;
 import plugin.borealcore.api.item.ItemEnricher;
@@ -45,6 +46,7 @@ import plugin.borealcore.cooking.object.Layout;
 import plugin.borealcore.cooking.object.Recipe;
 import plugin.borealcore.listener.SimpleListener;
 import plugin.borealcore.manager.ConfigManager;
+import plugin.borealcore.manager.EffectManager;
 import plugin.borealcore.manager.GuiManager;
 import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
@@ -96,9 +98,10 @@ public class CookingModule extends Function implements BorealModule {
     public void onModuleEnable() throws Exception {
         CookingConfigLoader.load();
         CookingMessageLoader.load();
+
         competitionManager.load();
-        recipeManager.load();
         layoutManager.load();
+        recipeManager.load();
         masteryManager.load();
 
         this.cookingPlaceholders = new CookingPapi();
@@ -129,6 +132,18 @@ public class CookingModule extends Function implements BorealModule {
     @Override
     public void onModuleInitialize(ModuleContext context) throws Exception {
         this.context = context;
+
+        EffectManager.registerAction("dish-buff", PotionEffectImpl.class,
+                (sec, key, nick, perfect) -> {
+                    String actionKey = sec.getString(key);
+                    if (perfect) actionKey += CookingConfig.perfectItemSuffix;
+                    List<PotionEffect> effects = EffectManager.EFFECTS.get(actionKey);
+                    return effects != null ? new PotionEffectImpl(effects.toArray(new PotionEffect[0])) : null;
+                },
+                null
+        );
+        EffectManager.loadEffects("recipes/buffs");
+
         context.registerCommand(new CookCommand(this).buildCommandNode(), "The command to manage the Cooking Module of BorealCore", List.of("cc"));
         context.getItemEnrichmentManager().register(new ItemEnricher() {
 

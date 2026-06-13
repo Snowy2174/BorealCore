@@ -1,11 +1,15 @@
 package plugin.borealcore.jade.object;
 
+import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import plugin.borealcore.jade.config.JadeMessage;
 
 public class JadeEvent extends PlayerEvent implements Cancellable {
 
@@ -19,6 +23,7 @@ public class JadeEvent extends PlayerEvent implements Cancellable {
         this.cancelled = false;
         this.amount = amount;
         this.source = source;
+        sendDiscordMessage();
     }
 
     public static HandlerList getHandlerList() {
@@ -52,7 +57,22 @@ public class JadeEvent extends PlayerEvent implements Cancellable {
 
     public void sendDiscordMessage() {
         if (!cancelled) {
-            // Future Jade implementation?
+            String playerName = getPlayer().getName();
+            String source = getSource() != null && !getSource().isEmpty() ? getSource() : "playing";
+            String authorName = JadeMessage.jadeBroadcast
+                    .replace("{player}", playerName)
+                    .replace("{amount}", String.valueOf((int) getAmount()))
+                    .replace("{source}", source);
+            String avatarUrl = "https://cravatar.eu/avatar/" + playerName + "/64.png";
+
+            EmbedBuilder embed = new EmbedBuilder()
+                    .setAuthor(authorName, null, avatarUrl)
+                    .setColor(0x00FF00);
+
+            TextChannel textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName("general");
+            if (textChannel != null) {
+                textChannel.sendMessageEmbeds(embed.build()).queue();
+            }
         }
     }
 }

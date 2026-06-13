@@ -9,8 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
+import plugin.borealcore.utility.DebugLevel;
 
 import java.util.List;
 
@@ -35,7 +35,6 @@ public class MatchRunnable extends BukkitRunnable {
 
     @Override
     public void run() {
-        AdventureUtil.consoleMessage(DebugLevel.DEBUG, "HERE1");
         List<Spectator> spectators = getSpectators(spectateManager);
         for (Spectator spectator : spectators) {
             Player player = spectator.getPlayer();

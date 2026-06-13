@@ -24,8 +24,13 @@ public class AdventureUtil {
     }
 
     public static void sendMessage(CommandSender sender, String s) {
-        if (sender instanceof Player player) playerMessage(player, s);
-        else consoleMessage(s);
+        if (sender instanceof Player player) {
+            playerMessage(player, s);
+            return;
+        }
+        MiniMessage mm = MiniMessage.miniMessage();
+        Component parsed = mm.deserialize(MessageManager.prefix + replaceLegacy(s));
+        sender.sendMessage(parsed);
     }
 
     public static void consoleMessage(String s) {
@@ -42,7 +47,7 @@ public class AdventureUtil {
         Component parsed = mm.deserialize(MessageManager.prefix + "[ " + debug.toString() + " ] " + replaceLegacy(s));
         au.sendMessage(parsed);
         if (debug == DebugLevel.ERROR) { // Send error messages to Discord, and ping snowy
-            DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName("\uD83E\uDE9B｜plugin-stuff").sendMessage("<@701490040273895445>" + s);
+            DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName("developer-logs").sendMessage("<@701490040273895445>" + s);
         }
     }
 

@@ -21,9 +21,9 @@ import plugin.borealcore.jade.object.Leaderboard;
 import plugin.borealcore.jade.object.LeaderboardEntry;
 import plugin.borealcore.jade.object.LeaderboardType;
 import plugin.borealcore.manager.MessageManager;
-import plugin.borealcore.utility.DebugLevel;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.CommandUtil;
+import plugin.borealcore.utility.DebugLevel;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -39,9 +39,6 @@ public class JadeCommand {
         this.database = JadeModule.getDatabase();
     }
 
-    /**
-     * Builds the Brigadier command tree with subcommands, aliases, and redirects.
-     */
     public LiteralCommandNode<CommandSourceStack> buildCommandNode() {
 
         // Node: /jade leaderboard
@@ -181,6 +178,11 @@ public class JadeCommand {
         return builder.buildFuture();
     }
 
+    private void sendAdminMessage(CommandSender sender, String message, boolean positive) {
+        String prefix = positive ? MessageManager.infoPositive : MessageManager.infoNegative;
+        AdventureUtil.sendMessage(sender, prefix + message);
+    }
+
     // Execution Handlers
 
     private int handleAnnouncementPreferenceCommand(CommandContext<CommandSourceStack> ctx, String type) {
@@ -288,12 +290,12 @@ public class JadeCommand {
         Player player = Bukkit.getPlayer(playerName);
 
         if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            sendAdminMessage(sender, MessageManager.playerNotExist, false);
             return Command.SINGLE_SUCCESS;
         }
 
         JadeModule.giveJadeCommand(player, source, amount);
-        AdventureUtil.sendMessage(sender, "Gave " + amount + " from " + (source.isEmpty() ? "unknown" : source) + " to " + player.getName());
+        sendAdminMessage(sender, "Gave " + amount + " from " + (source.isEmpty() ? "unknown" : source) + " to " + player.getName(), true);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -302,12 +304,12 @@ public class JadeCommand {
         Player player = Bukkit.getPlayer(playerName);
 
         if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            sendAdminMessage(sender, MessageManager.playerNotExist, false);
             return Command.SINGLE_SUCCESS;
         }
 
         JadeModule.remove(player, amount, source);
-        AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Removed " + amount + " from " + (source.isEmpty() ? "unknown" : source) + " from " + player.getName());
+        sendAdminMessage(sender, "Removed " + amount + " from " + (source.isEmpty() ? "unknown" : source) + " from " + player.getName(), true);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -316,17 +318,20 @@ public class JadeCommand {
         Player player = Bukkit.getPlayer(playerName);
 
         if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            sendAdminMessage(sender, MessageManager.playerNotExist, false);
             return Command.SINGLE_SUCCESS;
         }
 
         JadeModule.setBalance(player, amount, source);
 
+        String message;
         if ("reset".equalsIgnoreCase(source)) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Reset balance for " + player.getName() + " to 0");
+            message = "Reset balance for " + player.getName() + " to 0";
         } else {
-            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Set balance of " + player.getName() + " to " + amount + (source.isEmpty() ? "" : " (" + source + ")"));
+            message = "Set balance of " + player.getName() + " to " + amount + (source.isEmpty() ? "" : " (" + source + ")");
         }
+
+        sendAdminMessage(sender, message, true);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -335,12 +340,12 @@ public class JadeCommand {
         Player player = Bukkit.getPlayer(playerName);
 
         if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            sendAdminMessage(sender, MessageManager.playerNotExist, false);
             return Command.SINGLE_SUCCESS;
         }
 
         database.getJadeForPlayerAsync(player, jade -> {
-            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);
+            sendAdminMessage(sender, "Total jade for " + player.getName() + ": " + jade, true);
         });
         return Command.SINGLE_SUCCESS;
     }
@@ -348,7 +353,7 @@ public class JadeCommand {
     private int handleTotalJadeForSourceCommand(CommandContext<CommandSourceStack> ctx, String source) {
         CommandSender sender = ctx.getSource().getSender();
         int totalJade = database.getTotalJadeFromSource(source);
-        AdventureUtil.sendMessage(sender, "Total jade for source " + source + ": " + totalJade);
+        sendAdminMessage(sender, "Total jade for source " + source + ": " + totalJade, true);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -357,11 +362,11 @@ public class JadeCommand {
         Player player = Bukkit.getPlayer(playerName);
 
         if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            sendAdminMessage(sender, MessageManager.playerNotExist, false);
             return Command.SINGLE_SUCCESS;
         }
 
-        AdventureUtil.sendMessage(sender, "Most recent transaction for " + player.getName() + ": " + database.getRecentPositiveTransactionTimestamps(player, source));
+        sendAdminMessage(sender, "Most recent transaction for " + player.getName() + ": " + database.getRecentPositiveTransactionTimestamps(player, source), true);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -370,12 +375,12 @@ public class JadeCommand {
         Player player = Bukkit.getPlayer(playerName);
 
         if (player == null) {
-            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + MessageManager.playerNotExist);
+            sendAdminMessage(sender, MessageManager.playerNotExist, false);
             return Command.SINGLE_SUCCESS;
         }
 
         database.getJadeForPlayerAsync(player, jade -> {
-            AdventureUtil.sendMessage(sender, "Total jade for " + player.getName() + ": " + jade);
+            sendAdminMessage(sender, "Total jade for " + player.getName() + ": " + jade, true);
         });
         return Command.SINGLE_SUCCESS;
     }
@@ -383,7 +388,7 @@ public class JadeCommand {
     private int handleVerifyAndFixTotals(CommandContext<CommandSourceStack> ctx) {
         CommandSender sender = ctx.getSource().getSender();
         database.verifyAndFixTotals();
-        AdventureUtil.sendMessage(sender, "Jade totals verified and fixed");
+        sendAdminMessage(sender, "Jade totals verified and fixed", true);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -391,8 +396,7 @@ public class JadeCommand {
         CommandSender sender = ctx.getSource().getSender();
         for (Player p : Bukkit.getOnlinePlayers()) {
             reconcileJadeData(p);
-            AdventureUtil.sendMessage(sender, MessageManager.infoPositive + "Reconciled jade data for " + p.getName());
-            return Command.SINGLE_SUCCESS;
+            sendAdminMessage(sender, "Reconciled jade data for " + p.getName(), true);
         }
         return Command.SINGLE_SUCCESS;
     }
