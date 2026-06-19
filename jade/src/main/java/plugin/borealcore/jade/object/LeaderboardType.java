@@ -1,0 +1,21 @@
+package plugin.borealcore.jade.object;
+
+public enum LeaderboardType {
+    CURRENT,
+    ALLTIME,
+    FARMING,
+    FARMINGMONTHLY,
+    FARMINGWEEKLY,
+    COOKING,
+    COOKINGMONTHLY,
+    COOKINGWEEKLY,
+    BREWING,
+    BREWINGMONTHLY,
+    BREWINGWEEKLY,
+    FISHING,
+    FISHINGMONTHLY,
+    FISHINGWEEKLY,
+    SPENT,
+    SPENTMONTHLY,
+    SPENTWEEKLY
+}

@@ -1,6 +1,7 @@
 # CustomCooking
 
-CustomCooking is a Paper plugin developed for BMC. It enhances gameplay by introducing custom cooking mechanics, handling of jade currency management, and leaderboard systems.
+CustomCooking is a Paper plugin developed for BMC. It enhances gameplay by introducing custom cooking mechanics,
+handling of jade currency management, and leaderboard systems.
 
 ## Features
 

@@ -1,1 +1,2 @@
-Use AdventureUtil.consoleMessage(DebugLevel.DEBUG, "This is a debug message from AdventureUtil"); for all debug messages in the codebase.
+Use AdventureUtil.consoleMessage(DebugLevel.DEBUG, "This is a debug message from AdventureUtil"); for all debug messages
+in the codebase.

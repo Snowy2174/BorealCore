@@ -1,0 +1,9 @@
+id: plushies
+name: Plushies
+version: 1.0.0
+author: SnowyOwl217
+main: plugin.borealcore.plushies.PlushieModule
+minimum-borealcore-version: 1.1.9.1
+module-depends:
+  - cooking
+

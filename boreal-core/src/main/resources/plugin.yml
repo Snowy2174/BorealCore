@@ -1,0 +1,61 @@
+name: BorealCore
+version: '${project.version}'
+main: plugin.borealcore.BorealCore
+author: [ SnowyOwl217 ]
+api-version: 1.21.11
+depend:
+  - ProtocolLib
+  - PlaceholderAPI
+  - NBTAPI
+  - ItemsAdder
+  - CustomCrops
+  - CustomFishing
+softdepend:
+  - AdvancedEnchantments
+  - DecentHolograms
+  - DiscordSRV
+  - Duels
+  - Towny
+
+commands:
+  herbalism:
+    description: The command to manage CustomHerbalism
+  jade:
+    description: The command to manage Jade
+  kn:
+    description: The command to manage Nodes
+  wiki:
+    description: The command to manage the Wiki
+  plushies:
+    description: The command to manage the Gamble feature
+  recipes:
+    description: The command to manage Recipes
+  traps:
+    description: The command to manage Traps
+  market:
+    description: The command to manage the Market
+    aliases: [ bazaar, shop ]
+  sit:
+    description: Sit
+    usage: /<command>
+    permission: borealcore.Sit
+  configeditor:
+    description: Open the in-game config editor for a specific plugin
+    usage: /configeditor <plugin> | /configeditor browse <plugin> | /configeditor reload <plugin>
+    aliases: [ confedit, editconfig ]
+    permission: borealcore.configeditor
+  titles:
+    description: Manage your titles, prefixes, and suffixes
+    usage: /titles [prefix|suffix]
+    aliases: [ title ]
+
+permissions:
+  customcooking.*:
+    default: false
+  customcooking.admin:
+    default: op
+  borealcore.*:
+    default: false
+    children:
+      borealcore.Sit: false
+      borealcore.SitClick: true

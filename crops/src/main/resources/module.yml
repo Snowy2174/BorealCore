@@ -1,0 +1,7 @@
+id: crops
+name: Crops Addons
+version: 1.0.0
+author: SnowyOwl217
+main: plugin.borealcore.crops.CropsModule
+minimum-borealcore-version: 1.1.9.1
+

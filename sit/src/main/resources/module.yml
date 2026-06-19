@@ -1,0 +1,7 @@
+id: sit
+name: Player Sit
+version: 1.0.0
+author: SnowyOwl217
+main: plugin.borealcore.sit.SitModule
+minimum-borealcore-version: 1.1.9.1
+

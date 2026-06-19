@@ -5,10 +5,26 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>plugin.borealcore</groupId>
-    <artifactId>BorealCore</artifactId>
+    <artifactId>BorealCore-Parent</artifactId>
     <version>1.1.9.1</version>
-    <packaging>jar</packaging>
-    <name>BorealCore</name>
+    <packaging>pom</packaging>
+    <name>BorealCore-Parent</name>
+    <modules>
+        <module>boreal-core</module>
+        <module>config-editor</module>
+        <module>bending</module>
+        <module>brewery</module>
+        <module>crops</module>
+        <module>market</module>
+        <module>karmic-node</module>
+        <module>sit</module>
+        <module>wiki</module>
+        <module>plushies</module>
+        <module>jade</module>
+        <module>cooking</module>
+        <module>traps</module>
+        <module>herbalism</module>
+    </modules>
 
     <properties>
         <java.version>21</java.version>
@@ -16,47 +32,51 @@
     </properties>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.4.1</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>shade</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${maven.multiModuleProjectDirectory}/target</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.3.0</version>
+                    <configuration>
+                        <outputDirectory>${maven.multiModuleProjectDirectory}/target</outputDirectory>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <source>21</source>
+                        <target>21</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <artifactSet>
-                                <includes>
-                                    <include>net.kyori:*</include>
-                                    <include>fr.minuskube.inv:*</include>
-                                </includes>
-                            </artifactSet>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <release>17</release>
-                    <source>21</source>
-                    <target>21</target>
-                </configuration>
             </plugin>
         </plugins>
-
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-
     </build>
 
     <repositories>
@@ -141,11 +161,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>fr.minuskube.inv</groupId>
-            <artifactId>smart-invs</artifactId>
-            <version>1.2.7</version>
-        </dependency>
-        <dependency>
             <groupId>de.tr7zw</groupId>
             <artifactId>item-nbt-api-plugin</artifactId>
             <version>2.15.5</version>
@@ -193,22 +208,22 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.ProjectKorra</groupId>
-            <artifactId>ProjectKorra</artifactId>
-            <version>v1.12.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.dumbo-the-developer.Duels</groupId>
-            <artifactId>duels-api</artifactId>
-            <version>3.9</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.palmergames.bukkit.towny</groupId>
             <artifactId>towny</artifactId>
             <version>0.101.1.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.1.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.46.0.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

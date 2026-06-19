@@ -1,0 +1,7 @@
+id: jade
+name: Jade
+version: 1.0.1
+author: SnowyOwl217
+main: plugin.borealcore.jade.JadeModule
+minimum-borealcore-version: 1.1.9.1
+
