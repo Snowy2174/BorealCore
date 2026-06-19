@@ -17,11 +17,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import plugin.borealcore.BorealCore;
+import plugin.borealcore.utility.ItemUtil;
 
 import java.util.List;
 import java.util.Optional;
-
-import static plugin.borealcore.utility.ItemUtil.buildia;
 
 public class PotInventory implements InventoryHolder {
 
@@ -65,7 +64,7 @@ public class PotInventory implements InventoryHolder {
     }
 
     public ItemStack generateItem() {
-        ItemStack item = buildia("pot");
+        ItemStack item = ItemUtil.build("pot");
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
         int maxFertilizers = potBlock != null ? potBlock.config(customCropsBlockState).maxFertilizers() : 0;

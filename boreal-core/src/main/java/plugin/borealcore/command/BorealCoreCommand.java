@@ -27,7 +27,7 @@ public class BorealCoreCommand {
                 .then(Commands.literal("give")
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(CommandUtil::suggestOnlinePlayers)
-                                .then(Commands.argument("item", StringArgumentType.word())
+                                .then(Commands.argument("item", StringArgumentType.string())
                                         .executes(ctx -> handleGiveItemCommand(ctx, false))
                                         .then(Commands.argument("amount", IntegerArgumentType.integer(1))
                                                 .executes(ctx -> handleGiveItemCommand(ctx, true))
@@ -92,7 +92,12 @@ public class BorealCoreCommand {
         String itemName = StringArgumentType.getString(ctx, "item");
         int amount = hasAmount ? IntegerArgumentType.getInteger(ctx, "amount") : 1;
 
-        ItemUtil.giveItem(player, itemName, amount);
+        try {
+            ItemUtil.giveItem(player, itemName, amount);
+        } catch (IllegalArgumentException e) {
+            AdventureUtil.sendMessage(sender, MessageManager.infoNegative + e.getMessage());
+            return Command.SINGLE_SUCCESS;
+        }
         AdventureUtil.sendMessage(sender, "Gave " + amount + " " + itemName + " to " + player.getName());
 
         return Command.SINGLE_SUCCESS;

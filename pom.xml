@@ -15,7 +15,6 @@
         <module>bending</module>
         <module>brewery</module>
         <module>crops</module>
-        <module>duels</module>
         <module>market</module>
         <module>karmic-node</module>
         <module>sit</module>

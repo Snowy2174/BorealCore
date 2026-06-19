@@ -1,6 +1,5 @@
 package plugin.borealcore.utility;
 
-
 import dev.lone.itemsadder.api.CustomStack;
 import net.momirealms.customfishing.api.BukkitCustomFishingPlugin;
 import net.momirealms.customfishing.api.mechanic.context.Context;
@@ -15,15 +14,15 @@ import org.jetbrains.annotations.Nullable;
 import plugin.borealcore.BorealCore;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ItemUtil {
 
-    public ItemUtil() {
-    }
+    private ItemUtil() {}
 
     @Nullable
-    public static ItemStack buildia(String key) {
-        if (key == null) {
+    public static ItemStack buildia(@Nullable String key) {
+        if (key == null || key.isBlank()) {
             return null;
         }
         String material = key.replaceAll("[\\[\\]]", "");
@@ -31,16 +30,19 @@ public class ItemUtil {
         return customStack == null ? null : customStack.getItemStack();
     }
 
+    /**
+     * Builds an ItemStack from a key.
+     * @throws IllegalArgumentException if the key is invalid or the item cannot be built.
+     */
     @NotNull
-    public static ItemStack build(String key) {
+    public static ItemStack build(@NotNull String key) throws IllegalArgumentException {
         ItemStack itemStack = buildia(key);
         if (itemStack == null) {
             try {
                 Material material = Material.valueOf(key.toUpperCase());
                 itemStack = new ItemStack(material);
             } catch (IllegalArgumentException e) {
-                AdventureUtil.consoleMessage(DebugLevel.WARNING, "Invalid material name: " + key);
-                itemStack = new ItemStack(Material.AIR);
+                throw new IllegalArgumentException("Invalid material or ItemsAdder key: " + key, e);
             }
         }
 
@@ -51,24 +53,37 @@ public class ItemUtil {
         return itemStack;
     }
 
-    public static Double getItemValue(Player player, ItemStack itemStack) {
+    public static Double getItemValue(@NotNull Player player, @NotNull ItemStack itemStack) {
+        Objects.requireNonNull(player, "Player cannot be null");
+        Objects.requireNonNull(itemStack, "ItemStack cannot be null");
         return BukkitCustomFishingPlugin.getInstance().getMarketManager().getItemPrice(Context.player(player), itemStack);
     }
 
-    private static void addIdentifier(ItemStack itemStack, String id) {
+    private static void addIdentifier(@NotNull ItemStack itemStack, @NotNull String id) {
         NamespacedKey key = new NamespacedKey(BorealCore.getInstance(), "id");
         itemStack.editMeta(meta -> {
-            meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, id);
+            if (meta != null) {
+                meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, id);
+            }
         });
     }
 
-    public static void giveItem(Player player, String item, Integer amount) {
+    /**
+     * Drops an item at the player's location.
+     * @throws IllegalArgumentException if the item fails to build.
+     */
+    public static void giveItem(@NotNull Player player, @NotNull String item, @NotNull Integer amount) throws IllegalArgumentException {
+        Objects.requireNonNull(player, "Player cannot be null");
+
         ItemStack drop = build(item);
         drop.setAmount(amount);
-        player.getLocation().getWorld().dropItem(player.getLocation(), drop);
+
+        if (player.getLocation().getWorld() != null) {
+            player.getLocation().getWorld().dropItem(player.getLocation(), drop);
+        }
     }
 
-    private static void removeItemsPrecisely(Inventory inv, ItemStack target, int amount) {
+    private static void removeItemsPrecisely(@NotNull Inventory inv, @NotNull ItemStack target, int amount) {
         for (int i = 0; i < inv.getSize() && amount > 0; i++) {
             ItemStack item = inv.getItem(i);
             if (item == null || !item.isSimilar(target)) continue;
@@ -84,7 +99,7 @@ public class ItemUtil {
         }
     }
 
-    public static void removeItem(Inventory playerInventory, String ingredient, int amount) {
+    public static void removeItem(@NotNull Inventory playerInventory, @NotNull String ingredient, int amount) {
         if (ingredient.endsWith("*")) {
             AdventureUtil.consoleMessage(DebugLevel.DEBUG, ingredient);
             removeWildcardItem(playerInventory, ingredient, amount);
@@ -98,28 +113,25 @@ public class ItemUtil {
             clone.setAmount(amount);
             playerInventory.removeItem(clone);
         } else {
-            Material material = Material.getMaterial(ingredient);
+            Material material = Material.getMaterial(ingredient.toUpperCase());
             if (material != null) {
                 playerInventory.removeItem(new ItemStack(material, amount));
+            } else {
+                AdventureUtil.consoleMessage(DebugLevel.WARNING, "Failed to remove unknown ingredient: " + ingredient);
             }
         }
     }
 
-    public static ItemStack buildItemAPI(String key) {
-        ItemStack itemStack = build(key);
-        if (itemStack == null) {
-            try {
-                Material material = Material.valueOf(key.toUpperCase());
-                itemStack = new ItemStack(material);
-            } catch (IllegalArgumentException e) {
-                AdventureUtil.consoleMessage(DebugLevel.WARNING, "Invalid material name: " + key);
-                itemStack = new ItemStack(Material.AIR);
-            }
-        }
-        return itemStack;
+    public static @NotNull ItemStack buildItemAPI(@NotNull String key) throws IllegalArgumentException {
+        // Forwarded to build(), which already handles exception throwing safely.
+        return build(key);
     }
 
-    public static boolean handleIngredientCheck(Inventory playerInventory, List<String> ingredients, Integer instances) {
+    /**
+     * Checks if a player has the required ingredients.
+     * @throws IllegalArgumentException if ingredient amounts are not valid integers.
+     */
+    public static boolean handleIngredientCheck(@NotNull Inventory playerInventory, @Nullable List<String> ingredients, @NotNull Integer instances) throws IllegalArgumentException {
         if (ingredients == null || ingredients.isEmpty()) {
             return true;
         }
@@ -132,15 +144,19 @@ public class ItemUtil {
         return true;
     }
 
-    private static boolean handleOptions(Inventory playerInventory, String[] options, Integer instances) {
+    private static boolean handleOptions(@NotNull Inventory playerInventory, @NotNull String[] options, @NotNull Integer instances) throws IllegalArgumentException {
         for (String option : options) {
             String[] parts = option.split(":");
+
+            if (parts.length < 2) {
+                throw new IllegalArgumentException("Malformed ingredient format. Expected 'id:amount', got: " + option);
+            }
+
             int amount;
             try {
                 amount = Integer.parseInt(parts[1]) * instances;
             } catch (NumberFormatException e) {
-                AdventureUtil.consoleMessage(DebugLevel.WARNING, "Invalid ingredient amount: " + parts[1]);
-                continue;
+                throw new IllegalArgumentException("Invalid ingredient amount for '" + parts[0] + "': " + parts[1], e);
             }
 
             if (parts[0].endsWith("*")) {
@@ -158,7 +174,7 @@ public class ItemUtil {
                         return true;
                     }
                 } else {
-                    Material material = Material.getMaterial(parts[0]);
+                    Material material = Material.getMaterial(parts[0].toUpperCase());
                     if (material != null && playerInventory.containsAtLeast(new ItemStack(material), amount)) {
                         return true;
                     }
@@ -168,7 +184,7 @@ public class ItemUtil {
         return false;
     }
 
-    public static boolean tieredIngredientCheck(Inventory playerInventory, String ingredient, Integer amount) {
+    public static boolean tieredIngredientCheck(@NotNull Inventory playerInventory, @NotNull String ingredient, @NotNull Integer amount) {
         CustomStack customStack = CustomStack.getInstance(ingredient);
         if (customStack == null) {
             return false;
@@ -176,41 +192,37 @@ public class ItemUtil {
         for (int tier = 0; tier <= 2; tier++) {
             String tieredIngredient = ingredient + (tier > 0 ? "_t" + tier : "");
             CustomStack customStackTiered = CustomStack.getInstance(tieredIngredient);
-            ItemStack itemStackTiered = customStackTiered.getItemStack();
-            if (playerInventory.containsAtLeast(itemStackTiered, amount)) {
-                return true;
+            if (customStackTiered != null) {
+                ItemStack itemStackTiered = customStackTiered.getItemStack();
+                if (playerInventory.containsAtLeast(itemStackTiered, amount)) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    public static boolean fishingIngredientCheck(Inventory playerInventory, String ingredient, Integer amount) {
+    public static boolean fishingIngredientCheck(@NotNull Inventory playerInventory, @NotNull String ingredient, @NotNull Integer amount) {
         if (!ingredient.startsWith("fish")) {
-            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Ingredient does not start with 'fish': " + ingredient);
             return false;
         }
 
         int fishAmount = 0;
         for (ItemStack item : playerInventory.getContents()) {
-            if (item == null) continue;
-            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Checking item: " + item.getType() + " x" + item.getAmount());
+            if (item == null || item.getType() != Material.COD) continue;
+
             String customFishingItemID = BukkitCustomFishingPlugin.getInstance().getItemManager().getCustomFishingItemID(item);
-            if (customFishingItemID != null && item.getType() == Material.COD) {
-                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Custom fishing item found: " + customFishingItemID);
-                if (item.getAmount() >= amount) {
-                    AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Enough fish found: " + item.getAmount());
+            if (customFishingItemID != null) {
+                fishAmount += item.getAmount();
+                if (fishAmount >= amount) {
                     return true;
                 }
-                fishAmount += item.getAmount();
-            } else {
-                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "No custom fishing item found for item: " + item);
             }
         }
-        AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Total fish amount accumulated: " + fishAmount);
-        return fishAmount >= amount;
+        return false;
     }
 
-    public static void removeIngredients(Inventory playerInventory, List<String> ingredients, Integer instances) {
+    public static void removeIngredients(@NotNull Inventory playerInventory, @Nullable List<String> ingredients, @NotNull Integer instances) throws IllegalArgumentException {
         if (ingredients == null || ingredients.isEmpty()) {
             return;
         }
@@ -218,18 +230,22 @@ public class ItemUtil {
             String[] options = ingredient.split("/");
             for (String option : options) {
                 String[] parts = option.split(":");
-                String ingredientName = parts[0];
                 if (parts.length < 2) {
-                    AdventureUtil.consoleMessage(DebugLevel.WARNING, "Malformed ingredient: " + option);
-                    continue;
+                    throw new IllegalArgumentException("Malformed ingredient format during removal: " + option);
                 }
-                int amount = Integer.parseInt(parts[1]) * instances;
-                removeItem(playerInventory, ingredientName, amount);
+
+                String ingredientName = parts[0];
+                try {
+                    int amount = Integer.parseInt(parts[1]) * instances;
+                    removeItem(playerInventory, ingredientName, amount);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Invalid amount for ingredient removal: " + parts[1], e);
+                }
             }
         }
     }
 
-    public static boolean playerHasIngredient(Inventory playerInventory, String ingredient) {
+    public static boolean playerHasIngredient(@NotNull Inventory playerInventory, @NotNull String ingredient) {
         if (ingredient.endsWith("*")) {
             String base = ingredient.replace("*", "");
             if (base.startsWith("fish")) {
@@ -240,28 +256,24 @@ public class ItemUtil {
         } else {
             CustomStack customStack = CustomStack.getInstance(ingredient);
             if (customStack != null) {
-                ItemStack itemStack = customStack.getItemStack();
-                return playerInventory.containsAtLeast(itemStack, 1);
+                return playerInventory.containsAtLeast(customStack.getItemStack(), 1);
             } else {
-                Material material = Material.getMaterial(ingredient);
-                if (material != null) {
-                    return playerInventory.containsAtLeast(new ItemStack(material), 1);
-                } else {
-                    return false;
-                }
+                Material material = Material.getMaterial(ingredient.toUpperCase());
+                return material != null && playerInventory.containsAtLeast(new ItemStack(material), 1);
             }
         }
     }
 
-    static void removeWildcardItem(Inventory playerInventory, String ingredient, int amount) {
+    static void removeWildcardItem(@NotNull Inventory playerInventory, @NotNull String ingredient, int amount) {
         String baseIngredient = ingredient.replace("*", "");
         if (baseIngredient.startsWith("fish")) {
             int remaining = amount;
             for (int i = 0; i < playerInventory.getSize(); i++) {
                 ItemStack item = playerInventory.getItem(i);
-                if (item == null) continue;
+                if (item == null || item.getType() != Material.COD) continue;
+
                 String customFishingItemID = BukkitCustomFishingPlugin.getInstance().getItemManager().getCustomFishingItemID(item);
-                if (customFishingItemID != null && item.getType() == Material.COD) {
+                if (customFishingItemID != null) {
                     int itemAmount = item.getAmount();
                     if (itemAmount <= remaining) {
                         playerInventory.setItem(i, null);
@@ -294,11 +306,8 @@ public class ItemUtil {
                     removeItemsPrecisely(playerInventory, itemStackTiered, toRemove);
                     amount -= toRemove;
                 }
-            } else {
-                AdventureUtil.consoleMessage(DebugLevel.DEBUG, "CustomStack for " + tieredIngredient + " is null.");
             }
         }
-        AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Finished removing tiered or fish item: " + ingredient);
     }
 
     public static String getDuration(int durationInSeconds) {

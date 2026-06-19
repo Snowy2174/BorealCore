@@ -9,7 +9,10 @@ import plugin.borealcore.BorealCore;
 import plugin.borealcore.database.DatabaseManager;
 import plugin.borealcore.manager.ConfigManager;
 import plugin.borealcore.manager.ItemEnrichmentManager;
+import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.manager.PlaceholderManager;
+import plugin.borealcore.utility.AdventureUtil;
+import plugin.borealcore.utility.DebugLevel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -106,11 +109,11 @@ public class ModuleContext {
      */
     public void saveModuleConfig(String identifier, ConfigurationSection section) {
         if (identifier.endsWith(".yml")) {
-            if (section instanceof YamlConfiguration) {
-                ConfigManager.saveConfig((YamlConfiguration) section, identifier);
-            } else {
-                logger.warning("Attempted to save a non-YamlConfiguration to file: " + identifier);
-            }
+                if (section instanceof YamlConfiguration) {
+                    ConfigManager.saveConfig((YamlConfiguration) section, identifier);
+                } else {
+                    AdventureUtil.consoleMessage(DebugLevel.WARNING, MessageManager.nonYamlConfigSave.replace("{file}", identifier));
+                }
         } else {
             YamlConfiguration mainConfig = ConfigManager.getConfig("config.yml");
             mainConfig.set(identifier, section);

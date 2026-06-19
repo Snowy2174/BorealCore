@@ -4,18 +4,19 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import plugin.borealcore.cooking.competition.Competition;
-import plugin.borealcore.cooking.competition.CompetitionSchedule;
-import plugin.borealcore.cooking.configs.CookingMessage;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import plugin.borealcore.cooking.competition.Competition;
+import plugin.borealcore.cooking.competition.CompetitionSchedule;
+import plugin.borealcore.cooking.configs.CookingMessage;
 import plugin.borealcore.manager.GuiManager;
 import plugin.borealcore.manager.MessageManager;
 import plugin.borealcore.utility.AdventureUtil;
 import plugin.borealcore.utility.CommandUtil;
+import plugin.borealcore.utility.DebugLevel;
 
 import java.util.List;
 import java.util.Set;
@@ -31,7 +32,7 @@ public class CookCommand {
     }
 
     public LiteralCommandNode<CommandSourceStack> buildCommandNode() {
-        return Commands.literal("plugin/borealcore/cooking")
+        return Commands.literal("cooking")
                 .executes(ctx -> showStatsCommand(ctx.getSource().getSender()))
                 .requires(src -> src.getSender().hasPermission("borealcore.admin"))
 
@@ -175,8 +176,10 @@ public class CookCommand {
             RecipeDataUtil.checkAndAddRandomRecipe(player);
         } else if (recipe.equalsIgnoreCase("all")) {
             RecipeDataUtil.unlockAllRecipes(player);
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Unlocked all recipes for " + targetPlayer);
         } else if (recipe.equalsIgnoreCase("player")) {
             RecipeDataUtil.unlockStarterRecipes(player);
+            AdventureUtil.consoleMessage(DebugLevel.DEBUG, "Unlocked starter recipes for " + targetPlayer);
         } else {
             RecipeDataUtil.setRecipeStatus(player, recipe, true);
         }

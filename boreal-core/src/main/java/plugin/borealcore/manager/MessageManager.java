@@ -27,6 +27,7 @@ public class MessageManager {
     public static String TOTAL_SCORE;
     public static String CATCH_AMOUNT;
     public static String actionBarHealth;
+    public static String nonYamlConfigSave;
 
     public static void load() {
         YamlConfiguration config = ConfigManager.getConfig("messages_" + ConfigManager.lang + ".yml");
@@ -49,8 +50,8 @@ public class MessageManager {
         pluginError = getOrSet(config, "plugin-error", "<red>Please contact @Snow'eh on discord with a full report of this error");
         TOTAL_SCORE = getOrSet(config, "total_score", "Total score");
         CATCH_AMOUNT = getOrSet(config, "catch_amount", "Catch amount");
-
         actionBarHealth = getOrSet(config, "action-bar-health", "<gray>%s: <red>%d / %.0f <grey>| %s: <red>%d / %.0f");
+        nonYamlConfigSave = getOrSet(config, "non-yaml-config-save", "Attempted to save a non-YamlConfiguration to file: {file}");
 
         try {
             config.save(new File(BorealCore.getInstance().getDataFolder(), "messages_" + ConfigManager.lang + ".yml"));
